@@ -24,15 +24,6 @@ import java.time.LocalDateTime;
  * 
  */
 public class LogManager {
-	public static int LOG_MANAGER = 0;
-	public static int NETWORK_MANAGER = 1;
- 	public static int RENDER_MANAGER = 2;
- 	public static int AUDIO_MANAGER = 3;
- 	public static int INPUT_MANAGER = 4;
- 	public static int RESOURCE_MANAGER = 5;
- 	public static int PHYSICS_MANAGER = 6;
- 	public static int MODEL_MANAGER = 7;
-
  	public static int SCOPE_INFO = 0;
  	public static int SCOPE_DEBUG = 1;
  	public static int SCOPE_WARNING = 2;
@@ -126,7 +117,7 @@ public class LogManager {
 	 * @param scope The scope of the log
 	 * @param content The content of the log
 	 */
-	public void log(int source, int scope, String content){
+	public void log(String source, int scope, String content){
 		try{
 			FileWriter writer = new FileWriter(LogManager.filePath, true);
 			String line = "";
@@ -137,27 +128,8 @@ public class LogManager {
 			line += " ";
 
 			// Put source
-			switch(source){
-				case 0: line += "Log";
-						break;
-				case 1: line += "Network";
-						break;
-				case 2: line += "Render";
-						break;
-				case 3: line += "Audio";
-						break;
-				case 4: line += "Input";
-						break;
-				case 5: line += "Resource";
-						break;
-				case 6: line += "Physics";
-						break;
-				case 7: line += "Model";
-						break;
-				default: line += "UNKNOWN";
-						break;
-			}
-
+			line += source;
+			
 			// Put scope
 			line += "[";
 			switch(scope){

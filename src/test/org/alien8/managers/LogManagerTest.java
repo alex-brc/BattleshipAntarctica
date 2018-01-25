@@ -34,7 +34,7 @@ class LogManagerTest {
 	void testLog() {
 		LogManager lm = LogManager.getInstance();
 		for(int i = -1; i <= 7; i++)
-			lm.log(i, i%5, "Test log #" + i);
+			lm.log("Test_Source_"+i, i%5, "Test log #" + i);
 	}
 
 	@Test
