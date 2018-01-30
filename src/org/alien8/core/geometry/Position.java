@@ -47,4 +47,14 @@ public class Position {
 	public void setY(double y) {
 		this.y = y;
 	}
+	/**
+	 * Verifies if two positions in the XY plane are equal.
+	 * @param position the position to compare this position to
+	 * @return true if the two positions are equal, false otherwise
+	 */
+	public boolean equals(Position position) {
+		if(this.getX() == position.getX() && this.getY() == position.getY())
+			return true;
+		return false;
+	}
 }

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 /**
  *  This class implements the log manager. It is implemented
- *  as a singleton class, so it is used by requesting it's 
+ *  as a singleton class, so it is used by requesting its 
  *	instance at runtime.
  *	<p>
  *	Its purpose is to log normal and abnormal behaviour of the
@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
  *	Logs are unique per application run. The log is created on 
  *	application start and closed on application end.
  *
- * @author Alexandru Bracau
  * @version 1.0
  * 
  */
@@ -32,7 +31,7 @@ public class LogManager {
 
 	public static String filePath = "logs/";
 
-	private static LogManager instance = new LogManager();
+	private static LogManager instance = null;
 
 	private LogManager(){
 
@@ -59,7 +58,7 @@ public class LogManager {
 
 		max++;
 
-		// Parse that ID into a length 3 string
+		// Pad left with 0's to length 3
 		if(max >= 100)
 			numString = "" + max;
 		else if(max >= 10)
@@ -96,10 +95,14 @@ public class LogManager {
 
 	}
 	/**
-	 * A standard getInstance() that returns an instance of the active LogManager
+	 * A standard getInstance() in accordance with the singleton pattern
 	 * @return an instance of the active LogManager
 	 */
 	public static LogManager getInstance() {
+		// Lazy instantiation
+		if(instance == null) {
+			instance = new LogManager();
+		}
 		return instance;
 	}
 	/**
