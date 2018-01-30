@@ -12,6 +12,10 @@ public abstract class Entity {
 	private Type type;
 	private long serial = -1;
 
+	private double mass;
+	private double speed;
+	private double direction;
+
 	/**
 	 * Basic constructor for an entity
 	 * 
@@ -81,4 +85,28 @@ public abstract class Entity {
 			this.serial = serial;
 		// Else, do nothing. Only works once.
 	}
+
+  public double getMass() {
+    return mass;
+  }
+
+  public void setMass(double mass) {
+    this.mass = mass;
+  }
+
+  public double getSpeed() {
+    return speed;
+  }
+
+  public void setSpeed(double speed) {
+    this.speed = speed;
+  }
+
+  public double getDirection() {
+    return direction;
+  }
+
+  public void setDirection(double direction) {
+    this.direction = direction;
+  }
 }
