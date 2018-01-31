@@ -29,5 +29,12 @@ public class Renderer extends Canvas{
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
+	
+	/**
+	 * The render() method renders all entities to the screen in their current state
+	 */
+	public void render(){
+		
+	}
 
 }

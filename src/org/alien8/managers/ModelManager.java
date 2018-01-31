@@ -3,7 +3,6 @@ package org.alien8.managers;
 import java.util.LinkedList;
 
 import org.alien8.core.Entity;
-import org.alien8.core.Parameters;
 
 /**
  * This class implements the model at the core of the game itself. It is
@@ -13,20 +12,16 @@ import org.alien8.core.Parameters;
  * 
  * @version 1.0
  */
-public class ModelManager implements Runnable {;
+public class ModelManager{;
 	
 	/**
 	 *  Volatile "running" boolean to avoid internal caching. 
 	 *	Thread should stop when set to false.
 	 */
-	private volatile boolean running = false;
 	private int lastSerial = 0;
 	
 	private static ModelManager instance = new ModelManager();
 	private LinkedList<Entity> entities = new LinkedList<Entity>();
-	private Thread thread;
-	
-	private int FPS = 0;
 
 	private ModelManager() {
 		// All setup should be done here, such as support for networking, etc.
@@ -43,70 +38,9 @@ public class ModelManager implements Runnable {;
 	}
 
 	/**
-	 * Starts the main loop of the game.
-	 */
-	public synchronized void start() {
-		// Do nothing if the game is already running
-		if (running)
-			return;
-		running = true;
-		
-		thread = new Thread(this);
-		thread.start();
-		// Start the loop
-	}
-
-	/**
-	 * The main loop of the game. A common way to implement it. 
-	 * This implementation
-	 * basically allows the renderer to do it's job separately from the update()
-	 * method. If a certain computer tends to be slower on the render() side, then
-	 * it can perform more fixed time updates in between frames to compensate.
-	 * Faster computers wouldn't see any improvement.
-	 */
-	public void run() {
-		long lastTime = getTime();
-		long currentTime = 0;
-		double catchUp = 0;
-
-		int frameRate = 0;
-		long frameTimer = getTime();
-
-		while (running) {
-			// Process user input. Alter the game state appropriately.
-			processInput();
-			
-			currentTime = getTime();
-
-			// Get the amount of update()s the model needs to catch up
-			catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
-			// Update lastTime
-			lastTime = currentTime;
-
-			// Call update() as many times as needed to compensate before rendering
-			while (catchUp >= 1) {
-				update();
-				catchUp--;
-			}
-
-			// Call the renderer
-			render();
-			frameRate++;
-
-			// Update the FPS timer every FPS_FREQ^-1 seconds
-			if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
-				frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-				FPS = frameRate * Parameters.FPS_FREQ;
-				frameRate = 0;
-			}
-		}
-		System.out.println("stopped");
-	}
-
-	/**
 	 * The update() method updates the state of all entities
 	 */
-	private void update() {
+	public void update() {
 		// Call update for all entities
 		for(Entity ent : entities) {
 			ent.update();
@@ -114,20 +48,10 @@ public class ModelManager implements Runnable {;
 	}
 
 	/**
-	 * The render() method renders all entities to the screen in their current state
-	 */
-	private void render() {
-		// Call render for all entities
-		for(Entity ent : entities) {
-			ent.render();
-		}
-	}
-
-	/**
 	 * Might pause the game. I don't know if this works yet.
 	 */
 	public void pause() {
-		running = false;
+		
 	}
 
 	/**
@@ -140,7 +64,7 @@ public class ModelManager implements Runnable {;
 	/**
 	 * Grabs the input and alters the game state accordingly.
 	 */
-	protected void processInput() {
+	public void processInput() {
 		//TODO
 	}
 	
@@ -170,14 +94,6 @@ public class ModelManager implements Runnable {;
 		return null;
 	}
 	
-	/**
-	 * Getter for the latest FPS estimation.
-	 * 
-	 * @return
-	 */
-	public int getFPS() {
-		return FPS;
-	}
 
 	/**
 	 * Getter for the entity list.
@@ -191,17 +107,5 @@ public class ModelManager implements Runnable {;
 	 * 
 	 * @return the thread this class runs
 	 */
-	public Thread getThread() {
-		return thread;
-	}
-
-	
-	/**
-	 * Gets current time in nanoseconds from the JVM
-	 * @return current time in nanoseconds
-	 */
-	private long getTime() {
-		return System.nanoTime();
-	}
 
 }
