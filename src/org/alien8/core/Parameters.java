@@ -14,10 +14,10 @@ public class Parameters {
 	/**
 	 * How often the model calls update() on the entities. 
 	 */
-	public static final int TICKS_PER_SECOND = 60;
+	public static int TICKS_PER_SECOND = 60;
 	/**
 	 * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for simplicity.
 	 */
-	public static final int FPS_FREQ = 4;
-	public static final int N_SECOND = 1000000; 
+	public static int FPS_FREQ = 4;
+	public static int N_SECOND = 1000000; 
 }
