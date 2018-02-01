@@ -7,6 +7,7 @@ public class ClientCommandSender extends Thread {
 	
 	private InetAddress serverIP = null;
 	private DatagramSocket socket = null;
+	private boolean run = true;
 	
 	public ClientCommandSender(InetAddress serverIP, DatagramSocket socket) {
 		this.serverIP = serverIP;
@@ -14,19 +15,21 @@ public class ClientCommandSender extends Thread {
 	}
 	
 	public void run() {
-		try {
-			// TODO: code for serializing command object into command byte[]...
-			
-			
-			
-			
-			
-			byte[] buf = new byte[256];
-			DatagramPacket packet = new DatagramPacket(buf, buf.length, serverIP, 4446);
-			socket.send(packet);
-		}
-		catch (IOException e) {
-			
+		while(run) {
+			try {
+				// TODO: code for serializing command object into command byte[]...
+				
+				
+				
+				
+				
+				byte[] buf = new byte[256];
+				DatagramPacket packet = new DatagramPacket(buf, buf.length, serverIP, 4446);
+				socket.send(packet);
+			}
+			catch (IOException e) {
+				
+			}
 		}
 	}
 }

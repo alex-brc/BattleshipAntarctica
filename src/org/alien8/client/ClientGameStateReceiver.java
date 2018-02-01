@@ -7,6 +7,7 @@ public class ClientGameStateReceiver extends Thread {
 	
 	private InetAddress serverIP = null;
 	private DatagramSocket socket = null;
+	private boolean run = true;
 
 	public ClientGameStateReceiver(InetAddress serverIP, DatagramSocket socket) {
 		this.serverIP = serverIP;
@@ -14,16 +15,20 @@ public class ClientGameStateReceiver extends Thread {
 	}
 	
 	public void run() {
-		try {
-		    byte[] buf = new byte[256];
-		    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-		    socket.receive(packet);
-		    byte[] gameStateByte = packet.getData();
-		    
-		    // TODO: code for deserializing game state byte[] into game state object...
-		}
-		catch (IOException e) {
-			
+		while (run) {
+			try {
+			    byte[] buf = new byte[256];
+			    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+			    socket.receive(packet);
+			    byte[] gameStateByte = packet.getData();
+			    
+			    // TODO: deserializing game state byte[] into game state object...
+			    
+			    // TODO: update all state of entities according to the received game state object
+			}
+			catch (IOException e) {
+				
+			}
 		}
 	}
 }
