@@ -1,6 +1,6 @@
 package test.org.alien8.core.geometry;
 
-import org.alien8.core.geometry.Position;
+import org.alien8.physics.Position;
 import org.junit.jupiter.api.Test;
 
 class PositionTest {
@@ -15,6 +15,12 @@ class PositionTest {
 		p.setY(3d);
 		assert(p.getX() == 2);
 		assert(p.getY() == 3);
+		
+		Position p1 = new Position(2d,3d);
+		Position p2 = new Position(-1d,-1d);
+		
+		assert(p1.equals(p));
+		assert(!p1.equals(p2));
 	}
 
 }

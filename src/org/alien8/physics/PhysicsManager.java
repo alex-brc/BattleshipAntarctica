@@ -1,7 +1,6 @@
 package org.alien8.physics;
 
 import org.alien8.core.Entity;
-import org.alien8.core.geometry.Position;
 
 public class PhysicsManager {
   /**
