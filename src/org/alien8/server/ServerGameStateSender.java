@@ -30,12 +30,15 @@ public class ServerGameStateSender extends Thread {
 				
 				
 				byte[] buf = new byte[256];
-		        DatagramPacket packet = new DatagramPacket(message, message.length, clientIP, 4446);
+		        DatagramPacket packet = new DatagramPacket(buf, buf.length, clientIP, 4446);
 		        socket.send(packet);
 		        sleep(1000 / SNAPSHOTS_PER_SECOND);
 			}
 			catch (IOException e) {
 				System.err.println("Error on sending game state packet");
+				e.printStackTrace();
+			}
+			catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
