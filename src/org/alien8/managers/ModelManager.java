@@ -12,12 +12,8 @@ import org.alien8.core.Entity;
  * 
  * @version 1.0
  */
-public class ModelManager{;
+public class ModelManager {
 	
-	/**
-	 *  Volatile "running" boolean to avoid internal caching. 
-	 *	Thread should stop when set to false.
-	 */
 	private int lastSerial = 0;
 	
 	private static ModelManager instance = new ModelManager();
@@ -47,12 +43,6 @@ public class ModelManager{;
 		}
 	}
 
-	/**
-	 * Might pause the game. I don't know if this works yet.
-	 */
-	public void pause() {
-		
-	}
 
 	/**
 	 * Syncs the client with the server

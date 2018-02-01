@@ -1,6 +1,6 @@
 package test.org.alien8.core.geometry;
 
-import org.alien8.core.geometry.Position;
+import org.alien8.physics.Position;
 import org.junit.jupiter.api.Test;
 
 class PositionTest {

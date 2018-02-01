@@ -1,8 +1,6 @@
 package org.alien8.physics;
 /**
  * Basic position class to pack together the X and Y coordinates for an entity.
- * 
- * @author Alexandru Bracau	
  *
  */
 public class Position {

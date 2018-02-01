@@ -1,6 +1,7 @@
 package org.alien8.core;
 
-import org.alien8.core.geometry.Position;
+import org.alien8.physics.Position;
+
 /**
  * This abstract class implements the generic Entity. All things that are part
  * of the game map are instances of classes that implement Entity. Such could 
@@ -9,7 +10,6 @@ import org.alien8.core.geometry.Position;
  */
 public abstract class Entity {
 	private Position position;
-	private Type type;
 	private long serial = -1;
 
 	private double mass;
@@ -22,9 +22,8 @@ public abstract class Entity {
 	 * @param position the XY coordinates for this entity
 	 * @param id the ID of this entity. The ID determines the type of the entity
 	 */
-	public Entity(Position position, Type type) {
+	public Entity(Position position) {
 		this.setPosition(position);
-		this.setId(type);
 	}
 	/**
 	 * Basic constructor for an entity
@@ -33,9 +32,8 @@ public abstract class Entity {
 	 * @param y Y coordinate for this entity
 	 * @param id the ID of this entity. The ID determines the type of the entity
 	 */
-	public Entity(double x, double y, Type type) {
+	public Entity(double x, double y) {
 		this.setPosition(new Position(x,y));
-		this.setId(type);
 	}
 	
 	/**
@@ -63,18 +61,6 @@ public abstract class Entity {
 	public void setPosition(Position position) {
 		this.position = position;
 	}
-
-	/**
-	 * @return the id of this entity
-	 */
-	public Type getType() {
-		return type;
-	}
-	
-	private void setId(Type type) {
-		this.type = type;
-	}
-	
 	
 	public long getSerial() {
 		return serial;

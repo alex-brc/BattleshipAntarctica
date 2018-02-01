@@ -7,7 +7,10 @@ import org.alien8.managers.ModelManager;
 import org.alien8.rendering.Renderer;
 
 public class Client implements Runnable{
-	
+	/**
+	 *  Volatile "running" boolean to avoid internal caching. 
+	 *	Thread should stop when set to false.
+	 */
 	private boolean running = false;
 	private Thread thread;
 	private Renderer renderer;
@@ -108,7 +111,13 @@ public class Client implements Runnable{
 		return FPS;
 	}
 	
-	
+	/**
+	 * Might pause the game. I don't know if this works yet.
+	 */
+	public void pause() {
+		running = false;
+	}
+
 	/**
 	 * Gets current time in nanoseconds from the JVM
 	 * @return current time in nanoseconds
