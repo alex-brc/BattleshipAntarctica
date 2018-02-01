@@ -1,8 +1,7 @@
 package test.org.alien8.core;
 
 import org.alien8.core.Entity;
-import org.alien8.core.ID;
-import org.alien8.core.geometry.Position;
+import org.alien8.physics.Position;
 import org.junit.jupiter.api.Test;
 
 class EntityTest {
@@ -12,19 +11,27 @@ class EntityTest {
 		// Extend the Entity class
 		class TestClass extends Entity{
 
-			public TestClass(double x, double y, ID id) {
-				super(x, y, id);
+			public TestClass(double x, double y) {
+				super(x, y);
 			}
 			
-			public TestClass(Position position, ID id) {
-				super(position, id);
+			public TestClass(Position position) {
+				super(position);
+			}
+			
+			public void update() {
+				this.setPosition(new Position(-1d,-1d));
+			}
+			
+			public void render() {
+				
 			}
 		}
 		
-		TestClass testerA = new TestClass(0d,1d,ID.AI);
-		TestClass testerB = new TestClass(0d,1d,ID.PLAYER);
-		TestClass testerC = new TestClass(0d,1d,ID.TERRAIN);
-		TestClass testerD = new TestClass(new Position(0d,1d),ID.PROJECTILE);
+		TestClass testerA = new TestClass(0d,1d);
+		TestClass testerB = new TestClass(0d,1d);
+		TestClass testerC = new TestClass(0d,1d);
+		TestClass testerD = new TestClass(new Position(0d,1d));
 		
 		testerB.setPosition(new Position(2d,3d));
 		
@@ -35,10 +42,10 @@ class EntityTest {
 		assert(testerD.getPosition().getX() == 0d);
 		assert(testerD.getPosition().getY() == 1d);
 		
-		assert(testerA.getId() == ID.AI);
-		assert(testerB.getId() == ID.PLAYER);
-		assert(testerC.getId() == ID.TERRAIN);
-		assert(testerD.getId() == ID.PROJECTILE);	
+		testerA.update();
+		assert(testerA.getPosition().getX() == -1d);
+		assert(testerA.getPosition().getY() == -1d);
+		
 	}
 
 }
