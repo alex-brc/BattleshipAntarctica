@@ -1,6 +1,6 @@
 package org.alien8.server;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.util.*;
 import org.alien8.managers.*;
@@ -20,18 +20,23 @@ public class ServerGameStateSender extends Thread {
 	}
 	
 	public void run() {
-		// Send gameState 60 times per second
+		// Send game state snapshot 60 times per second
+		
 		while (run) {
 			try {
 				LinkedList<Entity> gameState = model.getEntities();
-				// TODO: code for serializing game state object into game state byte[]...
 				
-				
-				
-				
-				byte[] buf = new byte[256];
-		        DatagramPacket packet = new DatagramPacket(buf, buf.length, clientIP, 4446);
+				// Serialize the game state object into byte array 
+				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+				ObjectOutputStream objOut = new ObjectOutputStream(byteOut)
+				objOut.writeObject(gameState);
+				byte[] gameStateByte = byteOut.toByteArray();
+		        DatagramPacket packet = new DatagramPacket(gameStateByte, gameStateByte.length, clientIP, 4446);
+		        
+		        // Send the game state byte array to client
 		        socket.send(packet);
+		        
+		        // Thread pauses operation according to snapshot sending rate
 		        sleep(1000 / SNAPSHOTS_PER_SECOND);
 			}
 			catch (IOException e) {
@@ -42,6 +47,7 @@ public class ServerGameStateSender extends Thread {
 				e.printStackTrace();
 			}
 		}
+		
 	}
 	
 

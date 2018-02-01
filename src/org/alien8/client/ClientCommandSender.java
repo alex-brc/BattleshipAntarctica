@@ -32,4 +32,6 @@ public class ClientCommandSender extends Thread {
 			}
 		}
 	}
+	
+	public 
 }
