@@ -38,18 +38,6 @@ public abstract class Entity {
   }
 
   /**
-   * This method is called in the game loop. It must implement the behaviour of the entity on an
-   * update step (if it needs to).
-   */
-  public abstract void update();
-
-  /**
-   * This method is called in the game loop. It should use the renderer to be displayed on screen
-   * (if it is the case)
-   */
-  public abstract void render();
-
-  /**
    * @return the position in XY coordinates
    */
   public Position getPosition() {

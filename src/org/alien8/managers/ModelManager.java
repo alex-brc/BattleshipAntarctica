@@ -37,10 +37,7 @@ public class ModelManager {
 	 * The update() method updates the state of all entities
 	 */
 	public void update() {
-		// Call update for all entities
-		for(Entity ent : entities) {
-			ent.update();
-		}
+		
 	}
 
 
@@ -93,9 +90,5 @@ public class ModelManager {
 	public LinkedList<Entity> getEntities() {
 		return entities;
 	}
-	/**
-	 * 
-	 * @return the thread this class runs
-	 */
 
 }
