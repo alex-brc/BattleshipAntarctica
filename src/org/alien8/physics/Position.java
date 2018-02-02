@@ -55,4 +55,24 @@ public class Position {
 			return true;
 		return false;
 	}
+	/**
+	 * Computes the angle between the X axis and the line formed by
+	 * the point at this position and the point at the given position
+	 * @param position the second point that determines the line
+	 * @return the required angle in radians, anti-clockwise from the positive X axis, is in [0,2pi) 
+	 */
+	public double getAngleTo(Position position) {
+		return Math.atan2(						// Intentionally left out intermediary variables for speed
+				position.getX() - this.getX(),  // B(x) - A(x)  
+				position.getY() - this.getY()); // B(y) - A(y) 
+	}
+	
+	/**
+	 * Simply adds the X's and Y's of the two position to 
+	 * @param position the second point to add to this one
+	 * @return a new position resulting from the two
+	 */
+	public Position addPosition(Position position) {
+		return new Position(this.getX() + position.getX(), this.getY() + position.getY());
+	}
 }

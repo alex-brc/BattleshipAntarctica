@@ -1,15 +1,15 @@
 package org.alien8.ship;
 
-import org.alien8.core.Entity;
 import org.alien8.physics.Position;
 
 public class Turret {
-	
+	// Position will be handled by Ship class
+	private Position position;
 	// Orientation in radians
 	private double direction;
 
-	public Turret(double direction) {
-		this.direction = direction;
+	public Turret(Position position) {
+		this.position = position;
 	}
 	
 	/**
@@ -24,6 +24,20 @@ public class Turret {
 	 */
 	public void setDirection(double direction) {
 		this.direction = direction;
+	}
+
+	/**
+	 * @return the position
+	 */
+	public Position getPosition() {
+		return position;
+	}
+
+	/**
+	 * @param position the position to set
+	 */
+	public void setPosition(Position position) {
+		this.position = position;
 	}
 
 }
