@@ -15,6 +15,7 @@ public abstract class Entity {
   private double mass;
   private double speed;
   private double direction;
+  private double length;
 
   /**
    * Basic constructor for an entity
@@ -68,8 +69,9 @@ public abstract class Entity {
   }
 
   public void setSerial(long serial) {
-    if (this.serial == -1)
+    if (this.serial == -1) {
       this.serial = serial;
+    }
     // Else, do nothing. Only works once.
   }
 
@@ -95,5 +97,13 @@ public abstract class Entity {
 
   public void setDirection(double direction) {
     this.direction = direction;
+  }
+
+  public double getLength() {
+    return length;
+  }
+
+  public void setLength(double length) {
+    this.length = length;
   }
 }
