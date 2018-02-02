@@ -9,33 +9,32 @@ import org.alien8.physics.Position;
  *
  */
 public abstract class Entity {
-  private Position position;
-  private long serial = -1;
+  protected Position position;
+  protected long serial = -1;
 
-  private double mass;
-  private double speed;
-  private double direction;
+  protected double mass;
+  protected double speed;
+  protected double direction;
 
+  /**
+   * Empty constuctor. Should not be used.
+   * Here for technical purposes. 
+   */
+  protected Entity() {
+	  
+  }
   /**
    * Basic constructor for an entity
    * 
    * @param position the XY coordinates for this entity
    * @param id the ID of this entity. The ID determines the type of the entity
    */
-  public Entity(Position position) {
+  public Entity(Position position, double direction, double speed, double mass) {
     this.setPosition(position);
-  }
-
-  /**
-   * Basic constructor for an entity
-   * 
-   * @param x X coordinate for this entity
-   * @param y Y coordinate for this entity
-   * @param id the ID of this entity. The ID determines the type of the entity
-   */
-  public Entity(double x, double y) {
-    this.setPosition(new Position(x, y));
-  }
+    this.setDirection(direction);
+    this.setSpeed(speed);
+    this.setMass(mass);
+    }
 
   /**
    * @return the position in XY coordinates

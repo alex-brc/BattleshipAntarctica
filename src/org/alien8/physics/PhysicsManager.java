@@ -52,6 +52,8 @@ public class PhysicsManager {
    * @param clockwise Set to true if the rotation is clockwise, false if anti-clockwise.
    */
   public static void rotateEntity(Entity e, boolean clockwise) {
+	// TODO change to positive X-based anticlockwise angles
+	// TODO NOTE: we might need to shift these angles into [0,2pi) after a rotation 
     // This modifier can be tweaked during testing
     double modifier = 0.2;
     if (clockwise) {
@@ -62,18 +64,17 @@ public class PhysicsManager {
   }
   
   /**
-	 * Shifts the angle in radians to [0,2pi] interval.
-	 * 
-	 * @param rads the angle in radians to shit.
-	 */
-	public static double shiftAngle(double rads) {
-		while(rads < 0)
-			rads += 2*Math.PI;
-		while(rads > 2*Math.PI)
-			rads -= 2*Math.PI;
-		return rads;
-	}
-
+   * Shifts the angle in radians to [0,2pi) interval.
+   * 
+   * @param rads the angle in radians to shit.
+   */
+  public static double shiftAngle(double rads) {
+	  while(rads < 0)
+		  rads += 2*Math.PI;
+	  while(rads >= 2*Math.PI)
+		  rads -= 2*Math.PI;
+	  return rads;
+  }
 
   /**
    * Calculates the result of a collision between two Entities.
