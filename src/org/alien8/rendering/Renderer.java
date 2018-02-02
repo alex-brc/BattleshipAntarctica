@@ -5,6 +5,8 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
+import org.alien8.managers.InputManager;
+
 public class Renderer extends Canvas{
 
 	private static final long serialVersionUID = 1L;
@@ -19,6 +21,10 @@ public class Renderer extends Canvas{
 		setPreferredSize(size);
 		width = size.width;
 		height = size.height;
+		
+		addMouseListener(InputManager.getInstance());
+		addMouseMotionListener(InputManager.getInstance());
+		addKeyListener(InputManager.getInstance());
 		
 		frame = new JFrame();
 		frame.setTitle("Battleship Antarctica");
