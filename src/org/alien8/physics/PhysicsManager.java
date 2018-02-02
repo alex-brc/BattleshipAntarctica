@@ -60,6 +60,20 @@ public class PhysicsManager {
       e.setDirection(e.getDirection() - modifier * e.getSpeed());
     }
   }
+  
+  /**
+	 * Shifts the angle in radians to [0,2pi] interval.
+	 * 
+	 * @param rads the angle in radians to shit.
+	 */
+	public static double shiftAngle(double rads) {
+		while(rads < 0)
+			rads += 2*Math.PI;
+		while(rads > 2*Math.PI)
+			rads -= 2*Math.PI;
+		return rads;
+	}
+
 
   /**
    * Calculates the result of a collision between two Entities.

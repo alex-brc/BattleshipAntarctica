@@ -24,16 +24,6 @@ class ModelManagerTest {
 			super(x,y);
 		}
 
-		@Override
-		public void update() {
-			// do nothing
-			
-		}
-
-		@Override
-		public void render() {
-			// do nothing
-		}
 	}
 	
 	/**
