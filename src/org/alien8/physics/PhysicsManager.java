@@ -37,11 +37,13 @@ public class PhysicsManager {
     Position pos = e.getPosition();
     double speed = e.getSpeed();
     double direction = e.getDirection();
-    // Calculate the new x and y positions
-    double x = pos.getX() + speed * Math.cos(direction);
-    double y = pos.getY() + speed * Math.sin(direction);
+    // Calculate difference in x and y
+    double xdiff = speed * Math.cos(direction);
+    double ydiff = speed * Math.sin(direction);
     // Sets the new position
-    e.setPosition(new Position(x, y));
+    e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
+    // Update the Oriented Bounding Box
+    e.translateObb(xdiff, ydiff);
   }
 
   /**
@@ -56,10 +58,14 @@ public class PhysicsManager {
 	// TODO NOTE: we might need to shift these angles into [0,2pi) after a rotation 
     // This modifier can be tweaked during testing
     double modifier = 0.2;
+    double angle = modifier * e.getSpeed();
+    // In both of these cases, we update the direction of the Entity, but also the bounding box
     if (clockwise) {
-      e.setDirection(e.getDirection() + modifier * e.getSpeed());
+      e.setDirection(e.getDirection() + angle);
+      e.rotateObb(angle);
     } else {
-      e.setDirection(e.getDirection() - modifier * e.getSpeed());
+      e.setDirection(e.getDirection() - angle);
+      e.rotateObb(-angle);
     }
   }
   
@@ -76,13 +82,13 @@ public class PhysicsManager {
 	  return rads;
   }
 
-  /**
-   * Calculates the result of a collision between two Entities.
-   * 
-   * @param e1 The first Entity.
-   * @param e2 The second Entity.
-   */
-  public static void calculateCollision(Entity e1, Entity e2) {
-    // Still working on this
-  }
+  // /**
+  // * Calculates the result of a collision between two Entities.
+  // *
+  // * @param e1 The first Entity.
+  // * @param e2 The second Entity.
+  // */
+  // public static void calculateCollision(Entity e1, Entity e2) {
+  // // Still working on this
+  // }
 }
