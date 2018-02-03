@@ -2,33 +2,52 @@ package org.alien8.client;
 
 import java.net.*;
 import java.io.*;
+import java.util.*;
+
+import org.alien8.core.*;
 
 public class ClientGameStateReceiver extends Thread {
 	
-	private InetAddress serverIP = null;
 	private DatagramSocket socket = null;
 	private boolean run = true;
 
-	public ClientGameStateReceiver(InetAddress serverIP, DatagramSocket socket) {
-		this.serverIP = serverIP;
-		this.socket = socket;
+	public ClientGameStateReceiver(DatagramSocket ds) {
+		socket = ds;
 	}
 	
 	public void run() {
 		while (run) {
 			try {
-			    byte[] buf = new byte[256];
+			    byte[] buf = new byte[1024];
 			    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-			    socket.receive(packet);
+			    
+			    // Receive gameStateByte array from server
+			    socket.receive(packet); 
 			    byte[] gameStateByte = packet.getData();
 			    
-			    // TODO: deserializing game state byte[] into game state object...
+			    // Deserialize gameStateByte array into gameState object
+			    ByteArrayInputStream byteIn = new ByteArrayInputStream(gameStateByte);
+			    ObjectInputStream objIn = new ObjectInputStream(byteIn);
+			    LinkedList<Entity> gameState = (LinkedList<Entity>) objIn.readObject();
 			    
-			    // TODO: update all state of entities according to the received game state object
+			    // TODO: update all state of entities according to the received gameState object
+			    
+			    
+			    
+			    
+			    
+			    
 			}
-			catch (IOException e) {
-				
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+			catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
 			}
 		}
+	}
+	
+	public void end() {
+		run = false;
 	}
 }

@@ -1,6 +1,7 @@
 package org.alien8.client;
 
 import java.net.*;
+import java.io.*;
 import java.awt.Dimension;
 
 import org.alien8.core.Parameters;
@@ -17,6 +18,10 @@ public class Client implements Runnable{
 	private Renderer renderer;
 	private ModelManager model;
 	private int FPS = 0;
+	private DatagramSocket socket = null;
+	private InetAddress serverIP = null;
+	private ClientInputSampleSender ciss = null;
+	private ClientGameStateReceiver cgsr = null;
 	
 	public static void main(String[] args){
 		
@@ -127,18 +132,80 @@ public class Client implements Runnable{
 		return System.nanoTime();
 	}
 	
+	/**
+	 * Should be called when the client clicks the 'Connect' button after entering an server IP.
+	 */
 	public void connect(String serverIPStr) {
-		try {
-			DatagramSocket socket = new DatagramSocket(4446);
-			InetAddress serverIP = InetAddress.getByName(serverIPStr);
-			new ClientGameStateReceiver(serverIP, socket).start();
-			new ClientCommandSender(serverIP, socket).start();
-		}
-		catch (SocketException se) {
-			
-		}
-		catch (UnknownHostException uhe) {
-			
+		if (socket == null && serverIP == null && ciss == null && cgsr == null) {
+			try {
+				socket = new DatagramSocket(4446);
+				serverIP = InetAddress.getByName(serverIPStr);
+				
+				// Serialize a TRUE Boolean object (representing connect request) into byte array 
+				Boolean connectRequest = new Boolean(true);
+				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+				ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+				objOut.writeObject(connectRequest);
+				byte[] connectRequestByte = byteOut.toByteArray();
+				
+				DatagramPacket packet = new DatagramPacket(connectRequestByte, connectRequestByte.length, serverIP, 4446);
+				
+				// Send the connect request packet to the server
+				socket.send(packet);
+				
+				// Start a thread responsible for sending client input sample regularly
+				ciss = new ClientInputSampleSender(serverIP, socket);
+				ciss.start();
+				
+				// Start a thread for handling game state snapshot received from the server
+				cgsr = new ClientGameStateReceiver(socket);
+				cgsr.start();
+			}
+			catch (SocketException se) {
+				se.printStackTrace();
+			}
+			catch (UnknownHostException uhe) {
+				uhe.printStackTrace();
+			}
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
 	}
+	
+	/**
+	 * Should be called when the client clicks the 'Exit' button from the in-game menu.
+	 */
+	public void disconnect() {
+		if (socket != null && serverIP != null && ciss != null && cgsr != null) {
+			try {
+				// Serialize a FALSE Boolean object (representing disconnect request) into byte array 
+				Boolean disconnectRequest = new Boolean(false);
+				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+				ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+				objOut.writeObject(disconnectRequest);
+				byte[] disconnectRequestByte = byteOut.toByteArray();
+				
+				DatagramPacket packet = new DatagramPacket(disconnectRequestByte, disconnectRequestByte.length, serverIP, 4446);
+				
+				// Send the disconnect request packet to the server
+				socket.send(packet);
+				
+				// Stop all the client-side threads and socket
+				ciss.end();
+				cgsr.end();
+				socket.close();
+				
+				// Reset the socket, serverIP and client-side threads after disconnecting
+				socket = null;
+				serverIP = null;
+				ciss = null;
+				cgsr = null;
+			}
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+		}
+	}
+
 }

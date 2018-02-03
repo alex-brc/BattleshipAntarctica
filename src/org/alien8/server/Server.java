@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.alien8.client.ClientInputSample;
+
 public class Server {
 	private static DatagramSocket socket = null;
 	private static ArrayList<Player> playerList = new ArrayList<Player>();
@@ -15,10 +17,12 @@ public class Server {
 			socket = new DatagramSocket(4446);
 			
 			while (run) {
-				byte[] buf = new byte[256];
+				byte[] buf = new byte[1024];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
-				// possible packet type: (1) Connection Request (2) in-game input command (3) Quit Request
+				
+				// Receive client's input command packet
 			    socket.receive(packet);
+			    
 			    processPacket(packet);
 			}
 			
@@ -37,33 +41,103 @@ public class Server {
 	}
 	
 	public static void processPacket(DatagramPacket packet) {
-		byte[] packetByte = packet.getData();
-		InetAddress clientIP = packet.getAddress();
-		
-		// if (1) Connection Request do the following
-			if (!isClientConnected(clientIP)) {
-				playerList.add(new Player(clientIP));
-				ServerGameStateSender sgss = new ServerGameStateSender(clientIP, socket));
-				sgssList.add(sgss);
-				sgss.start();
-			}
-		
-		// if (2) in-game input command do the following
-			if (isClientConnected(clientIP)) {
-				// TODO: process input command
+		try {
+			byte[] packetByte = packet.getData();
+			ByteArrayInputStream byteIn = new ByteArrayInputStream(packetByte);
+			ObjectInputStream objIn = new ObjectInputStream(byteIn);
+			InetAddress clientIP = packet.getAddress();
+			
+			if (objIn.readObject() instanceof ClientInputSample) { // Server receive a client's input sample
+				ClientInputSample clientInputSample = (ClientInputSample) objIn.readObject();
 				
-				// TODO: update the game state according to the input command
-			}
-		
-		// if (3) Quit Request do the following
-			if (isClientConnected(clientIP)) {
-				for (int i = 0; i < playerList.size(); i++) {
-					if (playerList.get(i).getIP().equals(clientIP)) {
-						playerList.remove(playerList.get(i));
-						// TODO: Stop the ServerGameStateSender thread of the corresponding client
+				if (clientInputSample.lmbPressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
+					}
+				}
+				else if (clientInputSample.lmbPressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
+					}
+				}
+				else if (clientInputSample.rmbPressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
+					}
+				}
+				else if (clientInputSample.wPressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
+					}
+				}
+				else if (clientInputSample.aPressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
+					}
+				}
+				else if (clientInputSample.sPressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
+					}
+				}
+				else if (clientInputSample.dPressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
+					}
+				}
+				else if (clientInputSample.spacePressed) {
+					if (isClientConnected(clientIP)) {
+						// TODO: process input command
+						
+						// TODO: update the game state according to the input command
 					}
 				}
 			}
+			else if (objIn.readObject() instanceof Boolean) { // Server receive a client's network request
+				Boolean clientNetworkRequest = (Boolean) objIn.readObject();
+				
+				if (clientNetworkRequest.booleanValue()) {
+					if (!isClientConnected(clientIP)) {
+						playerList.add(new Player(clientIP));
+						ServerGameStateSender sgss = new ServerGameStateSender(clientIP, socket);
+						sgssList.add(sgss);
+						sgss.start();
+					}
+				}
+				else if ( !(clientNetworkRequest.booleanValue()) ) {
+					if (isClientConnected(clientIP)) {
+						for (int i = 0; i < playerList.size(); i++) {
+							if (playerList.get(i).getIP().equals(clientIP)) {
+								playerList.remove(playerList.get(i));
+								getSGSSThreadByIP(clientIP, sgssList).end();
+								removeSGSSThreadByIP(clientIP, sgssList);
+							}
+						}
+					}
+				}
+			}
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+			
 	}
 	
 	public static boolean isClientConnected(InetAddress clientIP) {
@@ -74,4 +148,24 @@ public class Server {
 		}
 		return false;
 	}
+	
+	public static ServerGameStateSender getSGSSThreadByIP (InetAddress clientIP, ArrayList<ServerGameStateSender> sgssList) {
+		for (int i = 0; i < sgssList.size(); i++) {
+			if (clientIP.equals(sgssList.get(i).getClientIP())) {
+				return sgssList.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public static void removeSGSSThreadByIP(InetAddress clientIP, ArrayList<ServerGameStateSender> sgssList) {
+		for (int i = 0; i < sgssList.size(); i++) {
+			if (clientIP.equals(sgssList.get(i).getClientIP())) {
+				sgssList.remove(sgssList.get(i));
+				break;
+			}
+		}
+	}
+	
+	
 }
