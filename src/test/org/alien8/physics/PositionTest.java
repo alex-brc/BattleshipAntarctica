@@ -1,4 +1,4 @@
-package test.org.alien8.core.geometry;
+package test.org.alien8.physics;
 
 import org.alien8.physics.Position;
 import org.junit.jupiter.api.Test;

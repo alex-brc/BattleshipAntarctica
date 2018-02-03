@@ -14,10 +14,21 @@ public class Parameters {
 	/**
 	 * How often the model calls update() on the entities. 
 	 */
-	public static final int TICKS_PER_SECOND = 60;
+	public static int TICKS_PER_SECOND = 60;
 	/**
 	 * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for simplicity.
 	 */
-	public static final int FPS_FREQ = 4;
-	public static final int N_SECOND = 1000000; 
+	public static int FPS_FREQ = 4;
+	public static int N_SECOND = 1000000;
+	/**
+	 * Length of the ship in units (the same units we use for the coordinate system)
+	 * Currently, this number doesn't mean much
+	 */
+	public static int SHIP_LENGTH = 100;
+	public static double SHIP_MASS = 1000;
+	public static double BIG_BULLET_MASS = 30;
+	public static double SMALL_BULLET_MASS = 10;
+	public static double BIG_BULLET_SPEED = 7;
+	public static double SMALL_BULLET_SPEED = 20;
+	
 }

@@ -3,7 +3,6 @@ package org.alien8.client;
 import java.net.*;
 import java.io.*;
 import java.awt.Dimension;
-
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
 import org.alien8.rendering.Renderer;
@@ -207,5 +206,4 @@ public class Client implements Runnable{
 			}
 		}
 	}
-
 }
