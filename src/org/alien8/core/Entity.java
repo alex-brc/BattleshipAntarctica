@@ -16,6 +16,8 @@ public abstract class Entity {
   private double speed;
   private double direction;
   private double length;
+  private double width;
+  private Position[] obb;
 
   /**
    * Basic constructor for an entity
@@ -36,6 +38,7 @@ public abstract class Entity {
    */
   public Entity(double x, double y) {
     this.setPosition(new Position(x, y));
+    initObb();
   }
 
   /**
@@ -105,5 +108,68 @@ public abstract class Entity {
 
   public void setLength(double length) {
     this.length = length;
+  }
+
+  public Position[] getObb() {
+    return obb;
+  }
+
+  /**
+   * Method to initialise the Oriented Bounding Box (OBB) of an Entity, using its Position,
+   * direction, length and width.
+   */
+  public void initObb() {
+    this.obb = new Position[4];
+    // Get center point of box
+    double centerX = position.getX();
+    double centerY = position.getY();
+    // First, calculate box as if it is facing north
+    // Corners are labelled:
+    // 0 1
+    // 3 2
+    obb[0] = new Position(centerX - width / 2, centerY + length / 2);
+    obb[1] = new Position(centerX + width / 2, centerY + length / 2);
+    obb[2] = new Position(centerX + width / 2, centerY - length / 2);
+    obb[3] = new Position(centerX - width / 2, centerY - length / 2);
+
+
+    // Now rotate box to correct orientation
+    rotateObb(direction);
+  }
+
+  /**
+   * Method to translate the Oriented Bounding Box (OBB) of an Entity by a difference in X and Y.
+   * 
+   * @param xdiff the amount to translate in the X direction
+   * @param ydiff the amount to translate in the Y direction
+   */
+  public void translateObb(double xdiff, double ydiff) {
+    for (Position corner : obb) {
+      corner = new Position(corner.getX() + xdiff, corner.getY() + ydiff);
+    }
+  }
+
+  public void rotateObb(double angle) {
+    // Get center point of box
+    double centerX = position.getX();
+    double centerY = position.getY();
+    // We perform the rotation as if it were around the origin (rather than the center of the box),
+    // then translate the corner to find its true position
+    for (Position corner : obb) {
+      // Get current corner points
+      double cornerX = corner.getX();
+      double cornerY = corner.getY();
+      // Translate corner point to origin
+      double tempX = cornerX - centerX;
+      double tempY = cornerY - centerY;
+      // Perform rotation
+      double rotatedX = tempX * Math.cos(angle) - tempY * Math.sin(angle);
+      double rotatedY = tempX * Math.sin(angle) + tempY * Math.cos(angle);
+      // Translate corner back to find true position
+      cornerX = rotatedX + centerX;
+      cornerY = rotatedY + centerY;
+      // Set corner position
+      corner = new Position(cornerX, cornerY);
+    }
   }
 }

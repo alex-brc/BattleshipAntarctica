@@ -148,10 +148,119 @@ public class CollisionDetector {
     return potentialCollisions;
   }
 
+  /**
+   * Verifies that two Entities included in a Collision are colliding. This method uses the
+   * Separating Axis Theorem to determine intersection between the Entities' Oriented Bounding Boxes
+   * (OBBs).
+   * 
+   * @param c the Collision which is being checked
+   * @return <code>true</code> if the Entities are colliding, <code>false</code> if they are not
+   */
   private boolean verifyCollision(Collision c) {
-    // use separating axis theorem
-    return false;
+    // Get the two Entities' bounding boxes
+    Position[] box1 = c.getEntity1().getObb();
+    Position[] box2 = c.getEntity2().getObb();
+    // Get the two sets of axes to test
+    AxisVector[] axes1 = getAxes(box1);
+    AxisVector[] axes2 = getAxes(box2);
+    // Check against first set of axes
+    for (AxisVector axis : axes1) {
+      // Project both boxes onto a single axis
+      Projection p1 = project(box1, axis);
+      Projection p2 = project(box2, axis);
+      // Check for overlap in the projections
+      // If no overlap is found, there must be a gap between the Entities, meaning they are not
+      // colliding so the method returns false
+      if (!overlap(p1, p2)) {
+        return false;
+      }
+    }
+    // Check against second set of axes
+    for (AxisVector axis : axes2) {
+      Projection p1 = project(box1, axis);
+      Projection p2 = project(box2, axis);
+      if (!overlap(p1, p2)) {
+        return false;
+      }
+    }
+    // Control flow reaches this point if no gap has been found between the two Entities, so they
+    // must collide
+    return true;
   }
 
+  /**
+   * Gets a set of axes to test against when given an Oriented Bounding Box (OBB).
+   * 
+   * @param box an OBB to get axes from
+   * @return a set of AxisVectors
+   */
+  private AxisVector[] getAxes(Position[] box) {
+    AxisVector[] axes = new AxisVector[box.length];
+    for (int i = 0; i < box.length; i++) {
+      Position p1 = box[i];
+      // If the i is the last corner, set the next corner to 0 to find the last edge
+      // Else, use the i+1th corner
+      Position p2 = box[i + 1 == box.length ? 0 : i + 1];
+      // Calculate the edge vector between the two points
+      AxisVector edge = new AxisVector(p1.getX() - p2.getX(), p1.getY() - p2.getY());
+      // Calculate the normal of the edge vector
+      AxisVector normal = new AxisVector(-edge.getY(), edge.getX());
+      // Since the normal is an axis we want, add it to the array
+      axes[i] = normal;
+    }
+    return axes;
+  }
+
+  /**
+   * Calculates the projection of an Oriented Bounding Box (OBB) onto an axis.
+   * 
+   * @param box the OBB being projected
+   * @param axis the axis to project onto
+   * @return the Projection of the OBB onto the axis
+   */
+  private Projection project(Position[] box, AxisVector axis) {
+    // Set up max and min values of the Projection
+    // Each value is the dot product of a corner of the box with the axis
+    double min = dotProduct(box[0], axis);
+    double max = min;
+    // Test the value from each corner against the max and min to find the max and min of the
+    // Projection
+    for (int i = 1; i < box.length; i++) {
+      double value = dotProduct(box[i], axis);
+      if (value < min) {
+        min = value;
+      } else if (value > max) {
+        max = value;
+      }
+    }
+    return new Projection(min, max);
+  }
+
+  /**
+   * Performs the dot product (scalar product) operation between a Position and AxisVector.
+   * 
+   * @param position a Position
+   * @param axis an AxisVector
+   * @return the dot product between the Position and the AxisVector
+   */
+  private double dotProduct(Position position, AxisVector axis) {
+    double dot = position.getX() * axis.getX() + position.getY() * axis.getY();
+    return dot;
+  }
+
+  /**
+   * Tests if there is an overlap between two Projections.
+   * 
+   * @param p1 the first Projection
+   * @param p2 the second Projection
+   * @return <code>true</code> if there is an overlap, <code>false</code> if there is not
+   */
+  private boolean overlap(Projection p1, Projection p2) {
+    if (p2.getMin() < p1.getMax()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
