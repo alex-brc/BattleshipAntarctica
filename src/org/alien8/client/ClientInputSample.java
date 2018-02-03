@@ -3,7 +3,7 @@ package org.alien8.client;
 import java.io.Serializable;
 
 import org.alien8.physics.Position;
-import org.alien8.Managers.InputManager;
+import org.alien8.managers.InputManager;
 
 public class ClientInputSample implements Serializable {
 	private static final long serialVersionUID = 8460850087080341787L;

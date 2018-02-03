@@ -52,58 +52,58 @@ public class Server {
 				
 				if (clientInputSample.lmbPressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
-						
+
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 				else if (clientInputSample.lmbPressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
-						
+
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 				else if (clientInputSample.rmbPressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
-						
+
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 				else if (clientInputSample.wPressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
-						
+
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 				else if (clientInputSample.aPressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
-						
+
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 				else if (clientInputSample.sPressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
 						
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 				else if (clientInputSample.dPressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
 						
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 				else if (clientInputSample.spacePressed) {
 					if (isClientConnected(clientIP)) {
-						// TODO: process input command
 						
 						// TODO: update the game state according to the input command
+						
 					}
 				}
 			}
