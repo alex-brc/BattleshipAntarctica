@@ -9,7 +9,7 @@ public class Bullet extends Entity {
 	public static final int BIG = 2;
 	
 	
-	public Bullet(Position position, double direction, int bulletType) throws Exception {
+	public Bullet(Position position, double direction, int bulletType) {
 		if(bulletType == SMALL) {
 			this.setPosition(position);
 			this.setDirection(direction);
@@ -22,9 +22,5 @@ public class Bullet extends Entity {
 			this.setSpeed(Parameters.BIG_BULLET_SPEED);
 			this.setMass(Parameters.BIG_BULLET_MASS);	
 		}
-		else
-			throw new Exception("Bullet type not \"BIG\" or \"SMALL\"");
 	}
-	
-	
 }

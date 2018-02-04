@@ -1,11 +1,21 @@
 package org.alien8.client;
 
-import java.net.*;
-import java.io.*;
 import java.awt.Dimension;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
+import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
+import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
+import org.alien8.ship.Ship;
 
 public class Client implements Runnable{
 	/**
@@ -31,6 +41,9 @@ public class Client implements Runnable{
 	public Client(){
 		renderer = new Renderer(new Dimension(800, 600));
 		model = ModelManager.getInstance();
+		Entity ship = new Ship(new Position(1,1), 0);
+		// Add the first ship to the map, this will be the player.
+		model.addEntity(ship);
 	}
 	
 	/**
@@ -76,9 +89,6 @@ public class Client implements Runnable{
 			long frameTimer = getTime();
 
 			while (running) {
-				// Process user input. Alter the game state appropriately.
-				model.processInput();
-				
 				currentTime = getTime();
 
 				// Get the amount of update()s the model needs to catch up

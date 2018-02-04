@@ -1,8 +1,11 @@
 package org.alien8.managers;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.core.Entity;
+import org.alien8.core.Parameters;
+import org.alien8.physics.PhysicsManager;
 
 /**
  * This class implements the model at the core of the game itself. It is
@@ -17,7 +20,7 @@ public class ModelManager {
 	private int lastSerial = 0;
 	
 	private static ModelManager instance = new ModelManager();
-	private LinkedList<Entity> entities = new LinkedList<Entity>();
+	private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
 
 	private ModelManager() {
 		// All setup should be done here, such as support for networking, etc.
@@ -37,7 +40,31 @@ public class ModelManager {
 	 * The update() method updates the state of all entities
 	 */
 	public void update() {
-		
+		InputManager im = InputManager.getInstance();
+		for(Entity ent : entities) {
+			if(ent.getSerial() == 1) { // Then it's the player
+				// Do movement first
+				// Apply forward OR backward force
+				if(im.wPressed())
+					PhysicsManager.applyForce(ent, Parameters.SHIP_FORWARD_FORCE, ent.getDirection());
+				else if(im.sPressed())
+					PhysicsManager.applyForce(ent, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(ent.getDirection() + Math.PI));
+				
+				// Apply rotation
+				if(im.aPressed())
+					PhysicsManager.rotateEntity(ent, false);
+				if(im.dPressed())
+					PhysicsManager.rotateEntity(ent, true);
+				
+				// Apply "friction"
+				ent.setSpeed(ent.getSpeed()*Parameters.FRICTION);
+				
+				// Update positions
+				PhysicsManager.updatePosition(ent);
+				
+			}
+			
+		}
 	}
 
 
@@ -48,13 +75,6 @@ public class ModelManager {
 		// TODO
 	}
 
-	/**
-	 * Grabs the input and alters the game state accordingly.
-	 */
-	public void processInput() {
-		//TODO
-	}
-	
 	/**
 	 * Creates a serial number for it then adds the Entity to the entity list
 	 * 
@@ -87,7 +107,7 @@ public class ModelManager {
 	 * 
 	 * @return the entity list as a LinkedList<Entity>
 	 */
-	public LinkedList<Entity> getEntities() {
+	public ConcurrentLinkedQueue<Entity> getEntities() {
 		return entities;
 	}
 

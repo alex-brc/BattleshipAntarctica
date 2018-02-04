@@ -2,6 +2,7 @@ package org.alien8.ship;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.managers.InputManager;
 import org.alien8.physics.Position;
 
 /**
@@ -26,25 +27,39 @@ public class Ship extends Entity {
 		midTurret = new Turret(position);
 		rearTurret = new Turret(position);
 		
-		setTurretsDirection(new Position(0,0), direction);
-		setTurretsPosition(position, direction);
+		setTurretsDirection(new Position(0,0));
+		setTurretsPosition();
 		
 	}
+	// TODO: cooldowns.
 	
 	@Override
 	public void setPosition(Position position) {
 		this.position = position;
 		
-		setTurretsPosition(position, this.getDirection());
+		InputManager im = InputManager.getInstance();
+		
+		setTurretsPosition();
+		setTurretsDirection(im.mousePosition());
+		
+		// Also shoot
+		if(im.lmbPressed())
+			frontTurret.shoot(1);
+		if(im.rmbPressed())
+			rearTurret.shoot(1);
+		if(im.spacePressed())
+			frontTurret.shoot(2);
+		
+		System.out.println("Player: " + position);
 	}
-	
+
 	/**
 	 * Sets the direction for all turrets for the new mouse position
 	 * considering the current ship direction for limiting the movement
 	 * of turrets
 	 * @param mousePosition the latest position of the cursor
 	 */
-	public void setTurretsDirection(Position mousePosition, double direction) {
+	public void setTurretsDirection(Position mousePosition) {
 		// For a natural look and feel, the turrets will have a 270* degrees of motion,
 		// becoming unable to shoot "through" the ship. The exception is the middle turret
 		// which is supposedly mounted above the others and can fire with 360* degrees 
@@ -88,25 +103,24 @@ public class Ship extends Entity {
 	 * Sets the position for all turrets considering the ship's position
 	 * and direction
 	 * @param shipPosition the ship's position
-	 * @param direction the ship's direction
 	 */
-	public void setTurretsPosition(Position shipPosition, double direction) {
+	public void setTurretsPosition() {
 		// The radius from the ship position to the turret position
 		// Chosen to be a fifth of the length of the ship AWAY from
 		// the tip of the ship.
 		double r = 2*0.2*Parameters.SHIP_LENGTH;
 		
 		frontTurret
-			.setPosition(shipPosition.addPosition(new Position(
-					r*Math.cos(direction),
-					r*Math.sin(direction))));
+			.setPosition(this.getPosition().addPosition(new Position(
+					r*Math.cos(this.getDirection()),
+					r*Math.sin(this.getDirection()))));
 		
 		rearTurret
-			.setPosition(shipPosition.addPosition(new Position(
-					(-r)*Math.cos(direction),
-					(-r)*Math.sin(direction))));
+			.setPosition(this.getPosition().addPosition(new Position(
+					(-r)*Math.cos(this.getDirection()),
+					(-r)*Math.sin(this.getDirection()))));
 		
-		midTurret.setPosition(shipPosition);
+		midTurret.setPosition(this.getPosition());
 	}
 	
 	public double getFrontTurretDirection() {

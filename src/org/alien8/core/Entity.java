@@ -39,7 +39,7 @@ public abstract class Entity {
     this.mass = mass;
     initObb();
   }
-
+  
   /**
    * @return the position in XY coordinates
    */
