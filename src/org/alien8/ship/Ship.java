@@ -50,7 +50,6 @@ public class Ship extends Entity {
 		if(im.spacePressed())
 			frontTurret.shoot(2);
 		
-		System.out.println("Player: " + position);
 	}
 
 	/**

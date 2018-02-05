@@ -20,6 +20,8 @@ public class Parameters {
 	 */
 	public static int FPS_FREQ = 4;
 	public static int N_SECOND = 1000000;
+	public static int MAP_HEIGHT = 512;
+	public static int MAP_WIDTH = 512;
 	/**
 	 * Length of the ship in units (the same units we use for the coordinate system)
 	 * Currently, this number doesn't mean much

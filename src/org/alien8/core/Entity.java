@@ -11,7 +11,8 @@ import org.alien8.physics.Position;
 public abstract class Entity {
   protected Position position;
   protected long serial = -1;
-
+  protected boolean toBeDeleted = false;
+  
   private double mass;
   private double speed;
   private double direction;
@@ -64,6 +65,14 @@ public abstract class Entity {
     }
     // Else, do nothing. Only works once.
   }
+  
+  public void delete() {
+	  this.toBeDeleted = true;
+  }
+  
+  public boolean isToBeDeleted() {
+	  return toBeDeleted;
+  }
 
   public double getMass() {
     return mass;
@@ -96,7 +105,15 @@ public abstract class Entity {
   public void setLength(double length) {
     this.length = length;
   }
-
+  
+  public boolean isOutOfBounds() {
+	  double x = this.getPosition().getX();
+	  double y = this.getPosition().getY();
+	  if(x > 0 && x < Parameters.MAP_WIDTH && y > 0 && y < Parameters.MAP_HEIGHT)
+		  return true;
+	  return false;
+  }
+  
   public Position[] getObb() {
     return obb;
   }

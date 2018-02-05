@@ -23,4 +23,12 @@ public class Bullet extends Entity {
 			this.setMass(Parameters.BIG_BULLET_MASS);	
 		}
 	}
+	
+	@Override
+	public void setPosition(Position position) {
+		this.position = position;
+		
+		if(this.isOutOfBounds())
+			this.delete();
+	}
 }

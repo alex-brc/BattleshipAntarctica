@@ -42,7 +42,7 @@ public class Client implements Runnable{
 		renderer = new Renderer(new Dimension(800, 600));
 		model = ModelManager.getInstance();
 		Entity ship = new Ship(new Position(1,1), 0);
-		// Add the first ship to the map, this will be the player.
+		// Add the first ship to the map, this will be the player for now
 		model.addEntity(ship);
 	}
 	
