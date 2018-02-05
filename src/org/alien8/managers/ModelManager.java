@@ -44,8 +44,11 @@ public class ModelManager {
 		for(Entity ent : entities) {
 			if(ent.isToBeDeleted()) {
 				entities.remove(ent);
-				System.out.println("removed it");
-			}			
+				// Accelerate it's removal
+				ent = null;	
+				// Skip the rest
+				continue;
+			}
 			if(ent.getSerial() == 1) { // Then it's the player
 				// Do movement first
 				// Apply forward OR backward force
@@ -65,8 +68,6 @@ public class ModelManager {
 				
 				// Update positions
 				PhysicsManager.updatePosition(ent);
-
-				System.out.println(entities.size());
 			}
 			
 			PhysicsManager.updatePosition(ent);
