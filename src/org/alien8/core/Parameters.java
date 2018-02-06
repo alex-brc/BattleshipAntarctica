@@ -29,7 +29,9 @@ public class Parameters {
 	public static int SHIP_LENGTH = 100;
 	public static double SHIP_MASS = 1000;
 	public static double SHIP_FORWARD_FORCE = 0.025;
-	public static double SHIP_BACKWARD_FORCE = 0.02;
+	public static double SHIP_BACKWARD_FORCE = 0.025;
+	public static double SHIP_ROTATION_PER_SEC = Math.PI/3;
+	public static double ROTATION_MODIFIER = 1;
 	public static double FRICTION = 0.997;
 	public static double BIG_BULLET_MASS = 30;
 	public static double SMALL_BULLET_MASS = 10;

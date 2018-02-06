@@ -59,9 +59,9 @@ public class ModelManager {
 				
 				// Apply rotation
 				if(im.aPressed())
-					PhysicsManager.rotateEntity(ent, false);
+					PhysicsManager.rotateEntity(ent, Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 				if(im.dPressed())
-					PhysicsManager.rotateEntity(ent, true);
+					PhysicsManager.rotateEntity(ent, (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 				
 				// Apply "friction"
 				ent.setSpeed(ent.getSpeed()*Parameters.FRICTION);
