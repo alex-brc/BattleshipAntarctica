@@ -38,4 +38,9 @@ public class Parameters {
 	// Bullet cooldowns in miliseconds
 	public static int SMALL_BULLET_CD = 500;
 	public static int BIG_BULLET_CD = 2000;
+	/**
+	 * This modifier affects how much distance holding down
+	 * a button gives to the turret shot
+	 */
+	public static double CHARGE_MODIFIER = 1;
 }

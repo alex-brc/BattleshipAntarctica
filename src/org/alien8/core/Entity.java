@@ -109,7 +109,7 @@ public abstract class Entity {
   public boolean isOutOfBounds() {
 	  double x = this.getPosition().getX();
 	  double y = this.getPosition().getY();
-	  if(x > 0 && x < Parameters.MAP_WIDTH && y > 0 && y < Parameters.MAP_HEIGHT)
+	  if(x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
 		  return true;
 	  return false;
   }

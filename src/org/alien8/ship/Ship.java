@@ -23,18 +23,20 @@ public class Ship extends Entity {
 	public Ship(Position position, double direction) {
 		super(position, direction, 0, Parameters.SHIP_MASS);
 	
-		frontTurret = new Turret(position);
-		midTurret = new Turret(position);
-		rearTurret = new Turret(position);
+		frontTurret = new Turret(position,Turret.SMALL);
+		midTurret = new Turret(position,Turret.BIG);
+		rearTurret = new Turret(position,Turret.SMALL);
 		
 		setTurretsDirection(new Position(0,0));
 		setTurretsPosition();
-		
 	}
-	// TODO: cooldowns.
 	
 	@Override
 	public void setPosition(Position position) {
+		// Don't move if it's out of bounds
+		if(this.isOutOfBounds())
+			return;
+
 		this.position = position;
 		
 		InputManager im = InputManager.getInstance();
@@ -42,14 +44,20 @@ public class Ship extends Entity {
 		setTurretsPosition();
 		setTurretsDirection(im.mousePosition());
 		
-		// Also shoot
 		if(im.lmbPressed())
-			frontTurret.shoot(1);
-		if(im.rmbPressed())
-			rearTurret.shoot(1);
-		if(im.spacePressed())
-			frontTurret.shoot(2);
+			frontTurret.charge();
+		else 
+			frontTurret.shoot();
 		
+		if(im.rmbPressed())
+			rearTurret.charge();
+		else
+			rearTurret.shoot();
+		
+		if(im.spacePressed())
+			midTurret.charge();
+		else
+			midTurret.shoot();
 	}
 
 	/**
