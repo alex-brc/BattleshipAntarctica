@@ -3,6 +3,7 @@ package org.alien8.ship;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
+import org.alien8.rendering.Renderer;
 
 public class Bullet extends Entity {
 	public static final int SMALL = 1;
@@ -30,5 +31,9 @@ public class Bullet extends Entity {
 		
 		if(this.isOutOfBounds())
 			this.delete();
+	}
+	
+	public void render(Renderer r){
+		r.drawRect((int)position.getX(), (int)position.getY(), 1, 1, 0xffffff, false);
 	}
 }

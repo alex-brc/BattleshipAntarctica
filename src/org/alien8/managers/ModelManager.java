@@ -40,6 +40,7 @@ public class ModelManager {
 	 */
 	public void update() {
 		InputManager im = InputManager.getInstance();
+		System.out.println(entities.size());
 		for(Entity ent : entities) {
 			if(ent.isToBeDeleted()) {
 				entities.remove(ent);
