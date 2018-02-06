@@ -114,7 +114,7 @@ public class PerlinNoise{
 	}
 	
 	//Just using this to test stuff
-	public static void main(String[] args){
+	/*public static void main(String[] args){
 		int pxlSize = 512;
 		int gridSize = 4;
 		
@@ -155,5 +155,5 @@ public class PerlinNoise{
 		frame.pack();
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
+	}*/
 }

@@ -30,9 +30,10 @@ public class Map{
 		widthDensity = wD;
 		iceGrid = new boolean[l][w];
 		makeMap();
+		makeRoughAABBs();
 	}
 	
-	public void makeMap(){
+	protected void makeMap(){
 		double waterLevel = 0.4d;
 		
 		double[][] noiseGrid = PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity);
@@ -74,4 +75,8 @@ public class Map{
 	public List<AABB> getAABBs(){
 		return roughAABBs;
 	}
+	
+	public boolean[][] getIceGrid(){
+		return iceGrid;
+	} 
 }

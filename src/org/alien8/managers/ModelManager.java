@@ -8,6 +8,7 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.ship.Ship;
+import org.alien8.mapgeneration.Map;
 
 /**
  * This class implements the model at the core of the game itself. It is
@@ -22,6 +23,7 @@ public class ModelManager {
 	private int lastSerial = 0;
 	private static ModelManager instance = new ModelManager();
 	private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
+	private Map map = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8);
 	
 
 	private ModelManager() {
