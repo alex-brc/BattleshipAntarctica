@@ -36,7 +36,7 @@ public class Ship extends Entity {
 	public void setPosition(Position position) {
 		// Don't move if it's out of bounds
 		if(this.isOutOfBounds())
-			return;
+			position = new Position(100,100);
 
 		this.position = position;
 		

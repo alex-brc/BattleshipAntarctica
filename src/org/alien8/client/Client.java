@@ -88,19 +88,22 @@ public class Client implements Runnable{
 
 			int frameRate = 0;
 			long frameTimer = getTime();
+			int tickRate = 0;
+			long tickTimer = getTime();
 
 			while (running) {
 				currentTime = getTime();
 
 				// Get the amount of update()s the model needs to catch up
 				catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
-				// Update lastTime
-				lastTime = currentTime;
 
 				// Call update() as many times as needed to compensate before rendering
 				while (catchUp >= 1) {
 					model.update();
 					catchUp--;
+					tickRate++;
+					// Update last time
+					lastTime = getTime();
 				}
 
 				// Call the renderer
@@ -112,6 +115,11 @@ public class Client implements Runnable{
 					frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
 					FPS = frameRate * Parameters.FPS_FREQ;
 					frameRate = 0;
+				}
+				if(getTime() - tickTimer > Parameters.N_SECOND) {
+					System.out.println(tickRate);
+					tickTimer = getTime();
+					tickRate = 0;
 				}
 			}
 			System.out.println("stopped");
