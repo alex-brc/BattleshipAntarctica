@@ -19,7 +19,7 @@ public class Parameters {
 	 * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for simplicity.
 	 */
 	public static int FPS_FREQ = 4;
-	public static int N_SECOND = 1000000;
+	public static int N_SECOND = 1000000000;
 	public static int MAP_HEIGHT = 512;
 	public static int MAP_WIDTH = 512;
 	/**
@@ -27,16 +27,23 @@ public class Parameters {
 	 * Currently, this number doesn't mean much
 	 */
 	public static int SHIP_LENGTH = 100;
-	public static double SHIP_MASS = 1000;
-	public static double SHIP_FORWARD_FORCE = 0.025;
-	public static double SHIP_BACKWARD_FORCE = 0.025;
-	public static double SHIP_ROTATION_PER_SEC = Math.PI/3;
+	/**
+	 * Interdependent stuff. Force required is computed according to how long it
+	 * would take to reach top speed
+	 */
+	public static double SHIP_TOP_SPEED_REACH_TIME = 10; // s
+	public static double SHIP_TOP_SPEED_FORWARD = 2; // m/s
+	public static double SHIP_TOP_SPEED_BACKWARD = 3; // m/s
+	public static double SHIP_MASS = 1000; // kg. This is kinda random
+	public static double SHIP_FORWARD_FORCE = SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME; // N  
+	public static double SHIP_BACKWARD_FORCE = SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
+	public static double SHIP_ROTATION_PER_SEC = Math.PI;
 	public static double ROTATION_MODIFIER = 1;
-	public static double FRICTION = 0.997;
+	public static double FRICTION = 0.92;
 	public static double BIG_BULLET_MASS = 30;
 	public static double SMALL_BULLET_MASS = 10;
-	public static double BIG_BULLET_SPEED = 4;
-	public static double SMALL_BULLET_SPEED = 2;
+	public static double BIG_BULLET_SPEED = 1;
+	public static double SMALL_BULLET_SPEED = 1;
 	// Bullet cooldowns in miliseconds
 	public static int SMALL_BULLET_CD = 500;
 	public static int BIG_BULLET_CD = 2000;
@@ -44,5 +51,5 @@ public class Parameters {
 	 * This modifier affects how much distance holding down
 	 * a button gives to the turret shot
 	 */
-	public static double CHARGE_MODIFIER = 1;
+	public static double CHARGE_MODIFIER = 100;
 }

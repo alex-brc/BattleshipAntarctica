@@ -40,7 +40,7 @@ public class ModelManager {
 	 */
 	public void update() {
 		InputManager im = InputManager.getInstance();
-		System.out.println(entities.size());
+		// System.out.println(entities.size());
 		for(Entity ent : entities) {
 			if(ent.isToBeDeleted()) {
 				entities.remove(ent);
@@ -59,9 +59,9 @@ public class ModelManager {
 				
 				// Apply rotation
 				if(im.aPressed())
-					PhysicsManager.rotateEntity(ent, Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-				if(im.dPressed())
 					PhysicsManager.rotateEntity(ent, (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+				if(im.dPressed())
+					PhysicsManager.rotateEntity(ent, Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 				
 				// Apply "friction"
 				ent.setSpeed(ent.getSpeed()*Parameters.FRICTION);
