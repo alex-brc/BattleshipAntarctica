@@ -67,19 +67,18 @@ public class Ship extends Entity {
 		double angle = Renderer.getScreenPosition(frontTurret.getPosition())
 				.getAngleTo(mousePosition);
 		angle = (-1)*angle + Math.PI/2;
-		ra = angle + (Math.PI - this.getDirection());
-		PhysicsManager.shiftAngle(ra);
-		System.out.println(ra > 2*Math.PI);
+		ra = angle + (Math.PI - this.getDirection()) - Math.PI/2;
+		ra = PhysicsManager.shiftAngle(ra);
 		// Range of motion: [7pi/4, 5pi/4]
 		if( ra < 5.0 * Math.PI / 4 || ra > 7.0 * Math.PI / 4)
-			frontTurret.setDirection(angle); // FIX IT, IT'S A HACK
+			frontTurret.setDirection(angle);
 
 		// Rear
 		angle = Renderer.getScreenPosition(rearTurret.getPosition())
 				.getAngleTo(mousePosition);
 		angle = (-1)*angle + Math.PI/2;
-		ra = angle + (Math.PI - this.getDirection());
-		PhysicsManager.shiftAngle(ra);
+		ra = angle + (Math.PI - this.getDirection())  - Math.PI/2;
+		ra = PhysicsManager.shiftAngle(ra);
 		// Range of motion: [3pip/4,pi/4]
 		if( ra < 1.0 * Math.PI / 4 || ra > 3.0 * Math.PI / 4)
 			rearTurret.setDirection(angle);
@@ -119,6 +118,9 @@ public class Ship extends Entity {
 	
 	public void render(Renderer r){
 		r.drawRect((int)position.getX(), (int)position.getY(), 10, 20, 0x666666, false);
+		frontTurret.render(r);
+		rearTurret.render(r);
+		midTurret.render(r);
 	}
 	
 	public double getFrontTurretDirection() {

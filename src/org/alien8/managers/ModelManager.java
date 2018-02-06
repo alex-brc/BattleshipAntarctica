@@ -60,7 +60,7 @@ public class ModelManager {
 					PhysicsManager.applyForce(ent, Parameters.SHIP_FORWARD_FORCE, ent.getDirection());
 				else if(im.sPressed())
 					PhysicsManager.applyForce(ent, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(ent.getDirection() + Math.PI));
-				
+				System.out.println(ent.getSpeed());
 				// Apply rotation
 				if(im.aPressed())
 					PhysicsManager.rotateEntity(ent, (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);

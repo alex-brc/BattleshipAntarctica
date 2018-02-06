@@ -47,7 +47,8 @@ public class PhysicsManager {
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
     // Update the Oriented Bounding Box
-    // we.translateObb(xdiff, ydiff);
+    // TODO: This causes an error. 
+    // e.translateObb(xdiff, ydiff);
   }
 
   /**
@@ -59,7 +60,7 @@ public class PhysicsManager {
    */
   public static void rotateEntity(Entity e, double angle) {
 	// TODO: Get speed modifier
-	
+	angle *= (Parameters.SHIP_TOP_SPEED_FORWARD - e.getSpeed()) * Parameters.ROTATION_MODIFIER;
     // Update the direction of the Entity, but also the bounding box
     e.setDirection(shiftAngle(e.getDirection() + angle));
     e.rotateObb(angle);
@@ -73,8 +74,8 @@ public class PhysicsManager {
   public static double shiftAngle(double rads) {
 	  while(rads < 0)
 		  rads += 2*Math.PI;
-	  if(rads >= 2*Math.PI)
-		  rads %= 2*Math.PI;
+	  while(rads >= 2*Math.PI)
+		  rads -= 2*Math.PI;
 	  return rads;
   }
 

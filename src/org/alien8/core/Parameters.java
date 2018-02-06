@@ -32,15 +32,20 @@ public class Parameters {
 	 * Interdependent stuff. Force required is computed according to how long it
 	 * would take to reach top speed
 	 */
-	public static double SHIP_TOP_SPEED_REACH_TIME = 10; // s
-	public static double SHIP_TOP_SPEED_FORWARD = 2; // m/s
-	public static double SHIP_TOP_SPEED_BACKWARD = 3; // m/s
+	public static double SHIP_TOP_SPEED_REACH_TIME = 200;
+	public static double SHIP_TOP_SPEED_FORWARD = 2;
+	public static double SHIP_TOP_SPEED_BACKWARD = 2;
 	public static double SHIP_MASS = 1000; // kg. This is kinda random
 	public static double SHIP_FORWARD_FORCE = SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME; // N  
 	public static double SHIP_BACKWARD_FORCE = SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
-	public static double SHIP_ROTATION_PER_SEC = Math.PI;
-	public static double ROTATION_MODIFIER = 1;
-	public static double FRICTION = 0.92;
+	public static double SHIP_ROTATION_PER_SEC = Math.PI/2;
+	/**
+	 * Affects how much the speed impacts the turning rate
+	 * Lower means turns are tighter at speed. 
+	 * 1 means at top speed turning is impossible.
+	 */
+	public static double ROTATION_MODIFIER = 0.8;
+	public static double FRICTION = 0.997;
 	public static double BIG_BULLET_MASS = 30;
 	public static double SMALL_BULLET_MASS = 10;
 	public static double BIG_BULLET_SPEED = 2;
