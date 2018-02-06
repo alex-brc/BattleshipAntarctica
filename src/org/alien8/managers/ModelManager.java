@@ -1,10 +1,13 @@
 package org.alien8.managers;
 
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
+import org.alien8.physics.Position;
+import org.alien8.ship.Ship;
 
 /**
  * This class implements the model at the core of the game itself. It is
@@ -50,6 +53,7 @@ public class ModelManager {
 				continue;
 			}
 			if(ent.getSerial() == 1) { // Then it's the player
+				
 				// Do movement first
 				// Apply forward OR backward force
 				if(im.wPressed())
@@ -68,6 +72,27 @@ public class ModelManager {
 				
 				// Update positions
 				PhysicsManager.updatePosition(ent);
+				
+				// Prepare for shootings
+				Ship sh = (Ship) ent;
+				
+				// Orientation
+				sh.setTurretsDirection(im.mousePosition());
+				
+				if(im.lmbPressed())
+					sh.frontTurretCharge();
+				else 
+					sh.frontTurretShoot();
+				
+				if(im.rmbPressed())
+					sh.rearTurretCharge();
+				else
+					sh.rearTurretShoot();
+				
+				if(im.spacePressed())
+					sh.midTurretCharge();
+				else
+					sh.midTurretShoot();
 			}
 			
 			PhysicsManager.updatePosition(ent);
@@ -108,7 +133,6 @@ public class ModelManager {
 		return null;
 	}
 	
-
 	/**
 	 * Getter for the entity list.
 	 * 

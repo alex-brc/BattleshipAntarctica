@@ -28,7 +28,8 @@ public class PhysicsManager {
     e.setSpeed(Math.sqrt((newSpeedX * newSpeedX) + (newSpeedY * newSpeedY)));
     if(e.getSpeed() > Parameters.SHIP_TOP_SPEED_FORWARD)
     	e.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD);
-    // TODO:this is causing weird stuff. e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
+    // TODO:this is causing weird stuff. 
+    // e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
   }
 
   /**
@@ -46,7 +47,7 @@ public class PhysicsManager {
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
     // Update the Oriented Bounding Box
-    e.translateObb(xdiff, ydiff);
+    // we.translateObb(xdiff, ydiff);
   }
 
   /**
@@ -72,8 +73,8 @@ public class PhysicsManager {
   public static double shiftAngle(double rads) {
 	  while(rads < 0)
 		  rads += 2*Math.PI;
-	  while(rads >= 2*Math.PI)
-		  rads -= 2*Math.PI;
+	  if(rads >= 2*Math.PI)
+		  rads %= 2*Math.PI;
 	  return rads;
   }
 

@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import org.alien8.core.Entity;
 import org.alien8.managers.InputManager;
 import org.alien8.managers.ModelManager;
+import org.alien8.physics.Position;
 
 public class Renderer extends Canvas {
 
@@ -108,5 +109,15 @@ public class Renderer extends Canvas {
 	  if (xp + width >= this.width) continue;
 	  if (xp + width > 0) pixels[(xp + width) + y * this.width] = col;
 	}
+  }
+  
+  /**
+   * TODO
+   * Returns the position on the screen of the given
+   * position in game coordinates
+   * @return the Position of the center in 
+   */
+  public static Position getScreenPosition(Position position) {
+	  return new Position(400,300);
   }
 }

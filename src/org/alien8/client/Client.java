@@ -101,7 +101,6 @@ public class Client implements Runnable{
 				while (catchUp >= 1) {
 					model.update();
 					catchUp--;
-					tickRate++;
 					// Update last time
 					lastTime = getTime();
 				}
@@ -116,11 +115,7 @@ public class Client implements Runnable{
 					FPS = frameRate * Parameters.FPS_FREQ;
 					frameRate = 0;
 				}
-				if(getTime() - tickTimer > Parameters.N_SECOND) {
-					System.out.println(tickRate);
-					tickTimer = getTime();
-					tickRate = 0;
-				}
+				
 			}
 			System.out.println("stopped");
 		}

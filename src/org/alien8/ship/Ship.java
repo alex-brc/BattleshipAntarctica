@@ -1,8 +1,10 @@
 package org.alien8.ship;
 
+import java.util.Arrays;
+
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.managers.InputManager;
+import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
@@ -20,7 +22,7 @@ public class Ship extends Entity {
 	private Turret frontTurret;
 	private Turret rearTurret;
 	private Turret midTurret;
-		
+	
 	public Ship(Position position, double direction) {
 		super(position, direction, 0, Parameters.SHIP_MASS);
 	
@@ -40,25 +42,8 @@ public class Ship extends Entity {
 
 		this.position = position;
 		
-		InputManager im = InputManager.getInstance();
-		
 		setTurretsPosition();
-		setTurretsDirection(im.mousePosition());
 		
-		if(im.lmbPressed())
-			frontTurret.charge();
-		else 
-			frontTurret.shoot();
-		
-		if(im.rmbPressed())
-			rearTurret.charge();
-		else
-			rearTurret.shoot();
-		
-		if(im.spacePressed())
-			midTurret.charge();
-		else
-			midTurret.shoot();
 	}
 
 	/**
@@ -79,29 +64,30 @@ public class Ship extends Entity {
 		double ra = 0;
 		
 		// Front
-		double angle = frontTurret
-				.getPosition()
+		double angle = Renderer.getScreenPosition(frontTurret.getPosition())
 				.getAngleTo(mousePosition);
-		
+		angle = (-1)*angle + Math.PI/2;
 		ra = angle + (Math.PI - this.getDirection());
+		PhysicsManager.shiftAngle(ra);
+		System.out.println(ra > 2*Math.PI);
 		// Range of motion: [7pi/4, 5pi/4]
 		if( ra < 5.0 * Math.PI / 4 || ra > 7.0 * Math.PI / 4)
-			frontTurret.setDirection(angle);
+			frontTurret.setDirection(angle); // FIX IT, IT'S A HACK
 
 		// Rear
-		angle = rearTurret
-				.getPosition()
+		angle = Renderer.getScreenPosition(rearTurret.getPosition())
 				.getAngleTo(mousePosition);
-		
+		angle = (-1)*angle + Math.PI/2;
 		ra = angle + (Math.PI - this.getDirection());
+		PhysicsManager.shiftAngle(ra);
 		// Range of motion: [3pip/4,pi/4]
 		if( ra < 1.0 * Math.PI / 4 || ra > 3.0 * Math.PI / 4)
 			rearTurret.setDirection(angle);
 
 		// Mid
-		angle = frontTurret
-				.getPosition()
+		angle = Renderer.getScreenPosition(midTurret.getPosition())
 				.getAngleTo(mousePosition);
+		angle = PhysicsManager.shiftAngle((-1)*angle + Math.PI/2);
 		// No need to get relative angle. 
 		// This can go shoot it wants
 		midTurret.setDirection(angle);	
@@ -158,5 +144,30 @@ public class Ship extends Entity {
 	public Position getRearTurretPosition() {
 		return rearTurret.getPosition();
 	}
+
+	public void frontTurretCharge() {
+		frontTurret.charge();
+	}
+
+	public void midTurretCharge() {
+		midTurret.charge();
+	}
+	
+	public void rearTurretCharge() {
+		rearTurret.charge();
+	}
+	
+	public void frontTurretShoot() {
+		frontTurret.shoot();
+	}
+	
+	public void midTurretShoot() {
+		midTurret.shoot();
+	}
+	
+	public void rearTurretShoot() {
+		rearTurret.shoot();
+	}
+	
 }
 

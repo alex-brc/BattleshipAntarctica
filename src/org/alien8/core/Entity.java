@@ -1,5 +1,7 @@
 package org.alien8.core;
 
+import java.util.Arrays;
+
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 

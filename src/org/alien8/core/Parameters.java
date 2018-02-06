@@ -12,9 +12,10 @@ package org.alien8.core;
  */
 public class Parameters {
 	/**
-	 * How often the model calls update() on the entities. 
+	 * How often the model calls update() on the entities. Because of some divisions, it's a bit lower than that.
+	 * This value gies 58-60 ticks/second, hovering around 59
 	 */
-	public static int TICKS_PER_SECOND = 60;
+	public static int TICKS_PER_SECOND = 63;
 	/**
 	 * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for simplicity.
 	 */
@@ -42,8 +43,8 @@ public class Parameters {
 	public static double FRICTION = 0.92;
 	public static double BIG_BULLET_MASS = 30;
 	public static double SMALL_BULLET_MASS = 10;
-	public static double BIG_BULLET_SPEED = 1;
-	public static double SMALL_BULLET_SPEED = 1;
+	public static double BIG_BULLET_SPEED = 2;
+	public static double SMALL_BULLET_SPEED = 4;
 	// Bullet cooldowns in miliseconds
 	public static int SMALL_BULLET_CD = 500;
 	public static int BIG_BULLET_CD = 2000;
@@ -51,5 +52,5 @@ public class Parameters {
 	 * This modifier affects how much distance holding down
 	 * a button gives to the turret shot
 	 */
-	public static double CHARGE_MODIFIER = 100;
+	public static double CHARGE_MODIFIER = 20;
 }
