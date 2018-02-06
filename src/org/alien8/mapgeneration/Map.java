@@ -74,4 +74,8 @@ public class Map{
 	public List<AABB> getAABBs(){
 		return roughAABBs;
 	}
+	
+	public boolean[][] getIceGrid(){
+		return iceGrid;
+	} 
 }
