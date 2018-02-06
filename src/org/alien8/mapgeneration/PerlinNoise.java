@@ -114,25 +114,37 @@ public class PerlinNoise{
 	}
 	
 	//Just using this to test stuff
-	/*public static void main(String[] args){
+	public static void main(String[] args){
 		int pxlSize = 512;
-		int gridSize = 16;
+		int gridSize = 4;
 		
 		double[][] testNoise = generateNoiseGrid(pxlSize, pxlSize, gridSize, gridSize);
 		
 		BufferedImage image = new BufferedImage(pxlSize,pxlSize, BufferedImage.TYPE_INT_RGB); 
 		int colV = 0;
+		Color c = new Color(0,0,0);
 		
 		for (int y = 0; y < pxlSize; y++){
 			for (int x = 0; x < pxlSize; x++){
-				colV = (int)Math.floor(testNoise[x][y]*255d);
+				//colV = (int)Math.floor(testNoise[x][y]*255d);
 				if (testNoise[x][y] > 0.4){
-					colV = 255;
+					if (testNoise[x][y] <= 0.7){
+						c = new Color(0,64,128);
+					}else if (testNoise[x][y] <= 0.9){
+						c = new Color(0,51,102);
+					}else{
+						c = new Color(0,38,77);
+					}
 				}
 				else{
-					colV = 0;
+					if (testNoise[x][y] >= 0.2){
+						c = new Color(179,255,255);
+					}else if (testNoise[x][y] >= 0.1){
+						c = new Color(204,255,255);
+					}else {
+						c = new Color(230,255,255);
+					}
 				}
-				Color c = new Color(colV, colV, colV);
 				image.setRGB(x, y, c.getRGB());
 			}
 		}
@@ -143,5 +155,5 @@ public class PerlinNoise{
 		frame.pack();
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}*/
+	}
 }
