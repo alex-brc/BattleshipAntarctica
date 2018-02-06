@@ -1,6 +1,7 @@
 package org.alien8.core;
 
 import org.alien8.physics.Position;
+import org.alien8.rendering.Renderer;
 
 /**
  * This abstract class implements the generic Entity. All things that are part of the game map are
@@ -175,5 +176,9 @@ public abstract class Entity {
       // Set corner position
       corner = new Position(cornerX, cornerY);
     }
+  }
+  
+  public void render(Renderer r){
+	
   }
 }

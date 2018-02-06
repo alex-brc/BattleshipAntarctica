@@ -1,6 +1,5 @@
 package org.alien8.managers;
 
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.core.Entity;
@@ -117,6 +116,10 @@ public class ModelManager {
 	 */
 	public ConcurrentLinkedQueue<Entity> getEntities() {
 		return entities;
+	}
+	
+	public Entity getPlayer(){
+		return getEntity(1); //change implementation later
 	}
 
 }

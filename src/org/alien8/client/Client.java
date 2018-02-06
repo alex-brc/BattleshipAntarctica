@@ -44,6 +44,7 @@ public class Client implements Runnable{
 		Entity ship = new Ship(new Position(1,1), 0);
 		// Add the first ship to the map, this will be the player for now
 		model.addEntity(ship);
+		model.addEntity(new Ship(new Position(100,100), 0)); //temporary reference point
 	}
 	
 	/**
@@ -103,7 +104,7 @@ public class Client implements Runnable{
 				}
 
 				// Call the renderer
-				renderer.render();
+				renderer.render(model);
 				frameRate++;
 
 				// Update the FPS timer every FPS_FREQ^-1 seconds

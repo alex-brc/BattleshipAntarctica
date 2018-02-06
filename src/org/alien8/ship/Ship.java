@@ -4,6 +4,7 @@ import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.managers.InputManager;
 import org.alien8.physics.Position;
+import org.alien8.rendering.Renderer;
 
 /**
  * Developer's notes:
@@ -120,6 +121,10 @@ public class Ship extends Entity {
 					(-r)*Math.sin(this.getDirection()))));
 		
 		midTurret.setPosition(this.getPosition());
+	}
+	
+	public void render(Renderer r){
+		r.drawRect((int)position.getX(), (int)position.getY(), 10, 20, 0x666666, false);
 	}
 	
 	public double getFrontTurretDirection() {

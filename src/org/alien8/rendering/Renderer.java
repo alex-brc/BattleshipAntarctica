@@ -9,7 +9,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
+
+import org.alien8.core.Entity;
 import org.alien8.managers.InputManager;
+import org.alien8.managers.ModelManager;
 
 public class Renderer extends Canvas {
 
@@ -17,6 +20,8 @@ public class Renderer extends Canvas {
 
   private int width;
   private int height;
+  private int xScroll;
+  private int yScroll;
 
   private JFrame frame;
   
@@ -49,7 +54,7 @@ public class Renderer extends Canvas {
   /**
    * The render() method renders all entities to the screen in their current state
    */
-  public void render() {
+  public void render(ModelManager model) {
     BufferStrategy bs = getBufferStrategy(); //gets canvas buffer strategy
 	if (bs == null){
 	  createBufferStrategy(3); //if none found, create a triple buffering strategy
@@ -58,6 +63,17 @@ public class Renderer extends Canvas {
 	}
 	
 	clear();
+	
+	//Actual drawing goes here
+	Entity player = model.getPlayer();
+	xScroll = (int) (player.getPosition().getX() - width / 2);
+	yScroll = (int) (player.getPosition().getY() - height / 2);
+	
+	//Render terrain here
+	
+	for(Entity e : model.getEntities()){
+		e.render(this);
+	}
 	
 	Graphics g = bs.getDrawGraphics(); //graphics object from buffer strategy
 	
@@ -72,6 +88,25 @@ public class Renderer extends Canvas {
   public void clear(){
 	for (int i = 0; i < pixels.length; i++){
 	  pixels[i] = 0; //cycles through all pixels and sets them to 0, resetting the array
+	}
+  }
+  
+  public void drawRect(int xp, int yp, int width, int height, int col, boolean fixed) {
+	if (!fixed){
+	  xp -= xScroll;
+	  yp -= yScroll;
+	}
+	for (int x = xp; x <= xp + width; x++){
+	  if (x < 0 || x >= this.width || yp >= this.height) continue;
+	  if (yp > 0) pixels[x + yp * this.width] = col;
+	  if (yp + height >= this.height) continue;
+	  if (yp + height > 0) pixels[x + (yp + height) * this.width] = col;
+	}
+	for (int y = yp; y < yp + height; y++){
+	  if (xp >= this.width || y < 0 || y >= this.height) continue;
+	  if (xp > 0) pixels[xp + y * this.width] = col;
+	  if (xp + width >= this.width) continue;
+	  if (xp + width > 0) pixels[(xp + width) + y * this.width] = col;
 	}
   }
 }
