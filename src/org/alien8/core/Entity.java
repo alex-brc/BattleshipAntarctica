@@ -1,5 +1,7 @@
 package org.alien8.core;
 
+import java.util.Arrays;
+
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
@@ -64,7 +66,7 @@ public abstract class Entity {
     if (this.serial == -1) {
       this.serial = serial;
     }
-    // Else, do nothing. Only works once.
+    // Only works once.
   }
   
   public void delete() {
@@ -88,6 +90,9 @@ public abstract class Entity {
   }
 
   public void setSpeed(double speed) {
+	// Makes friction less CPU-intensive sometimes
+	if(speed < 0.001d)
+		speed = 0;
     this.speed = speed;
   }
 

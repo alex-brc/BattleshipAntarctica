@@ -3,6 +3,7 @@ package org.alien8.ship;
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
+import org.alien8.rendering.Renderer;
 
 public class Turret {
 	// Type of bullets this turret shoots
@@ -38,7 +39,7 @@ public class Turret {
 	 * @param type
 	 */
 	public void shoot() {
-		if(distance == 0)
+		if(distance == 0 || this.isOnCooldon())
 			return;
 		
 		ModelManager.getInstance()
@@ -91,6 +92,10 @@ public class Turret {
 	
 	private void startCooldown() {
 		this.lastShot = System.currentTimeMillis();
+	}
+
+	public void render(Renderer r) {
+		r.drawRect((int)position.getX(), (int)position.getY(), 4, 4, 0xFF0000, false);
 	}
 
 }

@@ -28,7 +28,8 @@ public class PhysicsManager {
     e.setSpeed(Math.sqrt((newSpeedX * newSpeedX) + (newSpeedY * newSpeedY)));
     if(e.getSpeed() > Parameters.SHIP_TOP_SPEED_FORWARD)
     	e.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD);
-    // TODO:this is causing weird stuff. e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
+    // TODO:this is causing weird stuff. 
+    // e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
   }
 
   /**
@@ -46,7 +47,8 @@ public class PhysicsManager {
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
     // Update the Oriented Bounding Box
-    e.translateObb(xdiff, ydiff);
+    // TODO: This causes an error. 
+    // e.translateObb(xdiff, ydiff);
   }
 
   /**
@@ -58,7 +60,7 @@ public class PhysicsManager {
    */
   public static void rotateEntity(Entity e, double angle) {
 	// TODO: Get speed modifier
-	
+	angle *= (Parameters.SHIP_TOP_SPEED_FORWARD - e.getSpeed()) * Parameters.ROTATION_MODIFIER;
     // Update the direction of the Entity, but also the bounding box
     e.setDirection(shiftAngle(e.getDirection() + angle));
     e.rotateObb(angle);
