@@ -17,9 +17,9 @@ import org.alien8.physics.PhysicsManager;
 public class ModelManager {
 	
 	private int lastSerial = 0;
-	
 	private static ModelManager instance = new ModelManager();
 	private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
+	
 
 	private ModelManager() {
 		// All setup should be done here, such as support for networking, etc.
@@ -71,7 +71,6 @@ public class ModelManager {
 			}
 			
 			PhysicsManager.updatePosition(ent);
-			
 		}
 	}
 

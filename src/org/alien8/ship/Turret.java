@@ -5,41 +5,51 @@ import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 
 public class Turret {
+	// Type of bullets this turret shoots
+	public static final int SMALL = 1;
+	public static final int BIG = 2;
 	// Position will be handled by Ship class
 	private Position position;
 	// Orientation in radians
 	private double direction;
 	// Last time it shot in nanoseconds
 	private long lastShot;
+	// Type of bullets this turret shoots
+	private int type;
+	// Cooldown of this turret
+	private long cooldown;
+	// Charged distance of this turret
+	private double distance;
 
-	public Turret(Position position) {
+	public Turret(Position position, int type) {
 		this.position = position;
 		this.direction = 0;
-		this.lastShot = 0;
+		this.lastShot = System.currentTimeMillis();
+		this.type = type;
+		this.cooldown = (type == Turret.BIG) ? Parameters.BIG_BULLET_CD : Parameters.SMALL_BULLET_CD; 
+	}
+	
+	public void charge() {
+		this.distance++;
 	}
 	
 	/**
 	 * Shoots a bullet of the given type in the direction the turret is facing.
 	 * @param type
 	 */
-	public void shoot(int type) {
-		int cd = 0;
-		if(type == 2)
-			cd = Parameters.BIG_BULLET_CD;
-		if(type == 1)
-			cd = Parameters.SMALL_BULLET_CD;
+	public void shoot() {
+		if(distance == 0)
+			return;
 		
-		// Current time
-		long t = System.currentTimeMillis();
+		ModelManager.getInstance()
+		.addEntity(new Bullet(
+				this.getPosition(),
+				this.getDirection(),
+				type,
+				distance*Parameters.CHARGE_MODIFIER));
 		
-		if(lastShot < t - cd) {
-			ModelManager.getInstance()
-				.addEntity(new Bullet(
-						this.getPosition(),
-						this.getDirection(),
-						type));
-			lastShot = t;
-		}
+		this.startCooldown();
+		this.distance = 0;
 	}
 	
 	/**
@@ -73,8 +83,14 @@ public class Turret {
 	/**
 	 * @return the time of the last shot
 	 */
-	public double getLastShot() {
-		return lastShot;
+	public boolean isOnCooldon() {
+		if(System.currentTimeMillis() - this.lastShot < this.cooldown)
+			return true;
+		return false;
+	}
+	
+	private void startCooldown() {
+		this.lastShot = System.currentTimeMillis();
 	}
 
 }

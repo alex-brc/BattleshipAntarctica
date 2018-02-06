@@ -128,7 +128,7 @@ public class Client implements Runnable{
 	}
 	
 	/**
-	 * Might pause the game. I don't know if this works yet.
+	 * Pauses the game.
 	 */
 	public void pause() {
 		running = false;

@@ -76,6 +76,18 @@ public class Position {
 		return new Position(this.getX() + position.getX(), this.getY() + position.getY());
 	}
 	
+	public double distanceTo(Position position) {
+		return (Math.sqrt(
+					Math.pow(
+						(position.getX()-this.getX()), 
+						2) + 
+					Math.pow(
+						(position.getY()-this.getY()), 
+						2)
+					)
+				);
+	}
+	
 	@Override
 	public String toString() {
 		return "X: " + this.getX() + " Y: " + this.getY();

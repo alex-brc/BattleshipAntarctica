@@ -43,7 +43,7 @@ public class PhysicsManager {
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
     // Update the Oriented Bounding Box
-    e.translateObb(xdiff, ydiff);
+    //e.translateObb(xdiff, ydiff);
   }
 
   /**
