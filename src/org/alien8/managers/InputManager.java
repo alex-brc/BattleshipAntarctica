@@ -104,7 +104,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
 		switch(e.getButton()) {
 		case 1: // LMB
 			lmbPressed = true;

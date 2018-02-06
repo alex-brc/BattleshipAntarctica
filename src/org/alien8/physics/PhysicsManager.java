@@ -43,7 +43,7 @@ public class PhysicsManager {
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
     // Update the Oriented Bounding Box
-    e.translateObb(xdiff, ydiff);
+    //e.translateObb(xdiff, ydiff);
   }
 
   /**
@@ -72,7 +72,7 @@ public class PhysicsManager {
   /**
    * Shifts the angle in radians to [0,2pi) interval.
    * 
-   * @param rads the angle in radians to shit.
+   * @param rads the angle in radians to shift.
    */
   public static double shiftAngle(double rads) {
 	  while(rads < 0)

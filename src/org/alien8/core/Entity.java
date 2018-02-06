@@ -1,6 +1,7 @@
 package org.alien8.core;
 
 import org.alien8.physics.Position;
+import org.alien8.rendering.Renderer;
 
 /**
  * This abstract class implements the generic Entity. All things that are part of the game map are
@@ -11,7 +12,8 @@ import org.alien8.physics.Position;
 public abstract class Entity {
   protected Position position;
   protected long serial = -1;
-
+  protected boolean toBeDeleted = false;
+  
   private double mass;
   private double speed;
   private double direction;
@@ -39,7 +41,7 @@ public abstract class Entity {
     this.mass = mass;
     initObb();
   }
-
+  
   /**
    * @return the position in XY coordinates
    */
@@ -63,6 +65,14 @@ public abstract class Entity {
       this.serial = serial;
     }
     // Else, do nothing. Only works once.
+  }
+  
+  public void delete() {
+	  this.toBeDeleted = true;
+  }
+  
+  public boolean isToBeDeleted() {
+	  return toBeDeleted;
   }
 
   public double getMass() {
@@ -96,7 +106,15 @@ public abstract class Entity {
   public void setLength(double length) {
     this.length = length;
   }
-
+  
+  public boolean isOutOfBounds() {
+	  double x = this.getPosition().getX();
+	  double y = this.getPosition().getY();
+	  if(x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
+		  return true;
+	  return false;
+  }
+  
   public Position[] getObb() {
     return obb;
   }
@@ -158,5 +176,9 @@ public abstract class Entity {
       // Set corner position
       corner = new Position(cornerX, cornerY);
     }
+  }
+  
+  public void render(Renderer r){
+	
   }
 }

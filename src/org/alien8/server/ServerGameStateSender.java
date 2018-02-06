@@ -1,11 +1,15 @@
 package org.alien8.server;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.alien8.managers.*;
-import org.alien8.core.*;
+import org.alien8.core.Entity;
+import org.alien8.managers.ModelManager;
 
 public class ServerGameStateSender extends Thread {
 	
@@ -27,7 +31,7 @@ public class ServerGameStateSender extends Thread {
 			try {
 				
 				// Serialize the game state object into byte array 
-				LinkedList<Entity> gameState = model.getEntities();
+				ConcurrentLinkedQueue<Entity> gameState = model.getEntities();
 				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 				ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
 				objOut.writeObject(gameState);
