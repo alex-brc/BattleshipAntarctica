@@ -45,6 +45,7 @@ public class Client implements Runnable{
 		// Add the first ship to the map, this will be the player for now
 		model.addEntity(ship);
 		model.addEntity(new Ship(new Position(100,100), 0)); //temporary reference point
+		
 	}
 	
 	/**
@@ -88,8 +89,6 @@ public class Client implements Runnable{
 
 			int frameRate = 0;
 			long frameTimer = getTime();
-			int tickRate = 0;
-			long tickTimer = getTime();
 
 			while (running) {
 				currentTime = getTime();

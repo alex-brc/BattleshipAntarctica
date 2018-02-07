@@ -3,6 +3,7 @@ package org.alien8.mapgeneration;
 import org.alien8.mapgeneration.PerlinNoise;
 import org.alien8.mapgeneration.Ice;
 import org.alien8.core.Entity;
+import org.alien8.core.Parameters;
 import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
 import java.util.List;
@@ -30,7 +31,7 @@ public class Map{
 		widthDensity = wD;
 		iceGrid = new boolean[l][w];
 		makeMap();
-		makeRoughAABBs(4);
+		makeRoughAABBs(Parameters.MAP_BOX_SIZE);
 	}
 	
 	protected void makeMap(){
