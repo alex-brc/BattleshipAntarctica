@@ -14,10 +14,10 @@ public class Parameters {
 	
 	///////////// META AND GAME PARAMS ////////
 	/**
-	 * How often the model calls update() on the entities. Because of some divisions, it's a bit lower than that.
+	 * How often the model calls update() on the entities. Because of some rounding operations, it's a bit lower than that.
 	 * This value gives 58-61 ticks/second, hovering around 59-60
 	 */
-	public static int TICKS_PER_SECOND = 60;
+	public static int TICKS_PER_SECOND = 63;
 	/**
 	 * Nanoseconds in a second
 	 */
@@ -61,7 +61,7 @@ public class Parameters {
 	 * Lower means turns are tighter at speed. 
 	 * 1 means at top speed turning is impossible.
 	 */
-	public static double ROTATION_MODIFIER = 0.8;
+	public static double ROTATION_MODIFIER = 0.5;
 	/**
 	 * Applied to ship speeds every tick.
 	 */
@@ -70,8 +70,8 @@ public class Parameters {
 	//////// BULLET PARAMS //////////
 	public static double BIG_BULLET_MASS = 30;
 	public static double SMALL_BULLET_MASS = 10;
-	public static double BIG_BULLET_SPEED = 2;
-	public static double SMALL_BULLET_SPEED = 4;
+	public static double BIG_BULLET_SPEED = 5;
+	public static double SMALL_BULLET_SPEED = 8;
 	public static int SMALL_BULLET_CD = 1000; // Milliseconds
 	public static int BIG_BULLET_CD = 3000;   //
 	public static int BIG_BULLET_MIN_DIST = 50;
