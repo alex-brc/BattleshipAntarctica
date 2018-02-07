@@ -43,7 +43,7 @@ public class Ship extends Entity {
 		this.position = position;
 		
 		setTurretsPosition();
-		
+		// Turrets direction set in model
 	}
 
 	/**
@@ -67,20 +67,20 @@ public class Ship extends Entity {
 		double angle = Renderer.getScreenPosition(frontTurret.getPosition())
 				.getAngleTo(mousePosition);
 		angle = (-1)*angle + Math.PI/2;
-		ra = angle + (Math.PI - this.getDirection()) - Math.PI/2;
+		ra = angle + (Math.PI - this.getDirection());
 		ra = PhysicsManager.shiftAngle(ra);
-		// Range of motion: [7pi/4, 5pi/4]
-		if( ra < 5.0 * Math.PI / 4 || ra > 7.0 * Math.PI / 4)
+		// Range of motion: [5*pi/4, 3*pi/4]
+		if( ra < 3.0 * Math.PI / 4 || ra > 5.0 * Math.PI / 4)
 			frontTurret.setDirection(angle);
 
 		// Rear
 		angle = Renderer.getScreenPosition(rearTurret.getPosition())
 				.getAngleTo(mousePosition);
 		angle = (-1)*angle + Math.PI/2;
-		ra = angle + (Math.PI - this.getDirection())  - Math.PI/2;
+		ra = angle + (Math.PI - this.getDirection());
 		ra = PhysicsManager.shiftAngle(ra);
-		// Range of motion: [3pip/4,pi/4]
-		if( ra < 1.0 * Math.PI / 4 || ra > 3.0 * Math.PI / 4)
+		// Range of motion: [pi/4,7*pi/4]
+		if( ra > 1.0 * Math.PI / 4 && ra < 7.0 * Math.PI / 4)
 			rearTurret.setDirection(angle);
 
 		// Mid
