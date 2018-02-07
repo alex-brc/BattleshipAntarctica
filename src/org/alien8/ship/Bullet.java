@@ -24,6 +24,8 @@ public class Bullet extends Entity {
 			this.setSpeed(Parameters.BIG_BULLET_SPEED);
 			this.setMass(Parameters.BIG_BULLET_MASS);	
 		}
+		
+		initObb();
 	}
 	
 	@Override

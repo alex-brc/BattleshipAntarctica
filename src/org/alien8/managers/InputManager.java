@@ -83,7 +83,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 		return spacePressed;
 	}
 	/**
-	 * @return the latest mouse position, in XY coordinates
+	 * @return the latest mouse position, in screen XY coordinates
 	 */
 	public Position mousePosition() {
 		return mousePosition;

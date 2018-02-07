@@ -90,7 +90,7 @@ public abstract class Entity {
   }
 
   public void setSpeed(double speed) {
-	// Makes friction less CPU-intensive sometimes
+	// Makes gliding less CPU-intensive sometimes
 	if(speed < 0.001d)
 		speed = 0;
     this.speed = speed;
@@ -133,7 +133,7 @@ public abstract class Entity {
     obb[1] = new Position(centerX + width / 2, centerY + length / 2);
     obb[2] = new Position(centerX + width / 2, centerY - length / 2);
     obb[3] = new Position(centerX - width / 2, centerY - length / 2);
-
+    
 
     // Now rotate box to correct orientation
     rotateObb(direction);

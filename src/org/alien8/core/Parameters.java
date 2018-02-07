@@ -17,18 +17,26 @@ public class Parameters {
 	 * How often the model calls update() on the entities. Because of some divisions, it's a bit lower than that.
 	 * This value gives 58-61 ticks/second, hovering around 59-60
 	 */
-	public static int TICKS_PER_SECOND = 63;
+	public static int TICKS_PER_SECOND = 60;
+	/**
+	 * Nanoseconds in a second
+	 */
+	public static int N_SECOND = 1000000000;
 	/**
 	 * Size of map hitboxes
 	 */
 	public static int MAP_BOX_SIZE = 4;
-	/**
-	 * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for simplicity.
-	 */
-	public static int FPS_FREQ = 4;
-	public static int N_SECOND = 1000000000;
 	public static int MAP_HEIGHT = 2048;
 	public static int MAP_WIDTH = 2048;
+	/**
+	 * Must be between 0 and 1. Affects the size and frequency of
+	 * the ice patches
+	 */
+	public static double WATER_LEVEL = 0.4d;
+	/**
+	 * How many times a second to update the FPS tracker. Ideally, set to a divisor of 1,000,000,000 for optimization.
+	 */
+	public static int FPS_FREQ = 2;
 	
 	////////////// SHIP PARAMS ////////////////
 	

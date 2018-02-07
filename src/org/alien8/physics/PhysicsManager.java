@@ -46,9 +46,8 @@ public class PhysicsManager {
     double ydiff = speed * Math.sin(direction);
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
-    // Update the Oriented Bounding Box
-    // TODO: This causes an error. 
-    // e.translateObb(xdiff, ydiff);
+    // Update the Oriented Bounding Box 
+    e.translateObb(xdiff, ydiff);
   }
 
   /**
@@ -59,7 +58,6 @@ public class PhysicsManager {
    * @param clockwise Set to true if the rotation is clockwise, false if anti-clockwise.
    */
   public static void rotateEntity(Entity e, double angle) {
-	// TODO: Get speed modifier
 	angle *= (Parameters.SHIP_TOP_SPEED_FORWARD - e.getSpeed()) * Parameters.ROTATION_MODIFIER;
     // Update the direction of the Entity, but also the bounding box
     e.setDirection(shiftAngle(e.getDirection() + angle));

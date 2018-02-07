@@ -73,6 +73,7 @@ public class Renderer extends Canvas {
 	
 	//Render terrain here
 	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false);
+	model.getMap().render(this);
 	
 	for(Entity e : model.getEntities()){
 		e.render(this);
