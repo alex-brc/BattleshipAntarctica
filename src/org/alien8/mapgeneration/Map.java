@@ -6,6 +6,7 @@ import org.alien8.core.Entity;
 import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Map{
 	protected int length;
@@ -13,8 +14,7 @@ public class Map{
 	protected int lengthDensity;
 	protected int widthDensity;
 	protected boolean[][] iceGrid;
-	//protected List<Entity> iceEntities;
-	protected List<AABB> roughAABBs;
+	protected List<AABB> roughAABBs = new ArrayList<AABB>();
 	
 	public Map(){
 		length = 0;
@@ -30,7 +30,7 @@ public class Map{
 		widthDensity = wD;
 		iceGrid = new boolean[l][w];
 		makeMap();
-		makeRoughAABBs();
+		makeRoughAABBs(4);
 	}
 	
 	protected void makeMap(){
@@ -46,12 +46,13 @@ public class Map{
 	}
 	
 	protected void makeRoughAABBs(int boxSize){
+		System.out.println(length);
 		for (int y = 0; y < width; y+=boxSize){
 			for (int x = 0; x < length; x+=boxSize){
-				
+				System.out.println(x);
 				int countIce = 0;
-				for (int locY = y; locY < (y+boxSize); y++){
-					for (int locX = x; locX < (x+boxSize); x++){
+				for (int locY = y; locY < (y+boxSize); locY++){
+					for (int locX = x; locX < (x+boxSize); locX++){
 						if (iceGrid[locX][locY]){
 							countIce++;
 						}
@@ -78,5 +79,9 @@ public class Map{
 	
 	public boolean[][] getIceGrid(){
 		return iceGrid;
-	} 
+	}
+	
+	/*public static void main(String[] args){
+		Map test = new Map(512,512,8,8);
+	}*/
 }
