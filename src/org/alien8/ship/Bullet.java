@@ -33,7 +33,7 @@ public class Bullet extends Entity {
 		// If this distance calculation is too slow, 
 		// we can change to a limited life span of 
 		// bullets, after which they are deleted 
-		if(this.isOutOfBounds() || startingPosition.distanceTo(position) > distance)
+		if(position.isOutOfBounds() || startingPosition.distanceTo(position) > distance)
 			this.delete();
 	}
 	

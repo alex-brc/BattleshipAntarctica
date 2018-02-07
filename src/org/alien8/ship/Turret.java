@@ -21,17 +21,30 @@ public class Turret {
 	private long cooldown;
 	// Charged distance of this turret
 	private double distance;
+	private double minDistance;
+	private double maxDistance;
 
 	public Turret(Position position, int type) {
 		this.position = position;
 		this.direction = 0;
-		this.lastShot = System.currentTimeMillis();
 		this.type = type;
-		this.cooldown = (type == Turret.BIG) ? Parameters.BIG_BULLET_CD : Parameters.SMALL_BULLET_CD; 
+		this.cooldown = (type == Turret.BIG) ? Parameters.BIG_BULLET_CD : Parameters.SMALL_BULLET_CD;
+		this.lastShot = System.currentTimeMillis() - cooldown;
+		this.minDistance = (type == Turret.BIG) ? Parameters.BIG_BULLET_MIN_DIST : Parameters.SMALL_BULLET_MIN_DIST;
+		this.maxDistance = (type == Turret.BIG) ? Parameters.BIG_BULLET_MAX_DIST : Parameters.SMALL_BULLET_MAX_DIST;
+		this.distance = this.minDistance;
 	}
 	
+	/**
+	 * Charge the distance for every tick the button is pressed.
+	 * Only start charging if it's not on cooldown.
+	 * If it reached max charge, shoot.
+	 */
 	public void charge() {
-		this.distance++;
+		if(!this.isOnCooldon() && this.distance <= this.maxDistance) 
+			this.distance += Parameters.CHARGE_INCREMENT;
+		else
+			this.shoot();
 	}
 	
 	/**
@@ -39,7 +52,7 @@ public class Turret {
 	 * @param type
 	 */
 	public void shoot() {
-		if(distance == 0 || this.isOnCooldon())
+		if(distance == this.minDistance || this.isOnCooldon())
 			return;
 		
 		ModelManager.getInstance()
@@ -47,10 +60,10 @@ public class Turret {
 				this.getPosition(),
 				this.getDirection(),
 				type,
-				distance*Parameters.CHARGE_MODIFIER));
+				distance));
 		
 		this.startCooldown();
-		this.distance = 0;
+		this.distance = this.minDistance;
 	}
 	
 	/**
@@ -90,12 +103,34 @@ public class Turret {
 		return false;
 	}
 	
+	/**
+	 * Puts the turret on cooldown.
+	 */
 	private void startCooldown() {
 		this.lastShot = System.currentTimeMillis();
 	}
+	
+	/**
+	 * Gets the remaining cooldown
+	 * @return the remaining cooldown time in milliseconds
+	 */
+	public long getCooldown() {
+		long result = (lastShot + cooldown) - System.currentTimeMillis();
+		if(result < 0)
+			return 0;
+		return result;
+	}
 
 	public void render(Renderer r) {
-		r.drawRect((int)position.getX(), (int)position.getY(), 4, 4, 0xFF0000, false);
+		if(this.isOnCooldon())
+			r.drawRect((int)position.getX(), (int)position.getY(), 4, 4, 0xFF0000, false);
+		else
+			r.drawRect((int)position.getX(), (int)position.getY(), 4, 4, 0x00FF00, false);
+	}
+
+	public Position getScreenPosition() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

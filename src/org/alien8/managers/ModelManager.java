@@ -24,7 +24,6 @@ public class ModelManager {
 	private static ModelManager instance = new ModelManager();
 	private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
 	private Map map = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8);
-	
 
 	private ModelManager() {
 		// All setup should be done here, such as support for networking, etc.
@@ -54,8 +53,7 @@ public class ModelManager {
 				// Skip the rest
 				continue;
 			}
-			if(ent.getSerial() == 1) { // Then it's the player
-				
+			if(ent.isPlayer()) { // Then it's the player
 				// Do movement first
 				// Apply forward OR backward force
 				if(im.wPressed())

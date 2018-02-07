@@ -11,9 +11,11 @@ package org.alien8.core;
  * 
  */
 public class Parameters {
+	
+	///////////// META AND GAME PARAMS ////////
 	/**
 	 * How often the model calls update() on the entities. Because of some divisions, it's a bit lower than that.
-	 * This value gies 58-60 ticks/second, hovering around 59
+	 * This value gives 58-61 ticks/second, hovering around 59-60
 	 */
 	public static int TICKS_PER_SECOND = 63;
 	/**
@@ -27,6 +29,9 @@ public class Parameters {
 	public static int N_SECOND = 1000000000;
 	public static int MAP_HEIGHT = 2048;
 	public static int MAP_WIDTH = 2048;
+	
+	////////////// SHIP PARAMS ////////////////
+	
 	/**
 	 * Length of the ship in units (the same units we use for the coordinate system)
 	 * Currently, this number doesn't mean much
@@ -49,17 +54,25 @@ public class Parameters {
 	 * 1 means at top speed turning is impossible.
 	 */
 	public static double ROTATION_MODIFIER = 0.8;
+	/**
+	 * Applied to ship speeds every tick.
+	 */
 	public static double FRICTION = 0.997;
+	
+	//////// BULLET PARAMS //////////
 	public static double BIG_BULLET_MASS = 30;
 	public static double SMALL_BULLET_MASS = 10;
 	public static double BIG_BULLET_SPEED = 2;
 	public static double SMALL_BULLET_SPEED = 4;
-	// Bullet cooldowns in miliseconds
-	public static int SMALL_BULLET_CD = 500;
-	public static int BIG_BULLET_CD = 2000;
+	public static int SMALL_BULLET_CD = 1000; // Milliseconds
+	public static int BIG_BULLET_CD = 3000;   //
+	public static int BIG_BULLET_MIN_DIST = 50;
+	public static int BIG_BULLET_MAX_DIST = 400;
+	public static int SMALL_BULLET_MIN_DIST = 50;
+	public static int SMALL_BULLET_MAX_DIST = 400;
 	/**
 	 * This modifier affects how much distance holding down
-	 * a button gives to the turret shot
+	 * a button gives to the turret shot every tick
 	 */
-	public static double CHARGE_MODIFIER = 20;
+	public static double CHARGE_INCREMENT = 4;
 }

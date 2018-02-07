@@ -47,10 +47,9 @@ public class Map{
 	}
 	
 	protected void makeRoughAABBs(int boxSize){
-		System.out.println(length);
 		for (int y = 0; y < width; y+=boxSize){
 			for (int x = 0; x < length; x+=boxSize){
-				System.out.println(x);
+				
 				int countIce = 0;
 				for (int locY = y; locY < (y+boxSize); locY++){
 					for (int locX = x; locX < (x+boxSize); locX++){

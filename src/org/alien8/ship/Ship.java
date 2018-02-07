@@ -37,10 +37,8 @@ public class Ship extends Entity {
 	@Override
 	public void setPosition(Position position) {
 		// Don't move if it's out of bounds
-		if(this.isOutOfBounds())
-			position = new Position(100,100);
-
-		this.position = position;
+		if(!position.isOutOfBounds())
+			this.position = position;
 		
 		setTurretsPosition();
 		// Turrets direction set in model
@@ -70,9 +68,9 @@ public class Ship extends Entity {
 		ra = angle + (Math.PI - this.getDirection());
 		ra = PhysicsManager.shiftAngle(ra);
 		// Range of motion: [5*pi/4, 3*pi/4]
-		if( ra < 3.0 * Math.PI / 4 || ra > 5.0 * Math.PI / 4)
+		if( ra > 1.0 * Math.PI / 4 && ra < 7.0 * Math.PI / 4)
 			frontTurret.setDirection(angle);
-
+		
 		// Rear
 		angle = Renderer.getScreenPosition(rearTurret.getPosition())
 				.getAngleTo(mousePosition);
@@ -80,7 +78,7 @@ public class Ship extends Entity {
 		ra = angle + (Math.PI - this.getDirection());
 		ra = PhysicsManager.shiftAngle(ra);
 		// Range of motion: [pi/4,7*pi/4]
-		if( ra > 1.0 * Math.PI / 4 && ra < 7.0 * Math.PI / 4)
+		if( ra < 3.0 * Math.PI / 4 || ra > 5.0 * Math.PI / 4)		
 			rearTurret.setDirection(angle);
 
 		// Mid

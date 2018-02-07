@@ -112,14 +112,6 @@ public abstract class Entity {
     this.length = length;
   }
   
-  public boolean isOutOfBounds() {
-	  double x = this.getPosition().getX();
-	  double y = this.getPosition().getY();
-	  if(x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
-		  return true;
-	  return false;
-  }
-  
   public Position[] getObb() {
     return obb;
   }
@@ -181,6 +173,12 @@ public abstract class Entity {
       // Set corner position
       corner = new Position(cornerX, cornerY);
     }
+  }
+
+  public boolean isPlayer() {
+	  if(this.getSerial() == 1)
+		  return true;
+	  return false;
   }
   
   public void render(Renderer r){

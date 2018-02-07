@@ -11,6 +11,7 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 
 import org.alien8.core.Entity;
+import org.alien8.core.Parameters;
 import org.alien8.managers.InputManager;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
@@ -71,6 +72,7 @@ public class Renderer extends Canvas {
 	yScroll = (int) (player.getPosition().getY() - height / 2);
 	
 	//Render terrain here
+	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false);
 	
 	for(Entity e : model.getEntities()){
 		e.render(this);
