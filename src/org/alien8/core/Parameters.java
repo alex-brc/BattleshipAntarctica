@@ -29,6 +29,8 @@ public class Parameters {
 	public static int N_SECOND = 1000000000;
 	public static int MAP_HEIGHT = 2048;
 	public static int MAP_WIDTH = 2048;
+	public static int SNAPSHOTS_PER_SECOND = 60;
+	public static int INPUT_SAMPLING_RATE = 60;
 	
 	////////////// SHIP PARAMS ////////////////
 	

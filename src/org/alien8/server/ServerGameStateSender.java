@@ -9,11 +9,11 @@ import java.net.InetAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.core.Entity;
+import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
 
 public class ServerGameStateSender extends Thread {
 	
-	private final int SNAPSHOTS_PER_SECOND = 60;
 	private InetAddress clientIP = null;
 	private DatagramSocket socket = null;
 	private ModelManager model = ModelManager.getInstance();
@@ -25,7 +25,6 @@ public class ServerGameStateSender extends Thread {
 	}
 	
 	public void run() {
-		
 		// Send game state snapshot 60 times per second
 		while (run) {
 			try {
@@ -37,13 +36,14 @@ public class ServerGameStateSender extends Thread {
 				objOut.writeObject(gameState);
 				byte[] gameStateByte = byteOut.toByteArray();
 				
+				// Create a packet for holding the game state byte data
 		        DatagramPacket packet = new DatagramPacket(gameStateByte, gameStateByte.length, clientIP, 4446);
 		        
-		        // Send the game state byte array to client
+		        // Send the game state packet to client
 		        socket.send(packet);
 		        
 		        // Thread pauses operation according to snapshot sending rate
-		        sleep(1000 / SNAPSHOTS_PER_SECOND);
+		        sleep(1000 / Parameters.SNAPSHOTS_PER_SECOND);
 			}
 			catch (IOException e) {
 				System.err.println("Error on sending game state packet");
@@ -53,7 +53,6 @@ public class ServerGameStateSender extends Thread {
 				e.printStackTrace();
 			}
 		}
-		
 	}
 	
 	public InetAddress getClientIP() {
