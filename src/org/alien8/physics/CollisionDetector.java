@@ -2,6 +2,7 @@ package org.alien8.physics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.core.Entity;
 
 public class CollisionDetector {
@@ -11,7 +12,7 @@ public class CollisionDetector {
    * @param entities a List of Entities which are being checked for collisions
    * @return a List of Collisions
    */
-  public List<Collision> checkForCollisions(List<Entity> entities) {
+  public List<Collision> checkForCollisions(ConcurrentLinkedQueue<Entity> entities) {
     /*
      * BROAD PHASE: In this phase, we do some rough spatial examination of the Entities to rule out
      * collisions between objects that are very far away. We end up with a list of potential
@@ -48,7 +49,7 @@ public class CollisionDetector {
    * @param entities a List of Entities
    * @return a list of AABB's. Each one represents one Entity
    */
-  private ArrayList<AABB> createAabbs(List<Entity> entities) {
+  private ArrayList<AABB> createAabbs(ConcurrentLinkedQueue<Entity> entities) {
     ArrayList<AABB> aabbs = new ArrayList<AABB>();
     for (Entity e : entities) {
       // Get position and length from the Entity

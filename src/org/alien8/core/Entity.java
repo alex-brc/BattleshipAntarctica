@@ -1,6 +1,7 @@
 package org.alien8.core;
 
 import org.alien8.physics.Position;
+import org.alien8.rendering.Renderer;
 
 /**
  * This abstract class implements the generic Entity. All things that are part of the game map are
@@ -9,15 +10,19 @@ import org.alien8.physics.Position;
  *
  */
 public abstract class Entity {
-  private Position position;
-  private long serial = -1;
+  protected Position position;
+  protected long serial = -1;
+  protected boolean toBeDeleted = false;
 
   private double mass;
   private double speed;
   private double direction;
   private double length;
   private double width;
+  private double health;
   private Position[] obb;
+
+  public Entity() {}
 
   /**
    * Basic constructor for an entity
@@ -25,33 +30,22 @@ public abstract class Entity {
    * @param position the XY coordinates for this entity
    * @param id the ID of this entity. The ID determines the type of the entity
    */
-  public Entity(Position position) {
-    this.setPosition(position);
-  }
-
-  /**
-   * Basic constructor for an entity
-   * 
-   * @param x X coordinate for this entity
-   * @param y Y coordinate for this entity
-   * @param id the ID of this entity. The ID determines the type of the entity
-   */
-  public Entity(double x, double y) {
-    this.setPosition(new Position(x, y));
+  public Entity(Position position, double direction, double speed, double mass, double length,
+      double width) {
+    this.position = position;
+    this.direction = direction;
+    this.speed = speed;
+    this.mass = mass;
+    this.length = length;
+    this.width = width;
     initObb();
   }
 
-  /**
-   * This method is called in the game loop. It must implement the behaviour of the entity on an
-   * update step (if it needs to).
-   */
-  public abstract void update();
-
-  /**
-   * This method is called in the game loop. It should use the renderer to be displayed on screen
-   * (if it is the case)
-   */
-  public abstract void render();
+  public Entity(Position position, double direction) {
+    this.position = position;
+    this.direction = direction;
+    initObb();
+  }
 
   /**
    * @return the position in XY coordinates
@@ -75,7 +69,15 @@ public abstract class Entity {
     if (this.serial == -1) {
       this.serial = serial;
     }
-    // Else, do nothing. Only works once.
+    // Only works once.
+  }
+
+  public void delete() {
+    this.toBeDeleted = true;
+  }
+
+  public boolean isToBeDeleted() {
+    return toBeDeleted;
   }
 
   public double getMass() {
@@ -91,6 +93,9 @@ public abstract class Entity {
   }
 
   public void setSpeed(double speed) {
+    // Makes friction less CPU-intensive sometimes
+    if (speed < 0.001d)
+      speed = 0;
     this.speed = speed;
   }
 
@@ -108,6 +113,22 @@ public abstract class Entity {
 
   public void setLength(double length) {
     this.length = length;
+  }
+
+  public double getWidth() {
+    return width;
+  }
+
+  public void setWidth(double width) {
+    this.width = width;
+  }
+
+  public boolean isOutOfBounds() {
+    double x = this.getPosition().getX();
+    double y = this.getPosition().getY();
+    if (x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
+      return true;
+    return false;
   }
 
   public Position[] getObb() {
@@ -171,5 +192,21 @@ public abstract class Entity {
       // Set corner position
       corner = new Position(cornerX, cornerY);
     }
+  }
+
+  public void render(Renderer r) {
+
+  }
+
+  public double getHealth() {
+    return health;
+  }
+
+  public void setHealth(double health) {
+    this.health = health;
+  }
+
+  public void damage(double damage) {
+    this.health -= damage;
   }
 }

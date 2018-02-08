@@ -1,6 +1,7 @@
 package org.alien8.physics;
 
 import org.alien8.core.Entity;
+import org.alien8.core.Parameters;
 
 public class PhysicsManager {
   /**
@@ -25,7 +26,10 @@ public class PhysicsManager {
 
     // Update the speed and direction of the Entity
     e.setSpeed(Math.sqrt((newSpeedX * newSpeedX) + (newSpeedY * newSpeedY)));
-    e.setDirection(Math.atan(newSpeedY / newSpeedX));
+    if(e.getSpeed() > Parameters.SHIP_TOP_SPEED_FORWARD)
+    	e.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD);
+    // TODO:this is causing weird stuff. 
+    // e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
   }
 
   /**
@@ -43,7 +47,8 @@ public class PhysicsManager {
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
     // Update the Oriented Bounding Box
-    e.translateObb(xdiff, ydiff);
+    // TODO: This causes an error. 
+    // e.translateObb(xdiff, ydiff);
   }
 
   /**
@@ -53,18 +58,25 @@ public class PhysicsManager {
    * @param e The Entity to be rotated.
    * @param clockwise Set to true if the rotation is clockwise, false if anti-clockwise.
    */
-  public static void rotateEntity(Entity e, boolean clockwise) {
-    // This modifier can be tweaked during testing
-    double modifier = 0.2;
-    double angle = modifier * e.getSpeed();
-    // In both of these cases, we update the direction of the Entity, but also the bounding box
-    if (clockwise) {
-      e.setDirection(e.getDirection() + angle);
-      e.rotateObb(angle);
-    } else {
-      e.setDirection(e.getDirection() - angle);
-      e.rotateObb(-angle);
-    }
+  public static void rotateEntity(Entity e, double angle) {
+	// TODO: Get speed modifier
+	angle *= (Parameters.SHIP_TOP_SPEED_FORWARD - e.getSpeed()) * Parameters.ROTATION_MODIFIER;
+    // Update the direction of the Entity, but also the bounding box
+    e.setDirection(shiftAngle(e.getDirection() + angle));
+    e.rotateObb(angle);
+  }
+  
+  /**
+   * Shifts the angle in radians to [0,2pi) interval.
+   * 
+   * @param rads the angle in radians to shift.
+   */
+  public static double shiftAngle(double rads) {
+	  while(rads < 0)
+		  rads += 2*Math.PI;
+	  while(rads >= 2*Math.PI)
+		  rads -= 2*Math.PI;
+	  return rads;
   }
 
   // /**
