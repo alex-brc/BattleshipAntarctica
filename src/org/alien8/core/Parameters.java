@@ -15,73 +15,73 @@ public class Parameters {
 
   /**
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
-   * than that. This value gies 58-60 ticks/second, hovering around 59
+   * than that. This value gives 58-60 ticks/second, hovering around 59
    */
-  public static int TICKS_PER_SECOND = 63;
+  public static final int TICKS_PER_SECOND = 63;
   /**
    * Size of map hitboxes
    */
-  public static int MAP_BOX_SIZE = 4;
+  public static final int MAP_BOX_SIZE = 4;
   /**
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */
-  public static int FPS_FREQ = 4;
-  public static int N_SECOND = 1000000000;
-  public static int MAP_HEIGHT = 2048;
-  public static int MAP_WIDTH = 2048;
+  public static final int FPS_FREQ = 4;
+  public static final int N_SECOND = 1000000000;
+  public static final int MAP_HEIGHT = 2048;
+  public static final int MAP_WIDTH = 2048;
   /**
    * Length of the ship in units (the same units we use for the coordinate system) Currently, this
    * number doesn't mean much
    */
-  public static double SHIP_LENGTH = 100;
-  public static double SHIP_WIDTH = 25;
+  public static final double SHIP_LENGTH = 100;
+  public static final double SHIP_WIDTH = 25;
   /**
    * Interdependent stuff. Force required is computed according to how long it would take to reach
    * top speed
    */
-  public static double SHIP_TOP_SPEED_REACH_TIME = 200;
-  public static double SHIP_TOP_SPEED_FORWARD = 2;
-  public static double SHIP_TOP_SPEED_BACKWARD = 2;
-  public static double SHIP_MASS = 1000; // kg. This is kinda random
-  public static double SHIP_FORWARD_FORCE =
+  public static final double SHIP_TOP_SPEED_REACH_TIME = 200;
+  public static final double SHIP_TOP_SPEED_FORWARD = 2;
+  public static final double SHIP_TOP_SPEED_BACKWARD = 2;
+  public static final double SHIP_MASS = 1000; // kg. This is kinda random
+  public static final double SHIP_FORWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME; // N
-  public static double SHIP_BACKWARD_FORCE =
+  public static final double SHIP_BACKWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
-  public static double SHIP_ROTATION_PER_SEC = Math.PI / 2;
+  public static final double SHIP_ROTATION_PER_SEC = Math.PI / 2;
   /**
    * Affects how much the speed impacts the turning rate Lower means turns are tighter at speed. 1
    * means at top speed turning is impossible.
    */
-  public static double ROTATION_MODIFIER = 0.8;
-  public static double FRICTION = 0.997;
+  public static final double ROTATION_MODIFIER = 0.8;
+  public static final double FRICTION = 0.997;
   // Affects how much speed is lost when Entities collide
-  public static double RESTITUTION_COEFFICIENT;
+  public static final double RESTITUTION_COEFFICIENT = 0.5;
   /**
    * Bullet parameters
    */
-  public static double SMALL_BULLET_MASS = 10;
-  public static double SMALL_BULLET_WIDTH = 2;
-  public static double SMALL_BULLET_LENGTH = 4;
-  public static double SMALL_BULLET_SPEED = 4;
-  public static double SMALL_BULLET_DAMAGE = 10;
+  public static final double SMALL_BULLET_MASS = 10;
+  public static final double SMALL_BULLET_WIDTH = 2;
+  public static final double SMALL_BULLET_LENGTH = 4;
+  public static final double SMALL_BULLET_SPEED = 4;
+  public static final double SMALL_BULLET_DAMAGE = 10;
   // Bullet cooldown in milliseconds
-  public static int SMALL_BULLET_CD = 500;
+  public static final int SMALL_BULLET_CD = 500;
 
-  public static double BIG_BULLET_MASS = 30;
-  public static double BIG_BULLET_WIDTH = 4;
-  public static double BIG_BULLET_LENGTH = 6;
-  public static double BIG_BULLET_SPEED = 2;
-  public static double BIG_BULLET_DAMAGE = 10;
-  public static int BIG_BULLET_CD = 2000;
+  public static final double BIG_BULLET_MASS = 30;
+  public static final double BIG_BULLET_WIDTH = 4;
+  public static final double BIG_BULLET_LENGTH = 6;
+  public static final double BIG_BULLET_SPEED = 2;
+  public static final double BIG_BULLET_DAMAGE = 10;
+  public static final int BIG_BULLET_CD = 2000;
   /**
    * This modifier affects how much distance holding down a button gives to the turret shot
    */
-  public static double CHARGE_MODIFIER = 20;
+  public static final double CHARGE_MODIFIER = 20;
   /**
    * This modifier affects how much damage ships take in collisions.
    */
-  public static double COLLISION_DAMAGE_MODIFIER = 0.5;
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.5;
 
 
 }
