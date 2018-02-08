@@ -89,6 +89,8 @@ public class Client implements Runnable{
 
 			int frameRate = 0;
 			long frameTimer = getTime();
+			connect("172.22.35.217");
+			//147.188.254.171
 
 			while (running) {
 				currentTime = getTime();
@@ -98,7 +100,7 @@ public class Client implements Runnable{
 
 				// Call update() as many times as needed to compensate before rendering
 				while (catchUp >= 1) {
-					model.update();
+					//model.update();
 					catchUp--;
 					// Update last time
 					lastTime = getTime();

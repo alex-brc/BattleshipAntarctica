@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 
 import org.alien8.core.Parameters;
+import org.alien8.managers.ModelManager;
 
 public class ClientInputSampleSender extends Thread {
 	
@@ -24,7 +25,8 @@ public class ClientInputSampleSender extends Thread {
 				// Serialize the input sample object into byte array 
 				ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 				ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-				objOut.writeObject(new ClientInputSample());
+				ClientInputSample cis = new ClientInputSample();
+				objOut.writeObject(cis);
 				byte[] clientInputSampleByte = byteOut.toByteArray();
 				
 				// Create a packet for holding the input sample byte data

@@ -30,8 +30,10 @@ public class Server {
 				byte[] buf = new byte[1024];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				
+				System.out.println("Waiting for packet....");
 				// Receive and process client's packet
 			    socket.receive(packet);
+			    System.out.println("A packet received!");
 			    processPacket(packet);
 			}
 			

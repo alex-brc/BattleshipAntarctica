@@ -24,7 +24,7 @@ public class ClientGameStateReceiver extends Thread {
 			    DatagramPacket packet = new DatagramPacket(buf, buf.length);
 			    
 			    // Receive a game state packet and obtain the byte data
-			    socket.receive(packet); 
+			    socket.receive(packet);
 			    byte[] gameStateByte = packet.getData();
 			    
 			    // Deserialize the game state byte data into object1

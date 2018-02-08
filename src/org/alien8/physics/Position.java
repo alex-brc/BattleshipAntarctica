@@ -1,12 +1,14 @@
 package org.alien8.physics;
 
+import java.io.Serializable;
+
 import org.alien8.core.Parameters;
 
 /**
  * Basic position class to pack together the X and Y coordinates for an entity.
  *
  */
-public class Position {
+public class Position implements Serializable{
 	private double x;
 	private double y;
 	
