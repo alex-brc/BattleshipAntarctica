@@ -166,4 +166,8 @@ public class ModelManager {
   public Entity getPlayer() {
     return getEntity(1); // change implementation later
   }
+  
+  public Map getMap() {
+	  return this.map;
+  }
 }

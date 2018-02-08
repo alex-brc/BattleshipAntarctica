@@ -183,9 +183,11 @@ public abstract class Entity {
    * @param ydiff the amount to translate in the Y direction
    */
   public void translateObb(double xdiff, double ydiff) {
-    for (Position corner : obb) {
-      corner = new Position(corner.getX() + xdiff, corner.getY() + ydiff);
+    Position[] result = new Position[4];
+	for (int i = 0; i < 4; i++) {
+      result[i] = new Position(obb[i].getX() + xdiff, obb[i].getY() + ydiff);
     }
+	this.obb = result;
   }
 
   public void rotateObb(double angle) {

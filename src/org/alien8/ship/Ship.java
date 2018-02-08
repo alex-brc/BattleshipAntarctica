@@ -108,7 +108,8 @@ public class Ship extends Entity {
   }
 
   public void render(Renderer r) {
-    r.drawRect((int) position.getX(), (int) position.getY(), 10, 20, 0x666666, false);
+    // r.drawRect((int) position.getX(), (int) position.getY(), 10, 20, 0x666666, false);
+    r.drawRect((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), (int) this.getLength(), (int) this.getWidth(), 0xFF0000, false);
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);
