@@ -37,7 +37,8 @@ public class Parameters {
 	 * How many times a second to update the FPS tracker. Ideally, set to a divisor of 1,000,000,000 for optimization.
 	 */
 	public static int FPS_FREQ = 2;
-	
+	public static int SNAPSHOTS_PER_SECOND = 60;
+	public static int INPUT_SAMPLING_RATE = 60;	
 	////////////// SHIP PARAMS ////////////////
 	
 	/**

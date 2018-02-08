@@ -3,6 +3,7 @@ package org.alien8.managers;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
@@ -98,6 +99,64 @@ public class ModelManager {
 			PhysicsManager.updatePosition(ent);
 		}
 	}
+	
+	/**
+	 * Server version of update()
+	 */
+	public void updateServer(ClientInputSample cis) {
+		for(Entity ent : entities) {
+			if(ent.isToBeDeleted()) {
+				entities.remove(ent);
+				// Accelerate it's removal
+				ent = null;	
+				// Skip the rest
+				continue;
+			}
+			if(ent instanceof Ship) { // Then it's the player
+				// Do movement first
+				// Apply forward OR backward force
+				if(cis.wPressed)
+					PhysicsManager.applyForce(ent, Parameters.SHIP_FORWARD_FORCE, ent.getDirection());
+				else if(cis.sPressed)
+					PhysicsManager.applyForce(ent, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(ent.getDirection() + Math.PI));
+				// System.out.println(ent.getSpeed());
+				// Apply rotation
+				if(cis.aPressed)
+					PhysicsManager.rotateEntity(ent, (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+				if(cis.dPressed)
+					PhysicsManager.rotateEntity(ent, Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+				
+				// Apply "friction"
+				ent.setSpeed(ent.getSpeed()*Parameters.FRICTION);
+				
+				// Update positions
+				PhysicsManager.updatePosition(ent);
+				
+				// Prepare for shootings
+				Ship sh = (Ship) ent;
+				
+				// Orientation
+				sh.setTurretsDirection(cis.mousePosition);
+				
+				if(cis.lmbPressed)
+					sh.frontTurretCharge();
+				else 
+					sh.frontTurretShoot();
+				
+				if(cis.rmbPressed)
+					sh.rearTurretCharge();
+				else
+					sh.rearTurretShoot();
+				
+				if(cis.spacePressed)
+					sh.midTurretCharge();
+				else
+					sh.midTurretShoot();
+			}
+			
+			PhysicsManager.updatePosition(ent);
+		}
+	}
 
 
 	/**
@@ -140,6 +199,13 @@ public class ModelManager {
 	 */
 	public ConcurrentLinkedQueue<Entity> getEntities() {
 		return entities;
+	}
+	
+	/**
+	 * Setter for the entity list (Used when client updates the game state according to a full snapshot received)
+	 */
+	public void setEntities(ConcurrentLinkedQueue<Entity> entities) {
+		this.entities = entities;
 	}
 	
 	public Entity getPlayer(){

@@ -2,9 +2,10 @@ package org.alien8.client;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.core.*;
+import org.alien8.managers.ModelManager;
 
 public class ClientGameStateReceiver extends Thread {
 	
@@ -18,25 +19,21 @@ public class ClientGameStateReceiver extends Thread {
 	public void run() {
 		while (run) {
 			try {
+				// Create a packet for receiving game state packet
 			    byte[] buf = new byte[1024];
 			    DatagramPacket packet = new DatagramPacket(buf, buf.length);
 			    
-			    // Receive gameStateByte array from server
+			    // Receive a game state packet and obtain the byte data
 			    socket.receive(packet); 
 			    byte[] gameStateByte = packet.getData();
 			    
-			    // Deserialize gameStateByte array into gameState object
+			    // Deserialize the game state byte data into object1
 			    ByteArrayInputStream byteIn = new ByteArrayInputStream(gameStateByte);
 			    ObjectInputStream objIn = new ObjectInputStream(byteIn);
-			    LinkedList<Entity> gameState = (LinkedList<Entity>) objIn.readObject();
+			    ConcurrentLinkedQueue<Entity> gameState = (ConcurrentLinkedQueue<Entity>) objIn.readObject();
 			    
-			    // TODO: update all state of entities according to the received gameState object
-			    
-			    
-			    
-			    
-			    
-			    
+			    // Update the game state
+			    ModelManager.getInstance().setEntities(gameState);
 			}
 			catch (IOException ioe) {
 				ioe.printStackTrace();
@@ -50,4 +47,5 @@ public class ClientGameStateReceiver extends Thread {
 	public void end() {
 		run = false;
 	}
+	
 }
