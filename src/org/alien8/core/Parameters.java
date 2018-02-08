@@ -25,6 +25,7 @@ public class Parameters {
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */
+  public static final int INPUT_SAMPLING_RATE = 60;
   public static final int FPS_FREQ = 4;
   public static final int N_SECOND = 1000000000;
   public static final int MAP_HEIGHT = 2048;
@@ -66,6 +67,8 @@ public class Parameters {
   public static final double SMALL_BULLET_DAMAGE = 10;
   // Bullet cooldown in milliseconds
   public static final int SMALL_BULLET_CD = 500;
+  public static final int SMALL_BULLET_MIN_DIST = 50;
+  public static final int SMALL_BULLET_MAX_DIST = 400;
 
   public static final double BIG_BULLET_MASS = 30;
   public static final double BIG_BULLET_WIDTH = 4;
@@ -73,12 +76,17 @@ public class Parameters {
   public static final double BIG_BULLET_SPEED = 2;
   public static final double BIG_BULLET_DAMAGE = 10;
   public static final int BIG_BULLET_CD = 2000;
+  public static final int BIG_BULLET_MIN_DIST = 50;
+  public static final int BIG_BULLET_MAX_DIST = 400;
+
   /**
-   * This modifier affects how much distance holding down a button gives to the turret shot
+   * This modifier affects how much distance holding down a button gives to the turret shot every
+   * tick
    */
-  public static final double CHARGE_MODIFIER = 20;
-  /**
+  public static final double CHARGE_INCREMENT = 4;
+  /*
    * This modifier affects how much damage ships take in collisions.
    */
   public static final double COLLISION_DAMAGE_MODIFIER = 0.5;
+  public static final double WATER_LEVEL = 0.4d;
 }

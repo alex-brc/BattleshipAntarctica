@@ -155,6 +155,14 @@ public class ModelManager {
     return entities;
   }
 
+  /**
+   * Setter for the entity list (Used when client updates the game state according to a full
+   * snapshot received)
+   */
+  public void setEntities(ConcurrentLinkedQueue<Entity> entities) {
+    this.entities = entities;
+  }
+
   public Entity getPlayer() {
     return getEntity(1); // change implementation later
   }

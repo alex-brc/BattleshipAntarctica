@@ -1,4 +1,7 @@
 package org.alien8.physics;
+
+import org.alien8.core.Parameters;
+
 /**
  * Basic position class to pack together the X and Y coordinates for an entity.
  *
@@ -87,7 +90,15 @@ public class Position {
 					)
 				);
 	}
-	
+
+	public boolean isOutOfBounds() {
+		double x = this.getX();
+		double y = this.getY();
+		if(x < 0 || x > Parameters.MAP_WIDTH || y < 0 || y > Parameters.MAP_HEIGHT)
+			return true;
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return "X: " + this.getX() + " Y: " + this.getY();

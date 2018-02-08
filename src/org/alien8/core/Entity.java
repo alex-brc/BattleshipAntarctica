@@ -227,4 +227,11 @@ public abstract class Entity {
   public void damage(double damage) {
     this.health -= damage;
   }
+
+
+  public boolean isPlayer() {
+    if (this.getSerial() == 1)
+      return true;
+    return false;
+  }
 }
