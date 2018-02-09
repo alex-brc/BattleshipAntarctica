@@ -1,6 +1,7 @@
 package org.alien8.ship;
 
 import org.alien8.core.Entity;
+import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
@@ -9,6 +10,7 @@ public abstract class Bullet extends Entity {
   private Position startingPosition;
   private double distance;
   private double damage;
+  private double travelled;
 
   public Bullet(Position position, double direction, double distance, double mass, double width,
       double length, double speed, double damage) {
@@ -16,16 +18,17 @@ public abstract class Bullet extends Entity {
     this.distance = distance;
     this.damage = damage;
     this.startingPosition = position;
+    this.travelled = 0;
   }
 
   @Override
   public void setPosition(Position position) {
     this.position = position;
-
+    this.travelled += this.getSpeed();
     // If this distance calculation is too slow,
     // we can change to a limited life span of
     // bullets, after which they are deleted
-    if (this.isOutOfBounds() || startingPosition.distanceTo(position) > distance)
+    if (this.getPosition().isOutOfBounds() || this.travelled > this.distance)
       this.delete();
   }
 
