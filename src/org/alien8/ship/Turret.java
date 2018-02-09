@@ -57,7 +57,7 @@ public class Turret {
   public void shoot() {
     if (distance == this.minDistance || this.isOnCooldon())
       return;
-
+    
     if (type == Turret.BIG) {
       ModelManager.getInstance()
           .addEntity(new BigBullet(this.getPosition(), this.getDirection(), distance));

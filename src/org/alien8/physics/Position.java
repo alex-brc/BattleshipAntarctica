@@ -54,7 +54,7 @@ public class Position {
 	 * @return true if the two positions are equal, false otherwise
 	 */
 	public boolean equals(Position position) {
-		if(this.getX() == position.getX() && this.getY() == position.getY())
+		if((int) this.getX() == (int) position.getX() && (int) this.getY() == (int) position.getY())
 			return true;
 		return false;
 	}

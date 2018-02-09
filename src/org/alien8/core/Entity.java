@@ -141,14 +141,6 @@ public abstract class Entity {
     this.width = width;
   }
 
-  public boolean isOutOfBounds() {
-    double x = this.getPosition().getX();
-    double y = this.getPosition().getY();
-    if (x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
-      return true;
-    return false;
-  }
-
   public Position[] getObb() {
     return obb;
   }
