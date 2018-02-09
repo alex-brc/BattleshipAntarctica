@@ -11,8 +11,6 @@ import org.alien8.rendering.Renderer;
  * 
  * All calculations relative to the ship consider the ship "located" at the position right under the
  * center of mass of the ship. Turrets are moved together with it with that consideration in mind.
- * All calculations relative to the ship consider the ship "located" at the position right under the
- * center of mass of the ship. Turrets are moved together with it with that consideration in mind.
  * 
  */
 public class Ship extends Entity {
