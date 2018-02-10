@@ -21,7 +21,7 @@ import org.alien8.ship.Ship;
  */
 public class ModelManager {
 
-  private int lastSerial = 0;
+  private long lastSerial = 0;
   private static ModelManager instance = new ModelManager();
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
   private CollisionDetector collisionDetector = new CollisionDetector();
@@ -165,5 +165,9 @@ public class ModelManager {
 
   public Entity getPlayer() {
     return getEntity(1); // change implementation later
+  }
+  
+  public Map getMap() {
+	  return this.map;
   }
 }
