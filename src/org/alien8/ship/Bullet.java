@@ -12,8 +12,6 @@ public abstract class Bullet extends Entity {
   private double damage;
   private double travelled;
   private long source;
-  
-  protected Sprite sprite = Sprite.bullet;
 
   public Bullet(Position position, double direction, double distance, double mass, double width,
       double length, double speed, double damage, long source) {
