@@ -73,8 +73,7 @@ public class Renderer extends Canvas {
 	
 	//Render terrain here
 	model.getMap().render(this);
-	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false);
-	// this is current terrible for fps. 
+	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false); //bounding box, remove later?
 	
 	for(Entity e : model.getEntities()){
 		e.render(this);
@@ -131,7 +130,6 @@ public class Renderer extends Canvas {
 		
 	for (int y = y0; y < y1;y++){
       for (int x = x0; x < x1;x++){
-		//getTile(x, y).render(x, y, screen);
     	if (x >= 0 && y >= 0 && x < Parameters.MAP_WIDTH && y < Parameters.MAP_HEIGHT){
     	  if (grid[x][y]){
     		drawPixel(x, y, 0xffffff, false);
