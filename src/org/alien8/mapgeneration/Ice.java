@@ -11,4 +11,10 @@ public class Ice extends Entity{
 		setSpeed(0d);
 		setMass(0d);
 	}
+
+	@Override
+	public void dealWithOutOfBounds() {
+		// TODO Auto-generated method stub
+		
+	}
 }
