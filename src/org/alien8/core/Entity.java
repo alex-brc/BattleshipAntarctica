@@ -13,15 +13,10 @@ public abstract class Entity {
   protected Position position;
   protected long serial = -1;
   protected boolean toBeDeleted = false;
-
-  private double mass;
-  private double speed;
-  private double direction;
-  private double length;
-  private double width;
-  private double health;
+  protected Properties properties = new Properties();
+  protected Attributes attributes = new Attributes();
+  
   private Position[] obb;
-
 
   /**
    * Empty constuctor. Should not be used. Here for technical purposes.
@@ -36,32 +31,18 @@ public abstract class Entity {
    * @param position the XY coordinates for this entity
    * @param id the ID of this entity. The ID determines the type of the entity
    */
-  // public Entity(Position position, double direction, double speed, double mass) {
-  // this.position = position;
-  // this.direction = direction;
-  // this.speed = speed;
-  // this.mass = mass;
-  // initObb();
-  // }
-  //
   public Entity(Position position, double direction, double speed, double mass, double length,
       double width) {
-    this.position = position;
-    this.direction = direction;
-    this.speed = speed;
-    this.mass = mass;
-    this.length = length;
-    this.width = width;
-    initObb();
+	this.position = position;
+	this.properties.setDirection(direction);
+	this.properties.setSpeed(speed);
+	this.properties.setMass(mass);
+	this.properties.setLength(length);
+	this.properties.setWidth(width);
+	
+	initObb();
   }
-
-  //
-  // public Entity(Position position, double direction) {
-  // this.position = position;
-  // this.direction = direction;
-  // initObb();
-  // }
-  //
+  
   /**
    * @return the position in XY coordinates
    */
@@ -95,54 +76,6 @@ public abstract class Entity {
     return toBeDeleted;
   }
 
-  public double getMass() {
-    return mass;
-  }
-
-  public void setMass(double mass) {
-    this.mass = mass;
-  }
-
-  public double getSpeed() {
-    return speed;
-  }
-
-  public void setSpeed(double speed) {
-    this.speed = speed;
-    // Makes friction less CPU-intensive sometimes
-    if (speed < 0.001d) {
-      speed = 0;
-    }
-  }
-
-  public double getDirection() {
-    return direction;
-  }
-
-  public void setDirection(double direction) {
-    this.direction = direction;
-  }
-
-  public double getLength() {
-    return length;
-  }
-
-  public void setLength(double length) {
-    this.length = length;
-  }
-
-  public double getWidth() {
-    return width;
-  }
-
-  public void setWidth(double width) {
-    this.width = width;
-  }
-
-  public Position[] getObb() {
-    return obb;
-  }
-
   /**
    * Method to initialise the Oriented Bounding Box (OBB) of an Entity, using its Position,
    * direction, length and width.
@@ -156,14 +89,14 @@ public abstract class Entity {
     // Corners are labelled:
     // 0 1
     // 3 2
-    obb[0] = new Position(centerX - length / 2, centerY + width / 2);
-    obb[1] = new Position(centerX + length / 2, centerY + width / 2);
-    obb[2] = new Position(centerX + length / 2, centerY - width / 2);
-    obb[3] = new Position(centerX - length / 2, centerY - width / 2);
+    obb[0] = new Position(centerX - this.getLength() / 2, centerY + this.getWidth() / 2);
+    obb[1] = new Position(centerX + this.getLength() / 2, centerY + this.getWidth() / 2);
+    obb[2] = new Position(centerX + this.getLength() / 2, centerY - this.getWidth() / 2);
+    obb[3] = new Position(centerX - this.getLength() / 2, centerY - this.getWidth() / 2);
 
 
     // Now rotate box to correct orientation
-    rotateObb(direction);
+    rotateObb(this.getDirection());
   }
 
   /**
@@ -210,22 +143,12 @@ public abstract class Entity {
     obb = newObb;
   }
 
-  public void render(Renderer r) {
-
-  }
-
-  public double getHealth() {
-    return health;
-  }
-
-  public void setHealth(double health) {
-    this.health = health;
-  }
+  public abstract void render(Renderer r);
 
   public void damage(double damage) {
-    this.health -= damage;
+    this.setHealth(this.getHealth() - damage);
   }
-
+  
   public boolean isPlayer() {
     if (this.getSerial() == 1)
       return true;
@@ -241,4 +164,60 @@ public abstract class Entity {
   }
 
   public abstract void dealWithOutOfBounds();
+
+  public double getHealth() {
+	  return this.attributes.getHealth();
+  }
+
+  public void setHealth(double health) {
+	  this.attributes.setHealth(health);
+  }
+  
+  public double getMass() {
+	  return this.properties.getMass();
+  }
+
+  public void setMass(double mass) {
+	  this.properties.setMass(mass);
+  }
+
+  public double getSpeed() {
+	  return this.properties.getSpeed();
+  }
+
+  public void setSpeed(double speed) {
+	  // Makes friction less CPU-intensive sometimes
+	  if (speed < 0.001d) {
+		  speed = 0;
+	  }
+	  this.properties.setSpeed(speed);
+  }
+
+  public double getDirection() {
+	  return this.properties.getDirection();
+  }
+
+  public void setDirection(double direction) {
+	  this.properties.setDirection(direction);
+  }
+
+  public double getLength() {
+	  return this.properties.getLength();
+  }
+
+  public void setLength(double length) {
+	  this.properties.setLength(length);
+  }
+
+  public double getWidth() {
+	  return this.properties.getWidth();
+  }
+
+  public void setWidth(double width) {
+	  this.properties.setWidth(width);
+  }
+
+  public Position[] getObb() {
+	  return obb;
+  }
 }

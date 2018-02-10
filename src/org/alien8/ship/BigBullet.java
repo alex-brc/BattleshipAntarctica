@@ -14,6 +14,6 @@ public class BigBullet extends Bullet {
 
   @Override
   public void render(Renderer r) {
-	  r.drawRect((int) position.getX(), (int) position.getY(), 2, 2, 0xffffff, false);
+	r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 2, 2, 0xffffff, false);
   }
 }

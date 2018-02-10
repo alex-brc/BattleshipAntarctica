@@ -26,7 +26,7 @@ public class ModelManager {
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
   private CollisionDetector collisionDetector = new CollisionDetector();
   private Map map = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8);
-
+  private Ship player;
 
   private ModelManager() {
     // All setup should be done here, such as support for networking, etc.
@@ -46,9 +46,9 @@ public class ModelManager {
    * The update() method updates the state of all entities
    */
   public void update() {
-    InputManager im = InputManager.getInstance();
-    // System.out.println(entities.size());
-    for (Entity ent : entities) {
+    // Loop through all the entities
+	for (Entity ent : entities) {
+	  // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
         // Accelerate it's removal
@@ -56,52 +56,13 @@ public class ModelManager {
         // Skip the rest
         continue;
       }
-      if (ent.getSerial() == 1) { // Then it's the player
-
-        // Do movement first
-        // Apply forward OR backward force
-        if (im.wPressed())
-          PhysicsManager.applyForce(ent, Parameters.SHIP_FORWARD_FORCE, ent.getDirection());
-        else if (im.sPressed())
-          PhysicsManager.applyForce(ent, Parameters.SHIP_BACKWARD_FORCE,
-              PhysicsManager.shiftAngle(ent.getDirection() + Math.PI));
-        // System.out.println(ent.getSpeed());
-        // Apply rotation
-        if (im.aPressed())
-          PhysicsManager.rotateEntity(ent,
-              (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-        if (im.dPressed())
-          PhysicsManager.rotateEntity(ent,
-              Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-
-        // Apply "friction"
-        ent.setSpeed(ent.getSpeed() * Parameters.FRICTION);
-
-        // Update positions
-        PhysicsManager.updatePosition(ent);
-
-        // Prepare for shootings
-        Ship sh = (Ship) ent;
-
-        // Orientation
-        sh.setTurretsDirection(im.mousePosition());
-
-        if (im.lmbPressed())
-          sh.frontTurretCharge();
-        else
-          sh.frontTurretShoot();
-
-        if (im.rmbPressed())
-          sh.rearTurretCharge();
-        else
-          sh.rearTurretShoot();
-
-        if (im.spacePressed())
-          sh.midTurretCharge();
-        else
-          sh.midTurretShoot();
+      // Handle player stuff
+      if (ent == this.getPlayer()) {
+    	Ship player = (Ship) ent;
+    	InputManager.getInstance().processInputs(player);
       }
-
+      
+      // Update the position of the entity
       PhysicsManager.updatePosition(ent);
     }
     ArrayList<Collision> collisions =
@@ -111,7 +72,6 @@ public class ModelManager {
       c.resolveCollision();
     }
   }
-
 
   /**
    * Syncs the client with the server
@@ -162,9 +122,13 @@ public class ModelManager {
   public void setEntities(ConcurrentLinkedQueue<Entity> entities) {
     this.entities = entities;
   }
-
-  public Entity getPlayer() {
-    return getEntity(1); // change implementation later
+  
+  public void setPlayer(Ship player) {
+	  this.player = player;
+  }
+  
+  public Ship getPlayer() {
+    return player;
   }
   
   public Map getMap() {

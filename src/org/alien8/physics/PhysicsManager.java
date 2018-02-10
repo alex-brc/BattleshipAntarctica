@@ -2,6 +2,7 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.ship.Ship;
 
 public class PhysicsManager {
   /**
@@ -30,6 +31,16 @@ public class PhysicsManager {
       e.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD);
     // TODO:this is causing weird stuff.
     // e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
+  }
+  
+  /**
+   * Slows the entity down by a constant scaling factor.
+   * Less complex than dealing with forces.
+   * 
+   * @param e the entity to apply friction to
+   */
+  public static void applyFriction(Entity e) {
+	  e.setSpeed(e.getSpeed() * Parameters.FRICTION);
   }
 
   /**
