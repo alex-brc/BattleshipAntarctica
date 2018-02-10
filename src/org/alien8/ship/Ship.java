@@ -95,7 +95,10 @@ public class Ship extends Entity {
     // the tip of the ship.
     double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
 
-    frontTurret.setPosition(this.getPosition().addPosition(
+    frontTurret
+    .setPosition(
+    		this.getPosition()
+    		.addPosition(
         new Position(r * Math.cos(this.getDirection()), r * Math.sin(this.getDirection()))));
 
     rearTurret.setPosition(this.getPosition().addPosition(
@@ -105,6 +108,7 @@ public class Ship extends Entity {
   }
 
   public void render(Renderer r) {
+<<<<<<< HEAD
     // r.drawRect((int) position.getX(), (int) position.getY(), 10, 20, 0x666666, false);
     // r.drawRect((int) this.getObb()[0].getX(), (int) this.getObb()[0].getY(), (int)
     // this.getLength(),
@@ -112,6 +116,8 @@ public class Ship extends Entity {
 
 	r.drawSprite((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), sprite, false);
 	  
+=======
+>>>>>>> alexb
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
       // Color front two points blue

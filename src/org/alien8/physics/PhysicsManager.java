@@ -2,6 +2,7 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.ship.Ship;
 
 public class PhysicsManager {
   /**
@@ -30,6 +31,16 @@ public class PhysicsManager {
       e.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD);
     // TODO:this is causing weird stuff.
     // e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
+  }
+  
+  /**
+   * Slows the entity down by a constant scaling factor.
+   * Less complex than dealing with forces.
+   * 
+   * @param e the entity to apply friction to
+   */
+  public static void applyFriction(Entity e) {
+	  e.setSpeed(e.getSpeed() * Parameters.FRICTION);
   }
 
   /**
@@ -62,33 +73,26 @@ public class PhysicsManager {
    * @param clockwise Set to true if the rotation is clockwise, false if anti-clockwise.
    */
   public static void rotateEntity(Entity e, double angle) {
-    /**
-     * First, squeeze the speed into the [0,pi] interval
-     *
-     * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,pi]
-     */
-    double squeezedSpeed = e.getSpeed() * Math.PI / Parameters.SHIP_TOP_SPEED_FORWARD;
-    System.out.println(squeezedSpeed);
-    /**
-     * Then put this speed through the function:
-     *
-     * f : (0,PI) -> [0,1] f(x) = sin^2(x),
-     *
-     * to get a natural rotation modifier.
-     */
-    double rotModifier = Math.sin(squeezedSpeed);
-    rotModifier *= rotModifier;
-    rotModifier += 0.3;
-    System.out.println(angle + " " + rotModifier);
-    // Then apply this modifier to the angle, with a parametrised weight
-    angle *= rotModifier * Parameters.ROTATION_MODIFIER;
-    System.out.println(angle);
+	  /** First, squeeze the speed into the [0,pi] interval
+	   *
+	   * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,pi] */
+	  double squeezedSpeed = e.getSpeed() * Math.PI / Parameters.SHIP_TOP_SPEED_FORWARD;
+	  /**
+	   * Then put this speed through the function:
+	   *
+	   * f : (0,PI) -> [0,1]
+	   * f(x) = sin^2(x),
+	   *
+	   * to get a natural rotation modifier. */
+	  double rotModifier = Math.sin(squeezedSpeed);
+	  rotModifier *= rotModifier;
+	  rotModifier += 0.3;
+	  // Then apply this modifier to the angle, with a parametrised weight
+	  angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 
-    // TODO: Get speed modifier
-    // angle *= (Parameters.SHIP_TOP_SPEED_FORWARD - e.getSpeed()) * Parameters.ROTATION_MODIFIER;
-    // Update the direction of the Entity, but also the bounding box
-    e.setDirection(shiftAngle(e.getDirection() + angle));
-    e.rotateObb(shiftAngle(angle));
+	  // Update the direction of the Entity, but also the bounding box
+	  e.setDirection(shiftAngle(e.getDirection() + angle));
+	  e.rotateObb(angle);
   }
 
   /**
