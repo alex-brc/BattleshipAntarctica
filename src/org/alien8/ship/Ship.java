@@ -108,16 +108,13 @@ public class Ship extends Entity {
   }
 
   public void render(Renderer r) {
-<<<<<<< HEAD
     // r.drawRect((int) position.getX(), (int) position.getY(), 10, 20, 0x666666, false);
     // r.drawRect((int) this.getObb()[0].getX(), (int) this.getObb()[0].getY(), (int)
     // this.getLength(),
     // (int) this.getWidth(), 0xFF0000, false);
 
 	r.drawSprite((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), sprite, false);
-	  
-=======
->>>>>>> alexb
+
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
       // Color front two points blue
