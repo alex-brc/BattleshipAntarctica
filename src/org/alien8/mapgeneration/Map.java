@@ -81,11 +81,7 @@ public class Map{
 	}
 	
 	public void render(Renderer r) {
-		for (int y = 0; y < width; y++)
-			for (int x = 0; x < length; x++){
-				if(iceGrid[x][y])
-					r.drawRect(x, y, 1, 1, 0x00FFFF, false);
-			}
+		r.drawMap(iceGrid);
 	}
 	
 	/*public static void main(String[] args){

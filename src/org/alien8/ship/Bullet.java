@@ -3,6 +3,7 @@ package org.alien8.ship;
 import org.alien8.core.Entity;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
+import org.alien8.rendering.Sprite;
 
 public abstract class Bullet extends Entity {
 
@@ -11,6 +12,8 @@ public abstract class Bullet extends Entity {
   private double damage;
   private double travelled;
   private long source;
+  
+  protected Sprite sprite = Sprite.bullet;
 
   public Bullet(Position position, double direction, double distance, double mass, double width,
       double length, double speed, double damage, long source) {

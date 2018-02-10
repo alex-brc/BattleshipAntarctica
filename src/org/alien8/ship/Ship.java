@@ -5,6 +5,7 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
+import org.alien8.rendering.Sprite;
 
 /**
  * Developer's notes:
@@ -17,6 +18,8 @@ public class Ship extends Entity {
   private Turret frontTurret;
   private Turret rearTurret;
   private Turret midTurret;
+  
+  private Sprite sprite = Sprite.ship_green; //for now
 
   public Ship(Position position, double direction) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
@@ -107,6 +110,8 @@ public class Ship extends Entity {
     // this.getLength(),
     // (int) this.getWidth(), 0xFF0000, false);
 
+	r.drawSprite((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), sprite, false);
+	  
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
       // Color front two points blue
@@ -122,6 +127,7 @@ public class Ship extends Entity {
     }
 
     // Render turrets
+    
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);

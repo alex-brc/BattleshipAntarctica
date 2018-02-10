@@ -15,6 +15,6 @@ public class SmallBullet extends Bullet {
 
   @Override
   public void render(Renderer r) {
-	  r.drawRect((int) position.getX(), (int) position.getY(), 1, 1, 0xffffff, false);
+    r.drawSprite((int) position.getX(), (int) position.getY(), sprite, false);
   }
 }

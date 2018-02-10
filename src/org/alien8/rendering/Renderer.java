@@ -72,9 +72,8 @@ public class Renderer extends Canvas {
 	yScroll = (int) (player.getPosition().getY() - height / 2);
 	
 	//Render terrain here
-	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false);
-	// this is current terrible for fps. 
-	// model.getMap().render(this);
+	model.getMap().render(this);
+	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false); //bounding box, remove later?
 	
 	for(Entity e : model.getEntities()){
 		e.render(this);
@@ -113,6 +112,50 @@ public class Renderer extends Canvas {
 	  if (xp + width >= this.width) continue;
 	  if (xp + width > 0) pixels[(xp + width) + y * this.width] = col;
 	}
+  }
+  
+  public void drawPixel(int x, int y, int col, boolean fixed){
+	  if (!fixed){
+		  x -= xScroll;
+		  y -= yScroll;
+	  }
+	  if (x >= 0 && y >= 0 && x < width && y < height) pixels[x + y * width] = col;
+  }
+  
+  public void drawSprite(int xp, int yp, Sprite sprite, boolean fixed){
+		if (!fixed){
+			xp -= xScroll;
+			yp -= yScroll;
+		}
+		for (int y = 0; y < sprite.getHeight(); y++){
+			int ya = y + yp;
+			for (int x = 0; x < sprite.getWidth(); x++){
+				int xa = x + xp;
+				if (xa < -sprite.getWidth() || xa >= width|| ya < 0 || ya >= height) break;
+				if (xa < 0) xa = 0;
+				int col = sprite.getPixels()[x + y * sprite.getWidth()];
+				if (col != 0xffff00ff && col != 0xff7f007f) pixels[xa+ya*width] = col;
+			}
+		}
+	}
+  
+  public void drawMap(boolean[][] grid){
+	int x0 = xScroll;
+	int x1 = (xScroll + width + 1);
+    int y0 = yScroll;
+	int y1 = (yScroll + height + 1);
+		
+	for (int y = y0; y < y1;y++){
+      for (int x = x0; x < x1;x++){
+    	if (x >= 0 && y >= 0 && x < Parameters.MAP_WIDTH && y < Parameters.MAP_HEIGHT){
+    	  if (grid[x][y]){
+    		drawPixel(x, y, 0xffffff, false);
+    	  }else{
+    	    drawPixel(x, y, 0x5555ff, false);
+    	  }
+    	}
+      }
+    }
   }
   
   /**
