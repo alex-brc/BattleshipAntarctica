@@ -1,7 +1,6 @@
 package org.alien8.ship;
 
 import org.alien8.core.Entity;
-import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
@@ -38,5 +37,15 @@ public abstract class Bullet extends Entity {
 
   public double getDamage() {
     return damage;
+  }
+
+  /**
+   * This method should delete a bullet if it goes out of the bounds of the map. It isn't too
+   * crucial as bullets automatically delete after they have travelled their distance.
+   */
+  public void dealWithOutOfBounds() {
+    if (this.isOutOfBounds()) {
+      this.delete();
+    }
   }
 }

@@ -39,10 +39,12 @@ public class Client implements Runnable {
   public Client() {
     renderer = new Renderer(new Dimension(800, 600));
     model = ModelManager.getInstance();
-    Entity ship = new Ship(new Position(1, 1), 0);
+    Entity ship = new Ship(new Position(200, 200), 0);
     // Add the first ship to the map, this will be the player for now
     model.addEntity(ship);
-    model.addEntity(new Ship(new Position(100, 100), 0)); // temporary reference point
+    Entity notPlayer = new Ship(new Position(100, 100), 0);
+    notPlayer.setSpeed(0.8);
+    model.addEntity(notPlayer); // temporary reference point
 
   }
 

@@ -28,7 +28,7 @@ public class Turret {
   private double maxDistance;
 
   public Turret(Position position, int type, Ship ship) {
-	this.ship = ship;
+    this.ship = ship;
     this.position = position;
     this.direction = 0;
     this.type = type;
@@ -46,10 +46,12 @@ public class Turret {
    * cooldown. If it reached max charge, shoot.
    */
   public void charge() {
-    if (!this.isOnCooldon() && this.distance <= this.maxDistance)
+    if (!this.isOnCooldown() && this.distance <= this.maxDistance)
       this.distance += Parameters.CHARGE_INCREMENT;
     else
       this.shoot();
+
+    this.distance++;
   }
 
   /**
@@ -58,15 +60,15 @@ public class Turret {
    * @param type
    */
   public void shoot() {
-    if (distance == this.minDistance || this.isOnCooldon())
+    if (distance == this.minDistance || this.isOnCooldown())
       return;
-    
+
     if (type == Turret.BIG) {
-      ModelManager.getInstance()
-          .addEntity(new BigBullet(this.getPosition(), this.getDirection(), distance, this.getShip().getSerial()));
+      ModelManager.getInstance().addEntity(new BigBullet(this.getPosition(), this.getDirection(),
+          distance, this.getShip().getSerial()));
     } else {
-      ModelManager.getInstance()
-          .addEntity(new SmallBullet(this.getPosition(), this.getDirection(), distance, this.getShip().getSerial()));
+      ModelManager.getInstance().addEntity(new SmallBullet(this.getPosition(), this.getDirection(),
+          distance, this.getShip().getSerial()));
     }
     this.startCooldown();
     this.distance = this.minDistance;
@@ -82,7 +84,8 @@ public class Turret {
   /**
    * @return the time of the last shot
    */
-  public boolean isOnCooldon() {
+
+  public boolean isOnCooldown() {
     if (System.currentTimeMillis() - this.lastShot < this.cooldown)
       return true;
     return false;
@@ -108,7 +111,7 @@ public class Turret {
   }
 
   public void render(Renderer r) {
-    if (this.isOnCooldon())
+    if (this.isOnCooldown())
       r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
     else
       r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
@@ -120,6 +123,8 @@ public class Turret {
   }
 
   /**
+   * <<<<<<< Updated upstream ======= >>>>>>> Stashed changes >>>>>>> Stashed changes
+   * 
    * @param direction the direction to set
    */
   public void setDirection(double direction) {
@@ -139,8 +144,8 @@ public class Turret {
   public void setPosition(Position position) {
     this.position = position;
   }
-  
+
   protected Ship getShip() {
-	return ship;
+    return ship;
   }
 }

@@ -158,10 +158,10 @@ public abstract class Entity {
     // Corners are labelled:
     // 0 1
     // 3 2
-    obb[0] = new Position(centerX - width / 2, centerY + length / 2);
-    obb[1] = new Position(centerX + width / 2, centerY + length / 2);
-    obb[2] = new Position(centerX + width / 2, centerY - length / 2);
-    obb[3] = new Position(centerX - width / 2, centerY - length / 2);
+    obb[0] = new Position(centerX - length / 2, centerY + width / 2);
+    obb[1] = new Position(centerX + length / 2, centerY + width / 2);
+    obb[2] = new Position(centerX + length / 2, centerY - width / 2);
+    obb[3] = new Position(centerX - length / 2, centerY - width / 2);
 
 
     // Now rotate box to correct orientation
@@ -176,16 +176,19 @@ public abstract class Entity {
    */
   public void translateObb(double xdiff, double ydiff) {
     Position[] result = new Position[4];
-	for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
       result[i] = new Position(obb[i].getX() + xdiff, obb[i].getY() + ydiff);
     }
-	this.obb = result;
+    this.obb = result;
   }
 
   public void rotateObb(double angle) {
     // Get center point of box
     double centerX = position.getX();
     double centerY = position.getY();
+
+    Position[] newObb = new Position[4];
+    int i = 0;
     // We perform the rotation as if it were around the origin (rather than the center of the box),
     // then translate the corner to find its true position
     for (Position corner : obb) {
@@ -203,7 +206,10 @@ public abstract class Entity {
       cornerY = rotatedY + centerY;
       // Set corner position
       corner = new Position(cornerX, cornerY);
+      newObb[i] = corner;
+      i++;
     }
+    obb = newObb;
   }
 
   public void render(Renderer r) {
@@ -222,10 +228,19 @@ public abstract class Entity {
     this.health -= damage;
   }
 
-
   public boolean isPlayer() {
     if (this.getSerial() == 1)
       return true;
     return false;
   }
+
+  public boolean isOutOfBounds() {
+    double x = this.getPosition().getX();
+    double y = this.getPosition().getY();
+    if (x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
+      return true;
+    return false;
+  }
+
+  public abstract void dealWithOutOfBounds();
 }

@@ -55,7 +55,7 @@ public class Parameters {
   public static final double ROTATION_MODIFIER = 1;
   public static final double FRICTION = 0.997;
   // Affects how much speed is lost when Entities collide
-  public static final double RESTITUTION_COEFFICIENT = 0.5;
+  public static final double RESTITUTION_COEFFICIENT = 1;
   /**
    * Bullet parameters
    */
