@@ -122,6 +122,23 @@ public class Renderer extends Canvas {
 	  if (x >= 0 && y >= 0 && x < width && y < height) pixels[x + y * width] = col;
   }
   
+  public void drawSprite(int xp, int yp, Sprite sprite, boolean fixed){
+		if (!fixed){
+			xp -= xScroll;
+			yp -= yScroll;
+		}
+		for (int y = 0; y < sprite.getHeight(); y++){
+			int ya = y + yp;
+			for (int x = 0; x < sprite.getWidth(); x++){
+				int xa = x + xp;
+				if (xa < -sprite.getWidth() || xa >= width|| ya < 0 || ya >= height) break;
+				if (xa < 0) xa = 0;
+				int col = sprite.getPixels()[x + y * sprite.getWidth()];
+				if (col != 0xffff00ff && col != 0xff7f007f) pixels[xa+ya*width] = col;
+			}
+		}
+	}
+  
   public void drawMap(boolean[][] grid){
 	int x0 = xScroll;
 	int x1 = (xScroll + width + 1);

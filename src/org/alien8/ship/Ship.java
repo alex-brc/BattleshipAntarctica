@@ -5,6 +5,7 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
+import org.alien8.rendering.Sprite;
 
 /**
  * Developer's notes:
@@ -17,6 +18,8 @@ public class Ship extends Entity {
   private Turret frontTurret;
   private Turret rearTurret;
   private Turret midTurret;
+  
+  private Sprite sprite = Sprite.ship_green; //for now
 
   public Ship(Position position, double direction) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
@@ -103,7 +106,7 @@ public class Ship extends Entity {
 
   public void render(Renderer r) {
     // r.drawRect((int) position.getX(), (int) position.getY(), 10, 20, 0x666666, false);
-    r.drawRect((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), (int) this.getLength(), (int) this.getWidth(), 0xFF0000, false);
+    r.drawSprite((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), sprite, false);
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);
