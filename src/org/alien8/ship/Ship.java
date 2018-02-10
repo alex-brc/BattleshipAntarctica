@@ -22,9 +22,9 @@ public class Ship extends Entity {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
         Parameters.SHIP_WIDTH);
 
-    frontTurret = new Turret(position, Turret.SMALL);
-    midTurret = new Turret(position, Turret.BIG);
-    rearTurret = new Turret(position, Turret.SMALL);
+    frontTurret = new Turret(position, Turret.SMALL, this);
+    midTurret = new Turret(position, Turret.BIG, this);
+    rearTurret = new Turret(position, Turret.SMALL, this);
 
     setTurretsDirection(new Position(0, 0));
     setTurretsPosition();

@@ -11,14 +11,16 @@ public abstract class Bullet extends Entity {
   private double distance;
   private double damage;
   private double travelled;
+  private long source;
 
   public Bullet(Position position, double direction, double distance, double mass, double width,
-      double length, double speed, double damage) {
+      double length, double speed, double damage, long source) {
     super(position, direction, speed, mass, length, width);
     this.distance = distance;
     this.damage = damage;
     this.startingPosition = position;
     this.travelled = 0;
+    this.source = source;
   }
 
   @Override

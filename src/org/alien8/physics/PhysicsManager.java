@@ -60,7 +60,25 @@ public class PhysicsManager {
    * @param clockwise Set to true if the rotation is clockwise, false if anti-clockwise.
    */
   public static void rotateEntity(Entity e, double angle) {
-	angle *= (Parameters.SHIP_TOP_SPEED_FORWARD - e.getSpeed()) * Parameters.ROTATION_MODIFIER;
+	/** First, squeeze the speed into the [0,pi] interval
+	 *
+	 * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,pi] */
+	double squeezedSpeed = e.getSpeed() * Math.PI / Parameters.SHIP_TOP_SPEED_FORWARD;
+	System.out.println(squeezedSpeed);
+	/** 
+	 * Then put this speed through the function:
+	 *
+	 * f : (0,PI) -> [0,1]
+	 * f(x) = sin^2(x),	
+	 * 
+	 * to get a natural rotation modifier. */
+	double rotModifier = Math.sin(squeezedSpeed);
+	rotModifier *= rotModifier;
+	rotModifier += 0.3;
+	System.out.println(angle + " " + rotModifier);
+	// Then apply this modifier to the angle, with a parametrised weight
+	angle *= rotModifier * Parameters.ROTATION_MODIFIER;
+	System.out.println(angle);
     // Update the direction of the Entity, but also the bounding box
     e.setDirection(shiftAngle(e.getDirection() + angle));
     e.rotateObb(angle);

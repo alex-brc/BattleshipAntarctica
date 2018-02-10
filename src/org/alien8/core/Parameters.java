@@ -48,12 +48,11 @@ public class Parameters {
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME; // N
   public static final double SHIP_BACKWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
-  public static final double SHIP_ROTATION_PER_SEC = Math.PI / 2;
+  public static final double SHIP_ROTATION_PER_SEC = Math.PI / 3;
   /**
-   * Affects how much the speed impacts the turning rate Lower means turns are tighter at speed. 1
-   * means at top speed turning is impossible.
+   * Affects how much the speed impacts the turning rate.
    */
-  public static final double ROTATION_MODIFIER = 0.8;
+  public static final double ROTATION_MODIFIER = 1;
   public static final double FRICTION = 0.997;
   // Affects how much speed is lost when Entities collide
   public static final double RESTITUTION_COEFFICIENT = 0.5;

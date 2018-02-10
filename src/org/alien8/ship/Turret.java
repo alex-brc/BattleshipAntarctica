@@ -10,6 +10,8 @@ public class Turret {
   // Type of bullets this turret shoots
   public static final int SMALL = 1;
   public static final int BIG = 2;
+  // The parent ship of this turret
+  private Ship ship;
   // Position will be handled by Ship class
   private Position position;
   // Orientation in radians
@@ -25,7 +27,8 @@ public class Turret {
   private double minDistance;
   private double maxDistance;
 
-  public Turret(Position position, int type) {
+  public Turret(Position position, int type, Ship ship) {
+	this.ship = ship;
     this.position = position;
     this.direction = 0;
     this.type = type;
@@ -60,10 +63,10 @@ public class Turret {
     
     if (type == Turret.BIG) {
       ModelManager.getInstance()
-          .addEntity(new BigBullet(this.getPosition(), this.getDirection(), distance));
+          .addEntity(new BigBullet(this.getPosition(), this.getDirection(), distance, this.getShip().getSerial()));
     } else {
       ModelManager.getInstance()
-          .addEntity(new SmallBullet(this.getPosition(), this.getDirection(), distance));
+          .addEntity(new SmallBullet(this.getPosition(), this.getDirection(), distance, this.getShip().getSerial()));
     }
     this.startCooldown();
     this.distance = this.minDistance;
@@ -135,5 +138,9 @@ public class Turret {
    */
   public void setPosition(Position position) {
     this.position = position;
+  }
+  
+  protected Ship getShip() {
+	return ship;
   }
 }
