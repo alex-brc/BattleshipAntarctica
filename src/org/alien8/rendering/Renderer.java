@@ -72,9 +72,9 @@ public class Renderer extends Canvas {
 	yScroll = (int) (player.getPosition().getY() - height / 2);
 	
 	//Render terrain here
+	model.getMap().render(this);
 	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false);
 	// this is current terrible for fps. 
-	// model.getMap().render(this);
 	
 	for(Entity e : model.getEntities()){
 		e.render(this);
@@ -113,6 +113,34 @@ public class Renderer extends Canvas {
 	  if (xp + width >= this.width) continue;
 	  if (xp + width > 0) pixels[(xp + width) + y * this.width] = col;
 	}
+  }
+  
+  public void drawPixel(int x, int y, int col, boolean fixed){
+	  if (!fixed){
+		  x -= xScroll;
+		  y -= yScroll;
+	  }
+	  if (x >= 0 && y >= 0 && x < width && y < height) pixels[x + y * width] = col;
+  }
+  
+  public void drawMap(boolean[][] grid){
+	int x0 = xScroll;
+	int x1 = (xScroll + width + 1);
+    int y0 = yScroll;
+	int y1 = (yScroll + height + 1);
+		
+	for (int y = y0; y < y1;y++){
+      for (int x = x0; x < x1;x++){
+		//getTile(x, y).render(x, y, screen);
+    	if (x >= 0 && y >= 0 && x < Parameters.MAP_WIDTH && y < Parameters.MAP_HEIGHT){
+    	  if (grid[x][y]){
+    		drawPixel(x, y, 0xffffff, false);
+    	  }else{
+    	    drawPixel(x, y, 0x5555ff, false);
+    	  }
+    	}
+      }
+    }
   }
   
   /**
