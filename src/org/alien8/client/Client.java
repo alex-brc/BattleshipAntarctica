@@ -1,14 +1,17 @@
 package org.alien8.client;
 
 import java.awt.Dimension;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
@@ -89,8 +92,6 @@ public class Client implements Runnable{
 
 			int frameRate = 0;
 			long frameTimer = getTime();
-			connect("172.22.35.217");
-			//147.188.254.171
 
 			while (running) {
 				currentTime = getTime();
@@ -100,7 +101,7 @@ public class Client implements Runnable{
 
 				// Call update() as many times as needed to compensate before rendering
 				while (catchUp >= 1) {
-					//model.update();
+					model.update();
 					catchUp--;
 					// Update last time
 					lastTime = getTime();
@@ -152,7 +153,7 @@ public class Client implements Runnable{
 	public void connect(String serverIPStr) {
 		if (socket == null && serverIP == null && ciss == null && cgsr == null) {
 			try {
-				socket = new DatagramSocket(4446);
+				socket = new DatagramSocket(4445);
 				serverIP = InetAddress.getByName(serverIPStr);
 				
 				// Serialize a TRUE Boolean object (representing connect request) into byte array 
@@ -166,6 +167,16 @@ public class Client implements Runnable{
 				
 				// Send the connect request packet to the server
 				socket.send(packet);
+				
+				// Wait for a full snapshot of initial game state from server
+				ArrayList<Entity> initialGameState = getFullSnapshot();
+				
+				// Initialize the game state in ModelManager
+				for (Entity e : initialGameState) {
+					ModelManager.getInstance().addEntity(e);
+				}
+				
+				System.out.println("Full snapshot of initial game state set");
 				
 				// Start a thread responsible for sending client input sample regularly
 				ciss = new ClientInputSampleSender(serverIP, socket);
@@ -185,6 +196,46 @@ public class Client implements Runnable{
 				ioe.printStackTrace();
 			}
 		}
+	}
+	
+	private ArrayList<Entity> getFullSnapshot() {
+		ArrayList<Entity> fullSnapShot = new ArrayList<Entity>();
+		boolean morePacket = true;
+		
+		while (morePacket) {
+			try {
+			    byte[] buf = new byte[65536];
+			    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+			    
+			    socket.receive(packet);
+			    System.out.println("Full snapshot partition received");
+			    byte[] fullSnapshotPartitionByte = packet.getData();
+			    
+			    ByteArrayInputStream byteIn = new ByteArrayInputStream(fullSnapshotPartitionByte);
+			    ObjectInputStream objIn = new ObjectInputStream(byteIn);
+			    ArrayList<Entity> fullSnapshotPartition = (ArrayList<Entity>) objIn.readObject();
+			    
+				System.out.println("Full snapshot partition list length: " + fullSnapshotPartition.size());
+			    
+			    if (fullSnapshotPartition.isEmpty()) {
+			    	morePacket = false;
+			    }
+			    else {
+			    	for (Entity e : fullSnapshotPartition) {
+			    		fullSnapShot.add(e);
+			    	}
+			    }
+		    
+			}
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+			catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			}
+		}
+		
+		return fullSnapShot;
 	}
 	
 	/**

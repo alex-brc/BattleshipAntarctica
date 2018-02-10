@@ -1,11 +1,14 @@
 package org.alien8.ship;
 
+import java.io.Serializable;
+
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
-public class Turret {
+public class Turret implements Serializable {
+	private static final long serialVersionUID = 4820891890685898076L;
 	// Type of bullets this turret shoots
 	public static final int SMALL = 1;
 	public static final int BIG = 2;

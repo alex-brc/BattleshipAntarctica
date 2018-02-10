@@ -1,5 +1,6 @@
 package org.alien8.ship;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import org.alien8.core.Entity;
@@ -17,8 +18,9 @@ import org.alien8.rendering.Renderer;
  * with that consideration in mind. 
  * 
  */
-public class Ship extends Entity {
+public class Ship extends Entity implements Serializable {
 
+	private static final long serialVersionUID = 2239717996211228216L;
 	private Turret frontTurret;
 	private Turret rearTurret;
 	private Turret midTurret;

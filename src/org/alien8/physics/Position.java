@@ -9,6 +9,7 @@ import org.alien8.core.Parameters;
  *
  */
 public class Position implements Serializable{
+	private static final long serialVersionUID = 2186201837660951453L;
 	private double x;
 	private double y;
 	

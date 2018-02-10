@@ -1,11 +1,14 @@
 package org.alien8.ship;
 
+import java.io.Serializable;
+
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
-public class Bullet extends Entity {
+public class Bullet extends Entity implements Serializable {
+	private static final long serialVersionUID = -3644646556942405204L;
 	private Position startingPosition;
 	private double distance;
 	

@@ -31,6 +31,7 @@ public class Parameters {
 	public static int MAP_WIDTH = 2048;
 	public static int SNAPSHOTS_PER_SECOND = 60;
 	public static int INPUT_SAMPLING_RATE = 60;
+	public static int LIST_LENGTH_PER_PACKET = 5000;
 	
 	////////////// SHIP PARAMS ////////////////
 	

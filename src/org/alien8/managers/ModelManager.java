@@ -1,5 +1,6 @@
 package org.alien8.managers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -8,6 +9,7 @@ import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
+import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.mapgeneration.Map;
 
@@ -162,8 +164,16 @@ public class ModelManager {
 	/**
 	 * Syncs the client with the server
 	 */
-	protected void sync() {
-		// TODO
+	public void sync(ArrayList<Entity> compressedGameState) {
+		for (Entity e : entities) {
+			if (e instanceof Ship || e instanceof Bullet) {
+				entities.remove(e);
+			}
+		}
+		
+		for (Entity e : compressedGameState) {
+			addEntity(e);
+		}
 	}
 
 	/**
@@ -201,12 +211,6 @@ public class ModelManager {
 		return entities;
 	}
 	
-	/**
-	 * Setter for the entity list (Used when client updates the game state according to a full snapshot received)
-	 */
-	public void setEntities(ConcurrentLinkedQueue<Entity> entities) {
-		this.entities = entities;
-	}
 	
 	public Entity getPlayer(){
 		return getEntity(1); //change implementation later
