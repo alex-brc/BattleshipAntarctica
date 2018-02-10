@@ -123,7 +123,7 @@ public class Turret {
   }
 
   /**
-   * <<<<<<< Updated upstream ======= >>>>>>> Stashed changes >>>>>>> Stashed changes
+   *
    * 
    * @param direction the direction to set
    */

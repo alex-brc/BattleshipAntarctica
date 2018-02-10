@@ -50,4 +50,8 @@ public abstract class Bullet extends Entity {
       this.delete();
     }
   }
+
+  public long getSource() {
+    return source;
+  }
 }

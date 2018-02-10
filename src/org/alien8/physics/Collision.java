@@ -117,13 +117,15 @@ public class Collision {
   private void resolveBulletShipCollision(Bullet bullet, Ship ship) {
     System.out.println("A bullet has hit a ship!");
 
-    // Bullet damages ship
-    ship.damage(bullet.getDamage());
-    // See if ship has been destroyed
-    if (ship.getHealth() <= 0) {
-      // ship.delete();
+    if (bullet.getSource() != ship.getSerial()) {
+      // Bullet damages ship
+      ship.damage(bullet.getDamage());
+      // See if ship has been destroyed
+      if (ship.getHealth() <= 0) {
+        ship.delete();
+      }
+      // Destroy bullet
+      bullet.delete();
     }
-    // Destroy bullet
-    bullet.delete();
   }
 }
