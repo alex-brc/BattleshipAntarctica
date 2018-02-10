@@ -34,9 +34,7 @@ public abstract class Bullet extends Entity {
       this.delete();
   }
 
-  public void render(Renderer r) {
-    r.drawRect((int) position.getX(), (int) position.getY(), 1, 1, 0xffffff, false);
-  }
+  public abstract void render(Renderer r);
 
   public double getDamage() {
     return damage;
