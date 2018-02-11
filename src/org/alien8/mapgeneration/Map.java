@@ -1,13 +1,12 @@
 package org.alien8.mapgeneration;
 
-import org.alien8.mapgeneration.PerlinNoise;
-import org.alien8.mapgeneration.Ice;
-import org.alien8.core.Entity;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alien8.core.Parameters;
 import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
-import java.util.List;
-import java.util.ArrayList;
+import org.alien8.rendering.Renderer;
 
 public class Map{
 	protected int length;
@@ -35,7 +34,7 @@ public class Map{
 	}
 	
 	protected void makeMap(){
-		double waterLevel = 0.4d;
+		double waterLevel = Parameters.WATER_LEVEL;
 		
 		double[][] noiseGrid = PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity);
 		for (int y = 0; y < width; y++){
@@ -79,6 +78,10 @@ public class Map{
 	
 	public boolean[][] getIceGrid(){
 		return iceGrid;
+	}
+	
+	public void render(Renderer r) {
+		r.drawMap(iceGrid);
 	}
 	
 	/*public static void main(String[] args){

@@ -82,7 +82,7 @@ public class Server {
 				ClientInputSample cis = (ClientInputSample) obj;
 				
 				// Update the game state
-				modelManager.updateServer(cis);
+				modelManager.updateServer(clientIP, cis);
 				System.out.println("Game State updated according to client's input sample");
 			}
 			else if (obj instanceof Boolean) { // Server receive a client's network request

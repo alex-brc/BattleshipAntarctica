@@ -7,7 +7,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import org.alien8.core.Parameters;
+import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
+import org.alien8.ship.Ship;
 
 /**
  * This singleton class is a listener to be added to the main window. 
@@ -38,6 +41,45 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 	 */
 	public static InputManager getInstance() {
 		return instance;
+	}
+	
+	public void processInputs(Ship player) {
+        // Apply forward OR backward force
+        if (this.wPressed())
+          PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
+        else if (this.sPressed())
+          PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
+              PhysicsManager.shiftAngle(player.getDirection() + Math.PI));
+        
+        // Apply rotation
+        if (this.aPressed())
+          PhysicsManager.rotateEntity(player,
+              (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+        if (this.dPressed())
+          PhysicsManager.rotateEntity(player,
+              Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+
+        // Apply "friction"
+        PhysicsManager.applyFriction(player);
+        
+        // Prepare for shooting
+        // Orientation
+        player.setTurretsDirection(this.mousePosition());
+
+        if (this.lmbPressed())
+          player.frontTurretCharge();
+        else
+          player.frontTurretShoot();
+
+        if (this.rmbPressed())
+          player.rearTurretCharge();
+        else
+          player.rearTurretShoot();
+
+        if (this.spacePressed())
+          player.midTurretCharge();
+        else
+          player.midTurretShoot();
 	}
 	
 	/**
@@ -83,7 +125,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 		return spacePressed;
 	}
 	/**
-	 * @return the latest mouse position, in XY coordinates
+	 * @return the latest mouse position, in screen XY coordinates
 	 */
 	public Position mousePosition() {
 		return mousePosition;

@@ -1,7 +1,5 @@
 package org.alien8.core;
 
-import java.util.Arrays;
-
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
@@ -15,12 +13,9 @@ public abstract class Entity {
   protected Position position;
   protected long serial = -1;
   protected boolean toBeDeleted = false;
+  protected Properties properties = new Properties();
+  protected Attributes attributes = new Attributes();
   
-  private double mass;
-  private double speed;
-  private double direction;
-  private double length;
-  private double width;
   private Position[] obb;
 
   /**
@@ -36,12 +31,16 @@ public abstract class Entity {
    * @param position the XY coordinates for this entity
    * @param id the ID of this entity. The ID determines the type of the entity
    */
-  public Entity(Position position, double direction, double speed, double mass) {
-    this.position = position;
-    this.direction = direction;
-    this.speed = speed;
-    this.mass = mass;
-    initObb();
+  public Entity(Position position, double direction, double speed, double mass, double length,
+      double width) {
+	this.position = position;
+	this.properties.setDirection(direction);
+	this.properties.setSpeed(speed);
+	this.properties.setMass(mass);
+	this.properties.setLength(length);
+	this.properties.setWidth(width);
+	
+	initObb();
   }
   
   /**
@@ -68,52 +67,13 @@ public abstract class Entity {
     }
     // Only works once.
   }
-  
+
   public void delete() {
-	  this.toBeDeleted = true;
+    this.toBeDeleted = true;
   }
-  
+
   public boolean isToBeDeleted() {
-	  return toBeDeleted;
-  }
-
-  public double getMass() {
-    return mass;
-  }
-
-  public void setMass(double mass) {
-    this.mass = mass;
-  }
-
-  public double getSpeed() {
-    return speed;
-  }
-
-  public void setSpeed(double speed) {
-	// Makes friction less CPU-intensive sometimes
-	if(speed < 0.001d)
-		speed = 0;
-    this.speed = speed;
-  }
-
-  public double getDirection() {
-    return direction;
-  }
-
-  public void setDirection(double direction) {
-    this.direction = direction;
-  }
-
-  public double getLength() {
-    return length;
-  }
-
-  public void setLength(double length) {
-    this.length = length;
-  }
-  
-  public Position[] getObb() {
-    return obb;
+    return toBeDeleted;
   }
 
   /**
@@ -129,14 +89,14 @@ public abstract class Entity {
     // Corners are labelled:
     // 0 1
     // 3 2
-    obb[0] = new Position(centerX - width / 2, centerY + length / 2);
-    obb[1] = new Position(centerX + width / 2, centerY + length / 2);
-    obb[2] = new Position(centerX + width / 2, centerY - length / 2);
-    obb[3] = new Position(centerX - width / 2, centerY - length / 2);
+    obb[0] = new Position(centerX - this.getLength() / 2, centerY + this.getWidth() / 2);
+    obb[1] = new Position(centerX + this.getLength() / 2, centerY + this.getWidth() / 2);
+    obb[2] = new Position(centerX + this.getLength() / 2, centerY - this.getWidth() / 2);
+    obb[3] = new Position(centerX - this.getLength() / 2, centerY - this.getWidth() / 2);
 
 
     // Now rotate box to correct orientation
-    rotateObb(direction);
+    rotateObb(this.getDirection());
   }
 
   /**
@@ -146,15 +106,20 @@ public abstract class Entity {
    * @param ydiff the amount to translate in the Y direction
    */
   public void translateObb(double xdiff, double ydiff) {
-    for (Position corner : obb) {
-      corner = new Position(corner.getX() + xdiff, corner.getY() + ydiff);
+    Position[] result = new Position[4];
+    for (int i = 0; i < 4; i++) {
+      result[i] = new Position(obb[i].getX() + xdiff, obb[i].getY() + ydiff);
     }
+    this.obb = result;
   }
 
   public void rotateObb(double angle) {
     // Get center point of box
     double centerX = position.getX();
     double centerY = position.getY();
+
+    Position[] newObb = new Position[4];
+    int i = 0;
     // We perform the rotation as if it were around the origin (rather than the center of the box),
     // then translate the corner to find its true position
     for (Position corner : obb) {
@@ -172,16 +137,87 @@ public abstract class Entity {
       cornerY = rotatedY + centerY;
       // Set corner position
       corner = new Position(cornerX, cornerY);
+      newObb[i] = corner;
+      i++;
     }
+    obb = newObb;
   }
 
-  public boolean isPlayer() {
-	  if(this.getSerial() == 1)
-		  return true;
-	  return false;
+  public abstract void render(Renderer r);
+
+  public void damage(double damage) {
+    this.setHealth(this.getHealth() - damage);
   }
   
-  public void render(Renderer r){
-	
+  public boolean isPlayer() {
+    if (this.getSerial() == 1)
+      return true;
+    return false;
+  }
+
+  public boolean isOutOfBounds() {
+    double x = this.getPosition().getX();
+    double y = this.getPosition().getY();
+    if (x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
+      return true;
+    return false;
+  }
+
+  public abstract void dealWithOutOfBounds();
+
+  public double getHealth() {
+	  return this.attributes.getHealth();
+  }
+
+  public void setHealth(double health) {
+	  this.attributes.setHealth(health);
+  }
+  
+  public double getMass() {
+	  return this.properties.getMass();
+  }
+
+  public void setMass(double mass) {
+	  this.properties.setMass(mass);
+  }
+
+  public double getSpeed() {
+	  return this.properties.getSpeed();
+  }
+
+  public void setSpeed(double speed) {
+	  // Makes friction less CPU-intensive sometimes
+	  if (speed < 0.001d) {
+		  speed = 0;
+	  }
+	  this.properties.setSpeed(speed);
+  }
+
+  public double getDirection() {
+	  return this.properties.getDirection();
+  }
+
+  public void setDirection(double direction) {
+	  this.properties.setDirection(direction);
+  }
+
+  public double getLength() {
+	  return this.properties.getLength();
+  }
+
+  public void setLength(double length) {
+	  this.properties.setLength(length);
+  }
+
+  public double getWidth() {
+	  return this.properties.getWidth();
+  }
+
+  public void setWidth(double width) {
+	  this.properties.setWidth(width);
+  }
+
+  public Position[] getObb() {
+	  return obb;
   }
 }

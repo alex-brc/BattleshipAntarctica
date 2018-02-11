@@ -2,6 +2,7 @@ package org.alien8.physics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.core.Entity;
 
 public class CollisionDetector {
@@ -11,7 +12,7 @@ public class CollisionDetector {
    * @param entities a List of Entities which are being checked for collisions
    * @return a List of Collisions
    */
-  public List<Collision> checkForCollisions(List<Entity> entities) {
+  public List<Collision> checkForCollisions(ConcurrentLinkedQueue<Entity> entities) {
     /*
      * BROAD PHASE: In this phase, we do some rough spatial examination of the Entities to rule out
      * collisions between objects that are very far away. We end up with a list of potential
@@ -33,8 +34,9 @@ public class CollisionDetector {
     ArrayList<Collision> verifiedCollisions = new ArrayList<>();
     // Verify each of our potential collisions
     for (Collision c : potentialCollisions) {
-      if (verifyCollision(c) == true) {
-        verifiedCollisions.add(c);
+      MTV vector = verifyCollision(c);
+      if (vector != null) {
+        verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2(), vector));
       }
     }
 
@@ -48,7 +50,7 @@ public class CollisionDetector {
    * @param entities a List of Entities
    * @return a list of AABB's. Each one represents one Entity
    */
-  private ArrayList<AABB> createAabbs(List<Entity> entities) {
+  private ArrayList<AABB> createAabbs(ConcurrentLinkedQueue<Entity> entities) {
     ArrayList<AABB> aabbs = new ArrayList<AABB>();
     for (Entity e : entities) {
       // Get position and length from the Entity
@@ -156,7 +158,10 @@ public class CollisionDetector {
    * @param c the Collision which is being checked
    * @return <code>true</code> if the Entities are colliding, <code>false</code> if they are not
    */
-  private boolean verifyCollision(Collision c) {
+  private MTV verifyCollision(Collision c) {
+    // Set overlap to be very large
+    MTV minTranslationVector = new MTV(1000, null);
+
     // Get the two Entities' bounding boxes
     Position[] box1 = c.getEntity1().getObb();
     Position[] box2 = c.getEntity2().getObb();
@@ -172,7 +177,11 @@ public class CollisionDetector {
       // If no overlap is found, there must be a gap between the Entities, meaning they are not
       // colliding so the method returns false
       if (!overlap(p1, p2)) {
-        return false;
+        return null;
+      } else {
+        if (getOverlap(p1, p2) < minTranslationVector.getDistance()) {
+          minTranslationVector = new MTV(getOverlap(p1, p2), axis);
+        }
       }
     }
     // Check against second set of axes
@@ -180,13 +189,15 @@ public class CollisionDetector {
       Projection p1 = project(box1, axis);
       Projection p2 = project(box2, axis);
       if (!overlap(p1, p2)) {
-        return false;
+        return null;
       }
     }
     // Control flow reaches this point if no gap has been found between the two Entities, so they
     // must collide
-    return true;
+    return minTranslationVector;
   }
+
+
 
   /**
    * Gets a set of axes to test against when given an Oriented Bounding Box (OBB).
@@ -261,6 +272,16 @@ public class CollisionDetector {
     } else {
       return false;
     }
+  }
+
+  private double getOverlap(Projection p1, Projection p2) {
+    double thing1 = p2.getMin() - p1.getMax();
+    double thing2 = p1.getMin() - p2.getMax();
+    double abs1 = Math.abs(thing1);
+    double abs2 = Math.abs(thing2);
+    double res = Math.min(abs1, abs2);
+    return res / 1000;
+    // return Math.min(Math.abs(p2.getMin() - p1.getMax()), Math.abs(p1.getMin() - p2.getMax()));
   }
 }
 
