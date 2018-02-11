@@ -26,7 +26,7 @@ public class Parameters {
    * simplicity.
    */
   public static final int INPUT_SAMPLING_RATE = 60;
-  public static final int FPS_FREQ = 4;
+  public static final int FPS_FREQ = 1;
   public static final int N_SECOND = 1000000000;
   public static final int MAP_HEIGHT = 2048;
   public static final int MAP_WIDTH = 2048;

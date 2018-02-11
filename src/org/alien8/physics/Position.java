@@ -50,13 +50,9 @@ public class Position {
 	 * @return distance in units between the points
 	 */
 	public double distanceTo(Position position) {
-		return (Math.sqrt(
-					Math.pow(
-						(position.getX()-this.getX()), 
-						2) + 
-					Math.pow(
-						(position.getY()-this.getY()), 
-						2)
+		return (Math.hypot(
+					position.getX()-this.getX(),
+					position.getY()-this.getY()
 					)
 				);
 	}

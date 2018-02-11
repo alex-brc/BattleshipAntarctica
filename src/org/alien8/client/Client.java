@@ -9,7 +9,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
@@ -111,6 +110,7 @@ public class Client implements Runnable {
           frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
           FPS = frameRate * Parameters.FPS_FREQ;
           frameRate = 0;
+          System.out.println(FPS);
         }
 
       }

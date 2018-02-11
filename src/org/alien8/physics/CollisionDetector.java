@@ -3,6 +3,7 @@ package org.alien8.physics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.core.Entity;
 
 public class CollisionDetector {

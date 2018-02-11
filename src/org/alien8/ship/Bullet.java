@@ -3,11 +3,9 @@ package org.alien8.ship;
 import org.alien8.core.Entity;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
-import org.alien8.rendering.Sprite;
 
 public abstract class Bullet extends Entity {
 
-  private Position startingPosition;
   private double distance;
   private double damage;
   private double travelled;
@@ -18,7 +16,6 @@ public abstract class Bullet extends Entity {
     super(position, direction, speed, mass, length, width);
     this.distance = distance;
     this.damage = damage;
-    this.startingPosition = position;
     this.travelled = 0;
     this.source = source;
   }

@@ -1,12 +1,6 @@
 package org.alien8.mapgeneration;
 
-import org.alien8.mapgeneration.MapVector;
 import java.util.Random;
-
-import java.awt.image.BufferedImage;
-import java.awt.Color;
-import javax.swing.*;
-import java.awt.*;
 
 public class PerlinNoise{
 	

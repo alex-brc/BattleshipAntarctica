@@ -186,10 +186,6 @@ public abstract class Entity {
   }
 
   public void setSpeed(double speed) {
-	  // Makes friction less CPU-intensive sometimes
-	  if (speed < 0.001d) {
-		  speed = 0;
-	  }
 	  this.properties.setSpeed(speed);
   }
 
