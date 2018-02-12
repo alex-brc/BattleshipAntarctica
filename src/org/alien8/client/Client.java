@@ -15,6 +15,7 @@ import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.ship.Ship;
+import org.alien8.ai.AIController;
 
 public class Client implements Runnable {
   /**
@@ -29,6 +30,8 @@ public class Client implements Runnable {
   private InetAddress serverIP = null;
   private ClientInputSampleSender ciss = null;
   private ClientGameStateReceiver cgsr = null;
+  
+  //private AIController ai = new AIController(new Position(100, 100));
 
   public static void main(String[] args) {
 
@@ -42,6 +45,7 @@ public class Client implements Runnable {
     Ship ship = new Ship(new Position(200, 200), 0);
     model.setPlayer(ship);
     model.addEntity(ship);
+	//model.addEntity(ai.getShip());
     Ship notPlayer = new Ship(new Position(100, 100), 0);
     notPlayer.setSpeed(0.8);
     model.addEntity(notPlayer); // temporary reference point
@@ -103,6 +107,7 @@ public class Client implements Runnable {
         }
 
         // Call the renderer
+		//ai.update();
         renderer.render(model);
         frameRate++;
 

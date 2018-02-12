@@ -10,13 +10,17 @@ import java.awt.*;
 
 public class PerlinNoise{
 	
+	//The gradient vectors can only be one of the 4 unit vectors
 	static MapVector[] gradientVectors = {
 		new MapVector(1d,1d), new MapVector(1d,-1d), 
 		new MapVector(-1d,1d), new MapVector(-1d,-1d)
 		};
 	
 	public static MapVector distance(double px, double py, double gx, double gy){
-		//gx and gy refer to the coordinates of the grid point, px and py refer to the point's coordinates we are calculating the distance to 
+		/*Calculates the x distance and y distance given to vectors
+		* gx and gy refer to the coordinates of the grid point, px and py refer to the point's coordinates 
+		* we are calculating the distance to
+		*/
 		double outx = px - gx;
 		double outy = py - gy;
 		
@@ -39,6 +43,7 @@ public class PerlinNoise{
 	}
 	
 	public static double perlin(double x, double y, MapVector[][] gradients){
+		//Calculates the perlin value of a given xy coordinate
 		/*
 		Connotation - The numbers after variables generally refer to the corners on the unit square:
 					x0y1 -------- x1y1
@@ -88,6 +93,7 @@ public class PerlinNoise{
 		/*
 		PxlSize dimensions are difining the whole picture of noise (as a grid of pixels)
 		GridSize dimensions are difining the grid on top of the noise that has a gradient vector at each point
+		(Changing the grid size will change the density of noise)
 		*/
 		double[][] noiseGrid = new double[xPxlSize][yPxlSize];
 		MapVector[][] gradientGrid = new MapVector[xGridSize+1][yGridSize+1];
