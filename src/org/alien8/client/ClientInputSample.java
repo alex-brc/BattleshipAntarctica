@@ -20,11 +20,17 @@ public class ClientInputSample implements Serializable {
 	
 	public ClientInputSample() {
 		mousePosition = InputManager.getInstance().mousePosition();
+		lmbPressed = InputManager.getInstance().lmbPressed();
 		rmbPressed = InputManager.getInstance().rmbPressed();
 		wPressed = InputManager.getInstance().wPressed();
 		aPressed = InputManager.getInstance().aPressed();
 		sPressed = InputManager.getInstance().sPressed();
 		dPressed = InputManager.getInstance().dPressed();
 		spacePressed = InputManager.getInstance().spacePressed();
+	}
+	
+	public String toString() {
+		return mousePosition.getX() + "," + mousePosition.getY() + "," + lmbPressed + "," + rmbPressed + "," +
+			   wPressed + "," + aPressed + "," + sPressed + "," + dPressed + "," + spacePressed;
 	}
 }

@@ -2,11 +2,13 @@ package org.alien8.rendering;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
-public class Sprite {
+public class Sprite implements Serializable {
 
+	private static final long serialVersionUID = -7826033026339264249L;
 	private int width, height;
 	private int[] pixels;
 	private String path;

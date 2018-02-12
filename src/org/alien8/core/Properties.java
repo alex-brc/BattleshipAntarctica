@@ -1,9 +1,12 @@
 package org.alien8.core;
 
+import java.io.Serializable;
+
 /**
  * Packages all the physical parameters in one neat object.
  */
-public class Properties {
+public class Properties implements Serializable {
+	private static final long serialVersionUID = 3959568633929095110L;
 	public double mass;
 	public double speed;
 	public double direction;
@@ -48,5 +51,5 @@ public class Properties {
 
 	public void setWidth(double width) {
 		this.width = width;
-	}
+	}	
 }

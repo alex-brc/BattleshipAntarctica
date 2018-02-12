@@ -4,21 +4,22 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
-import org.alien8.core.Parameters;
+import org.alien8.core.EntityLite;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
+import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
+import org.alien8.ship.SmallBullet;
 
 public class Server {
 	
 	private static InetAddress hostIP = null;
-	private static DatagramSocket socket = null;
-	private static ArrayList<Entity> initialGameState = new ArrayList<Entity>();
-	private static ModelManager modelManager = ModelManager.getInstance();
+	private static ServerSocket tcpSocket = null;
+	private static DatagramSocket udpSocket = null;
+	private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
+	private static ModelManager model = ModelManager.getInstance();
 	private static ArrayList<Player> playerList = new ArrayList<Player>();
 	private static ArrayList<ServerGameStateSender> sgssList = new ArrayList<ServerGameStateSender>();
 	private static boolean run = true;
@@ -26,83 +27,61 @@ public class Server {
 	public static void main(String[] args) {
 		try {
 			setHostIP();
-			socket = new DatagramSocket(4446, hostIP);
-			System.out.println("Port: " + socket.getLocalPort());
-			System.out.println("IP: " + socket.getLocalAddress());
+			tcpSocket = new ServerSocket(4446, 50, hostIP);
+			udpSocket = new DatagramSocket(4446, hostIP);
+			System.out.println("Port: " + tcpSocket.getLocalPort());
+			System.out.println("IP: " + tcpSocket.getInetAddress());
 			
-			// Initialize the game state with only ice present
 			initializeGameState();
 			
+			// Create a thread for receiving input sample from client
+			ServerInputSampleReceiver sisr = new ServerInputSampleReceiver(udpSocket);
+			sisr.start();
+			
+			// Process clients' connect/disconnect request
 			while (run) {
-				// Create a packet for receiving client's packet
-				byte[] buf = new byte[65536];
-				DatagramPacket packet = new DatagramPacket(buf, buf.length);
-				
 				// Receive and process client's packet
-				System.out.println("Waiting for packet....");
-			    socket.receive(packet);
-			    System.out.println("A packet received");
-			    processPacket(packet);
+				System.out.println("Waiting for client request....");
+				Socket client = tcpSocket.accept();
+				InetAddress clientIP = client.getInetAddress();
+				ObjectInputStream fromClient = new ObjectInputStream(client.getInputStream());
+				ObjectOutputStream toClient = new ObjectOutputStream(client.getOutputStream());
+				Boolean clientRequest = (Boolean) fromClient.readObject();
+			    processClientRequest(clientIP, clientRequest, toClient);
 			}
 			
-			socket.close();
+			tcpSocket.close();
 		}
 		catch (SocketException e) {
 			e.printStackTrace();
-			socket.close();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-			socket.close();
+		}
+		catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
 		}
 	}
 	
 	public static void initializeGameState() {
+	    Ship notPlayer = new Ship(new Position(100, 100), 0);
+	    notPlayer.setSpeed(0.8);
+	    model.addEntity(notPlayer);
 		// Add ice
-		for(AABB aabb : modelManager.getMap().getAABBs()) {
-			modelManager.addEntity(aabb.getEntity());
-			initialGameState.add(aabb.getEntity());
-		}
+		//for(AABB aabb : model.getMap().getAABBs()) {
+			//model.addEntity(aabb.getEntity());
+			//lastSyncedEntities.add(aabb.getEntity());
+		//}
 		
 	}
 	
-	public static void processPacket(DatagramPacket packet) {
-		try {
-			// Get the IP from the packet to identify the sender
-			InetAddress clientIP = packet.getAddress();
-			
-			// Get the byte data from client's packet
-			byte[] packetByte = packet.getData();
-			
-			ByteArrayInputStream byteIn = new ByteArrayInputStream(packetByte);
-			ObjectInputStream objIn = new ObjectInputStream(byteIn);
-			Object obj = objIn.readObject();
-			
-			if (obj instanceof ClientInputSample) { // Server receive a client's input sample
-				ClientInputSample cis = (ClientInputSample) obj;
-				
-				// Update the game state
-				modelManager.updateServer(clientIP, cis);
-				System.out.println("Game State updated according to client's input sample");
-			}
-			else if (obj instanceof Boolean) { // Server receive a client's network request
-				// Deserialize client's byte data into Boolean object (representing connect/disconnect request)
-				Boolean clientNetworkRequest = (Boolean) obj;
-				
-				if (clientNetworkRequest.booleanValue()) { // Connect Request
-					setupClient(clientIP);
-				}
-				else if ( !(clientNetworkRequest.booleanValue()) ) { // Disconnect Request
-					disconnectPlayer(clientIP);
-				}
-			}
+	public static void processClientRequest(InetAddress clientIP, Boolean clientRequest, ObjectOutputStream toClient) {
+		if (clientRequest) { // Connect request
+			setupClient(clientIP, toClient);
 		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
+		else if (!clientRequest) { // Disconnect Request
+			disconnectPlayer(clientIP);
 		}
-		catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}	
 	}
 	
 	public static boolean isClientConnected(InetAddress clientIP) {
@@ -152,75 +131,97 @@ public class Server {
 		}
 	}
 
-	public static void setupClient(InetAddress clientIP) {
+	public static void setupClient(InetAddress clientIP, ObjectOutputStream toClient) {
 		if (!isClientConnected(clientIP)) {
-			boolean[][] iceGrid = modelManager.getMap().getIceGrid();
-			Random r = new Random();
-			double randomX = 0;
-			double randomY = 0;
-			boolean isIcePosition = true;
-			
-			// Generate a random position without ice for ship spawning
-			while (isIcePosition) {
-				randomX = r.nextInt(Parameters.MAP_WIDTH);
-				randomY = r.nextInt(Parameters.MAP_HEIGHT);
-				
-				if (!iceGrid[(int) randomX][(int) randomY]) {
-					isIcePosition = false;
-				}
-			}
+			// For generating a random position without ice for ship spawning, causing bug at the moment
+//			boolean[][] iceGrid = modelManager.getMap().getIceGrid();
+//			Random r = new Random();
+//			double randomX = 0;
+//			double randomY = 0;
+//			boolean isIcePosition = true;
+//			
+//			// Generate a random position without ice for ship spawning
+//			while (isIcePosition) {
+//				randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
+//				randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
+//				
+//				if (!iceGrid[(int) randomX][(int) randomY]) {
+//					isIcePosition = false;
+//				}
+//			}
 			
 			// Setup client's ship
-			Ship s = new Ship(new Position(randomX, randomY), 0d);
-			
-			// Add client to current player list
+			Ship s = new Ship(new Position(200, 200), 0);
+						
 			playerList.add(new Player(clientIP, s));
+			model.addEntity(s);
 			
-			// Spawn client's ship at random location without ice
-			modelManager.addEntity(s);
+			// Send a full snapshot of current game state to the client
+			sendFullSnapshot(clientIP, toClient, model.getEntities());
 			
-			// Send a full snapshot of initial game state to the client
-			sendFullSnapshot(clientIP, initialGameState);
-			System.out.println("Full snapshot of initial game state sent");
-			
-			// Create a dedicated thread for sending compressed game state to the client
-			ServerGameStateSender sgss = new ServerGameStateSender(clientIP, socket);
+			// Create a dedicated thread for sending difference in game state to client
+			ServerGameStateSender sgss = new ServerGameStateSender(clientIP, udpSocket, lastSyncedEntities);
 			sgssList.add(sgss);
 			sgss.start();
 		}
 	}
 	
-	private static void sendFullSnapshot(InetAddress clientIP, ArrayList<Entity> ents) {
-		try {
-			ArrayList<Entity> fullSnapshotPartition = new ArrayList<Entity>();
-	
-			// Send the full snapshot using multiple packets
-			for (int i = 0; i < ents.size(); i++) {
-				if ( i == ents.size() - 1 || (i % Parameters.LIST_LENGTH_PER_PACKET == 0 && i != 0) ) {
-					fullSnapshotPartition.add(ents.get(i));
-					ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-					ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-					objOut.writeObject(fullSnapshotPartition);
-					byte[] fullSnapshotPartitionByte = byteOut.toByteArray();
-					
-			        DatagramPacket packet = new DatagramPacket(fullSnapshotPartitionByte, fullSnapshotPartitionByte.length, clientIP, 4445);
-
-			        socket.send(packet);
-			        fullSnapshotPartition.clear();
-				}
-				else if (i % Parameters.LIST_LENGTH_PER_PACKET != 0 || i == 0) {
-					fullSnapshotPartition.add(ents.get(i));
-				}
+	/* 
+	 * Create a compressed set of entities (game state) from the original set of entities
+	 */
+	private static ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
+		ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
+		
+		for (Entity e : ents) {
+			if (e instanceof Ship) {
+				Ship s = (Ship) e;
+				long serial = s.getSerial();
+				Position position = s.getPosition();
+				boolean isToBeDeleted = s.isToBeDeleted();
+				double direction = s.getDirection();
+				double speed = s.getSpeed();
+				double health = s.getHealth();
+				
+				EntitiesLite.add(new EntityLite(serial, 0, position, isToBeDeleted, direction, speed, health));	
 			}
-			
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-			objOut.writeObject(new ArrayList<Entity>());
-			byte[] emptyArrayListByte = byteOut.toByteArray();
-	        DatagramPacket packet = new DatagramPacket(emptyArrayListByte, emptyArrayListByte.length, clientIP, 4445);
-	        
-	        // Send an empty array list to notice client the completion of full snapshot sending
-	        socket.send(packet);
+			else if (e instanceof SmallBullet) {
+				SmallBullet sb = (SmallBullet) e;
+				long serial = sb.getSerial();
+				Position position = sb.getPosition();
+				boolean isToBeDeleted = sb.isToBeDeleted();
+				double direction = sb.getDirection();
+				double speed = sb.getSpeed();
+				double distance = sb.getDistance();
+				double travelled = sb.getTravelled();
+				long source = sb.getSource();
+				
+				EntitiesLite.add(new EntityLite(serial, 1, position, isToBeDeleted, direction, speed, distance, travelled, source));	
+			}
+			else if (e instanceof BigBullet) {
+				BigBullet bb = (BigBullet) e;
+				long serial = bb.getSerial();
+				Position position = bb.getPosition();
+				boolean isToBeDeleted = bb.isToBeDeleted();
+				double direction = bb.getDirection();
+				double speed = bb.getSpeed();
+				double distance = bb.getDistance();
+				double travelled = bb.getTravelled();
+				long source = bb.getSource();
+				
+				EntitiesLite.add(new EntityLite(serial, 2, position, isToBeDeleted, direction, speed, distance, travelled, source));	
+			}
+		}
+		
+		return EntitiesLite;
+	}
+	
+	/* 
+	 * Send the compressed set of entities (full snapshot) to client
+	 */
+	private static void sendFullSnapshot(InetAddress clientIP, ObjectOutputStream toClient, ConcurrentLinkedQueue<Entity> ents) {
+		ArrayList<EntityLite> entitiesLite = calculateEntitiesLite(ents);
+		try {
+			toClient.writeObject(entitiesLite);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -234,7 +235,7 @@ public class Server {
 					// Remove player from the PlayerList
 					playerList.remove(p);
 					
-					// Stop and remove the dedicated thread for the player
+					// Stop and remove the dedicated sgss thread for the player
 					getSGSSThreadByIP(clientIP, sgssList).end();
 					removeSGSSThreadByIP(clientIP, sgssList);
 				}

@@ -26,8 +26,8 @@ public class Parameters {
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */
-  public static final int INPUT_SAMPLING_RATE = 60;
-  public static final int SNAPSHOTS_PER_SECOND = 60;
+  public static final int INPUT_SAMPLING_RATE = 63;
+  public static final int SNAPSHOTS_PER_SECOND = 63;
   public static final int LIST_LENGTH_PER_PACKET = 5000;
   public static final int FPS_FREQ = 4;
   public static final int N_SECOND = 1000000000;

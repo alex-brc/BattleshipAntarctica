@@ -223,4 +223,14 @@ public class Ship extends Entity implements Serializable {
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
   }
+  
+  public boolean equals(Ship s) {
+	  return this.getSerial() == s.getSerial() && this.getPosition().equals(s.getPosition()) && this.isToBeDeleted() == s.isToBeDeleted() && 
+			 this.getMass() == s.getMass() && this.getSpeed() == s.getSpeed() && this.getDirection() == s.getDirection() && 
+			 this.getLength() == s.getLength() && this.getWidth() == s.getWidth() && this.getHealth() == s.getHealth();
+  }
+  
+  public String toString() {
+	  return "Ship " + this.getSerial() + "," + this.getPosition();
+  }
 }

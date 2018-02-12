@@ -1,5 +1,7 @@
 package org.alien8.core;
 
+import java.io.Serializable;
+
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
@@ -9,7 +11,9 @@ import org.alien8.rendering.Renderer;
  * etc.
  *
  */
-public abstract class Entity {
+public abstract class Entity implements Serializable, Cloneable {
+
+  private static final long serialVersionUID = 1635902892337937842L;
   protected Position position;
   protected long serial = -1;
   protected boolean toBeDeleted = false;
@@ -62,10 +66,11 @@ public abstract class Entity {
   }
 
   public void setSerial(long serial) {
-    if (this.serial == -1) {
-      this.serial = serial;
-    }
-    // Only works once.
+	  if (this.serial == -1) {
+	      this.serial = serial;
+	    }
+	    // Only works once.
+
   }
 
   public void delete() {
@@ -219,5 +224,10 @@ public abstract class Entity {
 
   public Position[] getObb() {
 	  return obb;
+  }
+  
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+      return super.clone();
   }
 }

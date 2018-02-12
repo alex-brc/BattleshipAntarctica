@@ -1,53 +1,13 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
-
 import org.alien8.core.Entity;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
-import org.alien8.rendering.Sprite;
 
-<<<<<<< HEAD
-public class Bullet extends Entity implements Serializable {
-	private static final long serialVersionUID = -3644646556942405204L;
-	private Position startingPosition;
-	private double distance;
+public abstract class Bullet extends Entity implements Serializable{
 	
-	public Bullet(Position position, double direction, int bulletType, double distance) {
-		this.position = position;
-		this.setDirection(direction);
-		this.startingPosition = position;
-		this.distance = distance;
-		
-		if(bulletType == Turret.SMALL) {
-			this.setSpeed(Parameters.SMALL_BULLET_SPEED);
-			this.setMass(Parameters.SMALL_BULLET_MASS);
-			
-		}
-		else if(bulletType == Turret.BIG) {
-			this.setSpeed(Parameters.BIG_BULLET_SPEED);
-			this.setMass(Parameters.BIG_BULLET_MASS);	
-		}
-	}
-	
-	@Override
-	public void setPosition(Position position) {
-		this.position = position;
-		
-		// If this distance calculation is too slow, 
-		// we can change to a limited life span of 
-		// bullets, after which they are deleted 
-		if(position.isOutOfBounds() || startingPosition.distanceTo(position) > distance)
-			this.delete();
-	}
-	
-	public void render(Renderer r){
-		r.drawRect((int)position.getX(), (int)position.getY(), 1, 1, 0xffffff, false);
-	}
-=======
-public abstract class Bullet extends Entity {
-
-  private Position startingPosition;
+  private static final long serialVersionUID = -4758229490654529751L;
   private double distance;
   private double damage;
   private double travelled;
@@ -58,7 +18,6 @@ public abstract class Bullet extends Entity {
     super(position, direction, speed, mass, length, width);
     this.distance = distance;
     this.damage = damage;
-    this.startingPosition = position;
     this.travelled = 0;
     this.source = source;
   }
@@ -93,5 +52,26 @@ public abstract class Bullet extends Entity {
   public long getSource() {
     return source;
   }
->>>>>>> f88cc358b04e1e88328d1b191d94b4f27ed9dc86
+  
+  public double getDistance() {
+	  return distance;
+  }
+  
+  public double getTravelled() {
+	  return travelled;
+  }
+  
+  public void setTravelled(double travelled) {
+	  this.travelled = travelled;
+  }
+  
+  public boolean equals(Bullet b) {
+	  return this.getSerial() == b.getSerial() && this.getPosition().equals(b.getPosition()) && this.isToBeDeleted() == b.isToBeDeleted() && 
+			 this.getMass() == b.getMass() && this.getSpeed() == b.getSpeed() && this.getDirection() == b.getDirection() && 
+			 this.getLength() == b.getLength() && this.getWidth() == b.getWidth() && this.getDistance() == b.getDistance() && this.getTravelled() == b.getTravelled();
+  }
+  
+  public String toString() {
+	  return "Bullet " + this.getSerial() + "," + this.getPosition();
+  }
 }

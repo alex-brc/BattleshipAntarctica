@@ -1,11 +1,13 @@
 package org.alien8.ship;
 
+import java.io.Serializable;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 
-public class BigBullet extends Bullet {
+public class BigBullet extends Bullet implements Serializable {
+  private static final long serialVersionUID = -8445751045321379981L;
   protected Sprite sprite = Sprite.bullet;
   
   public BigBullet(Position position, double direction, double distance, long serial) {
