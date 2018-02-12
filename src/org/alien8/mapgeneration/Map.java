@@ -16,27 +16,29 @@ public class Map{
 	protected boolean[][] iceGrid;
 	protected List<AABB> roughAABBs = new ArrayList<AABB>();
 	
-	public Map(){
+	public Map(){ // Basic constructor - probably won't be used
 		length = 0;
 		width = 0;
 		lengthDensity = 0;
 		widthDensity = 0;
 	}
 	
-	public Map(int l, int w, int lD, int wD){
+	public Map(int l, int w, int lD, int wD){ 
 		length = l;
 		width = w;
 		lengthDensity = lD;
 		widthDensity = wD;
+		//Map is a 2-D array depicting if each pixel is either ice or water (True = ice, False = water)
 		iceGrid = new boolean[l][w];
-		makeMap();
-		makeRoughAABBs(Parameters.MAP_BOX_SIZE);
+		makeMap(); //Actually generates the Map using the PerlinNoise class
+		makeRoughAABBs(Parameters.MAP_BOX_SIZE); //Gives the ice hitboxes
 	}
 	
 	protected void makeMap(){
-		double waterLevel = Parameters.WATER_LEVEL;
-		
+		double waterLevel = Parameters.WATER_LEVEL; //Defines the cut-off point for water or ice
+		//Gets a noise grid from the PerlinNoise class
 		double[][] noiseGrid = PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity);
+		//Loops over all the pixels setting them to either ice (True) or water (False) based on the water level
 		for (int y = 0; y < width; y++){
 			for (int x = 0; x < length; x++){
 				boolean isIce = (noiseGrid[x][y] <= waterLevel);
@@ -46,6 +48,10 @@ public class Map{
 	}
 	
 	protected void makeRoughAABBs(int boxSize){
+		/* Function that gives all the ice basic hitboxes
+		*  Works by checking every square of a given size if the majority of the pixels are ice or not
+		*  If the majority is ice it makes the whole box a hitbox/entity
+		*/
 		for (int y = 0; y < width; y+=boxSize){
 			for (int x = 0; x < length; x+=boxSize){
 				
@@ -57,7 +63,10 @@ public class Map{
 						}
 					}
 				}
+
 				if (1.0 * countIce / (boxSize*boxSize) > Parameters.ICE_BOX_DENSITY){
+					//Just need to generate a bunch of values for initialising an entity/hitbox
+
 					double centerX = x + (Math.ceil(boxSize/2.0d) -1);
 					double centerY = y + (Math.ceil(boxSize/2.0d) -1);
 					Position center = new Position(centerX, centerY);
@@ -83,8 +92,4 @@ public class Map{
 	public void render(Renderer r) {
 		r.drawMap(iceGrid);
 	}
-	
-	/*public static void main(String[] args){
-		Map test = new Map(512,512,8,8);
-	}*/
 }

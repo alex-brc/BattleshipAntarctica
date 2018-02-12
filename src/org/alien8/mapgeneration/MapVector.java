@@ -1,7 +1,7 @@
 package org.alien8.mapgeneration;
 
 public class MapVector{
-	
+	//Needed a very simple implementaion of a vector for the purpose vectors in the Perlin Noise algorithm
 	protected double xValue;
 	protected double yValue;
 	

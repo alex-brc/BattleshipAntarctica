@@ -18,6 +18,7 @@ import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.ship.Ship;
+import org.alien8.ai.AIController;
 
 public class Client implements Runnable {
   /**
@@ -32,6 +33,8 @@ public class Client implements Runnable {
   private static DatagramSocket udpServer = null;
   private InetAddress serverIP = null;
   private ClientInputSampleSender ciss = null;
+  private ClientGameStateReceiver cgsr = null;
+
 
   public static void main(String[] args) {
 
@@ -48,7 +51,6 @@ public class Client implements Runnable {
     Ship notPlayer = new Ship(new Position(100, 100), 0); // <-- Comment out this line to test networking
     notPlayer.setSpeed(0.8); // <-- Comment out this line to test networking
     model.addEntity(notPlayer); // temporary reference point // <-- Comment out this line to test networking
-
   }
 
   /**
@@ -108,6 +110,7 @@ public class Client implements Runnable {
         }
 
         // Call the renderer
+		//ai.update();
         renderer.render(model);
         frameRate++;
 
