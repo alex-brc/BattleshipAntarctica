@@ -11,10 +11,7 @@ public class Ice extends Entity implements Serializable {
 	private static final long serialVersionUID = -3440599654141729832L;
 
 	public Ice(Position pos){
-		position = pos;
-		setDirection(0d);
-		setSpeed(0d);
-		setMass(0d);
+		super(pos,0,0,0,0,0);
 	}
 
 	@Override
@@ -25,7 +22,7 @@ public class Ice extends Entity implements Serializable {
 
 	@Override
 	public void render(Renderer r) {
-		// TODO Auto-generated method stub
+		r.drawRect((int) this.position.getX(), (int) this.position.getY(), 32, 32, 0xFF0000, false);
 		
 	}
 }

@@ -21,7 +21,7 @@ public class Parameters {
   /**
    * Size of map hitboxes
    */
-  public static final int MAP_BOX_SIZE = 4;
+  public static final int MAP_BOX_SIZE = 32;
   /**
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.

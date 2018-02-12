@@ -2,6 +2,7 @@ package org.alien8.managers;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.client.ClientInputSample;
@@ -9,13 +10,12 @@ import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.mapgeneration.Map;
+import org.alien8.physics.AABB;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
-import org.alien8.physics.Position;
 import org.alien8.server.Server;
 import org.alien8.ship.BigBullet;
-import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
 
@@ -40,6 +40,10 @@ public class ModelManager {
   private ModelManager() {
     // All setup should be done here, such as support for networking, etc.
     // Normally this exists only to defeat instantiation
+	List<AABB> aabbs = map.getAABBs();
+	for(AABB aabb : aabbs) {
+		entities.add(aabb.getEntity());
+	}
   }
 
   /**
