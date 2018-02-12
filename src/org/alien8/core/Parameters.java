@@ -23,6 +23,11 @@ public class Parameters {
    */
   public static final int MAP_BOX_SIZE = 32;
   /**
+   * How many ice pixels must be in a box to be considered an ice entity (%).
+   * This is in [0,1]
+   */
+  public static final double ICE_BOX_DENSITY = 0.7;
+  /**
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */

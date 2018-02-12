@@ -57,7 +57,7 @@ public class Map{
 						}
 					}
 				}
-				if (countIce > ((boxSize*boxSize)/2)){
+				if (1.0 * countIce / (boxSize*boxSize) > Parameters.ICE_BOX_DENSITY){
 					double centerX = x + (Math.ceil(boxSize/2.0d) -1);
 					double centerY = y + (Math.ceil(boxSize/2.0d) -1);
 					Position center = new Position(centerX, centerY);
