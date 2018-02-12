@@ -91,7 +91,7 @@ public class Client implements Runnable {
       int frameRate = 0;
       long frameTimer = getTime();
       
-      //this.connect("192.168.0.15"); <-- Uncomment this line to test networking
+      // this.connect("192.168.0.15"); // <-- Uncomment this line to test networking
       while (running) {
         currentTime = getTime();
 
@@ -101,7 +101,7 @@ public class Client implements Runnable {
         // Call update() as many times as needed to compensate before rendering
         while (catchUp >= 1) {
           model.update(); // <-- Comment out this line to test networking
-          //this.receiveAndUpdate(); <-- Uncomment this line to test networking
+          // this.receiveAndUpdate(); // <-- Uncomment this line to test networking
           catchUp--;
           // Update last time
           lastTime = getTime();
