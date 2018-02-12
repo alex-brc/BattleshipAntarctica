@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
+import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.ship.Ship;
 
@@ -41,12 +42,12 @@ public class Client implements Runnable {
   public Client() {
     renderer = new Renderer(new Dimension(800, 600));
     model = ModelManager.getInstance();
-    //Ship ship = new Ship(new Position(200, 200), 0);
-    //model.setPlayer(ship);
-    //model.addEntity(ship);
-    //Ship notPlayer = new Ship(new Position(100, 100), 0);
-    //notPlayer.setSpeed(0.8);
-    //model.addEntity(notPlayer); // temporary reference point
+    Ship ship = new Ship(new Position(200, 200), 0); // <-- Comment out this line to test networking
+    model.setPlayer(ship); // <-- Comment out this line to test networking
+    model.addEntity(ship); // <-- Comment out this line to test networking
+    Ship notPlayer = new Ship(new Position(100, 100), 0); // <-- Comment out this line to test networking
+    notPlayer.setSpeed(0.8); // <-- Comment out this line to test networking
+    model.addEntity(notPlayer); // temporary reference point // <-- Comment out this line to test networking
 
   }
 
