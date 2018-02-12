@@ -2,7 +2,6 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.ship.Ship;
 
 public class PhysicsManager {
   /**
@@ -41,12 +40,16 @@ public class PhysicsManager {
    */
   public static void applyFriction(Entity e) {
 	  e.setSpeed(e.getSpeed() * Parameters.FRICTION);
+	  // Makes friction less CPU-intensive sometimes
+	  if (e.getSpeed() < 0.001d) {
+		  e.setSpeed(0);
+	  }
   }
 
   /**
    * Updates the position of an Entity. Must be called every tick.
    * 
-   * @param e The Entity to be updated.
+   * @param e The Entity to be updated.	
    */
   public static void updatePosition(Entity e) {
     Position pos = e.getPosition();
@@ -61,7 +64,6 @@ public class PhysicsManager {
     // Update the Oriented Bounding Box
     // TODO: This causes an error.
     e.translateObb(xdiff, ydiff);
-
     e.dealWithOutOfBounds();
   }
 
@@ -83,10 +85,9 @@ public class PhysicsManager {
 	   * f : (0,PI) -> [0,1]
 	   * f(x) = sin^2(x),
 	   *
-	   * to get a natural rotation modifier. */
-	  double rotModifier = Math.sin(squeezedSpeed);
-	  rotModifier *= rotModifier;
-	  rotModifier += 0.3;
+	   * to get a natural rotation modifier. 
+	   * Shift up by 0.3, feels more natural */
+	  double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2) + 0.3;
 	  // Then apply this modifier to the angle, with a parametrised weight
 	  angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 

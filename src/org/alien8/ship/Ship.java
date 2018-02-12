@@ -115,9 +115,11 @@ public class Ship extends Entity implements Serializable {
     // r.drawRect((int) this.getObb()[0].getX(), (int) this.getObb()[0].getY(), (int)
     // this.getLength(),
     // (int) this.getWidth(), 0xFF0000, false);
-	
-    r.drawSprite((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), sprite, false);
+
 	  
+	r.drawSprite((int) this.getObb()[2].getX(),(int) this.getObb()[2].getY(), sprite, false);
+
+	
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
       // Color front two points blue
@@ -133,58 +135,9 @@ public class Ship extends Entity implements Serializable {
     }
 
     // Render turrets
-    
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);
-  }
-
-  public double getFrontTurretDirection() {
-    return frontTurret.getDirection();
-  }
-
-  public double getRearTurretDirection() {
-    return rearTurret.getDirection();
-  }
-
-  public double getMidTurretDirection() {
-    return midTurret.getDirection();
-  }
-
-  public Position getFrontTurretPosition() {
-    return frontTurret.getPosition();
-  }
-
-  public Position getMidTurretPosition() {
-    return rearTurret.getPosition();
-  }
-
-  public Position getRearTurretPosition() {
-    return rearTurret.getPosition();
-  }
-
-  public void frontTurretCharge() {
-    frontTurret.charge();
-  }
-
-  public void midTurretCharge() {
-    midTurret.charge();
-  }
-
-  public void rearTurretCharge() {
-    rearTurret.charge();
-  }
-
-  public void frontTurretShoot() {
-    frontTurret.shoot();
-  }
-
-  public void midTurretShoot() {
-    midTurret.shoot();
-  }
-
-  public void rearTurretShoot() {
-    rearTurret.shoot();
   }
 
   /**
@@ -222,6 +175,42 @@ public class Ship extends Entity implements Serializable {
     this.setPosition(
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
+  }
+
+  public double getFrontTurretDirection() {
+	  return frontTurret.getDirection();
+  }
+
+  public double getRearTurretDirection() {
+	  return rearTurret.getDirection();
+  }
+
+  public double getMidTurretDirection() {
+	  return midTurret.getDirection();
+  }
+
+  public void frontTurretCharge() {
+	  frontTurret.charge();
+  }
+
+  public void midTurretCharge() {
+	  midTurret.charge();
+  }
+
+  public void rearTurretCharge() {
+	  rearTurret.charge();
+  }
+
+  public void frontTurretShoot() {
+	  frontTurret.shoot();
+  }
+
+  public void midTurretShoot() {
+	  midTurret.shoot();
+  }
+
+  public void rearTurretShoot() {
+	  rearTurret.shoot();
   }
   
   public boolean equals(Ship s) {

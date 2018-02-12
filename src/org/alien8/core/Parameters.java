@@ -29,7 +29,7 @@ public class Parameters {
   public static final int INPUT_SAMPLING_RATE = 63;
   public static final int SNAPSHOTS_PER_SECOND = 63;
   public static final int LIST_LENGTH_PER_PACKET = 5000;
-  public static final int FPS_FREQ = 4;
+  public static final int FPS_FREQ = 1;
   public static final int N_SECOND = 1000000000;
   public static final int MAP_HEIGHT = 2048;
   public static final int MAP_WIDTH = 2048;

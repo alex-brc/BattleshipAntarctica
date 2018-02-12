@@ -278,6 +278,11 @@ public class ModelManager {
     return entities;
   }
   
+  /**
+   * Sets the designated ship player.
+   * 
+   * @param player ship to set as the player
+   */
   public void setPlayer(Ship player) {
 	  this.player = player;
   }

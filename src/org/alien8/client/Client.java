@@ -115,6 +115,7 @@ public class Client implements Runnable {
           frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
           FPS = frameRate * Parameters.FPS_FREQ;
           frameRate = 0;
+          System.out.println(FPS);
         }
 
       }
