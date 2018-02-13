@@ -25,7 +25,7 @@ public class AIController{
 	*     3  2  1
 	*       (S)
 	*/
-	private static int collisionCheckStart = 120; //Checks every 2 seconds (120 ticks) for a collision
+	private static int collisionCheckStart = 60; //Checks every 2 seconds (120 ticks) for a collision
 	protected int collisionCheckCountDown;
 	
 	public AIController(Position startPos){
