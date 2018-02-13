@@ -35,7 +35,6 @@ public class AIController{
 	}
 	
 	public void update(){
-		model.update();
 		calcCompassDirection();
 		target = findClosestTarget();
 		myShip.setTurretsDirection(target.getPosition());
