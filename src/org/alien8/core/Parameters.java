@@ -12,6 +12,7 @@ package org.alien8.core;
  * 
  */
 public class Parameters {
+	public static final boolean RENDER_BOX = false;
 
   /**
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower

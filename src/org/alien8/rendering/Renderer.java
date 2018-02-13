@@ -88,7 +88,7 @@ public class Renderer extends Canvas {
 	g.dispose(); //necessary to clear memory
 	bs.show(); //displays the buffer strategy to the monitor
   }
-  
+  	
   public void clear(){
 	for (int i = 0; i < pixels.length; i++){
 	  pixels[i] = 0; //cycles through all pixels and sets them to 0, resetting the array
