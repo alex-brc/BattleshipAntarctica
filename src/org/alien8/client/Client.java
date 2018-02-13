@@ -33,7 +33,8 @@ public class Client implements Runnable {
   private static DatagramSocket udpServer = null;
   private InetAddress serverIP = null;
   private ClientInputSampleSender ciss = null;
-
+  private AIController aiPlayer;
+  
   public static void main(String[] args) {
 
     Client game = new Client();
@@ -46,9 +47,8 @@ public class Client implements Runnable {
     Ship ship = new Ship(new Position(200, 200), 0); // <-- Comment out this line to test networking
     model.setPlayer(ship); // <-- Comment out this line to test networking
     model.addEntity(ship); // <-- Comment out this line to test networking
-    Ship notPlayer = new Ship(new Position(100, 100), 0); // <-- Comment out this line to test networking
-    notPlayer.setSpeed(0.8); // <-- Comment out this line to test networking
-    model.addEntity(notPlayer); // temporary reference point // <-- Comment out this line to test networking
+    aiPlayer = new AIController(new Position(100, 100)); // <-- Comment out this line to test networking
+    model.addEntity(aiPlayer.getShip()); // temporary reference point // <-- Comment out this line to test networking
   }
 
   /**
@@ -108,7 +108,7 @@ public class Client implements Runnable {
         }
 
         // Call the renderer
-		//ai.update();
+		aiPlayer.update();
         renderer.render(model);
         frameRate++;
 
