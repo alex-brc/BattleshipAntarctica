@@ -5,11 +5,12 @@ import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
+import org.alien8.rendering.Sprite;
 
 public class Turret implements Serializable {
-	
+
   private static final long serialVersionUID = -7308366899275446394L;
-// Type of bullets this turret shoots
+  // Type of bullets this turret shoots
   public static final int SMALL = 1;
   public static final int BIG = 2;
   // The parent ship of this turret
@@ -28,6 +29,8 @@ public class Turret implements Serializable {
   private double distance;
   private double minDistance;
   private double maxDistance;
+
+  private Sprite sprite = Sprite.turret; // for now
 
   public Turret(Position position, int type, Ship ship) {
     this.ship = ship;
@@ -113,6 +116,9 @@ public class Turret implements Serializable {
   }
 
   public void render(Renderer r) {
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
     if (this.isOnCooldown())
       r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
     else
