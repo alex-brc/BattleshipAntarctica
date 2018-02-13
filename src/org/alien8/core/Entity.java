@@ -16,7 +16,7 @@ public abstract class Entity {
 
   private double mass;
   private double speed;
-  private double direction;
+  protected double direction;
   private double length;
   private double width;
   private double health;

@@ -42,7 +42,7 @@ public class Client implements Runnable {
     Entity ship = new Ship(new Position(1, 1), 0);
     // Add the first ship to the map, this will be the player for now
     model.addEntity(ship);
-    model.addEntity(new Ship(new Position(100, 100), 0)); // temporary reference point
+    //model.addEntity(new Ship(new Position(100, 100), 0)); // temporary reference point
 
   }
 

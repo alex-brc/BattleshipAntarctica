@@ -106,7 +106,8 @@ public class Ship extends Entity {
 
   public void render(Renderer r) {
     // r.drawRect((int) position.getX(), (int) position.getY(), 10, 20, 0x666666, false);
-    r.drawSprite((int) this.getObb()[0].getX(),(int) this.getObb()[0].getY(), sprite, false);
+	Sprite currentSprite = sprite.rotateSprite(-(direction - Math.PI/2));
+    r.drawSprite((int)position.getX() - currentSprite.getWidth()/2, (int)position.getY() - currentSprite.getHeight()/2, currentSprite, false);
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);
