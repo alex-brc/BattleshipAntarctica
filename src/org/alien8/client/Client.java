@@ -12,19 +12,20 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import org.alien8.ai.AIController;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.ship.Ship;
-import org.alien8.ai.AIController;
 
 public class Client implements Runnable {
   /**
    * Volatile "running" boolean to avoid internal caching. Thread should stop when set to false.
    */
-  private boolean running = false;
+  private volatile  boolean running = false;
   private Thread thread;
   private Renderer renderer;
   private ModelManager model;
@@ -34,7 +35,10 @@ public class Client implements Runnable {
   private InetAddress serverIP = null;
   private ClientInputSampleSender ciss = null;
   private AIController aiPlayer;
-  
+
+  // private ClientGameStateReceiver cgsr = null;
+
+
   public static void main(String[] args) {
 
     Client game = new Client();
