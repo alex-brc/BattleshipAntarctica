@@ -34,6 +34,7 @@ public class Sprite implements Serializable {
 	public Sprite(int width, int height){
 		this.width = width;
 		this.height = height;
+		pixels = new int[width*height];
 	}
 	
 	/**
@@ -47,12 +48,30 @@ public class Sprite implements Serializable {
 	}
 	
 	public Sprite rotateSprite(double a){
-		Sprite s = new Sprite((int)(height * Math.cos(a) + width * Math.sin(a)), (int)(height * Math.sin(a) + width * Math.cos(a)));
+		Sprite s = new Sprite((int)(height * Math.abs(Math.sin(a)) + width * Math.abs(Math.cos(a))), (int)(height * Math.abs(Math.cos(a)) + width * Math.abs(Math.sin(a))));
+		double cx = (double)width / 2;
+		double cy = (double)height / 2;
+		double cxNew = (double)s.getWidth() / 2;
+		double cyNew = (double)s.getHeight() / 2;
 		for (int y = 0; y < s.getHeight(); y++){
 			for (int x = 0; x < s.getWidth(); x++){
-				
+				s.getPixels()[x + y * s.getWidth()] = 0xffff00ff;
 			}
 		}
+		for (int y = 0; y < height; y++){
+			for (int x = 0; x < width; x++){
+				double dx = x - cx;
+				double dy = y - cy;
+				double dist = Math.sqrt(dx*dx + dy*dy);
+				double da = Math.atan(dx/dy);
+				if (y > cy) da += Math.PI;
+				double na = da + a;
+				double nx = cxNew + dist * Math.sin(na);
+				double ny = cyNew + dist * Math.cos(na);
+				if (nx >= 0 && ny >= 00 && nx < s.getWidth() && ny < s.getHeight()) s.getPixels()[(int)nx + (int)ny * s.getWidth()] = pixels[x + y * width];
+			}
+		}
+		
 		return s;
 	}
 	

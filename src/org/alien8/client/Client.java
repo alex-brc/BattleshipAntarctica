@@ -33,8 +33,6 @@ public class Client implements Runnable {
   private static DatagramSocket udpServer = null;
   private InetAddress serverIP = null;
   private ClientInputSampleSender ciss = null;
-  private ClientGameStateReceiver cgsr = null;
-
 
   public static void main(String[] args) {
 
