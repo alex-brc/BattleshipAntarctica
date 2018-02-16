@@ -166,6 +166,7 @@ public class Client implements Runnable {
 	if (server == null && serverIP == null && ciss == null) {
 	  try {
 		serverIP = InetAddress.getByName(serverIPStr);
+		System.out.println("X");
 		server = new Socket(serverIP, 4446);
 		udpServer = new DatagramSocket(4445, serverIP);
 		

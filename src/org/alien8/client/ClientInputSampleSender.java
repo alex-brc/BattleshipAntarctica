@@ -34,16 +34,16 @@ public class ClientInputSampleSender extends Thread {
 				
 				// Send the client input sample packet to the server
 				socket.send(packet);
-//				
-//				// Thread pauses operation according to input sampling rate
-//				sleep(1000 / Parameters.INPUT_SAMPLING_RATE);
+				
+				// Thread pauses operation according to input sampling rate
+				sleep(1000 / Parameters.INPUT_SAMPLING_RATE);
 			}
 			catch (IOException ioe) {
 				ioe.printStackTrace();
 			}
-//			catch (InterruptedException ie) {
-//				ie.printStackTrace();
-//			}
+			catch (InterruptedException ie) {
+				ie.printStackTrace();
+			}
 		}
 		
 	}
