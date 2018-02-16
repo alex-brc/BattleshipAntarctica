@@ -36,9 +36,14 @@ public class ServerInputSampleReceiver extends Thread {
 			    ObjectInputStream objIn = new ObjectInputStream(byteIn);
 			    ClientInputSample inputSample = (ClientInputSample) objIn.readObject();
 			    
+			    if(inputSample.escPressed) {
+			    	System.out.println("BYE");
+			    	System.exit(-1);
+			    }
+			    
 			    // Update the game state according the input sample
 			    model.updateServer(clientIP, inputSample);
-			    System.out.println("Entities: " + model.getEntities().toString());
+			    //System.out.println("Entities: " + model.getEntities().toString());
 			}
 			catch (IOException ioe) {
 				ioe.printStackTrace();

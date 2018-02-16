@@ -19,15 +19,14 @@ public abstract class Entity implements Serializable, Cloneable {
   protected boolean toBeDeleted = false;
   protected Properties properties = new Properties();
   protected Attributes attributes = new Attributes();
-  
+
+  private double mass;
+  private double speed;
+  private double direction;
+  private double length;
+  private double width;
+  private double health;
   private Position[] obb;
-
-  /**
-   * Empty constuctor. Should not be used. Here for technical purposes.
-   */
-  protected Entity() {
-
-  }
 
   /**
    * Basic constructor for an entity

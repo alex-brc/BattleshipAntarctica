@@ -12,6 +12,7 @@ package org.alien8.core;
  * 
  */
 public class Parameters {
+	public static final boolean RENDER_BOX = true;
 
   /**
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
@@ -21,13 +22,18 @@ public class Parameters {
   /**
    * Size of map hitboxes
    */
-  public static final int MAP_BOX_SIZE = 4;
+  public static final int MAP_BOX_SIZE = 32;
+  /**
+   * How many ice pixels must be in a box to be considered an ice entity (%).
+   * This is in [0,1]
+   */
+  public static final double ICE_BOX_DENSITY = 0.7;
   /**
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */
-  public static final int INPUT_SAMPLING_RATE = 63;
-  public static final int SNAPSHOTS_PER_SECOND = 63;
+  public static final int INPUT_SAMPLING_RATE = TICKS_PER_SECOND;
+  public static final int SNAPSHOTS_PER_SECOND = TICKS_PER_SECOND;
   public static final int LIST_LENGTH_PER_PACKET = 5000;
   public static final int FPS_FREQ = 1;
   public static final int N_SECOND = 1000000000;

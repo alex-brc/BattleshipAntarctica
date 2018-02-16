@@ -115,10 +115,6 @@ public class Ship extends Entity implements Serializable {
     // r.drawRect((int) this.getObb()[0].getX(), (int) this.getObb()[0].getY(), (int)
     // this.getLength(),
     // (int) this.getWidth(), 0xFF0000, false);
-
-	  
-	r.drawSprite((int) this.getObb()[2].getX(),(int) this.getObb()[2].getY(), sprite, false);
-
 	
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
@@ -135,6 +131,8 @@ public class Ship extends Entity implements Serializable {
     }
 
     // Render turrets
+	Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI/2));
+    r.drawSprite((int)position.getX() - currentSprite.getWidth()/2, (int)position.getY() - currentSprite.getHeight()/2, currentSprite, false);
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);

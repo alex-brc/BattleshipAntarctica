@@ -9,15 +9,17 @@ import org.alien8.rendering.Sprite;
 public class BigBullet extends Bullet implements Serializable {
   private static final long serialVersionUID = -8445751045321379981L;
   protected Sprite sprite = Sprite.bullet;
-  
+
   public BigBullet(Position position, double direction, double distance, long serial) {
     super(position, direction, distance, Parameters.BIG_BULLET_MASS, Parameters.BIG_BULLET_WIDTH,
-        Parameters.BIG_BULLET_LENGTH, Parameters.BIG_BULLET_SPEED, Parameters.BIG_BULLET_DAMAGE, 
+        Parameters.BIG_BULLET_LENGTH, Parameters.BIG_BULLET_SPEED, Parameters.BIG_BULLET_DAMAGE,
         serial);
   }
 
   @Override
   public void render(Renderer r) {
-    r.drawSprite((int) position.getX(), (int) position.getY(), sprite, false);
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
   }
 }
