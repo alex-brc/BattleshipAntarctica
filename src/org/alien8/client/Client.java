@@ -36,8 +36,6 @@ public class Client implements Runnable {
   private ClientInputSampleSender ciss = null;
   private AIController aiPlayer;
 
-  // private ClientGameStateReceiver cgsr = null;
-
 
   public static void main(String[] args) {
 
@@ -48,11 +46,6 @@ public class Client implements Runnable {
   public Client() {
     renderer = new Renderer(new Dimension(800, 600));
     model = ModelManager.getInstance();
-    Ship ship = new Ship(new Position(200, 200), 0); // <-- Comment out this line to test networking
-    model.setPlayer(ship); // <-- Comment out this line to test networking
-    model.addEntity(ship); // <-- Comment out this line to test networking
-    aiPlayer = new AIController(new Position(100, 100)); // <-- Comment out this line to test networking
-    model.addEntity(aiPlayer.getShip()); // temporary reference point // <-- Comment out this line to test networking
   }
 
   /**
@@ -95,24 +88,32 @@ public class Client implements Runnable {
       int frameRate = 0;
       long frameTimer = getTime();
       
-      // this.connect("192.168.0.15"); // <-- Uncomment this line to test networking
+      int tickRate = 0;
+      long tickTimer = getTime();
+      
+      this.connect("172.22.35.217"); // <-- Uncomment this line to test networking
       while (running) {
         currentTime = getTime();
 
         // Get the amount of update()s the model needs to catch up
+        // 
+        //                  timeNow - timeLastUpdateWasDone    --> 
+        // timeToCatchUp = ----------------------------------
+        //							deltaTPerTick              --> how long a "tick" is
+        // 
         catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
         // Call update() as many times as needed to compensate before rendering
-        while (catchUp >= 1) {
-          model.update(); // <-- Comment out this line to test networking
-          // this.receiveAndUpdate(); // <-- Uncomment this line to test networking
+       while (catchUp >= 1) {
+          this.receiveAndUpdate(); // <-- Uncomment this line to test networking
+          tickRate++;
           catchUp--;
           // Update last time
           lastTime = getTime();
-        }
+       }
 
         // Call the renderer
-		aiPlayer.update();
+		// aiPlayer.update();
         renderer.render(model);
         frameRate++;
 
@@ -123,7 +124,11 @@ public class Client implements Runnable {
           frameRate = 0;
           System.out.println(FPS);
         }
-
+        if(getTime() - tickTimer > Parameters.N_SECOND) {
+        	tickTimer += Parameters.N_SECOND;
+        	System.out.println(tickRate);
+        	tickRate = 0;
+        }
       }
       System.out.println("stopped");
     }
@@ -232,7 +237,7 @@ public class Client implements Runnable {
 		    
 		    // Sync the game state with server
 		    ModelManager.getInstance().sync(difference);
-		    System.out.println("Entities: " + model.getEntities().toString());
+		    // System.out.println("Entities: " + model.getEntities().toString());
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();

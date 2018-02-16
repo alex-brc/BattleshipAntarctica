@@ -1,13 +1,23 @@
 package org.alien8.server;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.managers.ModelManager;
-import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
@@ -110,15 +120,24 @@ public class Server {
 		        NetworkInterface nic = nis.nextElement();
 		        String niName = nic.getName();
 		        
-		        if (niName.equals("eth1") || niName.equals("wlan0")) {
+		        if (niName.equals("eth1") || niName.equals("wlan1")) {
 		        	Enumeration<InetAddress> addrs = nic.getInetAddresses();
 			        while (addrs.hasMoreElements()) {
 			            InetAddress addr = addrs.nextElement();
+			            System.out.println(addr);
+			            System.out.println(niName);
 			            if (addr instanceof Inet4Address) {
 			            	hostIP = addr;
 			            } 
 			        }
 		        }
+		        
+		        try {
+					hostIP = Inet4Address.getLocalHost();
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		        
 		        // Make sure if the host has ethernet connection, it would be the priority choice
 		        if (niName.equals("eth1")) {

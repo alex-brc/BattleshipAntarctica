@@ -29,6 +29,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 	private boolean sPressed = false;
 	private boolean dPressed = false;
 	private boolean spacePressed = false;
+	private boolean escPressed = false;
 
 	private InputManager() {
 		// Normally this exists only to defeat instantiation
@@ -125,6 +126,12 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 		return spacePressed;
 	}
 	/**
+	 * @return true if ESC key is pressed, false otherwise
+	 */
+	public boolean escPressed() {
+		return escPressed;
+	}
+	/**
 	 * @return the latest mouse position, in screen XY coordinates
 	 */
 	public Position mousePosition() {
@@ -176,6 +183,8 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
+			escPressed = true;
 		
 		switch(e.getKeyChar()) {
 		case 'w': 
@@ -213,6 +222,9 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
+			escPressed = false;
+		
 		switch(e.getKeyChar()) {
 		case 'w': 
 			wPressed = false;

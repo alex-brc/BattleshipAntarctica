@@ -16,6 +16,7 @@ public class ClientInputSample implements Serializable {
 	public boolean sPressed = false;
 	public boolean dPressed = false;
 	public boolean spacePressed = false;
+	public boolean escPressed = false;
 
 	
 	public ClientInputSample() {
@@ -27,6 +28,7 @@ public class ClientInputSample implements Serializable {
 		sPressed = InputManager.getInstance().sPressed();
 		dPressed = InputManager.getInstance().dPressed();
 		spacePressed = InputManager.getInstance().spacePressed();
+		escPressed = InputManager.getInstance().escPressed();
 	}
 	
 	public String toString() {

@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -13,6 +14,7 @@ import org.alien8.physics.AABB;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
+import org.alien8.physics.Position;
 import org.alien8.server.Server;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
@@ -39,10 +41,10 @@ public class ModelManager {
   private ModelManager() {
     // All setup should be done here, such as support for networking, etc.
     // Normally this exists only to defeat instantiation
-    List<AABB> aabbs = map.getAABBs();
-    for (AABB aabb : aabbs) {
-      entities.add(aabb.getEntity());
-    }
+    //    List<AABB> aabbs = map.getAABBs();
+    //    for (AABB aabb : aabbs) {
+    //      entities.add(aabb.getEntity());
+	//    }
   }
 
   /**
@@ -62,6 +64,13 @@ public class ModelManager {
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
+    	if(this.getPlayer() == ent) {
+    		System.out.println("Player died! Respawning");
+    		Ship playerNew = new Ship(new Position(200,200), 0);
+    		this.setPlayer(playerNew);
+    		this.addEntity(playerNew);
+    		continue;
+    	}
         entities.remove(ent);
         // Accelerate it's removal
         ent = null;
