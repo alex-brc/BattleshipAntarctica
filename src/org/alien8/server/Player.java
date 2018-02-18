@@ -10,29 +10,35 @@ public class Player {
 	private Ship ship = null;
 	// add port number
 	private int port = 4400;
+	private ClientHandler ch = null;
 	
-	public Player(InetAddress ip, Ship s) {
+	public Player(InetAddress ip, Ship s, ClientHandler ch) {
 		this.ip = ip;
-		ship = s;
+		this.ship = s;
+		this.ch = ch;
 	}
 	
-	public Player(InetAddress ip, Ship s, int port) {
+	public Player(InetAddress ip, Ship s, int port, ClientHandler ch) {
 		this.ip = ip;
 		this.ship = s;
 		this.port = port;
+		this.ch = ch;
 	}
 
-	
 	public InetAddress getIP() {
-		return ip;
+		return this.ip;
 	}
 	
 	public Ship getShip() {
-		return ship;
+		return this.ship;
 	}
 	
 	public int getPort() {
 		return this.port;
 	}
 	
+	public ClientHandler getClientHandler() {
+		return this.ch;
+	}
+
 }

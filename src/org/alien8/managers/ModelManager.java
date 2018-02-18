@@ -41,10 +41,10 @@ public class ModelManager {
   private ModelManager() {
     // All setup should be done here, such as support for networking, etc.
     // Normally this exists only to defeat instantiation
-    //    List<AABB> aabbs = map.getAABBs();
-    //    for (AABB aabb : aabbs) {
-    //      entities.add(aabb.getEntity());
-	//    }
+//    List<AABB> aabbs = map.getAABBs();
+//    for (AABB aabb : aabbs) {
+//      entities.add(aabb.getEntity());
+//    }
   }
 
   /**
@@ -162,105 +162,155 @@ public class ModelManager {
   }
 
   /**
-   * Create an entity from a compressed entity and add it to the set of entities
-   */
-  public void addEntityByLite(EntityLite el) {
-    if (el.type == 0) { // Ship
-      Ship s = new Ship(el.position, el.direction);
-      s.setSerial(el.serial);
-      s.setSpeed(el.speed);
-      s.setHealth(el.health);
-
-      if (el.toBeDeleted) {
-        s.delete();
-      }
-
-      this.addEntity(s);
-    } else if (el.type == 1) { // Small bullet
-      SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
-      sb.setSerial(el.serial);
-      sb.setSpeed(el.speed);
-      sb.setTravelled(el.travelled);
-
-      if (el.toBeDeleted) {
-        sb.delete();
-      }
-
-      this.addEntity(sb);
-    } else if (el.type == 2) { // Big bullet
-      BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
-      bb.setSerial(el.serial);
-      bb.setSpeed(el.speed);
-      bb.setTravelled(el.travelled);
-
-      if (el.toBeDeleted) {
-        bb.delete();
-      }
-
-      this.addEntity(bb);
-    }
-  }
-
-  /**
    * Syncs the client with the server
    */
   public void sync(ArrayList<EntityLite> difference) {
-    for (EntityLite es : difference) {
-      boolean isNewEntity = true;
+	  for (EntityLite el : difference) {
+		  if (el.entityType == 0 && el.changeType == 0) { // Modify Ship
+	    	  for (Entity e : entities) {
+	    		  if (el.serial == e.getSerial()) {
+	    			  Ship s = (Ship) e;
+	    			  s.setPosition(el.position);
+	    	          s.setDirection(el.direction);
+	    	          s.setSpeed(el.speed);
+	    	          s.setHealth(el.health);
+	    	          s.getFrontTurret().setDirection(el.frontTurretDirection);
+	    	          s.getMidTurret().setDirection(el.midTurretDirection);
+	    	          s.getRearTurret().setDirection(el.rearTurretDirection);
+	    	          s.initObb();
+	    	          
+	    	          if (el.toBeDeleted) {
+	    	        	  s.delete();
+	    	          }	 
+	    	          
+	    	          break;
+	    		  }
+	    	  }
+	      }
+		  else if (el.entityType == 0 && el.changeType == 1) { // Add Ship
+			  Ship s = new Ship(el.position, el.direction);
+			  s.setSerial(el.serial);
+	          s.setSpeed(el.speed);
+	          s.setHealth(el.health);
+	          s.getFrontTurret().setDirection(el.frontTurretDirection);
+	          s.getMidTurret().setDirection(el.midTurretDirection);
+	          s.getRearTurret().setDirection(el.rearTurretDirection);
+	          
+	          if (el.toBeDeleted) {
+	        	  s.delete();
+	          }
+	          
+	          this.addEntity(s);
+		  }
+		  else if (el.entityType == 1 && el.changeType == 0) { // Modify small bullet
+			  for (Entity e : entities) {
+	    		  if (el.serial == e.getSerial()) {
+	    			  SmallBullet sb = (SmallBullet) e;
+	    			  sb.setPosition(el.position);
+	    	          sb.setDirection(el.direction);
+	    	          sb.setSpeed(el.speed);
+	    	          sb.setTravelled(el.travelled);
+	    	          sb.initObb();
+	    	          
+	    	          if (el.toBeDeleted) {
+	    	            sb.delete();
+	    	          }
+	    	          
+	    	          break;
+	    		  }
+	    	  }
+		  }
+		  else if (el.entityType == 1 && el.changeType == 1) { // Add small bullet
+			  SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
+		      sb.setSerial(el.serial);
+		      sb.setSpeed(el.speed);
+		      sb.setTravelled(el.travelled);
+		      
+		      if (el.toBeDeleted) {
+		    	  sb.delete();
+		      }
+		      
+		      this.addEntity(sb);
+		  }
+		  else if (el.entityType == 2 && el.changeType == 0) { // Modify big bullet
+			  for (Entity e : entities) {
+	    		  if (el.serial == e.getSerial()) {
+					  BigBullet bb = (BigBullet) e;
+			          bb.setPosition(el.position);
+			          bb.setDirection(el.direction);
+			          bb.setSpeed(el.speed);
+			          bb.setTravelled(el.travelled);
+			          bb.initObb();	
+			          
+			          if (el.toBeDeleted) {
+			        	  bb.delete();
+			          }
+			          
+			          break;
+	    		  }
+			  }
+		  }
+		  else if (el.entityType == 2 && el.changeType == 1) { // Add big bullet
+			  BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
+		      bb.setSerial(el.serial);
+		      bb.setSpeed(el.speed);
+		      bb.setTravelled(el.travelled);
 
-      for (Entity e : entities) {
-        if (es.serial == e.getSerial() && e instanceof Ship && es.type == 0) { // Ship
-          Ship s = (Ship) e;
-          s.setPosition(es.position);
-          s.setDirection(es.direction);
-          s.setSpeed(es.speed);
-          s.setHealth(es.health);
-          s.initObb();
-
-          if (es.toBeDeleted) {
-            s.delete();
-          }
-
-          isNewEntity = false;
-        } else if (es.serial == e.getSerial() && e instanceof SmallBullet && es.type == 1) { // SmallBullet
-          SmallBullet sb = (SmallBullet) e;
-          sb.setPosition(es.position);
-          sb.setDirection(es.direction);
-          sb.setSpeed(es.speed);
-          sb.setTravelled(es.travelled);
-          sb.initObb();
-
-          if (es.toBeDeleted) {
-            sb.delete();
-          }
-
-          isNewEntity = false;
-        } else if (es.serial == e.getSerial() && e instanceof BigBullet && es.type == 2) { // BigBullet
-          BigBullet bb = (BigBullet) e;
-          bb.setPosition(es.position);
-          bb.setDirection(es.direction);
-          bb.setSpeed(es.speed);
-          bb.setTravelled(es.travelled);
-          bb.initObb();
-
-          if (es.toBeDeleted) {
-            bb.delete();
-          }
-
-          isNewEntity = false;
-        }
-      }
-
-      if (isNewEntity) {
-        addEntityByLite(es);
-      }
-    }
+		      if (el.toBeDeleted) {
+		        bb.delete();
+		      }
+		      
+		      this.addEntity(bb);
+		  }
+		  else if (el.changeType == 2) { // Remove Entity
+			  for (Entity e : entities) {
+	    		  if (el.serial == e.getSerial()) {
+	    			  entities.remove(e);
+	    		  }
+	    	  }
+		  }
+	  }
   }
-
+  
   public void fullSync(ArrayList<EntityLite> entitiesLite) {
-    for (EntityLite es : entitiesLite) {
-      addEntityByLite(es);
-    }
+	  for (EntityLite el : entitiesLite) {
+		  if (el.entityType == 0) {
+			  Ship s = new Ship(el.position, el.direction);
+			  s.setSerial(el.serial);
+	          s.setSpeed(el.speed);
+	          s.setHealth(el.health);
+	          
+	          if (el.toBeDeleted) {
+	        	  s.delete();
+	          }
+	          
+	          this.addEntity(s);
+		  }
+		  else if (el.entityType == 1) {
+			  SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
+		      sb.setSerial(el.serial);
+		      sb.setSpeed(el.speed);
+		      sb.setTravelled(el.travelled);
+		      
+		      if (el.toBeDeleted) {
+		    	  sb.delete();
+		      }
+		      
+		      this.addEntity(sb);
+		  }
+		  else if (el.entityType == 2) {
+			  BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
+		      bb.setSerial(el.serial);
+		      bb.setSpeed(el.speed);
+		      bb.setTravelled(el.travelled);
+
+		      if (el.toBeDeleted) {
+		        bb.delete();
+		      }
+		      
+		      this.addEntity(bb);
+		  }
+	  }
   }
 
   /**

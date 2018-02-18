@@ -2,6 +2,7 @@ package org.alien8.client;
 
 import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,10 +31,9 @@ public class Client implements Runnable {
   private Renderer renderer;
   private ModelManager model;
   private int FPS = 0;
-  private Socket server = null;
-  private static DatagramSocket udpServer = null;
+  private Socket tcpSocket = null;
+  private static DatagramSocket udpSocket = null;
   private InetAddress serverIP = null;
-  private ClientInputSampleSender ciss = null;
   private AIController aiPlayer;
 
 
@@ -91,7 +91,7 @@ public class Client implements Runnable {
       int tickRate = 0;
       long tickTimer = getTime();
       
-      this.connect("172.22.35.217"); // <-- Uncomment this line to test networking
+      this.connect("192.168.0.15");
       while (running) {
         currentTime = getTime();
 
@@ -105,7 +105,8 @@ public class Client implements Runnable {
 
         // Call update() as many times as needed to compensate before rendering
        while (catchUp >= 1) {
-          this.receiveAndUpdate(); // <-- Uncomment this line to test networking
+    	  this.sendInputSample();
+          this.receiveAndUpdate();
           tickRate++;
           catchUp--;
           // Update last time
@@ -115,6 +116,7 @@ public class Client implements Runnable {
         // Call the renderer
 		// aiPlayer.update();
         renderer.render(model);
+      }
         frameRate++;
 
         // Update the FPS timer every FPS_FREQ^-1 seconds
@@ -132,7 +134,6 @@ public class Client implements Runnable {
       }
       System.out.println("stopped");
     }
-  }
 
   /**
    * Getter for the latest FPS estimation.
@@ -163,17 +164,16 @@ public class Client implements Runnable {
    * Should be called when the client clicks the 'Connect' button after entering an server IP.
    */
   public void connect(String serverIPStr) {
-	if (server == null && serverIP == null && ciss == null) {
+	if (tcpSocket == null && serverIP == null) {
 	  try {
 		serverIP = InetAddress.getByName(serverIPStr);
-		System.out.println("X");
-		server = new Socket(serverIP, 4446);
-		udpServer = new DatagramSocket(4445, serverIP);
+		tcpSocket = new Socket(serverIP, 4446);
+		udpSocket = new DatagramSocket(4445, serverIP);
 		
 		// Serialize a TRUE Boolean object (representing connect request) into byte array 
 		Boolean connectRequest = new Boolean(true);
-		ObjectOutputStream toServer = new ObjectOutputStream(server.getOutputStream());
-		ObjectInputStream fromServer = new ObjectInputStream(server.getInputStream());
+		ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
+		ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
 		toServer.writeObject(connectRequest);
 		
 		// Wait for a full snapshot of current game state from server
@@ -185,22 +185,69 @@ public class Client implements Runnable {
 		// Client's Ship is stored at the end of the synced entities queue
 		Object[] entitiesArr = model.getEntities().toArray();
 		model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
-		
-		// Start a thread responsible for sending client input sample regularly
-		ciss = new ClientInputSampleSender(serverIP, udpServer);
-		ciss.start();
-	}
-	catch (SocketException se) {
-		se.printStackTrace();
-	}
-	catch (UnknownHostException uhe) {
-		uhe.printStackTrace();
-	}
-	catch (IOException ioe) {
-		ioe.printStackTrace();
-	}
+  	  }
+	  catch (SocketException se) {
+		  se.printStackTrace();
+	  }
+	  catch (UnknownHostException uhe) {
+		  uhe.printStackTrace();
+	  }
+	  catch (IOException ioe) {
+		  ioe.printStackTrace();
+	  }
+    }
   }
-}
+  
+  private void sendInputSample() {
+	  try {
+			// Serialize the input sample object into byte array 
+			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+			ClientInputSample cis = new ClientInputSample();
+			objOut.writeObject(cis);
+			byte[] clientInputSampleByte = byteOut.toByteArray();
+			
+			// Create a packet for holding the input sample byte data
+			DatagramPacket packet = new DatagramPacket(clientInputSampleByte, clientInputSampleByte.length, serverIP, 4446);
+			
+			// Send the client input sample packet to the server
+			udpSocket.send(packet);
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+  }
+  
+  /*
+   * Receive the game state difference from the server and sync the game state with the server
+   */
+  public void receiveAndUpdate() {
+	  try {
+			// Create a packet for receiving difference packet
+		    byte[] buf = new byte[65536];
+		    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+		    
+		    // Receive a difference packet and obtain the byte data
+		    udpSocket.receive(packet);
+		    byte[] differenceByte = packet.getData();
+		    
+		    // Deserialize the difference byte data into object
+		    ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
+		    ObjectInputStream objIn = new ObjectInputStream(byteIn);
+		    ArrayList<EntityLite> difference = (ArrayList<EntityLite>) objIn.readObject();
+		    
+		    // Sync the game state with server
+		    ModelManager.getInstance().sync(difference);
+		    System.out.println("Entities: " + model.getEntities());
+		    System.out.println("Difference: " + difference);
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+  }
 
   private ArrayList<EntityLite> getFullSnapshot(ObjectInputStream fromServer) {
 	  ArrayList<EntityLite> fullSnapShot = null;
@@ -217,66 +264,28 @@ public class Client implements Runnable {
 	  
 	  return fullSnapShot;
   }
-  
-  /*
-   * Receive the game state difference from the server and sync the game state with the server
-   */
-  public void receiveAndUpdate() {
-	  try {
-			// Create a packet for receiving difference packet
-		    byte[] buf = new byte[65536];
-		    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-		    
-		    // Receive a difference packet and obtain the byte data
-		    udpServer.receive(packet);
-		    byte[] differenceByte = packet.getData();
-		    
-		    // Deserialize the difference byte data into object
-		    ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
-		    ObjectInputStream objIn = new ObjectInputStream(byteIn);
-		    ArrayList<EntityLite> difference = (ArrayList<EntityLite>) objIn.readObject();
-		    
-		    // Sync the game state with server
-		    ModelManager.getInstance().sync(difference);
-		    // System.out.println("Entities: " + model.getEntities().toString());
-		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-		catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}
-  }
 
   /**
    * Should be called when the client clicks the 'Exit' button from the in-game menu. TODO
    */
-//  public void disconnect() {
-//	if (server != null && serverIP != null && ciss != null) {
-//      try {
-//        // Serialize a FALSE Boolean object (representing disconnect request) into byte array
-//        Boolean disconnectRequest = new Boolean(false);
-//        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-//        ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-//        objOut.writeObject(disconnectRequest);
-//        byte[] disconnectRequestByte = byteOut.toByteArray();
-//
-//        DatagramPacket packet = new DatagramPacket(disconnectRequestByte, disconnectRequestByte.length, serverIP, 4446);
-//
-//        // Send the disconnect request packet to the server
-//        //socket.send(packet);
-//
-//        // Stop all the client-side threads and socket
-//        ciss.end();
-//        //socket.close();
-//
-//        // Reset the socket, serverIP and client-side threads after disconnecting
-//        //socket = null;
-//        serverIP = null;
-//        ciss = null;
-//      } catch (IOException ioe) {
-//        ioe.printStackTrace();
-//      }
-//    }
-//  }
+  public void disconnect() {
+	if (tcpSocket != null && serverIP != null) {
+      try {
+        // Serialize a FALSE Boolean object (representing disconnect request) into byte array
+  		Boolean disconnectRequest = new Boolean(false);
+  		ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
+  		ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
+  		
+  		// Send the disconnect request
+  		toServer.writeObject(disconnectRequest);
+  		
+        // Reset the socket, serverIP and client-side threads after disconnecting
+        tcpSocket = null;
+        serverIP = null;
+      }
+      catch (IOException ioe) {
+        ioe.printStackTrace();
+      }
+    }
+  }
 }

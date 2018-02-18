@@ -174,6 +174,18 @@ public class Ship extends Entity implements Serializable {
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
   }
+  
+  public Turret getFrontTurret() {
+	  return this.frontTurret;
+  }
+  
+  public Turret getMidTurret() {
+	  return this.midTurret;
+  }
+  
+  public Turret getRearTurret() {
+	  return this.rearTurret;
+  }
 
   public double getFrontTurretDirection() {
 	  return frontTurret.getDirection();
