@@ -1,7 +1,10 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
+
+import org.alien8.audio.SoundEffects;
 import org.alien8.core.Parameters;
+import org.alien8.managers.AudioManager;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -75,6 +78,7 @@ public class Turret implements Serializable {
       ModelManager.getInstance().addEntity(new SmallBullet(this.getPosition(), this.getDirection(),
           distance, this.getShip().getSerial()));
     }
+    AudioManager.getInstance().playFX(SoundEffects.SHIP_SHOOT);
     this.startCooldown();
     this.distance = this.minDistance;
   }

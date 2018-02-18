@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import org.alien8.ai.AIController;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
+import org.alien8.managers.AudioManager;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -46,6 +47,7 @@ public class Client implements Runnable {
   public Client() {
     renderer = new Renderer(new Dimension(800, 600));
     model = ModelManager.getInstance();
+    AudioManager.getInstance().startMusic();
   }
 
   /**
@@ -91,7 +93,7 @@ public class Client implements Runnable {
       int tickRate = 0;
       long tickTimer = getTime();
       
-      this.connect("192.168.0.15");
+      this.connect("172.22.35.217");
       while (running) {
         currentTime = getTime();
 
@@ -238,8 +240,8 @@ public class Client implements Runnable {
 		    
 		    // Sync the game state with server
 		    ModelManager.getInstance().sync(difference);
-		    System.out.println("Entities: " + model.getEntities());
-		    System.out.println("Difference: " + difference);
+		    // System.out.println("Entities: " + model.getEntities());
+		    // System.out.println("Difference: " + difference);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();

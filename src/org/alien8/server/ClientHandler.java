@@ -81,11 +81,11 @@ public class ClientHandler extends Thread {
 	
 	private void sendGameState() {
 		try {
-			System.out.println("Last synced entities: " + lastSyncedEntities);
-			System.out.println("Current entities: " + currentEntities);
+//			System.out.println("Last synced entities: " + lastSyncedEntities);
+//			System.out.println("Current entities: " + currentEntities);
 			ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
-			System.out.println("Difference: " + difference);
-			
+//			System.out.println("Difference: " + difference);
+//			
 			// Update the last synced set of entities right before sending the difference to client for syncing
 			ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
 			for (Entity e : currentEntities) {
