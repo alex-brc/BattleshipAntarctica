@@ -130,18 +130,18 @@ public class Server {
 		        if (niName.equals("eth1")) {
 		        	break;
 		        }
-		        
-//		        Comment the code above and use this if the above code fail to setup Host IP appropriately (e.g. Host ip being set 0.0.0.0)
-//		        try {
-//					hostIP = Inet4Address.getLocalHost();
-//				}
-//		        catch (UnknownHostException e) {
-//					e.printStackTrace();
-//				}
 		    }
+		    
+		    // If the above fails to set the IP properly, try the following
+	        if (hostIP == null) {
+				hostIP = Inet4Address.getLocalHost();
+	        }
 		}
 		catch (SocketException se) {
 			se.printStackTrace();
+		}
+        catch (UnknownHostException e) {
+			e.printStackTrace();
 		}
 	}
 
