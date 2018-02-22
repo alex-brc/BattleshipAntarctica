@@ -23,6 +23,7 @@ import org.alien8.ship.SmallBullet;
 public class ClientHandler extends Thread {
 	private DatagramSocket udpSocket = null;
 	private InetAddress clientIP = null;
+	private InetAddress multiIP = null;
 	private ModelManager model = ModelManager.getInstance();
 	private ConcurrentLinkedQueue<Entity> lastSyncedEntities = null;
 	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
@@ -31,9 +32,10 @@ public class ClientHandler extends Thread {
     double tick = 0;
 	private static boolean run = true;
 	
-	public ClientHandler(DatagramSocket udpSocket, InetAddress clientIP, ConcurrentLinkedQueue<Entity> lastSyncedEntities) {
+	public ClientHandler(DatagramSocket udpSocket, InetAddress clientIP, InetAddress multiIP, ConcurrentLinkedQueue<Entity> lastSyncedEntities) {
 		this.udpSocket = udpSocket;
 		this.clientIP = clientIP;
+		this.multiIP = multiIP;
 		this.lastSyncedEntities = lastSyncedEntities;
 	}
 	
@@ -44,7 +46,6 @@ public class ClientHandler extends Thread {
 
 	        while (tick >= 1) {
 	    	   this.readInputSample();
-	    	   this.sendGameState();
 	    	   tick--;
 	           // Update last time
 	           lastTime = System.nanoTime();
@@ -70,6 +71,7 @@ public class ClientHandler extends Thread {
 		    
 		    // Update the game state according the input sample
 		    model.updateServer(clientIP, inputSample);
+		    System.out.println("server receive input and update Entities to: " + model.getEntities().toString());
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -79,36 +81,6 @@ public class ClientHandler extends Thread {
 		}
 	}
 	
-	private void sendGameState() {
-		try {
-			System.out.println("Last synced entities: " + lastSyncedEntities);
-			System.out.println("Current entities: " + currentEntities);
-			ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
-			System.out.println("Difference: " + difference);
-			
-			// Update the last synced set of entities right before sending the difference to client for syncing
-			ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
-			for (Entity e : currentEntities) {
-				newLastSyncedEntities.add((Entity) deepClone(e));
-			}
-			lastSyncedEntities = newLastSyncedEntities;
-			
-			// Serialize the difference arraylist into byte array
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-			objOut.writeObject(difference);
-			byte[] differenceByte = byteOut.toByteArray();
-			
-			// Create a packet for holding the difference byte data
-	        DatagramPacket packet = new DatagramPacket(differenceByte, differenceByte.length, clientIP, 4445);
-	        
-	        // Send the difference packet to client
-	        udpSocket.send(packet);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	/* 
 	 * Calculate the difference between two set of entities, difference is represented as an arraylist of compressed entities that are modified or added or removed
