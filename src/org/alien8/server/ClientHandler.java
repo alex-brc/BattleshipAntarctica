@@ -23,6 +23,7 @@ import org.alien8.ship.SmallBullet;
 public class ClientHandler extends Thread {
 	private DatagramSocket udpSocket = null;
 	private InetAddress clientIP = null;
+	private int port = null;
 	private ModelManager model = ModelManager.getInstance();
 	private ConcurrentLinkedQueue<Entity> lastSyncedEntities = null;
 	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
@@ -60,7 +61,8 @@ public class ClientHandler extends Thread {
 		    
 		    // Receive an input sample packet and obtain its byte data
 		    udpSocket.receive(packet);
-		    InetAddress clientIP = packet.getAddress();
+		    clientIP = packet.getAddress();
+		    port = packet.getPort();
 		    byte[] inputSampleByte = packet.getData();
 		    
 		    // Deserialize the input sample byte data into object
@@ -100,7 +102,7 @@ public class ClientHandler extends Thread {
 			byte[] differenceByte = byteOut.toByteArray();
 			
 			// Create a packet for holding the difference byte data
-	        DatagramPacket packet = new DatagramPacket(differenceByte, differenceByte.length, clientIP, 4445);
+	        DatagramPacket packet = new DatagramPacket(differenceByte, differenceByte.length, clientIP, port);
 	        
 	        // Send the difference packet to client
 	        udpSocket.send(packet);
