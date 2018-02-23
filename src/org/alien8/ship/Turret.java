@@ -78,7 +78,6 @@ public class Turret implements Serializable {
       ModelManager.getInstance().addEntity(new SmallBullet(this.getPosition(), this.getDirection(),
           distance, this.getShip().getSerial()));
     }
-    AudioManager.getInstance().playFX(SoundEffects.SHIP_SHOOT);
     this.startCooldown();
     this.distance = this.minDistance;
   }

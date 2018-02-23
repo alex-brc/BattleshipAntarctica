@@ -95,4 +95,10 @@ public class Parameters {
    */
   public static final double COLLISION_DAMAGE_MODIFIER = 0.5;
   public static final double WATER_LEVEL = 0.4d;
+  /**
+   * Maximum number of "shoot" audio clips running at the same time
+   */
+  public static final int SFX_POOL_SIZE = 5;
+  public static final float INITIAL_VOLUME_SFX = 0.4f;
+  public static final float INITIAL_VOLUME_AMBIENT = 0.4f;
 }

@@ -2,7 +2,6 @@ package org.alien8.managers;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.client.ClientInputSample;
@@ -10,7 +9,6 @@ import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.mapgeneration.Map;
-import org.alien8.physics.AABB;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
@@ -44,8 +42,7 @@ public class ModelManager {
 //    List<AABB> aabbs = map.getAABBs();
 //    for (AABB aabb : aabbs) {
 //      entities.add(aabb.getEntity());
-//    }
-  }
+    }
 
   /**
    * A standard getInstance() in accordance with the singleton pattern
@@ -57,6 +54,9 @@ public class ModelManager {
   }
 
   /**
+   * OBSOLETE
+   * Old version, suitable for offline clients. Should not be used
+   * 
    * The update() method updates the state of all entities
    */
   public void update() {
@@ -65,10 +65,7 @@ public class ModelManager {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
     	if(this.getPlayer() == ent) {
-    		System.out.println("Player died! Respawning");
-    		Ship playerNew = new Ship(new Position(200,200), 0);
-    		this.setPlayer(playerNew);
-    		this.addEntity(playerNew);
+    		playerDied();
     		continue;
     	}
         entities.remove(ent);
@@ -80,7 +77,7 @@ public class ModelManager {
       // Handle player stuff
       if (ent == this.getPlayer()) {
         Ship player = (Ship) ent;
-        InputManager.getInstance().processInputs(player);
+        // InputManager.processInputs(player);
       }
 
       // Update the position of the entity
@@ -111,44 +108,7 @@ public class ModelManager {
       // Handle player stuff
       if (ent == Server.getPlayerByIp(clientIP).getShip()) {
         Ship player = (Ship) ent;
-
-        // Apply forward OR backward force
-        if (cis.wPressed)
-          PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
-        else if (cis.sPressed)
-          PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
-              PhysicsManager.shiftAngle(player.getDirection() + Math.PI));
-
-        // Apply rotation
-        if (cis.aPressed)
-          PhysicsManager.rotateEntity(player,
-              (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-        if (cis.dPressed)
-          PhysicsManager.rotateEntity(player,
-              Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-
-        // Apply "friction"
-        PhysicsManager.applyFriction(player);
-
-        // Prepare for shooting
-        // Orientation
-        player.setTurretsDirection(cis.mousePosition);
-
-        if (cis.lmbPressed)
-          player.frontTurretCharge();
-        else
-          player.frontTurretShoot();
-
-        if (cis.rmbPressed)
-          player.rearTurretCharge();
-        else
-          player.rearTurretShoot();
-
-        if (cis.spacePressed)
-          player.midTurretCharge();
-        else
-          player.midTurretShoot();
-      }
+        InputManager.processInputs(player, cis);      }
 
       // Update the position of the entity
       PhysicsManager.updatePosition(ent);
@@ -311,6 +271,13 @@ public class ModelManager {
 		      this.addEntity(bb);
 		  }
 	  }
+  }
+  
+  private void playerDied() {
+	  System.out.println("Player died! Respawning");
+	  Ship playerNew = new Ship(new Position(200,200), 0);
+	  this.setPlayer(playerNew);
+	  this.addEntity(playerNew);
   }
 
   /**

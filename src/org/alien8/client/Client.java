@@ -47,7 +47,7 @@ public class Client implements Runnable {
   public Client() {
     renderer = new Renderer(new Dimension(800, 600));
     model = ModelManager.getInstance();
-    AudioManager.getInstance().startMusic();
+    AudioManager.getInstance().startAmbient();
   }
 
   /**
@@ -92,7 +92,7 @@ public class Client implements Runnable {
       
       int tickRate = 0;
       long tickTimer = getTime();
-      
+      System.out.println("Connecting...");
       this.connect("172.22.35.217");
       while (running) {
         currentTime = getTime();
@@ -201,6 +201,7 @@ public class Client implements Runnable {
   }
   
   private void sendInputSample() {
+	  
 	  try {
 			// Serialize the input sample object into byte array 
 			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();

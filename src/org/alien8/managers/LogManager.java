@@ -23,11 +23,10 @@ import java.time.LocalDateTime;
  * 
  */
 public class LogManager {
- 	public static int SCOPE_INFO = 0;
- 	public static int SCOPE_DEBUG = 1;
- 	public static int SCOPE_WARNING = 2;
- 	public static int SCOPE_ERROR = 3;
- 	public static int SCOPE_CRITICAL = 4;
+	// Scopes for logging messages
+	public enum Scope {
+		INFO, DEBUG, WARNING, ERROR, CRITICAL
+	}
 
 	public static String filePath = "logs/";
 
@@ -120,7 +119,7 @@ public class LogManager {
 	 * @param scope The scope of the log
 	 * @param content The content of the log
 	 */
-	public void log(String source, int scope, String content){
+	public void log(String source, Scope scope, String content){
 		try{
 			FileWriter writer = new FileWriter(LogManager.filePath, true);
 			String line = "";
@@ -135,20 +134,7 @@ public class LogManager {
 			
 			// Put scope
 			line += "[";
-			switch(scope){
-				case 0: line += "INFO";
-						break;
-				case 1: line += "DEBUG";
-						break;
-				case 2: line += "WARNING";
-						break;
-				case 3: line += "ERROR";
-						break;
-				case 4: line += "CRITICAL";
-						break;
-				default: line += "UNKNOWN";
-						break;
-			}
+			line += scope.toString();
 
 			// Put message
 			line += "]: " +
