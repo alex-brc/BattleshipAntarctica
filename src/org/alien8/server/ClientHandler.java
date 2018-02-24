@@ -23,8 +23,8 @@ import org.alien8.ship.SmallBullet;
 public class ClientHandler extends Thread {
 	private DatagramSocket udpSocket = null;
 	private InetAddress clientIP = null;
+	private Integer port = null;
 	private ModelManager model = ModelManager.getInstance();
-	private int port = -1;
 	private ConcurrentLinkedQueue<Entity> lastSyncedEntities = null;
 	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
 	long lastTime = System.nanoTime();
