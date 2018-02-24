@@ -1,13 +1,11 @@
-package org.alien8.managers;
+package org.alien8.core;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.client.ClientInputSample;
-import org.alien8.core.Entity;
-import org.alien8.core.EntityLite;
-import org.alien8.core.Parameters;
+import org.alien8.client.InputManager;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
@@ -30,18 +28,23 @@ import org.alien8.ship.SmallBullet;
 public class ModelManager {
 
   private long lastSerial = 0;
-  private static ModelManager instance = new ModelManager();
+  private static ModelManager instance;
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
   private CollisionDetector collisionDetector = new CollisionDetector();
   private Map map = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8);
   private Ship player;
 
   private ModelManager() {
-    // All setup should be done here, such as support for networking, etc.
-    // Normally this exists only to defeat instantiation
-//    List<AABB> aabbs = map.getAABBs();
-//    for (AABB aabb : aabbs) {
-//      entities.add(aabb.getEntity());
+	  // All setup should be done here, such as support for networking, etc.
+	  // Normally this exists only to defeat instantiation
+
+	  entities = new ConcurrentLinkedQueue<Entity>();
+	  collisionDetector = new CollisionDetector();
+	  map = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8);
+	  
+	  // List<AABB> aabbs = map.getAABBs();
+	  // for (AABB aabb : aabbs) {
+	  // entities.add(aabb.getEntity());
     }
 
   /**
@@ -50,6 +53,8 @@ public class ModelManager {
    * @return an instance of the active ModelManager
    */
   public static ModelManager getInstance() {
+	if(instance == null)
+		instance = new ModelManager();
     return instance;
   }
 

@@ -2,10 +2,10 @@ package org.alien8.ship;
 
 import java.io.Serializable;
 
+import org.alien8.audio.AudioManager;
 import org.alien8.audio.SoundEffects;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.AudioManager;
-import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
@@ -118,7 +118,9 @@ public class Turret implements Serializable {
     return result;
   }
 
-  public void render(Renderer r) {
+  public void render() {
+	Renderer r = Renderer.getInstance();
+	
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);

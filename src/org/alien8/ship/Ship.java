@@ -110,12 +110,9 @@ public class Ship extends Entity implements Serializable {
     midTurret.setPosition(this.getPosition());
   }
 
-  public void render(Renderer r) {
-    // r.drawRect((int) position.getX(), (int) position.getY(), 10, 20, 0x666666, false);
-    // r.drawRect((int) this.getObb()[0].getX(), (int) this.getObb()[0].getY(), (int)
-    // this.getLength(),
-    // (int) this.getWidth(), 0xFF0000, false);
-	
+  public void render() {
+	Renderer r = Renderer.getInstance();
+	  
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
       // Color front two points blue
@@ -133,9 +130,9 @@ public class Ship extends Entity implements Serializable {
     // Render turrets
 	Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI/2));
     r.drawSprite((int)position.getX() - currentSprite.getWidth()/2, (int)position.getY() - currentSprite.getHeight()/2, currentSprite, false);
-    frontTurret.render(r);
-    rearTurret.render(r);
-    midTurret.render(r);
+    frontTurret.render();
+    rearTurret.render();
+    midTurret.render();
   }
 
   /**

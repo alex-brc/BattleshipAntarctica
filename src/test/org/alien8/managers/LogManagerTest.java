@@ -3,7 +3,8 @@ package test.org.alien8.managers;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
-import org.alien8.managers.LogManager;
+
+import org.alien8.util.LogManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 

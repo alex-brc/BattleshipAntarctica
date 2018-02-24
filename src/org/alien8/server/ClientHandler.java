@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.ModelManager;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
@@ -25,7 +25,6 @@ public class ClientHandler extends Thread {
 	private InetAddress clientIP = null;
 	private Integer port = null;
 	private ModelManager model = ModelManager.getInstance();
-	private int port = -1;
 	private ConcurrentLinkedQueue<Entity> lastSyncedEntities = null;
 	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
 	long lastTime = System.nanoTime();

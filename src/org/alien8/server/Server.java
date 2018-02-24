@@ -8,24 +8,24 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
+import org.alien8.util.LogManager;
+import org.alien8.util.ServerShutdownHook;
 
 public class Server {
 	
@@ -38,6 +38,7 @@ public class Server {
 	private static boolean run = true;
 	
 	public static void main(String[] args) {
+		Runtime.getRuntime().addShutdownHook(new ServerShutdownHook());
 		try {
 			setHostIP();
 			tcpSocket = new ServerSocket(4446, 50, hostIP);
@@ -76,6 +77,7 @@ public class Server {
 	}
 	
 	public static void initializeGameState() {
+		LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
 	    Ship notPlayer = new Ship(new Position(100, 100), 0);
 	    notPlayer.setSpeed(0.8);
 	    model.addEntity(notPlayer);

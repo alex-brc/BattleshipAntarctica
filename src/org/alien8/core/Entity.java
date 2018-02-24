@@ -147,7 +147,7 @@ public abstract class Entity implements Serializable, Cloneable {
     obb = newObb;
   }
 
-  public abstract void render(Renderer r);
+  public abstract void render();
 
   public void damage(double damage) {
     this.setHealth(this.getHealth() - damage);
