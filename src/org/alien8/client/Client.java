@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -170,7 +171,9 @@ public class Client implements Runnable {
 	  try {
 		serverIP = InetAddress.getByName(serverIPStr);
 		tcpSocket = new Socket(serverIP, 4446);
-		udpSocket = new DatagramSocket(4445, serverIP);
+		
+		System.out.println("ok");
+		udpSocket = new DatagramSocket();
 		
 		// Serialize a TRUE Boolean object (representing connect request) into byte array 
 		Boolean connectRequest = new Boolean(true);
@@ -188,6 +191,9 @@ public class Client implements Runnable {
 		Object[] entitiesArr = model.getEntities().toArray();
 		model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
   	  }
+	  catch (BindException be) {
+		  System.err.println("error");
+	  }
 	  catch (SocketException se) {
 		  se.printStackTrace();
 	  }

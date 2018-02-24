@@ -111,35 +111,35 @@ public class Server {
 	public static void setHostIP() {
 		try {
 			// Obtain an host IP reachable by the client
-			Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
-		    while (nis.hasMoreElements()) {
-		        NetworkInterface nic = nis.nextElement();
-		        String niName = nic.getName();
-		        
-		        if (niName.equals("eth1") || niName.equals("wlan1")) {
-		        	Enumeration<InetAddress> addrs = nic.getInetAddresses();
-			        while (addrs.hasMoreElements()) {
-			            InetAddress addr = addrs.nextElement();
-			            if (addr instanceof Inet4Address) {
-			            	hostIP = addr;
-			            } 
-			        }
-		        }
-		        
-		        // Make sure if the host has ethernet connection, it would be the priority choice
-		        if (niName.equals("eth1")) {
-		        	break;
-		        }
-		    }
+//			Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
+//		    while (nis.hasMoreElements()) {
+//		        NetworkInterface nic = nis.nextElement();
+//		        String niName = nic.getName();
+//		        
+//		        if (niName.equals("eth1") || niName.equals("wlan1")) {
+//		        	Enumeration<InetAddress> addrs = nic.getInetAddresses();
+//			        while (addrs.hasMoreElements()) {
+//			            InetAddress addr = addrs.nextElement();
+//			            if (addr instanceof Inet4Address) {
+//			            	hostIP = addr;
+//			            } 
+//			        }
+//		        }
+//		        
+//		        // Make sure if the host has ethernet connection, it would be the priority choice
+//		        if (niName.equals("eth1")) {
+//		        	break;
+//		        }
+//		    }
 		    
 		    // If the above fails to set the IP properly, try the following
 	        if (hostIP == null) {
 				hostIP = Inet4Address.getLocalHost();
 	        }
 		}
-		catch (SocketException se) {
-			se.printStackTrace();
-		}
+//		catch (SocketException se) {
+//		se.printStackTrace();
+//	}
         catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
