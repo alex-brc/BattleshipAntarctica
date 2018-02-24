@@ -18,6 +18,8 @@ import org.alien8.ai.AIController;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.managers.AudioManager;
+import org.alien8.managers.LogManager;
+import org.alien8.managers.LogManager.Scope;
 import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -35,19 +37,13 @@ public class Client implements Runnable {
   private Socket tcpSocket = null;
   private static DatagramSocket udpSocket = null;
   private InetAddress serverIP = null;
+  private String serverIPstr;
   private AIController aiPlayer;
 
-
-  public static void main(String[] args) {
-
-    Client game = new Client();
-    game.start();
-  }
-
-  public Client() {
-    renderer = new Renderer(new Dimension(800, 600));
+  public Client(Renderer r, String serverIPstr) {
+	renderer = r;
+	this.serverIPstr = serverIPstr;
     model = ModelManager.getInstance();
-    AudioManager.getInstance().startAmbient();
   }
 
   /**
@@ -58,7 +54,12 @@ public class Client implements Runnable {
     if (running)
       return;
     running = true;
-
+    
+    // Play the ambient music
+    AudioManager.getInstance().startAmbient();
+    
+    LogManager.getInstance().log("Client", LogManager.Scope.INFO, "Starting game thread...");
+    
     thread = new Thread(this, "Battleship Antarctica");
     thread.start();
     // Start the loop
@@ -93,7 +94,7 @@ public class Client implements Runnable {
       int tickRate = 0;
       long tickTimer = getTime();
       System.out.println("Connecting...");
-      this.connect("172.22.35.217");
+      this.connect(serverIPstr);
       while (running) {
         currentTime = getTime();
 
