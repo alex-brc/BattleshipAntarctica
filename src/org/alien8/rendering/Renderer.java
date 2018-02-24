@@ -4,22 +4,24 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import org.alien8.client.InputManager;
 import org.alien8.core.Entity;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.InputManager;
-import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 
 public class Renderer extends Canvas {
 
   private static final long serialVersionUID = 1L;
-
+  public static Renderer instance;
   private int width;
   private int height;
   private int xScroll;
@@ -30,20 +32,22 @@ public class Renderer extends Canvas {
   private BufferedImage image; //image which is rendered onto canvas
   private int[] pixels;
 
-  public Renderer(Dimension size) {
+  private Renderer() {
 
-    setPreferredSize(size);
-    width = size.width;
-    height = size.height;
+    setPreferredSize(Parameters.RENDERER_SIZE);
+    width = Parameters.RENDERER_SIZE.width;
+    height = Parameters.RENDERER_SIZE.height;
     
     image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-
+    
+    frame = new JFrame();
+    
+    
     addMouseListener(InputManager.getInstance());
     addMouseMotionListener(InputManager.getInstance());
     addKeyListener(InputManager.getInstance());
 
-    frame = new JFrame();
     frame.setTitle("Battleship Antarctica");
     frame.setResizable(false);
     frame.add(this);
@@ -51,6 +55,13 @@ public class Renderer extends Canvas {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
+    
+  }
+  
+  public static Renderer getInstance() {
+	  if(instance == null)
+		  instance = new Renderer();
+	  return instance;
   }
 
   /**
@@ -76,7 +87,7 @@ public class Renderer extends Canvas {
 	drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false); //bounding box, remove later?
 	
 	for(Entity e : model.getEntities()){
-		e.render(this);
+		e.render();
 	}
 	
 	Graphics g = bs.getDrawGraphics(); //graphics object from buffer strategy

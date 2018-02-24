@@ -33,8 +33,6 @@ public abstract class Bullet extends Entity implements Serializable{
       this.delete();
   }
 
-  public abstract void render(Renderer r);
-
   public double getDamage() {
     return damage;
   }

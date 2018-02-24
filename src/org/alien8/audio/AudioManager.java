@@ -1,4 +1,4 @@
-package org.alien8.managers;
+package org.alien8.audio;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -6,9 +6,9 @@ import java.util.Random;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-import org.alien8.audio.SoundEffects;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
+import org.alien8.util.LogManager;
 
 /**
  * This audio manager is responsible for all game audio, handles

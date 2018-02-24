@@ -1,6 +1,5 @@
 package org.alien8.client;
 
-import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,15 +15,14 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import org.alien8.ai.AIController;
+import org.alien8.audio.AudioManager;
 import org.alien8.core.EntityLite;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.AudioManager;
-import org.alien8.managers.LogManager;
-import org.alien8.managers.LogManager.Scope;
-import org.alien8.managers.ModelManager;
-import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.ship.Ship;
+import org.alien8.util.ClientShutdownHook;
+import org.alien8.util.LogManager;
 
 public class Client implements Runnable {
   /**
@@ -32,7 +30,6 @@ public class Client implements Runnable {
    */
   private volatile  boolean running = false;
   private Thread thread;
-  private Renderer renderer;
   private ModelManager model;
   private int FPS = 0;
   private Socket tcpSocket = null;
@@ -41,10 +38,9 @@ public class Client implements Runnable {
   private String serverIPstr;
   private AIController aiPlayer;
 
-  public Client(Renderer r, String serverIPstr) {
-	renderer = r;
-	this.serverIPstr = serverIPstr;
+  public Client() {
     model = ModelManager.getInstance();
+    Runtime.getRuntime().addShutdownHook(new ClientShutdownHook());
   }
 
   /**
@@ -59,8 +55,7 @@ public class Client implements Runnable {
     // Play the ambient music
     AudioManager.getInstance().startAmbient();
     
-    LogManager.getInstance().log("Client", LogManager.Scope.INFO, "Starting game thread...");
-    
+    LogManager.getInstance().log("Client", LogManager.Scope.INFO, "Booting client...");
     thread = new Thread(this, "Battleship Antarctica");
     thread.start();
     // Start the loop
@@ -83,64 +78,58 @@ public class Client implements Runnable {
    */
   @Override
   public void run() {
-    // Game loop goes here
-    while (running) {
-      long lastTime = getTime();
-      long currentTime = 0;
-      double catchUp = 0;
+	  // Game loop goes here
+	  long lastTime = getTime();
+	  long currentTime = 0;
+	  double catchUp = 0;
 
-      int frameRate = 0;
-      long frameTimer = getTime();
-      
-      int tickRate = 0;
-      long tickTimer = getTime();
-      
-      System.out.println("Connecting...");
-      this.connect(serverIPstr);
-      
-      
-      while (running) {
-        currentTime = getTime();
+	  int frameRate = 0;
+	  long frameTimer = getTime();
 
-        // Get the amount of update()s the model needs to catch up
-        // 
-        //                  timeNow - timeLastUpdateWasDone    --> 
-        // timeToCatchUp = ----------------------------------
-        //							deltaTPerTick              --> how long a "tick" is
-        // 
-        catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+	  int tickRate = 0;
+	  long tickTimer = getTime();
+	  
+	  while (running) {
+		  currentTime = getTime();
 
-        // Call update() as many times as needed to compensate before rendering
-       while (catchUp >= 1) {
-    	  this.sendInputSample();
-          this.receiveAndUpdate();
-          tickRate++;
-          catchUp--;
-          // Update last time
-          lastTime = getTime();
-       }
+		  // Get the amount of update()s the model needs to catch up
+		  // 
+		  //                  timeNow - timeLastUpdateWasDone    --> time elapsed
+		  // timeToCatchUp = ----------------------------------
+		  //							deltaTPerTick              --> how long a "tick" is
+		  // 
+		  catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
-        // Call the renderer
-		// aiPlayer.update();
-        renderer.render(model);
-      }
-        frameRate++;
+		  // Call update() as many times as needed to compensate before rendering
+		  while (catchUp >= 1) {
+			  this.sendInputSample();
+			  this.receiveAndUpdate();
+			  tickRate++;
+			  catchUp--;
+			  // Update last time
+			  lastTime = getTime();
+		  }
 
-        // Update the FPS timer every FPS_FREQ^-1 seconds
-        if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
-          frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-          FPS = frameRate * Parameters.FPS_FREQ;
-          frameRate = 0;
-          System.out.println(FPS);
-        }
-        if(getTime() - tickTimer > Parameters.N_SECOND) {
-        	tickTimer += Parameters.N_SECOND;
-        	System.out.println(tickRate);
-        	tickRate = 0;
-        }
-      }
-      System.out.println("stopped");
-    }
+		  // Call the renderer
+		  // aiPlayer.update();
+		  Renderer.getInstance().render(model);
+		  frameRate++;
+
+		  // Update the FPS timer every FPS_FREQ^-1 seconds
+		  if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
+			  frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
+			  FPS = frameRate * Parameters.FPS_FREQ;
+			  frameRate = 0;
+			  System.out.println(FPS);
+		  }
+		  if(getTime() - tickTimer > Parameters.N_SECOND) {
+			  tickTimer += Parameters.N_SECOND;
+			  System.out.println(tickRate);
+			  tickRate = 0;
+		  }
+	  }
+	  System.out.println("stopped");
+  }
 
   /**
    * Getter for the latest FPS estimation.
@@ -170,8 +159,9 @@ public class Client implements Runnable {
   /**
    * Should be called when the client clicks the 'Connect' button after entering an server IP.
    */
-  public void connect(String serverIPStr) {
+  public boolean connect(String serverIPStr) {
 	if (tcpSocket == null && serverIP == null) {
+      this.serverIPstr = serverIPStr;
 	  try {
 		serverIP = InetAddress.getByName(serverIPStr);
 		tcpSocket = new Socket(serverIP, 4446);
@@ -195,19 +185,28 @@ public class Client implements Runnable {
 		Object[] entitiesArr = model.getEntities().toArray();
 		model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
   	  }
-	  catch (BindException be) {
-		  System.err.println("error");
+	  catch (BindException e) {
+		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Could not bind to any port. Firewalls?\n" + e.toString());
+		  return false;
 	  }
-	  catch (SocketException se) {
-		  se.printStackTrace();
+	  catch (SocketException e) {
+		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "A socket exception occured.\n" + e.toString());
+		  return false;
 	  }
-	  catch (UnknownHostException uhe) {
-		  uhe.printStackTrace();
+	  catch (UnknownHostException e) {
+		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Unknown host. Check host details.\n" + e.toString());
+		  return false;
 	  }
-	  catch (IOException ioe) {
-		  ioe.printStackTrace();
+	  catch (IOException e) {
+		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "IO exception.\n" + e.toString());
+		  return false;
 	  }
+	  LogManager.getInstance().log("Networking", LogManager.Scope.INFO, "Client succesfully connected to the server at " + serverIPStr);
+	  return true;
     }
+	System.out.println("The client is already connected.");
+	LogManager.getInstance().log("Networking", LogManager.Scope.WARNING, "Connection attempted while already connected. ???");
+	return false;
   }
   
   private void sendInputSample() {
@@ -296,8 +295,8 @@ public class Client implements Runnable {
         tcpSocket = null;
         serverIP = null;
       }
-      catch (IOException ioe) {
-        ioe.printStackTrace();
+      catch (IOException e) {
+        LogManager.getInstance().log("Networking", LogManager.Scope.ERROR, "Something went wrong disconnecting client.\n" + e.toString());
       }
     }
   }

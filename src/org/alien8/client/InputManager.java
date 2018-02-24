@@ -1,5 +1,5 @@
 
-package org.alien8.managers;
+package org.alien8.client;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import org.alien8.client.ClientInputSample;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
@@ -241,8 +240,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 			dPressed = false;
 			return;
 		case ' ': 
-			// Was a shot, so play a sound.
-			AudioManager.getInstance().playSound(AudioManager.SFX_SHIP_SHOOT);	
 			spacePressed = false;
 			return;
 		case 'W': 
@@ -266,10 +263,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// If rmb/lmb, shot. Play sound
-		if(e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3)
-			AudioManager.getInstance().playSound(AudioManager.SFX_SHIP_SHOOT);
-		
+		// Not interesting
 	}
 	
 	@Override
