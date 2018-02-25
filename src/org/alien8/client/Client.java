@@ -14,19 +14,19 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import org.alien8.ai.AIController;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
+import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
 import org.alien8.util.ClientShutdownHook;
 import org.alien8.util.LogManager;
 
 public class Client implements Runnable {
   /**
-   * Volatile "running" boolean to avoid internal caching. Thread should stop when set to false.
+   * Volatile "running" boolean to avoid internal caching. Thread should stop cleanly when set to false.
    */
   private volatile  boolean running = false;
   private Thread thread;
@@ -36,10 +36,11 @@ public class Client implements Runnable {
   private static DatagramSocket udpSocket = null;
   private InetAddress serverIP = null;
   private String serverIPstr;
-  private AIController aiPlayer;
+  private ScoreBoard scoreBoard;
 
   public Client() {
     model = ModelManager.getInstance();
+    scoreBoard = ScoreBoard.getInstance();
     Runtime.getRuntime().addShutdownHook(new ClientShutdownHook());
   }
 
@@ -71,11 +72,15 @@ public class Client implements Runnable {
   }
 
   /**
+   *  ---------   DEPRECATED  -----------
+   * A version of this is used and ran on the server.
+   * 
    * The main loop of the game. A common way to implement it. This implementation basically allows
    * the renderer to do it's job separately from the update() method. If a certain computer tends to
    * be slower on the render() side, then it can perform more fixed time updates in between frames
    * to compensate. Faster computers wouldn't see any improvement.
    */
+  @Deprecated
   @Override
   public void run() {
 	  // Game loop goes here

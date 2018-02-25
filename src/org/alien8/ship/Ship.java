@@ -21,12 +21,14 @@ public class Ship extends Entity implements Serializable {
   private Turret frontTurret;
   private Turret rearTurret;
   private Turret midTurret;
-  
-  private Sprite sprite = Sprite.ship_green; //for now
+  private int colour;
+  private Sprite sprite;  //for now
 
-  public Ship(Position position, double direction) {
+  public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
         Parameters.SHIP_WIDTH);
+    this.colour = colour;
+    sprite = Sprite.makeShipSprite(colour);
 
     frontTurret = new Turret(position, Turret.SMALL, this);
     midTurret = new Turret(position, Turret.BIG, this);
@@ -195,7 +197,11 @@ public class Ship extends Entity implements Serializable {
   public double getMidTurretDirection() {
 	  return midTurret.getDirection();
   }
-
+  
+  public int getColour() {
+	  return this.colour;
+  }
+  
   public void frontTurretCharge() {
 	  frontTurret.charge();
   }
@@ -229,4 +235,5 @@ public class Ship extends Entity implements Serializable {
   public String toString() {
 	  return "Ship " + this.getSerial() + "," + this.getPosition();
   }
+
 }

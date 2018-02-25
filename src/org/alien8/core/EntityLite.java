@@ -25,15 +25,17 @@ public class EntityLite implements Serializable {
 	public double frontTurretDirection;
 	public double midTurretDirection;
 	public double rearTurretDirection;
-		
+	public int colour;
+	
 	// For bullet
 	public double distance;
 	public double travelled;
 	public long source;
+
 	
 	// For Ship
 	public EntityLite(long serial, int changeType, int entityType, Position position, boolean toBeDeleted, double direction, double speed, double health, 
-					  double frontTurretDirection, double midTurretDirection, double rearTurretDirection) {
+					  double frontTurretDirection, double midTurretDirection, double rearTurretDirection, int colour) {
 		this.serial = serial;
 		this.changeType = changeType;
 		this.entityType = entityType;
@@ -45,6 +47,7 @@ public class EntityLite implements Serializable {
 		this.frontTurretDirection = frontTurretDirection;
 		this.midTurretDirection = midTurretDirection;
 		this.rearTurretDirection = rearTurretDirection;
+		this.colour = colour;
 	}
 	
 	// For Bullet

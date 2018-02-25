@@ -10,6 +10,7 @@ import java.awt.event.MouseMotionListener;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
+import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
 
 /**
@@ -21,16 +22,21 @@ import org.alien8.ship.Ship;
 public class InputManager implements KeyListener, MouseListener, MouseMotionListener {
 	private static InputManager instance = new InputManager();
 	
+	// Synced
 	private Position mousePosition = new Position(0,0);
-	private boolean lmbPressed = false;
-	private boolean rmbPressed = false;
-	private boolean wPressed = false;
-	private boolean aPressed = false;
-	private boolean sPressed = false;
-	private boolean dPressed = false;
-	private boolean spacePressed = false;
-	private boolean escPressed = false;
+	private boolean lmbPressed = false; // Shoot 1
+	private boolean rmbPressed = false; // Shoot 2
+	private boolean wPressed = false; // Move forward
+	private boolean aPressed = false; // Turn left
+	private boolean sPressed = false; // Slow down
+	private boolean dPressed = false; // Turn right
+	private boolean spacePressed = false; // Shoot 3
 
+	// Not synced - local controls
+	private boolean escPressed = false; // Pull up menu
+	private boolean tabPressed = false; // Show scoreboard
+	private boolean mPressed = false; // Mute sounds
+	
 	private InputManager() {
 		// Normally this exists only to defeat instantiation
 	}
@@ -133,6 +139,12 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 		return escPressed;
 	}
 	/**
+	 * @return true if TAB key is pressed, false otherwise
+	 */
+	public boolean tabPressed() {
+		return tabPressed;
+	}
+	/**
 	 * @return the latest mouse position, in screen XY coordinates
 	 */
 	public Position mousePosition() {
@@ -184,36 +196,28 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
-			escPressed = true;
-		
-		switch(e.getKeyChar()) {
-		case 'w': 
+		switch(e.getKeyCode()) {
+		case KeyEvent.VK_W: 
 			wPressed = true;
 			return;
-		case 'a': 
+		case KeyEvent.VK_A: 
 			aPressed = true;
 			return;
-		case 's': 
+		case KeyEvent.VK_S: 
 			sPressed = true;
 			return;
-		case 'd': 
+		case KeyEvent.VK_D: 
 			dPressed = true;
 			return;
-		case ' ': 
+		case KeyEvent.VK_SPACE: 
 			spacePressed = true;
 			return;
-		case 'W': 
-			wPressed = true;
+		// Local controls
+		case KeyEvent.VK_ESCAPE: 
+			escPressed = true;
 			return;
-		case 'A': 
-			aPressed = true;
-			return;
-		case 'S': 
-			sPressed = true;
-			return;
-		case 'D': 
-			dPressed = true;
+		case KeyEvent.VK_TAB:
+			tabPressed = true;
 			return;
 		default:
 			// Not a game control
@@ -223,42 +227,33 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
-			escPressed = false;
-		
-		switch(e.getKeyChar()) {
-		case 'w': 
+		switch(e.getKeyCode()) {
+		case KeyEvent.VK_W: 
 			wPressed = false;
 			return;
-		case 'a': 
+		case KeyEvent.VK_A: 
 			aPressed = false;
 			return;
-		case 's': 
+		case KeyEvent.VK_S: 
 			sPressed = false;
 			return;
-		case 'd': 
+		case KeyEvent.VK_D: 
 			dPressed = false;
 			return;
-		case ' ': 
+		case KeyEvent.VK_SPACE: 
 			spacePressed = false;
 			return;
-		case 'W': 
-			wPressed = false;
+		// Local controls
+		case KeyEvent.VK_ESCAPE: 
+			escPressed = false;
 			return;
-		case 'A': 
-			aPressed = false;
-			return;
-		case 'S': 
-			sPressed = false;
-			return;
-		case 'D': 
-			dPressed = false;
+		case KeyEvent.VK_TAB:
+			tabPressed = false;
 			return;
 		default:
 			// Not a game control
 			return;
-		}
-		
+		}		
 	}
 
 	@Override
