@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -36,6 +37,10 @@ public class Server {
 	private static ModelManager model = ModelManager.getInstance();
 	private static ArrayList<Player> playerList = new ArrayList<Player>();
 	private static boolean run = true;
+	private static int clientMultiPort = 4445; // multicast client port
+	private static MulticastSocket multiSocket = null;
+	private static InetAddress multiIP = null;
+	private static String group = "224.0.0.5"; // multicast group ipString
 	
 	public static void main(String[] args) {
 		try {
@@ -47,6 +52,19 @@ public class Server {
 			System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
 			System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
 			
+			// set up multicast socket
+			multiIP = InetAddress.getByName(group) ;		
+			multiSocket = new MulticastSocket(clientMultiPort);  
+			multiSocket.setTimeToLive(1);  
+			multiSocket.joinGroup(multiIP);  
+			System.out.println("Multicast socket Port: " + clientMultiPort);
+			System.out.println("Multicast socket IP: " + group);
+			
+			ServerMulticastSender sms = new ServerMulticastSender(multiSocket, lastSyncedEntities, group,clientMultiPort);
+			//sgssList.add(sms);
+			sms.start();	         
+			System.out.println("server sender (multicast) started");
+
 			initializeGameState();
 			
 			// Process clients' connect/disconnect request
@@ -63,6 +81,7 @@ public class Server {
 			
 			tcpSocket.close();
 			udpSocket.close();
+			multiSocket.close();
 		}
 		catch (SocketException e) {
 			e.printStackTrace();
@@ -131,15 +150,12 @@ public class Server {
 //		        	break;
 //		        }
 //		    }
-		    
+
 		    // If the above fails to set the IP properly, try the following
 	        if (hostIP == null) {
 				hostIP = Inet4Address.getLocalHost();
 	        }
 		}
-//		catch (SocketException se) {
-//		se.printStackTrace();
-//	}
         catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -178,7 +194,7 @@ public class Server {
 			sendFullSnapshot(clientIP, toClient, model.getEntities());
 			
 			// Create a dedicated thread for receiving client's input and sending game state to client
-			ClientHandler ch = new ClientHandler(udpSocket, clientIP, lastSyncedEntities);
+			ClientHandler ch = new ClientHandler(udpSocket, clientIP, multiIP, lastSyncedEntities);
 			playerList.add(new Player(clientIP, s, ch));
 
 			// Start the dedicated thread

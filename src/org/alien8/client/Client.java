@@ -10,6 +10,7 @@ import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -36,6 +37,12 @@ public class Client implements Runnable {
   private static DatagramSocket udpSocket = null;
   private InetAddress serverIP = null;
   private AIController aiPlayer;
+  private int clientMultiPort = 4445;
+  private int clientUdpPort = 4443;
+  private InetAddress multiServerIP = null;
+  private MulticastSocket multiReceiver = null;
+  private String group = "224.0.0.5";
+  private String  serverIPstr = "172.22.175.216"; //<- change to the ip of the server to test
 
 
   public static void main(String[] args) {
@@ -92,7 +99,14 @@ public class Client implements Runnable {
       int tickRate = 0;
       long tickTimer = getTime();
       
-      this.connect("192.168.43.149");
+      try {
+		System.out.println("client connect to IP: " + InetAddress.getByName(serverIPstr));
+	  } 
+      catch (UnknownHostException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	  }
+      this.connect(serverIPstr);
       while (running) {
         currentTime = getTime();
 
@@ -169,9 +183,12 @@ public class Client implements Runnable {
 	  try {
 		serverIP = InetAddress.getByName(serverIPStr);
 		tcpSocket = new Socket(serverIP, 4446);
+		udpSocket = new DatagramSocket(clientUdpPort, serverIP);
 		
-		System.out.println("ok");
-		udpSocket = new DatagramSocket();
+		// set up multicast socket client receiver
+		multiServerIP = InetAddress.getByName(group);
+		multiReceiver = new MulticastSocket(clientMultiPort);
+		multiReceiver.joinGroup(multiServerIP);
 		
 		// Serialize a TRUE Boolean object (representing connect request) into byte array 
 		Boolean connectRequest = new Boolean(true);
@@ -233,8 +250,8 @@ public class Client implements Runnable {
 		    byte[] buf = new byte[65536];
 		    DatagramPacket packet = new DatagramPacket(buf, buf.length);
 		    
-		    // Receive a difference packet and obtain the byte data
-		    udpSocket.receive(packet);
+		    // Receive a difference packet and obtain the byte data-
+	        multiReceiver.receive(packet);
 		    byte[] differenceByte = packet.getData();
 		    
 		    // Deserialize the difference byte data into object
@@ -244,8 +261,8 @@ public class Client implements Runnable {
 		    
 		    // Sync the game state with server
 		    ModelManager.getInstance().sync(difference);
-		    System.out.println("Entities: " + model.getEntities());
-		    System.out.println("Difference: " + difference);
+		    System.out.println("client receive Entities: "  + model.getEntities());
+		    // System.out.println("Difference: " + difference);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
