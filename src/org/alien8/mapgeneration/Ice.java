@@ -21,9 +21,9 @@ public class Ice extends Entity implements Serializable {
 	}
 
 	@Override
-	public void render(Renderer r) {
+	public void render() {
 		if(Parameters.RENDER_BOX)
 			// Adjust for the position being the center of the box
-			r.drawRect((int) this.position.getX() - Parameters.MAP_BOX_SIZE/2 + 1, (int) this.position.getY() - Parameters.MAP_BOX_SIZE/2 + 1, 32, 32, 0xFF0000, false);
+			Renderer.getInstance().drawRect((int) this.position.getX() - Parameters.MAP_BOX_SIZE/2 + 1, (int) this.position.getY() - Parameters.MAP_BOX_SIZE/2 + 1, 32, 32, 0xFF0000, false);
 	}
 }

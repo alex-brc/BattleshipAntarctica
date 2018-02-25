@@ -130,7 +130,7 @@ public class ClientHandler extends Thread {
 							if (!currentShip.equals(lastSyncedShip)) {
 								difference.add(new EntityLite(currentShip.getSerial(), 0, 0, currentShip.getPosition(), currentShip.isToBeDeleted(), 
 											   currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(), currentShip.getFrontTurretDirection(),
-											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection()));
+											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection(), currentShip.getColour()));
 							}
 						}
 						else if (ce instanceof SmallBullet) {
@@ -164,7 +164,7 @@ public class ClientHandler extends Thread {
 						Ship currentShip = (Ship) ce;
 						difference.add(new EntityLite(currentShip.getSerial(), 1, 0, currentShip.getPosition(), currentShip.isToBeDeleted(), 
 								       currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(), currentShip.getFrontTurretDirection(),
-									   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection()));
+									   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection(), currentShip.getColour()));
 					}
 					else if (ce instanceof SmallBullet) {
 						SmallBullet currentSB = (SmallBullet) ce;
@@ -193,7 +193,7 @@ public class ClientHandler extends Thread {
 							if (!lastSyncedShip.equals(currentShip)) {
 								difference.add(new EntityLite(currentShip.getSerial(), 0, 0, currentShip.getPosition(), currentShip.isToBeDeleted(), 
 											   currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(), currentShip.getFrontTurretDirection(),
-											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection()));
+											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection(), currentShip.getColour()));
 							}
 						}
 						else if (lse instanceof SmallBullet) {
@@ -225,7 +225,7 @@ public class ClientHandler extends Thread {
 						Ship lastSyncedShip = (Ship) lse;
 						difference.add(new EntityLite(lastSyncedShip.getSerial(), 2, 0, lastSyncedShip.getPosition(), lastSyncedShip.isToBeDeleted(), 
 									   lastSyncedShip.getDirection(), lastSyncedShip.getSpeed(), lastSyncedShip.getHealth(), lastSyncedShip.getFrontTurretDirection(),
-									   lastSyncedShip.getMidTurretDirection(), lastSyncedShip.getRearTurretDirection()));
+									   lastSyncedShip.getMidTurretDirection(), lastSyncedShip.getRearTurretDirection(), lastSyncedShip.getColour()));
 					}
 					else if (lse instanceof SmallBullet) {
 						SmallBullet lastsyncedSB = (SmallBullet) lse;

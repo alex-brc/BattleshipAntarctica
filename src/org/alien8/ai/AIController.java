@@ -30,7 +30,7 @@ public class AIController{
 	
 	public AIController(Position startPos){
 		model = ModelManager.getInstance();
-		myShip = new Ship(startPos, 0); //All ai ships start facing East - temporary
+		myShip = new Ship(startPos, 0, (new Random()).nextInt(0xFFFFFF)); //All ai ships start facing East - temporary
 		collisionCheckCountDown = collisionCheckStart;
 	}
 	

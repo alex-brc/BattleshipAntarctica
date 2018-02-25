@@ -21,7 +21,9 @@ import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
+import org.alien8.score.ScoreBoard;
 import org.alien8.ship.BigBullet;
+import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
@@ -78,7 +80,12 @@ public class Server {
 	
 	public static void initializeGameState() {
 		LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
-	    Ship notPlayer = new Ship(new Position(100, 100), 0);
+	    Ship notPlayer = new Ship(new Position(100, 100), 0, 0xF8F8F8); // white
+	    
+	    // Initialise ScoreBoard 
+	    // Without a thread, it doesn't listen on input.
+	    ScoreBoard.getInstance();
+	    
 	    notPlayer.setSpeed(0.8);
 	    model.addEntity(notPlayer);
 	}
@@ -166,7 +173,8 @@ public class Server {
 			}
 			
 			// Setup client's ship
-			Ship s = new Ship(new Position(randomX, randomY), 0);
+			int randColour = (new Random()).nextInt(0xFFFFFF); 
+			Ship s = new Ship(new Position(randomX, randomY), 0, randColour);
 			model.addEntity(s);
 			
 			// Update the last synced set of entities right before sending a full snapshot to client for full sync
@@ -181,7 +189,8 @@ public class Server {
 			
 			// Create a dedicated thread for receiving client's input and sending game state to client
 			ClientHandler ch = new ClientHandler(udpSocket, clientIP, lastSyncedEntities);
-			playerList.add(new Player(clientIP, s, ch));
+			// TODO: ADD NAMES TO PLAYERS
+			playerList.add(new Player(clientIP, s, ch, "NO_NAMES_YET"));
 
 			// Start the dedicated thread
 			ch.start();
@@ -198,7 +207,7 @@ public class Server {
 			if (e instanceof Ship) {
 				Ship s = (Ship) e;
 				EntitiesLite.add(new EntityLite(s.getSerial(), 1, 0, s.getPosition(), s.isToBeDeleted(), s.getDirection(), s.getSpeed(), s.getHealth(), 
-						 s.getFrontTurretDirection(), s.getMidTurretDirection(), s.getRearTurretDirection()));	
+						 s.getFrontTurretDirection(), s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));	
 			}
 			else if (e instanceof SmallBullet) {
 				SmallBullet sb = (SmallBullet) e;
@@ -239,6 +248,22 @@ public class Server {
 				}
 			}
 		}
+	}
+	/**
+	 * Gets player by bullet. Used in awarding score.
+	 * 
+	 * @param bullet the bullet belonging to the player
+	 * @return the player who owns the bullet
+	 */
+	public static Player getPlayer(Bullet bullet) {
+		
+		for(Player p : playerList) 
+			if(p.getShip().getSerial() == bullet.getSource())
+				return p;
+		
+		LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL, "Bullet source ship does not exist. Exiting...");
+		System.exit(-1);
+		return null;
 	}
 	
 	/**

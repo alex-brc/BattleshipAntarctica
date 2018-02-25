@@ -30,6 +30,7 @@ public class Parameters {
    */
   public static final Dimension RENDERER_SIZE = new Dimension(800,600);
   public static final int MAP_BOX_SIZE = 32;
+  public static final int MAX_PLAYERS = 16;
   /**
    * How many ice pixels must be in a box to be considered an ice entity (%).
    * This is in [0,1]
@@ -108,4 +109,10 @@ public class Parameters {
   public static final int SFX_POOL_SIZE = 5;
   public static final float INITIAL_VOLUME_SFX = 0.4f;
   public static final float INITIAL_VOLUME_AMBIENT = 0.4f;
+  /**
+   * See Score for details
+   */
+  public static final int SCORE_PER_KILL = 100;
+  public static final float KILL_STREAK_MULTIPLIER = 0.1f;
+  public static final float DISTANCE_MULTIPLIER = 1;
 }

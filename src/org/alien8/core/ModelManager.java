@@ -153,7 +153,7 @@ public class ModelManager {
 	    	  }
 	      }
 		  else if (el.entityType == 0 && el.changeType == 1) { // Add Ship
-			  Ship s = new Ship(el.position, el.direction);
+			  Ship s = new Ship(el.position, el.direction, el.colour);
 			  s.setSerial(el.serial);
 	          s.setSpeed(el.speed);
 	          s.setHealth(el.health);
@@ -240,7 +240,7 @@ public class ModelManager {
   public void fullSync(ArrayList<EntityLite> entitiesLite) {
 	  for (EntityLite el : entitiesLite) {
 		  if (el.entityType == 0) {
-			  Ship s = new Ship(el.position, el.direction);
+			  Ship s = new Ship(el.position, el.direction, el.colour);
 			  s.setSerial(el.serial);
 	          s.setSpeed(el.speed);
 	          s.setHealth(el.health);
@@ -280,7 +280,7 @@ public class ModelManager {
   
   private void playerDied() {
 	  System.out.println("Player died! Respawning");
-	  Ship playerNew = new Ship(new Position(200,200), 0);
+	  Ship playerNew = new Ship(new Position(200,200), 0, 0xF8F8F8); // white
 	  this.setPlayer(playerNew);
 	  this.addEntity(playerNew);
   }
