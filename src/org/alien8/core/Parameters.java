@@ -28,8 +28,11 @@ public class Parameters {
   /**
    * Size of map hitboxes
    */
-  public static final Dimension RENDERER_SIZE = new Dimension(800,600);
   public static final int MAP_BOX_SIZE = 32;
+  /**
+   * Dimension object for the renderer dimensions
+   */
+  public static final Dimension RENDERER_SIZE = new Dimension(800,600);
   public static final int MAX_PLAYERS = 16;
   /**
    * How many ice pixels must be in a box to be considered an ice entity (%).
@@ -116,4 +119,7 @@ public class Parameters {
   public static final int SCORE_PER_KILL = 100;
   public static final float KILL_STREAK_MULTIPLIER = 0.1f;
   public static final float DISTANCE_MULTIPLIER = 1;
+  public static final int SCOREBOARD_HEIGHT = 500;
+  public static final int SCOREBOARD_WIDTH = 500;
+  
 }

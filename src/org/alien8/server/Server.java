@@ -39,7 +39,7 @@ public class Server {
 	private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
 	private static ModelManager model = ModelManager.getInstance();
 	private static ArrayList<Player> playerList = new ArrayList<Player>();
-	private static LinkedList<AudioEvent> audioEvents = new LinkedList<AudioEvent>();
+	private static LinkedList<GameEvent> events = new LinkedList<GameEvent>();
 	private static boolean run = true;
 	
 	public static void main(String[] args) {
@@ -61,7 +61,8 @@ public class Server {
 			// Process clients' connect/disconnect request
 			while (run) {
 				// Receive and process client's packet
-				System.out.println("Waiting for client request....");
+				System.out.println("Waiting for client request...");
+				LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Waiting for client request...");
 				Socket client = tcpSocket.accept();
 				InetAddress clientIP = client.getInetAddress();
 				ObjectInputStream fromClient = new ObjectInputStream(client.getInputStream());
@@ -94,6 +95,7 @@ public class Server {
 	    
 	    notPlayer.setSpeed(0.8);
 	    model.addEntity(notPlayer);
+		LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Game set up. Waiting for players.");
 	}
 	
 	public static void processClientRequest(InetAddress clientIP, Boolean clientRequest, ObjectOutputStream toClient) {
@@ -161,6 +163,7 @@ public class Server {
 	}
 
 	public static void setupClient(InetAddress clientIP, ObjectOutputStream toClient) {
+		LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Client attempting connect from " + clientIP);
 		if (!isClientConnected(clientIP)) {
 			boolean[][] iceGrid = model.getMap().getIceGrid();
 			Random r = new Random();
@@ -195,15 +198,25 @@ public class Server {
 			
 			// Create a dedicated thread for receiving client's input and sending game state to client
 			ClientHandler ch = new ClientHandler(udpSocket, eventSocket, clientIP, lastSyncedEntities);
+			
 			// TODO: ADD NAMES TO PLAYERS
-			playerList.add(new Player(clientIP, s, ch, "NO_NAMES_YET"));
+			int k = (new Random()).nextInt(1000);
+			String name = "RAND_NAME_" + k;
+			Player player = new Player(clientIP, s, ch, name);
+			playerList.add(player);
+			
+			// Add player to scoreboard
+			ScoreBoard.getInstance().add(player);
 			
 			// Get relevant port and IP information
 			ch.init();
 			
 			// Start the dedicated thread
 			ch.start();
+			LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Started ClientHandler for client " + clientIP);
 		}
+		else
+			LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Client " + clientIP + " is already connected.");
 	}
 	
 	/* 
@@ -254,6 +267,8 @@ public class Server {
 					p.getClientHandler().end();
 					// Remove player from the PlayerList
 					playerList.remove(p);
+					// Remove player from scoreboard
+					ScoreBoard.getInstance().remove(p);
 				}
 			}
 		}
@@ -275,14 +290,8 @@ public class Server {
 		return null;
 	}
 	
-	public static AudioEvent getAudioEvent() {
-		if(audioEvents.size() == 0)
-			return null;
-		return audioEvents.removeFirst();
-	}
-	
-	public static void addAudioEvent(AudioEvent audioEvent) {
-		audioEvents.add(audioEvent);
+	public static void addEvent(GameEvent event) {
+		events.add(event);
 	}
 	
 	/**
@@ -302,5 +311,11 @@ public class Server {
 	     return null;
 	   }
 	 }
+
+	public static GameEvent getNextEvent() {
+		if(events.size() == 0)
+			return null;
+		return events.removeFirst();
+	}
 	 
 }

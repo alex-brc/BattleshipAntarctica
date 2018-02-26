@@ -1,12 +1,10 @@
 package org.alien8.server;
 
-import java.io.Serializable;
-
 import org.alien8.physics.Position;
 
-public class AudioEvent implements Serializable{
+public class AudioEvent extends GameEvent{
 
-	private static final long serialVersionUID = 8550834400277582403L;
+	private static final long serialVersionUID = 8047674799697266330L;
 
 	public enum Type {
 		SHOOT,ICE_CRASH,SHIP_CRASH;

@@ -59,11 +59,12 @@ public class ModelManager {
   }
 
   /**
-   * OBSOLETE
+   * DEPRECATED
    * Old version, suitable for offline clients. Should not be used
    * 
    * The update() method updates the state of all entities
    */
+  @Deprecated
   public void update() {
     // Loop through all the entities
     for (Entity ent : entities) {
@@ -81,7 +82,7 @@ public class ModelManager {
       }
       // Handle player stuff
       if (ent == this.getPlayer()) {
-        Ship player = (Ship) ent;
+        // Ship player = (Ship) ent;
         // InputManager.processInputs(player);
       }
 

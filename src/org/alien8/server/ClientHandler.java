@@ -47,13 +47,14 @@ public class ClientHandler extends Thread {
 	 * 
 	 */
 	public void init() {
+		LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO, "Shaking hands with client...");
 		byte[] buf = new byte[65536];
 	    DatagramPacket packet = new DatagramPacket(buf, buf.length);
 		// Init udp socket
 	    try {
 			udpSocket.receive(packet);
 		} catch (IOException e) {
-			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in udp socket: " + e.toString());
+			LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in udp socket: " + e.toString());
 			System.exit(-1);
 		}
 		port = packet.getPort();
@@ -65,7 +66,7 @@ public class ClientHandler extends Thread {
 	    try {
 			eventSocket.receive(packet);
 		} catch (IOException e) {
-			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in event socket: " + e.toString());
+			LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in event socket: " + e.toString());
 			System.exit(-1);
 		}
 	    eventPort = packet.getPort();
@@ -116,8 +117,8 @@ public class ClientHandler extends Thread {
 	
 	private void sendEvents() {
 		try {
-			// Serialize the next audio event in a byte array
-	        AudioEvent event = Server.getAudioEvent();
+			// Serialize the next event in a byte array
+	        GameEvent event = Server.getNextEvent();
 	        
 			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);

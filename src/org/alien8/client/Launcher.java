@@ -16,7 +16,7 @@ public class Launcher {
 	public static Launcher instance;
 	private String loadStatus;
 	private Renderer renderer;
-	private String serverIPstr = "192.168.0.16";
+	private String serverIPstr = "172.22.35.217";
 	private Client game;
 	
 	private Launcher() {
@@ -71,8 +71,7 @@ public class Launcher {
 	}
 	
 	private void loadScoreBoard() {
-		Thread thread = new Thread(ScoreBoard.getInstance(), "ScoreBoard");
-		thread.start();
+		ScoreBoard.getInstance().startListener();
 	}
 
 	private void connect() {
