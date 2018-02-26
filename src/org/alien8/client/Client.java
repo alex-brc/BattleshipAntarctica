@@ -19,8 +19,10 @@ import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
+import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.AudioEvent;
+import org.alien8.server.GameEvent;
 import org.alien8.ship.Ship;
 import org.alien8.util.ClientShutdownHook;
 import org.alien8.util.LogManager;
@@ -171,7 +173,6 @@ public class Client implements Runnable {
 		tcpSocket = new Socket(serverIP, 4446);
 		
 		System.out.println("Connected");
-		LogManager.getInstance().log("Networking", LogManager.Scope.INFO, "Succesfully connected to server.");
 		udpSocket = new DatagramSocket();
 		eventSocket = new DatagramSocket();
 		
@@ -193,35 +194,36 @@ public class Client implements Runnable {
 		
 		// Perform initial handshake with ClientHandler
 		try {
+			LogManager.getInstance().log("Client", LogManager.Scope.INFO, "Sending handshakes to ClientHandler");
 			sendDummyPacket(udpSocket, 4446);
 			sendDummyPacket(eventSocket, 4447);
 		}
 		catch(IOException e) {
-			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in a socket: " + e.toString());
+			LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in a socket: " + e.toString());
 			System.exit(-1);
 		}
   	  }
 	  catch (BindException e) {
-		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Could not bind to any port. Firewalls?\n" + e.toString());
+		  LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL, "Could not bind to any port. Firewalls?\n" + e.toString());
 		  return false;
 	  }
 	  catch (SocketException e) {
-		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "A socket exception occured.\n" + e.toString());
+		  LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL, "A socket exception occured.\n" + e.toString());
 		  return false;
 	  }
 	  catch (UnknownHostException e) {
-		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Unknown host. Check host details.\n" + e.toString());
+		  LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL, "Unknown host. Check host details.\n" + e.toString());
 		  return false;
 	  }
 	  catch (IOException e) {
-		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "IO exception.\n" + e.toString());
+		  LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL, "IO exception.\n" + e.toString());
 		  return false;
 	  }
-	  LogManager.getInstance().log("Networking", LogManager.Scope.INFO, "Client succesfully connected to the server at " + serverIPStr);
+	  LogManager.getInstance().log("Client", LogManager.Scope.INFO, "Client succesfully connected to the server at " + serverIPStr);
 	  return true;
     }
 	System.out.println("The client is already connected.");
-	LogManager.getInstance().log("Networking", LogManager.Scope.WARNING, "Connection attempted while already connected. ???");
+	LogManager.getInstance().log("Client", LogManager.Scope.WARNING, "Connection attempted while already connected. ???");
 	return false;
   }
   
@@ -230,7 +232,7 @@ public class Client implements Runnable {
 	  // Serialize the input sample object into byte array 
 	  ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 	  ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-	  Boolean dummy = new Boolean(false);
+	  Boolean dummy = new Boolean(true);
 	  objOut.writeObject(dummy);
 	  byte[] clientInputSampleByte = byteOut.toByteArray();
 
@@ -273,13 +275,16 @@ public class Client implements Runnable {
 		    // Deserialize the event data into object
 		    ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
 		    ObjectInputStream objIn = new ObjectInputStream(byteIn);
-		    AudioEvent event = (AudioEvent) objIn.readObject();
+		    GameEvent event = (GameEvent) objIn.readObject();
 		    
 		    // Send audio events to AudioManager
-			System.out.println(event);
 		    if(event != null) {
-				System.out.println(event + "OK");
-		    	AudioManager.getInstance().addEvent((AudioEvent) event);
+
+			    System.out.println(event.toString());
+		    	if(event instanceof AudioEvent)
+		    		AudioManager.getInstance().addEvent((AudioEvent) event);
+		    	else if(event instanceof Score)
+		    		ScoreBoard.getInstance().update((Score) event);
 		    }
 		}
 		catch (IOException ioe) {
@@ -354,7 +359,8 @@ public class Client implements Runnable {
         serverIP = null;
       }
       catch (IOException e) {
-        LogManager.getInstance().log("Networking", LogManager.Scope.ERROR, "Something went wrong disconnecting client.\n" + e.toString());
+        LogManager.getInstance().log("Client", LogManager.Scope.ERROR, "Something went wrong disconnecting client. " + e.toString());
+        System.exit(-1);
       }
     }
   }

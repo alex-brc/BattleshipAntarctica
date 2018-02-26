@@ -2,6 +2,9 @@ package org.alien8.client;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
+import org.alien8.audio.AudioManager;
+import org.alien8.score.ScoreBoard;
 /**
  * Window listener for the Jframe in client.
  * 
@@ -12,7 +15,15 @@ public class ClientWindowListener implements WindowListener {
 	public void windowClosed(WindowEvent e) {
 		// Disconnect client
 		Launcher.getInstance().getRunningClient().disconnect();
+		// Shutdown audio clips
+		AudioManager.getInstance().shutDown();
+		// Tear down ScoreBoard
+		ScoreBoard.getInstance().killListener();
 		// Do other stuff maybe
+		
+		// Log status
+		System.out.println("System exit in a controlled fashion. Check log for crash information");
+		System.exit(0);
 	}
 	
 	@Override
@@ -23,7 +34,17 @@ public class ClientWindowListener implements WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
+		// Disconnect client
+		Launcher.getInstance().getRunningClient().disconnect();
+		// Shutdown audio clips
+		AudioManager.getInstance().shutDown();
+		// Tear down ScoreBoard
+		ScoreBoard.getInstance().killListener();
+		// Do other stuff maybe
+		
+		// Log status
+		System.out.println("System exit in a controlled fashion. Check log for crash information");
+		System.exit(0);
 		
 	}
 

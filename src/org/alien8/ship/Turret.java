@@ -79,7 +79,7 @@ public class Turret implements Serializable {
           distance, this.getShip().getSerial()));
     }
     
-    Server.addAudioEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
+    Server.addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
     this.startCooldown();
     this.distance = this.minDistance;
   }

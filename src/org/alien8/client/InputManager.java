@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import org.alien8.audio.AudioManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
@@ -34,7 +35,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	// Not synced - local controls
 	private boolean escPressed = false; // Pull up menu
-	private boolean tabPressed = false; // Show scoreboard
+	private boolean shiftPressed = false; // Show scoreboard
 	private boolean mPressed = false; // Mute sounds
 	
 	private InputManager() {
@@ -141,8 +142,8 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 	/**
 	 * @return true if TAB key is pressed, false otherwise
 	 */
-	public boolean tabPressed() {
-		return tabPressed;
+	public boolean shiftPressed() {
+		return shiftPressed;
 	}
 	/**
 	 * @return the latest mouse position, in screen XY coordinates
@@ -216,8 +217,9 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 		case KeyEvent.VK_ESCAPE: 
 			escPressed = true;
 			return;
-		case KeyEvent.VK_TAB:
-			tabPressed = true;
+		case KeyEvent.VK_SHIFT:
+			shiftPressed = true;
+			ScoreBoard.getInstance().notifyShift();
 			return;
 		default:
 			// Not a game control
@@ -247,8 +249,8 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 		case KeyEvent.VK_ESCAPE: 
 			escPressed = false;
 			return;
-		case KeyEvent.VK_TAB:
-			tabPressed = false;
+		case KeyEvent.VK_SHIFT:
+			shiftPressed = false;
 			return;
 		default:
 			// Not a game control

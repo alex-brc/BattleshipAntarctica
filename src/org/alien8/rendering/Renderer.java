@@ -2,16 +2,14 @@ package org.alien8.rendering;
 
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
@@ -43,7 +41,6 @@ public class Renderer extends Canvas {
     
     frame = new JFrame();
     
-    
     addMouseListener(InputManager.getInstance());
     addMouseMotionListener(InputManager.getInstance());
     addKeyListener(InputManager.getInstance());
@@ -53,6 +50,7 @@ public class Renderer extends Canvas {
     frame.add(this);
     frame.pack();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.addWindowListener(new ClientWindowListener());
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
     

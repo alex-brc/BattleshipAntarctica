@@ -1,20 +1,26 @@
 package org.alien8.score;
 
 import org.alien8.core.Parameters;
+import org.alien8.server.GameEvent;
 import org.alien8.server.Player;
 import org.alien8.ship.Bullet;
 
-public class Score implements Comparable<Score>{
+public class Score extends GameEvent implements Comparable<Score>{
+
+	private static final long serialVersionUID = -1613827319434373237L;
+
 	private String name;
 	private int colour;
 	private int score;
 	private int kills;
+	private boolean alive;
 	
 	public Score(Player player) {
 		this.name = player.getName();
 		this.colour = player.getShip().getColour();
 		this.score = 0;
 		this.kills = 0;
+		this.alive = true;
 	}
 	/**
 	 * Awards the score earned for landing a shot.
@@ -37,6 +43,10 @@ public class Score implements Comparable<Score>{
 		this.kills++;
 	}
 	
+	public void kill() {
+		this.alive = false;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -51,6 +61,10 @@ public class Score implements Comparable<Score>{
 
 	public int getKills() {
 		return kills;
+	}
+	
+	public boolean getAlive() {
+		return alive;
 	}
 	
 	@Override
