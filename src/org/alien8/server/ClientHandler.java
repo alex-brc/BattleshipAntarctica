@@ -19,11 +19,14 @@ import org.alien8.core.Parameters;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
+import org.alien8.util.LogManager;
 
 public class ClientHandler extends Thread {
 	private DatagramSocket udpSocket = null;
+	private DatagramSocket eventSocket = null;
 	private InetAddress clientIP = null;
 	private Integer port = null;
+	private Integer eventPort = null;
 	private ModelManager model = ModelManager.getInstance();
 	private ConcurrentLinkedQueue<Entity> lastSyncedEntities = null;
 	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
@@ -32,10 +35,41 @@ public class ClientHandler extends Thread {
     double tick = 0;
 	private static boolean run = true;
 	
-	public ClientHandler(DatagramSocket udpSocket, InetAddress clientIP, ConcurrentLinkedQueue<Entity> lastSyncedEntities) {
+	public ClientHandler(DatagramSocket udpSocket, DatagramSocket eventSocket, InetAddress clientIP, ConcurrentLinkedQueue<Entity> lastSyncedEntities) {
 		this.udpSocket = udpSocket;
+		this.eventSocket = eventSocket;
 		this.clientIP = clientIP;
 		this.lastSyncedEntities = lastSyncedEntities;
+	}
+	/**
+	 * Send some packets back and forth to client
+	 * to obtain IP and port numbers
+	 * 
+	 */
+	public void init() {
+		byte[] buf = new byte[65536];
+	    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+		// Init udp socket
+	    try {
+			udpSocket.receive(packet);
+		} catch (IOException e) {
+			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in udp socket: " + e.toString());
+			System.exit(-1);
+		}
+		port = packet.getPort();
+	    clientIP = packet.getAddress();
+	    
+	    buf = new byte[65536];
+	    packet = new DatagramPacket(buf, buf.length);
+		
+	    try {
+			eventSocket.receive(packet);
+		} catch (IOException e) {
+			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in event socket: " + e.toString());
+			System.exit(-1);
+		}
+	    eventPort = packet.getPort();
+	    
 	}
 	
 	public void run() {
@@ -45,12 +79,13 @@ public class ClientHandler extends Thread {
 
 	        while (tick >= 1) {
 	    	   this.readInputSample();
+	    	   this.sendEvents();
 	    	   this.sendGameState();
 	    	   tick--;
 	           // Update last time
 	           lastTime = System.nanoTime();
 	        }
-		}    
+		}
 	}
 	
 	private void readInputSample() {
@@ -61,8 +96,6 @@ public class ClientHandler extends Thread {
 		    
 		    // Receive an input sample packet and obtain its byte data
 		    udpSocket.receive(packet);
-		    port = packet.getPort();
-		    clientIP = packet.getAddress();
 		    byte[] inputSampleByte = packet.getData();
 		    
 		    // Deserialize the input sample byte data into object
@@ -81,13 +114,31 @@ public class ClientHandler extends Thread {
 		}
 	}
 	
+	private void sendEvents() {
+		try {
+			// Serialize the next audio event in a byte array
+	        AudioEvent event = Server.getAudioEvent();
+	        
+			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+	        objOut.writeObject(event);
+	        byte[] eventByte = byteOut.toByteArray();
+
+	        // Create the packet for event bytes
+	        DatagramPacket packet = new DatagramPacket(eventByte, eventByte.length, clientIP, eventPort);
+
+	        // Send the packet
+	        udpSocket.send(packet);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void sendGameState() {
 		try {
-//			System.out.println("Last synced entities: " + lastSyncedEntities);
-//			System.out.println("Current entities: " + currentEntities);
 			ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
-//			System.out.println("Difference: " + difference);
-//			
+			
 			// Update the last synced set of entities right before sending the difference to client for syncing
 			ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
 			for (Entity e : currentEntities) {

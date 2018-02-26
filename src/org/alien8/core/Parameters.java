@@ -109,6 +109,7 @@ public class Parameters {
   public static final int SFX_POOL_SIZE = 5;
   public static final float INITIAL_VOLUME_SFX = 0.4f;
   public static final float INITIAL_VOLUME_AMBIENT = 0.4f;
+  public static final int MAX_HEARING_DISTANCE = 1500;
   /**
    * See Score for details
    */

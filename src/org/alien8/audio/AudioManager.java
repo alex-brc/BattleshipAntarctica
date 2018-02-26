@@ -2,47 +2,48 @@ package org.alien8.audio;
 
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.rendering.Renderer;
+import org.alien8.physics.Position;
+import org.alien8.server.AudioEvent;
 import org.alien8.util.LogManager;
 
 /**
- * This audio manager is responsible for all game audio, handles
- * sound FX and also volume.
+ * This audio manager is responsible for all game audio, handles sound FX and
+ * also volume.
  * 
- * Supports volume control (in 10% steps on a linear scale) for 
- * ambient and SFX separately, as well as separate muting for each 
- * of them.
+ * Supports volume control (in 10% steps on a linear scale) for ambient and SFX
+ * separately, as well as separate muting for each of them.
  * 
- * TODO: Other players' sounds
- * TODO: Change to Thread implementation
- * TODO: Distance-based volume for SFX
  */
-public class AudioManager {
+public class AudioManager implements Runnable {
 	public static final int AIRPLANE_PASS = 0;
 	public static final int SFX_SHIP_SHOOT = 1;
 	public static final int SFX_ICE_CRASH = 2;
 	public static final int SFX_SHIP_CRASH = 3;
 	public static final int SFX_PLANE_PASS = 4;
-	
+
 	private static AudioManager instance = null;
+	private volatile boolean running;
 	private Random rand;
 	private Clip ambient;
-	
-	private float ambientVolumeValue;
-	private float sfxVolumeValue;
+	private ConcurrentLinkedQueue<AudioEvent> audioEvents;
+
+	private double ambientVolumeValue;
+	private double sfxVolumeValue;
 	private boolean ambientIsMuted = false;
 	private boolean sfxIsMuted = false;
 	private LinkedList<Clip> shoot1Pool;
 	private LinkedList<Clip> shoot2Pool;
 	private LinkedList<Clip> shoot3Pool;
 	private LinkedList<Clip> iceCrashPool;
-	private LinkedList<Clip> shipCrashPool;	
-	
+	private LinkedList<Clip> shipCrashPool;
+
 	private AudioManager() {
 		LogManager.getInstance().log("Audio", LogManager.Scope.INFO, "Loading sound files...");
 		try {
@@ -56,7 +57,7 @@ public class AudioManager {
 			iceCrashPool = new LinkedList<Clip>();
 
 			// Pool shoot sound effects
-			for(int i = 0; i < Parameters.SFX_POOL_SIZE; i++) {
+			for (int i = 0; i < Parameters.SFX_POOL_SIZE; i++) {
 				shoot1Pool.add(SoundEffects.makeClip(SoundEffects.SHIP_SHOOT_1));
 				shoot2Pool.add(SoundEffects.makeClip(SoundEffects.SHIP_SHOOT_2));
 				shoot3Pool.add(SoundEffects.makeClip(SoundEffects.SHIP_SHOOT_3));
@@ -66,184 +67,254 @@ public class AudioManager {
 			// Loads ambient sound
 			ambient = SoundEffects.makeClip(SoundEffects.AMBIENT);
 			ambientVolumeValue = Parameters.INITIAL_VOLUME_AMBIENT;
-		}
-		catch(Exception e) {
-			LogManager.getInstance().log("Audio", LogManager.Scope.CRITICAL, "Could not load sound files: " + e.getMessage() + ". Exiting.");
+
+			// Initialise event queue
+			audioEvents = new ConcurrentLinkedQueue<AudioEvent>();
+
+			// Start event listener thread
+			running = true;
+			(new Thread(this, "AudioManager")).start();
+		} catch (Exception e) {
+			LogManager.getInstance().log("Audio", LogManager.Scope.CRITICAL,
+					"Could not load sound files: " + e.getMessage() + ". Exiting.");
 			System.exit(-1);
 		}
-		
+
 	}
+
+	@Override
+	public void run() {
+		while (running) {
+			AudioEvent event = audioEvents.poll();
+			if(event != null)
+				this.handleEvent(event);
+		}
+	}
+
 	/**
 	 * Call to cleanly close everything and prepare for exit.
+	 * 
 	 * @return true if cleanly exited, false otherwise
 	 */
 	public boolean shutDown() {
+		// Stop run()
+		this.running = false;
+		// Kill daemons
 		try {
 			// Close SFX clips
-			for(Clip clip : shoot1Pool) {
+			for (Clip clip : shoot1Pool) {
 				clip.close();
 			}
-			for(Clip clip : shoot2Pool) {
+			for (Clip clip : shoot2Pool) {
 				clip.close();
 			}
-			for(Clip clip : shoot3Pool) {
+			for (Clip clip : shoot3Pool) {
 				clip.close();
 			}
 			// Stop and close ambient clips
 			ambient.close();
-		}
-		catch(Exception e) {
-			LogManager.getInstance().log("Audio", LogManager.Scope.ERROR, "Audio clips could not be closed: " + e.getMessage());
+		} catch (Exception e) {
+			LogManager.getInstance().log("Audio", LogManager.Scope.ERROR,
+					"Audio clips could not be closed: " + e.getMessage());
 			return false;
 		}
 		LogManager.getInstance().log("Audio", LogManager.Scope.INFO, "Audio manager closed cleanly.");
 		return true;
 	}
-	
+
 	/**
-	 * Starts the ambient sounds. 
+	 * Starts the ambient sounds.
 	 */
 	public void startAmbient() {
 		setVolume(ambient, ambientVolumeValue);
 		ambient.loop(Clip.LOOP_CONTINUOUSLY);
 	}
-	
+
 	public static AudioManager getInstance() {
-		if(instance == null)
+		if (instance == null)
 			instance = new AudioManager();
 		return instance;
 	}
-	
+
 	/**
 	 * Plays the specified type of sound effect
 	 * @param type the type of sounds to play, i.e. AudioManager.SFX_SHIP_SHOOT will shoot one of 3 shooting sounds at random
 	 */
-	public void playSound(int type) {
+	public void playSound(int type, Position position) {
+		double dist = ModelManager.getInstance().getPlayer().getPosition().distanceTo(position);
+		
+		// Only play it if it's in hearing range
+		if(dist > Parameters.MAX_HEARING_DISTANCE)
+			return;
+		
+		double modifier = distanceVolumeFunction(dist);
+			
 		if(type == SFX_SHIP_SHOOT) {
 			int k = rand.nextInt(3);
 			switch(k) {
-			case 0: playSFX(shoot1Pool);
+			case 0: playSFX(shoot1Pool, modifier);
 				return;
-			case 1: playSFX(shoot2Pool);
+			case 1: playSFX(shoot2Pool, modifier);
 				return;
-			case 2: playSFX(shoot3Pool);
+			case 2: playSFX(shoot3Pool, modifier);
 				return;
 			}
 		}
 	}
-	
-	private void playSFX(LinkedList<Clip> shootPool) {
+
+	private void playSFX(LinkedList<Clip> pool, double modifier) {
 		// Get first clip, play it regardless of it's state
-		Clip clip = shootPool.removeFirst();
-		if(!sfxIsMuted)
-			setVolume(clip, sfxVolumeValue);
+		Clip clip = pool.removeFirst();
+		if (!sfxIsMuted)
+			setVolume(clip, sfxVolumeValue * modifier);
 		else
 			setVolume(clip, 0.0f);
-		
-		if(clip.isRunning()) {
+
+		if (clip.isRunning()) {
 			clip.stop();
 			clip.flush();
 		}
 		clip.setFramePosition(0);
 		clip.start();
-		
+
 		// Add that clip to the end of the pool
-		shootPool.addLast(clip);
+		pool.addLast(clip);
 	}
-	
+
 	// Render controls. TODO
-	public void render(Renderer r) {
-		
+	public void render() {
+
 	}
+
 	/**
 	 * Mutes or unmutes the ambient sounds
 	 * 
-	 * @return returns the boolean representing the muted state of the ambient sounds after the operation (true if it muted, false otherwise).
+	 * @return returns the boolean representing the muted state of the ambient
+	 *         sounds after the operation (true if it muted, false otherwise).
 	 */
 	public boolean ambientMuteToggle() {
-		if(!ambientIsMuted) {
+		if (!ambientIsMuted) {
 			setVolume(ambient, 0.0f);
 			ambientIsMuted = true;
 			return true;
 		}
-		
+
 		setVolume(ambient, ambientVolumeValue);
 		ambientIsMuted = false;
 		return false;
 	}
-	
+
 	/**
-	 *  Ambient volume goes in steps of 0.1 from 0.0f to 1.0f
+	 * Ambient volume goes in steps of 0.1 from 0.0f to 1.0f
 	 */
 	public void ambientDecreaseVolume() {
-		if(ambientVolumeValue != 0.0f) {
+		if (ambientVolumeValue != 0.0f) {
 			ambientVolumeValue -= 0.1f;
-		    setVolume(ambient, ambientVolumeValue);
-		}
-	}
-	
-	/**
-	 *  Ambient volume goes in steps of 0.1 from 0.0f to 1.0f
-	 */
-	public void ambientIncreaseVolume() {
-		if(ambientVolumeValue != 1.0f) {
-			ambientVolumeValue += 0.1f;	
 			setVolume(ambient, ambientVolumeValue);
 		}
 	}
-	
+
+	/**
+	 * Ambient volume goes in steps of 0.1 from 0.0f to 1.0f
+	 */
+	public void ambientIncreaseVolume() {
+		if (ambientVolumeValue != 1.0f) {
+			ambientVolumeValue += 0.1f;
+			setVolume(ambient, ambientVolumeValue);
+		}
+	}
+
 	/**
 	 * Mutes or unmutes sound effects
 	 * 
-	 * @return returns the boolean representing the muted state of the sfx after the operation (true if it muted, false otherwise).
+	 * @return returns the boolean representing the muted state of the sfx after the
+	 *         operation (true if it muted, false otherwise).
 	 */
 	public boolean sfxMuteToggle() {
-		if(!sfxIsMuted) {
+		if (!sfxIsMuted) {
 			sfxIsMuted = true;
 			return true;
 		}
-		
+
 		sfxIsMuted = false;
 		return false;
 	}
+
 	/**
-	 *  Sfx volume goes in steps of 0.1 from 0.0f to 1.0f
+	 * Sfx volume goes in steps of 0.1 from 0.0f to 1.0f
 	 */
 	public void sfxDecreaseVolume() {
-		if(sfxVolumeValue != 0.0f)
+		if (sfxVolumeValue != 0.0f)
 			sfxVolumeValue -= 0.1f;
 	}
-	
+
 	/**
-	 *  Sfx volume goes in steps of 0.1 from 0.0f to 1.0f
+	 * Sfx volume goes in steps of 0.1 from 0.0f to 1.0f
 	 */
 	public void sfxIncreaseVolume() {
-		if(sfxVolumeValue != 1.0f)
+		if (sfxVolumeValue != 1.0f)
 			sfxVolumeValue += 0.1f;
 	}
-	
+
 	/**
-	 * Computes a linear volume scale from the gain in decibels and returns the equivalent value
+	 * Computes a linear volume scale from the gain in decibels and returns the
+	 * equivalent value
 	 * 
-	 * @param clip the clip to get the volume from
+	 * @param clip
+	 *            the clip to get the volume from
 	 * @return a linear scale value for the volume (0 to 1)
 	 */
 	private float getVolume(Clip clip) {
-	    FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);        
-	    return (float) Math.pow(10f, gainControl.getValue() / 20f);
+		FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+		return (float) Math.pow(10f, gainControl.getValue() / 20f);
 	}
-	
+
 	/**
-	 * Assigns a value for the gain in decibels from a linear scale input 
+	 * Assigns a value for the gain in decibels from a linear scale input
 	 * 
-	 * @param clip the clip to set the volume for
-	 * @param volume the new volume for the clip (0 to 1)
+	 * @param clip
+	 *            the clip to set the volume for
+	 * @param volume
+	 *            the new volume for the clip (0 to 1)
 	 */
-	private void setVolume(Clip clip, float volume) {
+	private void setVolume(Clip clip, double volume) {
 		if (volume < 0.0f || volume > 1.0f)
-	        return;
-		
-	    FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);        
-	    gainControl.setValue(20f * (float) Math.log10(volume));
+			return;
+
+		FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+		gainControl.setValue(20f * (float) Math.log10(volume));
+	}
+
+	public void addEvent(AudioEvent event) {
+		audioEvents.add(event);
+	}
+
+	/**
+	 * Handles events from the audio event queue
+	 * 
+	 * @param event
+	 */
+	private void handleEvent(AudioEvent event) {
+		if (event.getType() == AudioEvent.Type.SHOOT)
+			playSound(SFX_SHIP_SHOOT, event.getPosition());
+		else if (event.getType() == AudioEvent.Type.SHIP_CRASH)
+			playSound(SFX_SHIP_CRASH, event.getPosition());
+		else if (event.getType() == AudioEvent.Type.ICE_CRASH)
+			playSound(SFX_ICE_CRASH, event.getPosition());
+	}
+
+	/**
+	 * This function takes the distance to the sound source and returns the modifier
+	 * value for volume, making farther sounds quieter, and closer ones louder.
+	 * Right now, the function is:
+	 * 
+	 * f(distance) = 1 - distance / MAX_HEARING_DISTANCE
+	 * f : [0, MAX_HEARINGDISTANCE] -> [0, 1];
+	 * 
+	 * @param distance
+	 * @return the modifier for volume (between 0 and 1)
+	 */
+	private double distanceVolumeFunction(double distance) {
+		return  (1 - (distance / Parameters.MAX_HEARING_DISTANCE));
 	}
 }
