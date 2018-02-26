@@ -13,12 +13,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-
 import org.alien8.ai.AIController;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
-import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.ship.Ship;
 
@@ -26,7 +24,7 @@ public class Client implements Runnable {
   /**
    * Volatile "running" boolean to avoid internal caching. Thread should stop when set to false.
    */
-  private volatile  boolean running = false;
+  private volatile boolean running = false;
   private Thread thread;
   private Renderer renderer;
   private ModelManager model;
@@ -87,53 +85,53 @@ public class Client implements Runnable {
 
       int frameRate = 0;
       long frameTimer = getTime();
-      
+
       int tickRate = 0;
       long tickTimer = getTime();
-      
-      this.connect("192.168.0.15");
+
+      this.connect("192.168.56.1");
       while (running) {
         currentTime = getTime();
 
         // Get the amount of update()s the model needs to catch up
-        // 
-        //                  timeNow - timeLastUpdateWasDone    --> 
+        //
+        // timeNow - timeLastUpdateWasDone -->
         // timeToCatchUp = ----------------------------------
-        //							deltaTPerTick              --> how long a "tick" is
-        // 
+        // deltaTPerTick --> how long a "tick" is
+        //
         catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
         // Call update() as many times as needed to compensate before rendering
-       while (catchUp >= 1) {
-    	  this.sendInputSample();
+        while (catchUp >= 1) {
+          this.sendInputSample();
           this.receiveAndUpdate();
           tickRate++;
           catchUp--;
           // Update last time
           lastTime = getTime();
-       }
+        }
 
         // Call the renderer
-		// aiPlayer.update();
+        // aiPlayer.update();
         renderer.render(model);
       }
-        frameRate++;
+      frameRate++;
 
-        // Update the FPS timer every FPS_FREQ^-1 seconds
-        if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
-          frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-          FPS = frameRate * Parameters.FPS_FREQ;
-          frameRate = 0;
-          System.out.println(FPS);
-        }
-        if(getTime() - tickTimer > Parameters.N_SECOND) {
-        	tickTimer += Parameters.N_SECOND;
-        	System.out.println(tickRate);
-        	tickRate = 0;
-        }
+      // Update the FPS timer every FPS_FREQ^-1 seconds
+      if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
+        frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
+        FPS = frameRate * Parameters.FPS_FREQ;
+        frameRate = 0;
+        // System.out.println(FPS);
       }
-      System.out.println("stopped");
+      if (getTime() - tickTimer > Parameters.N_SECOND) {
+        tickTimer += Parameters.N_SECOND;
+        // System.out.println(tickRate);
+        tickRate = 0;
+      }
     }
+    System.out.println("stopped");
+  }
 
   /**
    * Getter for the latest FPS estimation.
@@ -164,126 +162,118 @@ public class Client implements Runnable {
    * Should be called when the client clicks the 'Connect' button after entering an server IP.
    */
   public void connect(String serverIPStr) {
-	if (tcpSocket == null && serverIP == null) {
-	  try {
-		serverIP = InetAddress.getByName(serverIPStr);
-		tcpSocket = new Socket(serverIP, 4446);
-		udpSocket = new DatagramSocket(4445, serverIP);
-		
-		// Serialize a TRUE Boolean object (representing connect request) into byte array 
-		Boolean connectRequest = new Boolean(true);
-		ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
-		ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
-		toServer.writeObject(connectRequest);
-		
-		// Wait for a full snapshot of current game state from server
-		ArrayList<EntityLite> initialEntitiesLite = getFullSnapshot(fromServer);
-		
-		// Full sync the game state
-		model.fullSync(initialEntitiesLite);
-		
-		// Client's Ship is stored at the end of the synced entities queue
-		Object[] entitiesArr = model.getEntities().toArray();
-		model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
-  	  }
-	  catch (SocketException se) {
-		  se.printStackTrace();
-	  }
-	  catch (UnknownHostException uhe) {
-		  uhe.printStackTrace();
-	  }
-	  catch (IOException ioe) {
-		  ioe.printStackTrace();
-	  }
+    if (tcpSocket == null && serverIP == null) {
+      try {
+        serverIP = InetAddress.getByName(serverIPStr);
+        tcpSocket = new Socket(serverIP, 4446);
+        udpSocket = new DatagramSocket(4445, serverIP);
+
+        // Serialize a TRUE Boolean object (representing connect request) into byte array
+        Boolean connectRequest = new Boolean(true);
+        ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
+        ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
+        toServer.writeObject(connectRequest);
+
+        // Wait for a full snapshot of current game state from server
+        ArrayList<EntityLite> initialEntitiesLite = getFullSnapshot(fromServer);
+
+        // Full sync the game state
+        model.fullSync(initialEntitiesLite);
+
+        // Client's Ship is stored at the end of the synced entities queue
+        Object[] entitiesArr = model.getEntities().toArray();
+        model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
+      } catch (SocketException se) {
+        se.printStackTrace();
+      } catch (UnknownHostException uhe) {
+        uhe.printStackTrace();
+      } catch (IOException ioe) {
+        ioe.printStackTrace();
+      }
     }
   }
-  
+
   private void sendInputSample() {
-	  try {
-			// Serialize the input sample object into byte array 
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-			ClientInputSample cis = new ClientInputSample();
-			objOut.writeObject(cis);
-			byte[] clientInputSampleByte = byteOut.toByteArray();
-			
-			// Create a packet for holding the input sample byte data
-			DatagramPacket packet = new DatagramPacket(clientInputSampleByte, clientInputSampleByte.length, serverIP, 4446);
-			
-			// Send the client input sample packet to the server
-			udpSocket.send(packet);
-		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
+    try {
+      // Serialize the input sample object into byte array
+      ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+      ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+      ClientInputSample cis = new ClientInputSample();
+      objOut.writeObject(cis);
+      byte[] clientInputSampleByte = byteOut.toByteArray();
+
+      // Create a packet for holding the input sample byte data
+      DatagramPacket packet =
+          new DatagramPacket(clientInputSampleByte, clientInputSampleByte.length, serverIP, 4446);
+
+      // Send the client input sample packet to the server
+      udpSocket.send(packet);
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    }
   }
-  
+
   /*
    * Receive the game state difference from the server and sync the game state with the server
    */
   public void receiveAndUpdate() {
-	  try {
-			// Create a packet for receiving difference packet
-		    byte[] buf = new byte[65536];
-		    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-		    
-		    // Receive a difference packet and obtain the byte data
-		    udpSocket.receive(packet);
-		    byte[] differenceByte = packet.getData();
-		    
-		    // Deserialize the difference byte data into object
-		    ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
-		    ObjectInputStream objIn = new ObjectInputStream(byteIn);
-		    ArrayList<EntityLite> difference = (ArrayList<EntityLite>) objIn.readObject();
-		    
-		    // Sync the game state with server
-		    ModelManager.getInstance().sync(difference);
-		    System.out.println("Entities: " + model.getEntities());
-		    System.out.println("Difference: " + difference);
-		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-		catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}
+    try {
+      // Create a packet for receiving difference packet
+      byte[] buf = new byte[65536];
+      DatagramPacket packet = new DatagramPacket(buf, buf.length);
+
+      // Receive a difference packet and obtain the byte data
+      udpSocket.receive(packet);
+      byte[] differenceByte = packet.getData();
+
+      // Deserialize the difference byte data into object
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
+      ObjectInputStream objIn = new ObjectInputStream(byteIn);
+      ArrayList<EntityLite> difference = (ArrayList<EntityLite>) objIn.readObject();
+
+      // Sync the game state with server
+      ModelManager.getInstance().sync(difference);
+      // System.out.println("Entities: " + model.getEntities());
+      // System.out.println("Difference: " + difference);
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
+    }
   }
 
   private ArrayList<EntityLite> getFullSnapshot(ObjectInputStream fromServer) {
-	  ArrayList<EntityLite> fullSnapShot = null;
-	  
-	  try {
-		  fullSnapShot = (ArrayList<EntityLite>) fromServer.readObject();
-	  }
-	  catch (IOException ioe) {
-		  ioe.printStackTrace();
-	  }
-	  catch (ClassNotFoundException cnfe) {
-		  cnfe.printStackTrace();
-	  }
-	  
-	  return fullSnapShot;
+    ArrayList<EntityLite> fullSnapShot = null;
+
+    try {
+      fullSnapShot = (ArrayList<EntityLite>) fromServer.readObject();
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
+    }
+
+    return fullSnapShot;
   }
 
   /**
    * Should be called when the client clicks the 'Exit' button from the in-game menu. TODO
    */
   public void disconnect() {
-	if (tcpSocket != null && serverIP != null) {
+    if (tcpSocket != null && serverIP != null) {
       try {
         // Serialize a FALSE Boolean object (representing disconnect request) into byte array
-  		Boolean disconnectRequest = new Boolean(false);
-  		ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
-  		ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
-  		
-  		// Send the disconnect request
-  		toServer.writeObject(disconnectRequest);
-  		
+        Boolean disconnectRequest = new Boolean(false);
+        ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
+        ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
+
+        // Send the disconnect request
+        toServer.writeObject(disconnectRequest);
+
         // Reset the socket, serverIP and client-side threads after disconnecting
         tcpSocket = null;
         serverIP = null;
-      }
-      catch (IOException ioe) {
+      } catch (IOException ioe) {
         ioe.printStackTrace();
       }
     }

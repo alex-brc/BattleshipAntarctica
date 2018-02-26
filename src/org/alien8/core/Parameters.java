@@ -12,7 +12,7 @@ package org.alien8.core;
  * 
  */
 public class Parameters {
-	public static final boolean RENDER_BOX = true;
+  public static final boolean RENDER_BOX = true;
 
   /**
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
@@ -22,10 +22,9 @@ public class Parameters {
   /**
    * Size of map hitboxes
    */
-  public static final int MAP_BOX_SIZE = 32;
+  public static final int MAP_BOX_SIZE = 1;
   /**
-   * How many ice pixels must be in a box to be considered an ice entity (%).
-   * This is in [0,1]
+   * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
    */
   public static final double ICE_BOX_DENSITY = 0.7;
   /**

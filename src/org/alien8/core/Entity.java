@@ -1,7 +1,6 @@
 package org.alien8.core;
 
 import java.io.Serializable;
-
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
@@ -36,16 +35,16 @@ public abstract class Entity implements Serializable, Cloneable {
    */
   public Entity(Position position, double direction, double speed, double mass, double length,
       double width) {
-	this.position = position;
-	this.properties.setDirection(direction);
-	this.properties.setSpeed(speed);
-	this.properties.setMass(mass);
-	this.properties.setLength(length);
-	this.properties.setWidth(width);
-	
-	initObb();
+    this.position = position;
+    this.properties.setDirection(direction);
+    this.properties.setSpeed(speed);
+    this.properties.setMass(mass);
+    this.properties.setLength(length);
+    this.properties.setWidth(width);
+
+    initObb();
   }
-  
+
   /**
    * @return the position in XY coordinates
    */
@@ -65,10 +64,10 @@ public abstract class Entity implements Serializable, Cloneable {
   }
 
   public void setSerial(long serial) {
-	  if (this.serial == -1) {
-	      this.serial = serial;
-	    }
-	    // Only works once.
+    if (this.serial == -1) {
+      this.serial = serial;
+    }
+    // Only works once.
 
   }
 
@@ -152,7 +151,7 @@ public abstract class Entity implements Serializable, Cloneable {
   public void damage(double damage) {
     this.setHealth(this.getHealth() - damage);
   }
-  
+
   public boolean isPlayer() {
     if (this.getSerial() == 1)
       return true;
@@ -169,60 +168,62 @@ public abstract class Entity implements Serializable, Cloneable {
 
   public abstract void dealWithOutOfBounds();
 
+  public abstract void dealWithInIce(boolean[][] iceGrid);
+
   public double getHealth() {
-	  return this.attributes.getHealth();
+    return this.attributes.getHealth();
   }
 
   public void setHealth(double health) {
-	  this.attributes.setHealth(health);
+    this.attributes.setHealth(health);
   }
-  
+
   public double getMass() {
-	  return this.properties.getMass();
+    return this.properties.getMass();
   }
 
   public void setMass(double mass) {
-	  this.properties.setMass(mass);
+    this.properties.setMass(mass);
   }
 
   public double getSpeed() {
-	  return this.properties.getSpeed();
+    return this.properties.getSpeed();
   }
 
   public void setSpeed(double speed) {
-	  this.properties.setSpeed(speed);
+    this.properties.setSpeed(speed);
   }
 
   public double getDirection() {
-	  return this.properties.getDirection();
+    return this.properties.getDirection();
   }
 
   public void setDirection(double direction) {
-	  this.properties.setDirection(direction);
+    this.properties.setDirection(direction);
   }
 
   public double getLength() {
-	  return this.properties.getLength();
+    return this.properties.getLength();
   }
 
   public void setLength(double length) {
-	  this.properties.setLength(length);
+    this.properties.setLength(length);
   }
 
   public double getWidth() {
-	  return this.properties.getWidth();
+    return this.properties.getWidth();
   }
 
   public void setWidth(double width) {
-	  this.properties.setWidth(width);
+    this.properties.setWidth(width);
   }
 
   public Position[] getObb() {
-	  return obb;
+    return obb;
   }
-  
+
   @Override
   public Object clone() throws CloneNotSupportedException {
-      return super.clone();
+    return super.clone();
   }
 }

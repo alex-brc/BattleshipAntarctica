@@ -10,7 +10,7 @@ import org.alien8.rendering.Sprite;
 
 /**
  * Developer's notes:
-
+ * 
  * 
  * All calculations relative to the ship consider the ship "located" at the position right under the
  * center of mass of the ship. Turrets are moved together with it with that consideration in mind.
@@ -21,8 +21,8 @@ public class Ship extends Entity implements Serializable {
   private Turret frontTurret;
   private Turret rearTurret;
   private Turret midTurret;
-  
-  private Sprite sprite = Sprite.ship_green; //for now
+
+  private Sprite sprite = Sprite.ship_green; // for now
 
   public Ship(Position position, double direction) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
@@ -98,10 +98,7 @@ public class Ship extends Entity implements Serializable {
     // the tip of the ship.
     double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
 
-    frontTurret
-    .setPosition(
-    		this.getPosition()
-    		.addPosition(
+    frontTurret.setPosition(this.getPosition().addPosition(
         new Position(r * Math.cos(this.getDirection()), r * Math.sin(this.getDirection()))));
 
     rearTurret.setPosition(this.getPosition().addPosition(
@@ -115,7 +112,7 @@ public class Ship extends Entity implements Serializable {
     // r.drawRect((int) this.getObb()[0].getX(), (int) this.getObb()[0].getY(), (int)
     // this.getLength(),
     // (int) this.getWidth(), 0xFF0000, false);
-	
+
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
       // Color front two points blue
@@ -131,8 +128,9 @@ public class Ship extends Entity implements Serializable {
     }
 
     // Render turrets
-	Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI/2));
-    r.drawSprite((int)position.getX() - currentSprite.getWidth()/2, (int)position.getY() - currentSprite.getHeight()/2, currentSprite, false);
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);
@@ -174,62 +172,112 @@ public class Ship extends Entity implements Serializable {
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
   }
-  
+
+  public void dealWithInIce(boolean[][] iceGrid) {
+    double direction = getDirection();
+    double shipX = getPosition().getX();
+    double shipY = getPosition().getY();
+
+    for (Position corner : this.getObb()) {
+      // System.out.println("Position: " + corner);
+      int x = (int) Math.rint(corner.getX());
+      int y = (int) Math.rint(corner.getY());
+      // System.out.println("Rounded X: " + x + "Y: " + y);
+
+      try {
+        if (iceGrid[y][Parameters.MAP_WIDTH - x] == true) {
+          System.out.println("Collision with ice");
+          int xdiff = 0;
+          int ydiff = 0;
+
+          while (iceGrid[x++][y++] == true) {
+            xdiff++;
+            ydiff++;
+          }
+          setPosition(new Position(shipX + xdiff, shipY + ydiff));
+          translateObb(xdiff, ydiff);
+          /*
+           * if (direction >= 0 && direction < Math.PI / 4) { setPosition(new Position(shipX, shipY
+           * + 1)); System.out.println("1"); this.translateObb(0, 1); } else if (direction >=
+           * Math.PI / 4 && direction < Math.PI / 2) { setPosition(new Position(shipX - 1, shipY));
+           * System.out.println("2"); this.translateObb(-1, 0); } else if (direction >= Math.PI / 2
+           * && direction < 3 * Math.PI / 4) { setPosition(new Position(shipX - 1, shipY));
+           * System.out.println("3"); this.translateObb(-1, 0); } else if (direction >= 3 * Math.PI
+           * / 4 && direction < Math.PI) { setPosition(new Position(shipX, shipY - 1));
+           * System.out.println("4"); this.translateObb(0, -1); } else if (direction >= Math.PI &&
+           * direction < 5 * Math.PI / 4) { setPosition(new Position(shipX, shipY - 1));
+           * System.out.println("5"); this.translateObb(0, -1); } else if (direction >= 5 * Math.PI
+           * / 4 && direction < 3 * Math.PI / 2) { setPosition(new Position(shipX + 1, shipY));
+           * System.out.println("6"); this.translateObb(1, 0); } else if (direction >= 3 * Math.PI /
+           * 2 && direction < 7 * Math.PI / 4) { setPosition(new Position(shipX + 1, shipY));
+           * System.out.println("7"); this.translateObb(1, 0); } else if (direction >= 7 * Math.PI /
+           * 4 && direction < Math.PI) { setPosition(new Position(shipX, shipY + 1));
+           * System.out.println("8"); this.translateObb(0, 1); }
+           */
+        }
+      } catch (ArrayIndexOutOfBoundsException e) {
+        // This happens if the entity touches the edge of the map
+      }
+    }
+  }
+
   public Turret getFrontTurret() {
-	  return this.frontTurret;
+    return this.frontTurret;
   }
-  
+
   public Turret getMidTurret() {
-	  return this.midTurret;
+    return this.midTurret;
   }
-  
+
   public Turret getRearTurret() {
-	  return this.rearTurret;
+    return this.rearTurret;
   }
 
   public double getFrontTurretDirection() {
-	  return frontTurret.getDirection();
+    return frontTurret.getDirection();
   }
 
   public double getRearTurretDirection() {
-	  return rearTurret.getDirection();
+    return rearTurret.getDirection();
   }
 
   public double getMidTurretDirection() {
-	  return midTurret.getDirection();
+    return midTurret.getDirection();
   }
 
   public void frontTurretCharge() {
-	  frontTurret.charge();
+    frontTurret.charge();
   }
 
   public void midTurretCharge() {
-	  midTurret.charge();
+    midTurret.charge();
   }
 
   public void rearTurretCharge() {
-	  rearTurret.charge();
+    rearTurret.charge();
   }
 
   public void frontTurretShoot() {
-	  frontTurret.shoot();
+    frontTurret.shoot();
   }
 
   public void midTurretShoot() {
-	  midTurret.shoot();
+    midTurret.shoot();
   }
 
   public void rearTurretShoot() {
-	  rearTurret.shoot();
+    rearTurret.shoot();
   }
-  
+
   public boolean equals(Ship s) {
-	  return this.getSerial() == s.getSerial() && this.getPosition().equals(s.getPosition()) && this.isToBeDeleted() == s.isToBeDeleted() && 
-			 this.getMass() == s.getMass() && this.getSpeed() == s.getSpeed() && this.getDirection() == s.getDirection() && 
-			 this.getLength() == s.getLength() && this.getWidth() == s.getWidth() && this.getHealth() == s.getHealth();
+    return this.getSerial() == s.getSerial() && this.getPosition().equals(s.getPosition())
+        && this.isToBeDeleted() == s.isToBeDeleted() && this.getMass() == s.getMass()
+        && this.getSpeed() == s.getSpeed() && this.getDirection() == s.getDirection()
+        && this.getLength() == s.getLength() && this.getWidth() == s.getWidth()
+        && this.getHealth() == s.getHealth();
   }
-  
+
   public String toString() {
-	  return "Ship " + this.getSerial() + "," + this.getPosition();
+    return "Ship " + this.getSerial() + "," + this.getPosition();
   }
 }
