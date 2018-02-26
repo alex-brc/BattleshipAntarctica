@@ -16,7 +16,7 @@ public class Launcher {
 	public static Launcher instance;
 	private String loadStatus;
 	private Renderer renderer;
-	private String serverIPstr = "172.22.35.217";
+	private String serverIPstr = "192.168.0.16";
 	private Client game;
 	
 	private Launcher() {
@@ -79,7 +79,7 @@ public class Launcher {
 		System.out.println("Connecting to " + serverIPstr + "...");
 		LogManager.getInstance().log("Networking", LogManager.Scope.INFO, "Connecting to host at " + serverIPstr + "...");
 		if(!game.connect(serverIPstr)) {
-			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Connection failed. Is a server running?");
+			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Connection failed.");
 			System.out.println("Connection failed. Are you running a server?");
 			System.exit(-1);
 		}

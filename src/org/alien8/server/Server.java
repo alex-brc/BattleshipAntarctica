@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -34,9 +35,11 @@ public class Server {
 	private static InetAddress hostIP = null;
 	private static ServerSocket tcpSocket = null;
 	private static DatagramSocket udpSocket = null;
+	private static DatagramSocket eventSocket = null;
 	private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
 	private static ModelManager model = ModelManager.getInstance();
 	private static ArrayList<Player> playerList = new ArrayList<Player>();
+	private static LinkedList<AudioEvent> audioEvents = new LinkedList<AudioEvent>();
 	private static boolean run = true;
 	
 	public static void main(String[] args) {
@@ -45,10 +48,13 @@ public class Server {
 			setHostIP();
 			tcpSocket = new ServerSocket(4446, 50, hostIP);
 			udpSocket = new DatagramSocket(4446, hostIP);
+			eventSocket = new DatagramSocket(4447, hostIP);
 			System.out.println("TCP socket Port: " + tcpSocket.getLocalPort());
 			System.out.println("TCP socket IP: " + tcpSocket.getInetAddress());
 			System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
 			System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
+			System.out.println("UDP event socket Port: " + eventSocket.getLocalPort());
+			System.out.println("UDP event socket IP: " + eventSocket.getLocalAddress());
 			
 			initializeGameState();
 			
@@ -188,10 +194,13 @@ public class Server {
 			sendFullSnapshot(clientIP, toClient, model.getEntities());
 			
 			// Create a dedicated thread for receiving client's input and sending game state to client
-			ClientHandler ch = new ClientHandler(udpSocket, clientIP, lastSyncedEntities);
+			ClientHandler ch = new ClientHandler(udpSocket, eventSocket, clientIP, lastSyncedEntities);
 			// TODO: ADD NAMES TO PLAYERS
 			playerList.add(new Player(clientIP, s, ch, "NO_NAMES_YET"));
-
+			
+			// Get relevant port and IP information
+			ch.init();
+			
 			// Start the dedicated thread
 			ch.start();
 		}
@@ -264,6 +273,16 @@ public class Server {
 		LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL, "Bullet source ship does not exist. Exiting...");
 		System.exit(-1);
 		return null;
+	}
+	
+	public static AudioEvent getAudioEvent() {
+		if(audioEvents.size() == 0)
+			return null;
+		return audioEvents.removeFirst();
+	}
+	
+	public static void addAudioEvent(AudioEvent audioEvent) {
+		audioEvents.add(audioEvent);
 	}
 	
 	/**

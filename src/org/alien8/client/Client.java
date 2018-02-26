@@ -20,6 +20,7 @@ import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
 import org.alien8.score.ScoreBoard;
+import org.alien8.server.AudioEvent;
 import org.alien8.ship.Ship;
 import org.alien8.util.ClientShutdownHook;
 import org.alien8.util.LogManager;
@@ -33,7 +34,8 @@ public class Client implements Runnable {
   private ModelManager model;
   private int FPS = 0;
   private Socket tcpSocket = null;
-  private static DatagramSocket udpSocket = null;
+  private DatagramSocket udpSocket = null;
+  private DatagramSocket eventSocket = null;
   private InetAddress serverIP = null;
   private String serverIPstr;
   private ScoreBoard scoreBoard;
@@ -72,15 +74,11 @@ public class Client implements Runnable {
   }
 
   /**
-   *  ---------   DEPRECATED  -----------
-   * A version of this is used and ran on the server.
-   * 
    * The main loop of the game. A common way to implement it. This implementation basically allows
    * the renderer to do it's job separately from the update() method. If a certain computer tends to
    * be slower on the render() side, then it can perform more fixed time updates in between frames
    * to compensate. Faster computers wouldn't see any improvement.
    */
-  @Deprecated
   @Override
   public void run() {
 	  // Game loop goes here
@@ -107,6 +105,7 @@ public class Client implements Runnable {
 		  // Call update() as many times as needed to compensate before rendering
 		  while (catchUp >= 1) {
 			  this.sendInputSample();
+			  this.receiveEvents();
 			  this.receiveAndUpdate();
 			  tickRate++;
 			  catchUp--;
@@ -170,8 +169,10 @@ public class Client implements Runnable {
 		serverIP = InetAddress.getByName(serverIPStr);
 		tcpSocket = new Socket(serverIP, 4446);
 		
-		System.out.println("ok");
+		System.out.println("Connected");
+		LogManager.getInstance().log("Networking", LogManager.Scope.INFO, "Succesfully connected to server.");
 		udpSocket = new DatagramSocket();
+		eventSocket = new DatagramSocket();
 		
 		// Serialize a TRUE Boolean object (representing connect request) into byte array 
 		Boolean connectRequest = new Boolean(true);
@@ -188,6 +189,16 @@ public class Client implements Runnable {
 		// Client's Ship is stored at the end of the synced entities queue
 		Object[] entitiesArr = model.getEntities().toArray();
 		model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
+		
+		// Perform initial handshake with ClientHandler
+		try {
+			sendDummyPacket(udpSocket, 4446);
+			sendDummyPacket(eventSocket, 4447);
+		}
+		catch(IOException e) {
+			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in a socket: " + e.toString());
+			System.exit(-1);
+		}
   	  }
 	  catch (BindException e) {
 		  LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Could not bind to any port. Firewalls?\n" + e.toString());
@@ -213,8 +224,24 @@ public class Client implements Runnable {
 	return false;
   }
   
+  private void sendDummyPacket(DatagramSocket udp, int destPort) throws IOException {
+
+	  // Serialize the input sample object into byte array 
+	  ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+	  ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+	  Boolean dummy = new Boolean(false);
+	  objOut.writeObject(dummy);
+	  byte[] clientInputSampleByte = byteOut.toByteArray();
+
+	  // Create a packet for holding the input sample byte data
+	  DatagramPacket packet = new DatagramPacket(clientInputSampleByte, clientInputSampleByte.length, serverIP, destPort);
+
+	  // Send the client input sample packet to the server
+	  udp.send(packet);
+
+  }
+  
   private void sendInputSample() {
-	  
 	  try {
 			// Serialize the input sample object into byte array 
 			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -233,6 +260,34 @@ public class Client implements Runnable {
 			ioe.printStackTrace();
 		}
   }
+  public void receiveEvents() {
+	  try {
+			// Create a packet for receiving difference packet
+		    byte[] buf = new byte[65536];
+		    DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
+		    
+		    eventSocket.receive(eventPacket);
+		    byte[] eventBytes = eventPacket.getData();
+		    
+		    // Deserialize the event data into object
+		    ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
+		    ObjectInputStream objIn = new ObjectInputStream(byteIn);
+		    AudioEvent event = (AudioEvent) objIn.readObject();
+		    
+		    // Send audio events to AudioManager
+			System.out.println(event);
+		    if(event != null) {
+				System.out.println(event + "OK");
+		    	AudioManager.getInstance().addEvent((AudioEvent) event);
+		    }
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+  }
   
   /*
    * Receive the game state difference from the server and sync the game state with the server
@@ -242,7 +297,7 @@ public class Client implements Runnable {
 			// Create a packet for receiving difference packet
 		    byte[] buf = new byte[65536];
 		    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-		    
+		     
 		    // Receive a difference packet and obtain the byte data
 		    udpSocket.receive(packet);
 		    byte[] differenceByte = packet.getData();
@@ -254,8 +309,6 @@ public class Client implements Runnable {
 		    
 		    // Sync the game state with server
 		    ModelManager.getInstance().sync(difference);
-		    // System.out.println("Entities: " + model.getEntities());
-		    // System.out.println("Difference: " + difference);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -304,4 +357,5 @@ public class Client implements Runnable {
       }
     }
   }
+  
 }
