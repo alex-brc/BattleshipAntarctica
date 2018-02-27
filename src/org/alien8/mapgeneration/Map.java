@@ -16,6 +16,7 @@ public class Map{
 	protected int widthDensity;
 	protected boolean[][] iceGrid;
 	protected List<AABB> roughAABBs = new ArrayList<AABB>();
+	protected seed;
 	
 	public Map(){ // Basic constructor - probably won't be used
 		length = 0;
@@ -24,11 +25,12 @@ public class Map{
 		widthDensity = 0;
 	}
 	
-	public Map(int l, int w, int lD, int wD){ 
+	public Map(int l, int w, int lD, int wD, long s){ 
 		length = l;
 		width = w;
 		lengthDensity = lD;
 		widthDensity = wD;
+		seed = s;
 		//Map is a 2-D array depicting if each pixel is either ice or water (True = ice, False = water)
 		iceGrid = new boolean[l][w];
 		makeMap(); //Actually generates the Map using the PerlinNoise class
@@ -38,7 +40,7 @@ public class Map{
 	protected void makeMap(){
 		double waterLevel = Parameters.WATER_LEVEL; //Defines the cut-off point for water or ice
 		//Gets a noise grid from the PerlinNoise class
-		double[][] noiseGrid = PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity);
+		double[][] noiseGrid = PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity, seed);
 		//Loops over all the pixels setting them to either ice (True) or water (False) based on the water level
 		for (int y = 0; y < width; y++){
 			for (int x = 0; x < length; x++){
