@@ -159,7 +159,7 @@ public class Server {
       }
 
       // Setup client's ship
-      Ship s = new Ship(new Position(randomX, randomY), 0);
+      Ship s = new Ship(new Position(200, 200), 0);
       model.addEntity(s);
 
       // Update the last synced set of entities right before sending a full snapshot to client for

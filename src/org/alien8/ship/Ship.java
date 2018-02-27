@@ -1,6 +1,8 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
@@ -178,24 +180,63 @@ public class Ship extends Entity implements Serializable {
     double shipX = getPosition().getX();
     double shipY = getPosition().getY();
 
-    for (Position corner : this.getObb()) {
+    // System.out.println("Ship " + getPosition());
+    Position[] obb = this.getObb();
+
+    for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
+      // for (Position corner: getObb()) {
+      Position corner = (Position) iterator.next();
       // System.out.println("Position: " + corner);
       int x = (int) Math.rint(corner.getX());
       int y = (int) Math.rint(corner.getY());
       // System.out.println("Rounded X: " + x + "Y: " + y);
 
       try {
-        if (iceGrid[y][Parameters.MAP_WIDTH - x] == true) {
+        if (iceGrid[x][y]) {
           System.out.println("Collision with ice");
-          int xdiff = 0;
-          int ydiff = 0;
+          int posXdiff = findDiff(iceGrid, x, y, 1, 0);
+          int posYdiff = findDiff(iceGrid, x, y, 0, 1);
+          int negXdiff = findDiff(iceGrid, x, y, -1, 0);
+          int negYdiff = findDiff(iceGrid, x, y, 0, -1);
 
-          while (iceGrid[x++][y++] == true) {
-            xdiff++;
-            ydiff++;
+          // System.out.println("posx = " + posXdiff);
+          // System.out.println("negx = " + negXdiff);
+
+          int xdiff;
+          int ydiff;
+
+          if (posXdiff >= negXdiff) {
+            xdiff = -negXdiff;
+          } else {
+            xdiff = posXdiff;
           }
-          setPosition(new Position(shipX + xdiff, shipY + ydiff));
-          translateObb(xdiff, ydiff);
+
+          if (posYdiff >= negYdiff) {
+            ydiff = -negYdiff;
+          } else {
+            ydiff = posYdiff;
+          }
+
+          if (Math.abs(xdiff) >= Math.abs(ydiff)) {
+            setPosition(new Position(shipX, shipY + ydiff));
+            translateObb(0, ydiff);
+            setSpeed(getSpeed() / 2);
+          } else {
+            setPosition(new Position(shipX + xdiff, shipY));
+            translateObb(xdiff, 0);
+            setSpeed(getSpeed() / 2);
+          }
+
+          // obb = this.getObb();
+
+          // break;
+
+          // while (iceGrid[x++][y++] == true) {
+          // xdiff++;
+          // ydiff++;
+          // }
+          // setPosition(new Position(shipX + xdiff, shipY + ydiff));
+          // translateObb(xdiff, ydiff);
           /*
            * if (direction >= 0 && direction < Math.PI / 4) { setPosition(new Position(shipX, shipY
            * + 1)); System.out.println("1"); this.translateObb(0, 1); } else if (direction >=
@@ -219,6 +260,26 @@ public class Ship extends Entity implements Serializable {
         // This happens if the entity touches the edge of the map
       }
     }
+  }
+
+  /**
+   * 
+   * @param iceGrid a 2-dimensional boolean array which represents the map
+   * @param x the Position of the Ship in x
+   * @param y the Position of the Ship in x
+   * @param i the difference amount in x
+   * @param j the difference amount in y
+   * @return
+   */
+  private int findDiff(boolean[][] iceGrid, int x, int y, int i, int j) {
+    int diff = 0;
+    while (iceGrid[x][y]) {
+      diff++;
+      x += i;
+      y += j;
+      // System.out.println(x);
+    }
+    return diff;
   }
 
   public Turret getFrontTurret() {

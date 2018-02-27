@@ -79,14 +79,14 @@ public abstract class Bullet extends Entity implements Serializable {
 
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
-    // int x = (int) Math.rint(getPosition().getX());
-    // int y = (int) Math.rint(getPosition().getY());
-    // try {
-    // if (iceGrid[x][y] == true) {
-    // this.delete();
-    // }
-    // } catch (ArrayIndexOutOfBoundsException e) {
-    // // This happens if the entity touches the edge of the map
-    // }
+    int x = (int) Math.rint(getPosition().getX());
+    int y = (int) Math.rint(getPosition().getY());
+    try {
+      if (iceGrid[x][y] == true) {
+        this.delete();
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      // This happens if the entity touches the edge of the map
+    }
   }
 }

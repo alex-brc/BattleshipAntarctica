@@ -2,6 +2,7 @@ package org.alien8.mapgeneration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import org.alien8.core.Parameters;
 import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
@@ -36,14 +37,42 @@ public class Map {
   protected void makeMap() {
     double waterLevel = Parameters.WATER_LEVEL; // Defines the cut-off point for water or ice
     // Gets a noise grid from the PerlinNoise class
-    double[][] noiseGrid =
-        PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity);
-    // Loops over all the pixels setting them to either ice (True) or water (False) based on the
-    // water level
-    for (int y = 0; y < width; y++) {
-      for (int x = 0; x < length; x++) {
-        boolean isIce = (noiseGrid[x][y] <= waterLevel);
-        iceGrid[x][y] = isIce;
+    // double[][] noiseGrid =
+    // PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity);
+    // // Loops over all the pixels setting them to either ice (True) or water (False) based on the
+    // // water level
+    // for (int y = 0; y < width; y++) {
+    // for (int x = 0; x < length; x++) {
+    // boolean isIce = (noiseGrid[x][y] <= waterLevel);
+    // iceGrid[x][y] = isIce;
+    // }
+    // }
+
+    // JAMES CHANGES FOR TESTING TERRAIN COLLISIONS
+    for (int i = 0; i < 10; i++) {
+      int start = ThreadLocalRandom.current().nextInt(1000) + 150;
+      int width = ThreadLocalRandom.current().nextInt(200);
+      int height = ThreadLocalRandom.current().nextInt(200);
+
+      for (int y = start; y < start + height; y++) {
+        for (int x = start; x < start + width; x++) {
+          iceGrid[x][y] = true;
+        }
+      }
+    }
+    // for (int y = 10; y < 100; y++) {
+    // for (int x = 10; x < 100; x++) {
+    // iceGrid[x][y] = true;
+    // }
+    // }
+    // for (int y = 220; y < 400; y++) {
+    // for (int x = 100; x < 200; x++) {
+    // iceGrid[x][y] = true;
+    // }
+    // }
+    for (int y = 100; y < 300; y++) {
+      for (int x = 50; x < 100; x++) {
+        iceGrid[x][y] = true;
       }
     }
   }
