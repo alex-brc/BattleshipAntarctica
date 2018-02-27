@@ -31,6 +31,12 @@ public class ClientInputSample implements Serializable {
 		escPressed = InputManager.getInstance().escPressed();
 	}
 	
+	public boolean equals(ClientInputSample cis) {
+		return mousePosition.equals(cis.mousePosition) && lmbPressed == cis.lmbPressed && rmbPressed == cis.rmbPressed && 
+				wPressed == cis.wPressed && aPressed == cis.aPressed && sPressed == cis.sPressed && dPressed == cis.dPressed && 
+				spacePressed == cis.spacePressed && escPressed == cis.escPressed;
+	}
+	
 	public String toString() {
 		return mousePosition.getX() + "," + mousePosition.getY() + "," + lmbPressed + "," + rmbPressed + "," +
 			   wPressed + "," + aPressed + "," + sPressed + "," + dPressed + "," + spacePressed;

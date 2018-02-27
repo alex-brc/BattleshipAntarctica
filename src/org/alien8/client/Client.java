@@ -44,7 +44,6 @@ public class Client implements Runnable {
   private String groupIPStr = "224.0.0.5";
   private String serverIPstr = "192.168.0.15"; //<- change to the ip of the server to test
 
-
   public static void main(String[] args) {
 
     Client game = new Client();
@@ -99,12 +98,6 @@ public class Client implements Runnable {
       int tickRate = 0;
       long tickTimer = getTime();
       
-      try {
-		System.out.println("client connect to IP: " + InetAddress.getByName(serverIPstr));
-	  } 
-      catch (UnknownHostException e) {
-		e.printStackTrace();
-	  }
       this.connect(serverIPstr);
       while (running) {
         currentTime = getTime();
@@ -121,7 +114,7 @@ public class Client implements Runnable {
        while (catchUp >= 1) {
     	  this.sendInputSample();
           this.receiveAndUpdate();
-          System.out.println("Entities: " + ModelManager.getInstance().getEntities());
+          System.out.println("Client Entities: " + ModelManager.getInstance().getEntities());
           tickRate++;
           catchUp--;
           // Update last time
@@ -184,7 +177,6 @@ public class Client implements Runnable {
 		serverIP = InetAddress.getByName(serverIPStr);
 		tcpSocket = new Socket(serverIP, 4446);
 		udpSocket = new DatagramSocket();
-		System.out.println(udpSocket.getLocalPort());
 		
 		// Serialize the ClientRequest object
 		ClientRequest connectRequest = new ClientRequest(0, udpSocket.getLocalPort());
@@ -262,7 +254,6 @@ public class Client implements Runnable {
 		    
 		    // Sync the game state with server
 		    ModelManager.getInstance().sync(difference);
-//		    System.out.println("Client receive Entities: " + model.getEntities());
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();

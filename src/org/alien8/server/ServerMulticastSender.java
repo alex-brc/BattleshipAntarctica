@@ -56,8 +56,8 @@ public class ServerMulticastSender extends Thread{
 	        while (tick >= 1) {
 	        	readInputSample();
 				updateGameStateByCIS();
-				System.out.println("Entities: " + ModelManager.getInstance().getEntities());
 				sendGameState();
+				System.out.println("Server Entities: " + ModelManager.getInstance().getEntities());
 				tick--;
 				// Update last time
 				lastTime = System.nanoTime();
@@ -81,7 +81,6 @@ public class ServerMulticastSender extends Thread{
 		    ByteArrayInputStream byteIn = new ByteArrayInputStream(cisByte);
 		    ObjectInputStream objIn = new ObjectInputStream(byteIn);
 		    ClientInputSample cis = (ClientInputSample) objIn.readObject();
-//		    System.out.println("Input: " + packet.getAddress() + ", " + packet.getPort() + ", " + cis);
 		    
 		    // Identify which Player the CIS belongs to
 		    Player p = Server.getPlayerByIpAndPort(clientIP, clientPort);

@@ -7,12 +7,12 @@ import org.alien8.ship.Ship;
 public class Player {
 	
 	private InetAddress ip;
-	private int port;
+	private int udpPort;
 	private Ship ship;
 	
 	public Player(InetAddress ip, int port, Ship s) {
 		this.ip = ip;
-		this.port = port;
+		this.udpPort = port;
 		this.ship = s;
 	}
 
@@ -21,7 +21,7 @@ public class Player {
 	}
 	
 	public int getPort() {
-		return this.port;
+		return this.udpPort;
 	}
 	
 	public Ship getShip() {
@@ -29,7 +29,7 @@ public class Player {
 	}
 	
 	public String toString() {
-		return ip.getHostAddress() + ", " + port;
+		return ip.getHostAddress() + ", " + udpPort;
 	}
 
 }
