@@ -6,6 +6,9 @@ import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
+import com.craftanium.rain.graphics.Sprite;
+import com.craftanium.rain.graphics.SpriteSheet;
+
 public class Sprite implements Serializable {
 
 	private static final long serialVersionUID = -7826033026339264249L;
@@ -73,6 +76,28 @@ public class Sprite implements Serializable {
 		}
 		
 		return s;
+	}
+	
+	public static Sprite[] split(Sprite sheet, int size){
+		int total = (sheet.getWidth() * sheet.getHeight()) / (size * size);
+		Sprite[] sprites = new Sprite[total];
+		int current = 0;
+		int[] pixels = new int[size * size];
+		
+		for (int yp = 0; yp < sheet.getWidth() / sheet.SIZE; yp++){
+			for (int xp = 0; xp < sheet.tWidth / sheet.SIZE; xp++){
+				for (int y = 0; y < sheet.SIZE; y++){
+					for (int x = 0; x < sheet.SIZE; x++){
+						int xo = x + xp * sheet.SIZE;
+						int yo = y + yp * sheet.SIZE;
+						pixels[x+y*sheet.SIZE] = sheet.pixels[xo + yo * sheet.tWidth];
+					}
+				}
+				sprites[current++] = new Sprite(pixels, sheet.SIZE, sheet.SIZE);
+			}
+		}
+		
+		return sprites;
 	}
 	
 	private void load(){
