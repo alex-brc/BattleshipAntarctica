@@ -1,13 +1,6 @@
 package org.alien8.client;
 
-import java.awt.Dimension;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-
 import org.alien8.audio.AudioManager;
-import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
@@ -16,7 +9,7 @@ public class Launcher {
 	public static Launcher instance;
 	private String loadStatus;
 	private Renderer renderer;
-	private String serverIPstr = "172.22.35.217";
+	private String serverIPstr = "172.22.179.172";
 	private Client game;
 	
 	private Launcher() {

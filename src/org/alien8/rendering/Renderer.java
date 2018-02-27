@@ -88,6 +88,8 @@ public class Renderer extends Canvas {
 		e.render();
 	}
 	
+	drawText("Test", 50, 50, true);
+	
 	Graphics g = bs.getDrawGraphics(); //graphics object from buffer strategy
 	
 	g.setColor(Color.BLACK);
@@ -147,6 +149,10 @@ public class Renderer extends Canvas {
 			}
 		}
 	}
+  
+  public void drawText(String text, int x, int y, boolean fixed){
+	  Font.defaultFont.render(text, this, x, y, fixed);
+  }
   
   public void drawMap(boolean[][] grid){
 	int x0 = xScroll;

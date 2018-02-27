@@ -6,9 +6,6 @@ import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
-import com.craftanium.rain.graphics.Sprite;
-import com.craftanium.rain.graphics.SpriteSheet;
-
 public class Sprite implements Serializable {
 
 	private static final long serialVersionUID = -7826033026339264249L;
@@ -50,6 +47,13 @@ public class Sprite implements Serializable {
 		System.arraycopy(s.getPixels(), 0, pixels, 0, s.getPixels().length);
 	}
 	
+	public Sprite(int[] pixels, int width, int height){
+		this.pixels = new int[width*height];
+		System.arraycopy(pixels, 0, this.pixels, 0, pixels.length);
+		this.width = width;
+		this.height = height;
+	}
+	
 	public Sprite rotateSprite(double a){
 		Sprite s = new Sprite((int)(height * Math.abs(Math.sin(a)) + width * Math.abs(Math.cos(a))), (int)(height * Math.abs(Math.cos(a)) + width * Math.abs(Math.sin(a))));
 		double cx = (double)width / 2;
@@ -84,16 +88,16 @@ public class Sprite implements Serializable {
 		int current = 0;
 		int[] pixels = new int[size * size];
 		
-		for (int yp = 0; yp < sheet.getWidth() / sheet.SIZE; yp++){
-			for (int xp = 0; xp < sheet.tWidth / sheet.SIZE; xp++){
-				for (int y = 0; y < sheet.SIZE; y++){
-					for (int x = 0; x < sheet.SIZE; x++){
-						int xo = x + xp * sheet.SIZE;
-						int yo = y + yp * sheet.SIZE;
-						pixels[x+y*sheet.SIZE] = sheet.pixels[xo + yo * sheet.tWidth];
+		for (int yp = 0; yp < sheet.getWidth() / sheet.getHeight(); yp++){
+			for (int xp = 0; xp < sheet.getWidth() / size; xp++){
+				for (int y = 0; y < size; y++){
+					for (int x = 0; x < size; x++){
+						int xo = x + xp * size;
+						int yo = y + yp * size;
+						pixels[x+y*size] = sheet.pixels[xo + yo * sheet.getWidth()];
 					}
 				}
-				sprites[current++] = new Sprite(pixels, sheet.SIZE, sheet.SIZE);
+				sprites[current++] = new Sprite(pixels, size, size);
 			}
 		}
 		
