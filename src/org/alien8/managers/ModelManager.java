@@ -3,6 +3,7 @@ package org.alien8.managers;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.client.ClientInputSample;
@@ -15,6 +16,7 @@ import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
+import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
@@ -39,7 +41,6 @@ public class ModelManager {
   private Ship player;
 
   private ModelManager() {
-    // All setup should be done here, such as support for networking, etc.
     // Normally this exists only to defeat instantiation
 //    List<AABB> aabbs = map.getAABBs();
 //    for (AABB aabb : aabbs) {
@@ -80,7 +81,7 @@ public class ModelManager {
       // Handle player stuff
       if (ent == this.getPlayer()) {
         Ship player = (Ship) ent;
-        InputManager.getInstance().processInputs(player);
+        //InputManager.getInstance().processInputs(player);
       }
 
       // Update the position of the entity
@@ -97,7 +98,7 @@ public class ModelManager {
   /**
    * Server version of update()
    */
-  public void updateServer(InetAddress clientIP, ClientInputSample cis) {
+  public void updateServer(ConcurrentHashMap<Player,ClientInputSample> latestCIS) {
     // Loop through all the entities
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
@@ -109,47 +110,13 @@ public class ModelManager {
         continue;
       }
       // Handle player stuff
-      if (ent == Server.getPlayerByIp(clientIP).getShip()) {
-        Ship player = (Ship) ent;
-
-        // Apply forward OR backward force
-        if (cis.wPressed)
-          PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
-        else if (cis.sPressed)
-          PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
-              PhysicsManager.shiftAngle(player.getDirection() + Math.PI));
-
-        // Apply rotation
-        if (cis.aPressed)
-          PhysicsManager.rotateEntity(player,
-              (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-        if (cis.dPressed)
-          PhysicsManager.rotateEntity(player,
-              Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-
-        // Apply "friction"
-        PhysicsManager.applyFriction(player);
-
-        // Prepare for shooting
-        // Orientation
-        player.setTurretsDirection(cis.mousePosition);
-
-        if (cis.lmbPressed)
-          player.frontTurretCharge();
-        else
-          player.frontTurretShoot();
-
-        if (cis.rmbPressed)
-          player.rearTurretCharge();
-        else
-          player.rearTurretShoot();
-
-        if (cis.spacePressed)
-          player.midTurretCharge();
-        else
-          player.midTurretShoot();
+      for (Player p : latestCIS.keySet()) {
+        if (ent == p.getShip()) {
+          Ship s = (Ship) ent;
+          ClientInputSample cis = latestCIS.get(p);
+          InputManager.processInputs(s, cis);
+        }
       }
-
       // Update the position of the entity
       PhysicsManager.updatePosition(ent);
     }
@@ -160,6 +127,7 @@ public class ModelManager {
       c.resolveCollision();
     }
   }
+
 
   /**
    * Syncs the client with the server

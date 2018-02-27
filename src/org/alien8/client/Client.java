@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import org.alien8.ai.AIController;
+import org.alien8.core.ClientRequest;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.managers.ModelManager;
@@ -32,17 +33,16 @@ public class Client implements Runnable {
   private Thread thread;
   private Renderer renderer;
   private ModelManager model;
-  private int FPS = 0;
-  private Socket tcpSocket = null;
-  private static DatagramSocket udpSocket = null;
-  private InetAddress serverIP = null;
   private AIController aiPlayer;
-  private int clientMultiPort = 4445;
-  private int clientUdpPort = 4443;
+  private int FPS = 0;
+  private InetAddress serverIP = null;
   private InetAddress multiServerIP = null;
+  private int clientMultiPort = 4445;
+  private Socket tcpSocket = null;
+  private DatagramSocket udpSocket = null;
   private MulticastSocket multiReceiver = null;
-  private String group = "224.0.0.5";
-  private String  serverIPstr = "172.22.175.216"; //<- change to the ip of the server to test
+  private String groupIPStr = "224.0.0.5";
+  private String serverIPstr = "192.168.0.15"; //<- change to the ip of the server to test
 
 
   public static void main(String[] args) {
@@ -103,7 +103,6 @@ public class Client implements Runnable {
 		System.out.println("client connect to IP: " + InetAddress.getByName(serverIPstr));
 	  } 
       catch (UnknownHostException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	  }
       this.connect(serverIPstr);
@@ -122,6 +121,7 @@ public class Client implements Runnable {
        while (catchUp >= 1) {
     	  this.sendInputSample();
           this.receiveAndUpdate();
+          System.out.println("Entities: " + ModelManager.getInstance().getEntities());
           tickRate++;
           catchUp--;
           // Update last time
@@ -183,15 +183,11 @@ public class Client implements Runnable {
 	  try {
 		serverIP = InetAddress.getByName(serverIPStr);
 		tcpSocket = new Socket(serverIP, 4446);
-		udpSocket = new DatagramSocket(clientUdpPort, serverIP);
+		udpSocket = new DatagramSocket();
+		System.out.println(udpSocket.getLocalPort());
 		
-		// set up multicast socket client receiver
-		multiServerIP = InetAddress.getByName(group);
-		multiReceiver = new MulticastSocket(clientMultiPort);
-		multiReceiver.joinGroup(multiServerIP);
-		
-		// Serialize a TRUE Boolean object (representing connect request) into byte array 
-		Boolean connectRequest = new Boolean(true);
+		// Serialize the ClientRequest object
+		ClientRequest connectRequest = new ClientRequest(0, udpSocket.getLocalPort());
 		ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
 		ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
 		toServer.writeObject(connectRequest);
@@ -205,9 +201,14 @@ public class Client implements Runnable {
 		// Client's Ship is stored at the end of the synced entities queue
 		Object[] entitiesArr = model.getEntities().toArray();
 		model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
+		
+		// set up multicast socket client receiver
+		multiServerIP = InetAddress.getByName(groupIPStr);
+		multiReceiver = new MulticastSocket(clientMultiPort);
+		multiReceiver.joinGroup(multiServerIP);
   	  }
 	  catch (BindException be) {
-		  System.err.println("error");
+		  be.printStackTrace();
 	  }
 	  catch (SocketException se) {
 		  se.printStackTrace();
@@ -261,8 +262,7 @@ public class Client implements Runnable {
 		    
 		    // Sync the game state with server
 		    ModelManager.getInstance().sync(difference);
-		    System.out.println("client receive Entities: "  + model.getEntities());
-		    // System.out.println("Difference: " + difference);
+//		    System.out.println("Client receive Entities: " + model.getEntities());
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -304,6 +304,8 @@ public class Client implements Runnable {
   		
         // Reset the socket, serverIP and client-side threads after disconnecting
         tcpSocket = null;
+        udpSocket = null;
+        multiReceiver = null;
         serverIP = null;
       }
       catch (IOException ioe) {

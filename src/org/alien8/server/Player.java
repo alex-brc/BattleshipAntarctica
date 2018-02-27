@@ -6,39 +6,30 @@ import org.alien8.ship.Ship;
 
 public class Player {
 	
-	private InetAddress ip = null;
-	private Ship ship = null;
-	// add port number
-	private int port = 4400;
-	private ClientHandler ch = null;
+	private InetAddress ip;
+	private int port;
+	private Ship ship;
 	
-	public Player(InetAddress ip, Ship s, ClientHandler ch) {
+	public Player(InetAddress ip, int port, Ship s) {
 		this.ip = ip;
-		this.ship = s;
-		this.ch = ch;
-	}
-	
-	public Player(InetAddress ip, Ship s, int port, ClientHandler ch) {
-		this.ip = ip;
-		this.ship = s;
 		this.port = port;
-		this.ch = ch;
+		this.ship = s;
 	}
 
 	public InetAddress getIP() {
 		return this.ip;
 	}
 	
-	public Ship getShip() {
-		return this.ship;
-	}
-	
 	public int getPort() {
 		return this.port;
 	}
 	
-	public ClientHandler getClientHandler() {
-		return this.ch;
+	public Ship getShip() {
+		return this.ship;
+	}
+	
+	public String toString() {
+		return ip.getHostAddress() + ", " + port;
 	}
 
 }

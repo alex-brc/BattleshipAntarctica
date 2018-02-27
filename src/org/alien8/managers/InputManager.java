@@ -1,4 +1,3 @@
-
 package org.alien8.managers;
 
 import java.awt.event.KeyEvent;
@@ -7,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import org.alien8.client.ClientInputSample;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
@@ -44,44 +44,46 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 		return instance;
 	}
 	
-	public void processInputs(Ship player) {
+	public static void processInputs(Ship player, ClientInputSample cis) {
         // Apply forward OR backward force
-        if (this.wPressed())
+        if (cis.wPressed)
           PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
-        else if (this.sPressed())
+        else if (cis.sPressed)
           PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
               PhysicsManager.shiftAngle(player.getDirection() + Math.PI));
-        
+
         // Apply rotation
-        if (this.aPressed())
+        if (cis.aPressed)
           PhysicsManager.rotateEntity(player,
               (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-        if (this.dPressed())
+        if (cis.dPressed)
           PhysicsManager.rotateEntity(player,
               Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 
         // Apply "friction"
         PhysicsManager.applyFriction(player);
-        
+
         // Prepare for shooting
         // Orientation
-        player.setTurretsDirection(this.mousePosition());
+        player.setTurretsDirection(cis.mousePosition);
 
-        if (this.lmbPressed())
+        if (cis.lmbPressed)
           player.frontTurretCharge();
         else
           player.frontTurretShoot();
 
-        if (this.rmbPressed())
+        if (cis.rmbPressed)
           player.rearTurretCharge();
         else
           player.rearTurretShoot();
 
-        if (this.spacePressed())
+        if (cis.spacePressed)
           player.midTurretCharge();
         else
           player.midTurretShoot();
+
 	}
+
 	
 	/**
 	 * @return true if left mouse button is pressed, false otherwise

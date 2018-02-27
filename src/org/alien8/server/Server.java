@@ -8,17 +8,17 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.alien8.client.ClientInputSample;
+import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
@@ -31,41 +31,27 @@ import org.alien8.ship.SmallBullet;
 public class Server {
 	
 	private static InetAddress hostIP = null;
+	private static InetAddress groupIP = null;
+	private static String groupIPStr = "224.0.0.5"; // multicast group ipString
 	private static ServerSocket tcpSocket = null;
 	private static DatagramSocket udpSocket = null;
 	private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
+	private static ConcurrentHashMap<Player, ClientInputSample> latestCIS = new ConcurrentHashMap<Player, ClientInputSample>();
 	private static ModelManager model = ModelManager.getInstance();
 	private static ArrayList<Player> playerList = new ArrayList<Player>();
-	private static boolean run = true;
-	private static int clientMultiPort = 4445; // multicast client port
-	private static MulticastSocket multiSocket = null;
-	private static InetAddress multiIP = null;
-	private static String group = "224.0.0.5"; // multicast group ipString
+	private static int serverPort = 4446;
+	private static int clientMultiCastPort = 4445;
+	private static volatile boolean run = true;
 	
 	public static void main(String[] args) {
 		try {
 			setHostIP();
-			tcpSocket = new ServerSocket(4446, 50, hostIP);
-			udpSocket = new DatagramSocket(4446, hostIP);
+			tcpSocket = new ServerSocket(serverPort, 50, hostIP);
+			udpSocket = new DatagramSocket(serverPort, hostIP);
 			System.out.println("TCP socket Port: " + tcpSocket.getLocalPort());
 			System.out.println("TCP socket IP: " + tcpSocket.getInetAddress());
 			System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
 			System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
-			
-			// set up multicast socket
-			multiIP = InetAddress.getByName(group) ;		
-			multiSocket = new MulticastSocket(clientMultiPort);  
-			multiSocket.setTimeToLive(1);  
-			multiSocket.joinGroup(multiIP);  
-			System.out.println("Multicast socket Port: " + clientMultiPort);
-			System.out.println("Multicast socket IP: " + group);
-			
-			ServerMulticastSender sms = new ServerMulticastSender(multiSocket, lastSyncedEntities, group,clientMultiPort);
-			//sgssList.add(sms);
-			sms.start();	         
-			System.out.println("server sender (multicast) started");
-
-			initializeGameState();
 			
 			// Process clients' connect/disconnect request
 			while (run) {
@@ -75,13 +61,12 @@ public class Server {
 				InetAddress clientIP = client.getInetAddress();
 				ObjectInputStream fromClient = new ObjectInputStream(client.getInputStream());
 				ObjectOutputStream toClient = new ObjectOutputStream(client.getOutputStream());
-				Boolean clientRequest = (Boolean) fromClient.readObject();
-			    processClientRequest(clientIP, clientRequest, toClient);
+				ClientRequest cr = (ClientRequest) fromClient.readObject();
+			    processClientRequest(clientIP, cr, toClient);
 			}
 			
 			tcpSocket.close();
 			udpSocket.close();
-			multiSocket.close();
 		}
 		catch (SocketException e) {
 			e.printStackTrace();
@@ -100,27 +85,27 @@ public class Server {
 	    model.addEntity(notPlayer);
 	}
 	
-	public static void processClientRequest(InetAddress clientIP, Boolean clientRequest, ObjectOutputStream toClient) {
-		if (clientRequest) { // Connect request
-			setupClient(clientIP, toClient);
+	public static void processClientRequest(InetAddress clientIP, ClientRequest cr, ObjectOutputStream toClient) {
+		if (cr.getType() == 0) { // Connect request
+			setupClient(clientIP, cr.getUdpPort(), toClient);
 		}
-		else if (!clientRequest) { // Disconnect Request
-			disconnectPlayer(clientIP);
+		else if (cr.getType() == 1) { // Disconnect Request
+			disconnectPlayer(clientIP, cr.getUdpPort());
 		}
 	}
 	
-	public static boolean isClientConnected(InetAddress clientIP) {
+	public static boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
 		for (Player p : playerList) {
-			if (p.getIP().equals(clientIP)) {
+			if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static Player getPlayerByIp(InetAddress clientIP) {
+	public static Player getPlayerByIpAndPort(InetAddress clientIP, int clientPort) {
 		for (Player p : playerList) {
-			if (p.getIP().equals(clientIP)) {
+			if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
 				return p;
 			}
 		}	
@@ -129,40 +114,16 @@ public class Server {
 	
 	public static void setHostIP() {
 		try {
-			// Obtain an host IP reachable by the client
-//			Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
-//		    while (nis.hasMoreElements()) {
-//		        NetworkInterface nic = nis.nextElement();
-//		        String niName = nic.getName();
-//		        
-//		        if (niName.equals("eth1") || niName.equals("wlan1")) {
-//		        	Enumeration<InetAddress> addrs = nic.getInetAddresses();
-//			        while (addrs.hasMoreElements()) {
-//			            InetAddress addr = addrs.nextElement();
-//			            if (addr instanceof Inet4Address) {
-//			            	hostIP = addr;
-//			            } 
-//			        }
-//		        }
-//		        
-//		        // Make sure if the host has ethernet connection, it would be the priority choice
-//		        if (niName.equals("eth1")) {
-//		        	break;
-//		        }
-//		    }
-
-		    // If the above fails to set the IP properly, try the following
-	        if (hostIP == null) {
-				hostIP = Inet4Address.getLocalHost();
-	        }
+			hostIP = Inet4Address.getLocalHost();
+        	groupIP = InetAddress.getByName(groupIPStr);
 		}
         catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void setupClient(InetAddress clientIP, ObjectOutputStream toClient) {
-		if (!isClientConnected(clientIP)) {
+	public static void setupClient(InetAddress clientIP, int clientUdpPort, ObjectOutputStream toClient) {
+		if (!isPlayerConnected(clientIP, clientUdpPort)) {
 			boolean[][] iceGrid = model.getMap().getIceGrid();
 			Random r = new Random();
 			double randomX = 0;
@@ -179,8 +140,16 @@ public class Server {
 				}
 			}
 			
-			// Setup client's ship
+			// Setup the player information for the client
 			Ship s = new Ship(new Position(randomX, randomY), 0);
+			Player p = new Player(clientIP, clientUdpPort, s);
+			playerList.add(p);
+			System.out.println("Player added: " + p);
+			
+			// Initialize the game state if it is the first client connection
+			if (playerList.size() == 1)
+				initializeGameState();
+			
 			model.addEntity(s);
 			
 			// Update the last synced set of entities right before sending a full snapshot to client for full sync
@@ -188,17 +157,14 @@ public class Server {
 			for (Entity e : model.getEntities()) {
 				newLastSyncedEntities.add((Entity) deepClone(e));
 			}
-			lastSyncedEntities = newLastSyncedEntities;
+			lastSyncedEntities = newLastSyncedEntities;	
 			
 			// Send a full snapshot of current game state to the client
-			sendFullSnapshot(clientIP, toClient, model.getEntities());
+			sendFullSnapshot(toClient, model.getEntities());
 			
-			// Create a dedicated thread for receiving client's input and sending game state to client
-			ClientHandler ch = new ClientHandler(udpSocket, clientIP, multiIP, lastSyncedEntities);
-			playerList.add(new Player(clientIP, s, ch));
-
-			// Start the dedicated thread
-			ch.start();
+			// Start the ServerMulticastSender thread if it is the first client connection
+			if (playerList.size() == 1)
+				new ServerMulticastSender(udpSocket, clientMultiCastPort, groupIP, lastSyncedEntities, latestCIS).start();
 		}
 	}
 	
@@ -232,7 +198,7 @@ public class Server {
 	/* 
 	 * Send the compressed set of all entities (full snapshot) to client
 	 */
-	private static void sendFullSnapshot(InetAddress clientIP, ObjectOutputStream toClient, ConcurrentLinkedQueue<Entity> ents) {
+	private static void sendFullSnapshot(ObjectOutputStream toClient, ConcurrentLinkedQueue<Entity> ents) {
 		ArrayList<EntityLite> entitiesLite = calculateEntitiesLite(ents);
 		try {
 			toClient.writeObject(entitiesLite);
@@ -242,20 +208,20 @@ public class Server {
 		}
 	}
 	
-	public static void disconnectPlayer(InetAddress clientIP) {
-		if (isClientConnected(clientIP)) {
+	public static void disconnectPlayer(InetAddress clientIP, int clientPort) {
+		if (isPlayerConnected(clientIP, clientPort)) {
 			for (Player p : playerList) {
-				if (p.getIP().equals(clientIP)) {
-					// Stop the dedicated thread for the client
-					p.getClientHandler().end();
+				if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
 					// Remove player from the PlayerList
+					model.getEntities().remove(p.getShip());
+					latestCIS.remove(p);
 					playerList.remove(p);
 				}
 			}
 		}
 	}
 	
-	/**
+	/*
 	 * This method makes a "deep clone" of any Java object it is given.
 	 */
 	 public static Object deepClone(Object object) {
