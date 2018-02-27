@@ -16,7 +16,7 @@ public class Map{
 	protected int widthDensity;
 	protected boolean[][] iceGrid;
 	protected List<AABB> roughAABBs = new ArrayList<AABB>();
-	protected seed;
+	protected long seed;
 	
 	public Map(int l, int w, int lD, int wD, long s){
 		length = l;
