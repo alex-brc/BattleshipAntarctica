@@ -183,6 +183,7 @@ public class Client implements Runnable {
 		
 		// Wait for a full snapshot of current game state from server
 		ArrayList<EntityLite> initialEntitiesLite = getFullSnapshot(fromServer);
+		Long seed = getMapSeed(fromServer);
 		
 		// Full sync the game state
 		model.fullSync(initialEntitiesLite);
@@ -337,6 +338,21 @@ public class Client implements Runnable {
 	  }
 	  
 	  return fullSnapShot;
+  }
+  
+  private Long getMapSeed(ObjectInputStream fromServer) {
+	  Long seed = null;
+	  try {
+		  seed = (Long) fromServer.readObject();
+	  }
+	  catch (IOException ioe) {
+		  ioe.printStackTrace();
+	  }
+	  catch (ClassNotFoundException cnfe) {
+		  cnfe.printStackTrace();
+	  }
+	  
+	  return seed;
   }
 
   /**

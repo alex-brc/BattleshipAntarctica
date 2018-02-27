@@ -17,13 +17,6 @@ public class Map{
 	protected boolean[][] iceGrid;
 	protected List<AABB> roughAABBs = new ArrayList<AABB>();
 	
-	public Map(){ // Basic constructor - probably won't be used
-		length = 0;
-		width = 0;
-		lengthDensity = 0;
-		widthDensity = 0;
-	}
-	
 	public Map(int l, int w, int lD, int wD){ 
 		length = l;
 		width = w;

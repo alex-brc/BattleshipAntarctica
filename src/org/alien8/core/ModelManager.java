@@ -31,7 +31,7 @@ public class ModelManager {
   private static ModelManager instance;
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
   private CollisionDetector collisionDetector = new CollisionDetector();
-  private Map map = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8);
+  private Map map;
   private Ship player;
 
   private ModelManager() {
@@ -40,7 +40,6 @@ public class ModelManager {
 
 	  entities = new ConcurrentLinkedQueue<Entity>();
 	  collisionDetector = new CollisionDetector();
-	  map = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8);
 	  
 	  // List<AABB> aabbs = map.getAABBs();
 	  // for (AABB aabb : aabbs) {
@@ -56,6 +55,10 @@ public class ModelManager {
 	if(instance == null)
 		instance = new ModelManager();
     return instance;
+  }
+  
+  public void makeMap(long seed) {
+	  map = new Map(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH, 8, 8, seed);
   }
 
   /**

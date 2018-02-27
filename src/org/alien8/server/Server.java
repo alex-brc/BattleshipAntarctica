@@ -41,6 +41,7 @@ public class Server {
 	private static ArrayList<Player> playerList = new ArrayList<Player>();
 	private static LinkedList<GameEvent> events = new LinkedList<GameEvent>();
 	private static boolean run = true;
+	private static Long seed = (new Random()).nextLong();
 	
 	public static void main(String[] args) {
 		Runtime.getRuntime().addShutdownHook(new ServerShutdownHook());
@@ -196,6 +197,9 @@ public class Server {
 			// Send a full snapshot of current game state to the client
 			sendFullSnapshot(clientIP, toClient, model.getEntities());
 			
+			// Send the map seed to the client
+			sendMapSeed(clientIP, toClient, seed);
+			
 			// Create a dedicated thread for receiving client's input and sending game state to client
 			ClientHandler ch = new ClientHandler(udpSocket, eventSocket, clientIP, lastSyncedEntities);
 			
@@ -253,6 +257,15 @@ public class Server {
 		ArrayList<EntityLite> entitiesLite = calculateEntitiesLite(ents);
 		try {
 			toClient.writeObject(entitiesLite);
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+	}
+	
+	private static void sendMapSeed(InetAddress clientIP, ObjectOutputStream toClient, Long seed) {
+		try {
+			toClient.writeObject(seed);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
