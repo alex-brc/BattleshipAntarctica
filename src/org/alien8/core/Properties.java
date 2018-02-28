@@ -6,50 +6,50 @@ import java.io.Serializable;
  * Packages all the physical parameters in one neat object.
  */
 public class Properties implements Serializable {
-	private static final long serialVersionUID = 3959568633929095110L;
-	public double mass;
-	public double speed;
-	public double direction;
-	public double length;
-	public double width;
-	
-	public double getMass() {
-		return mass;
-	}
+  private static final long serialVersionUID = 3959568633929095110L;
+  public double mass;
+  public double speed;
+  public double direction;
+  public double length;
+  public double width;
 
-	public void setMass(double mass) {
-		this.mass = mass;
-	}
+  public double getMass() {
+    return mass;
+  }
 
-	public double getSpeed() {
-		return speed;
-	}
+  public void setMass(double mass) {
+    this.mass = mass;
+  }
 
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
+  public double getSpeed() {
+    return speed;
+  }
 
-	public double getDirection() {
-		return direction;
-	}
+  public void setSpeed(double speed) {
+    this.speed = speed;
+  }
 
-	public void setDirection(double direction) {
-		this.direction = direction;
-	}
+  public double getDirection() {
+    return direction;
+  }
 
-	public double getLength() {
-		return length;
-	}
+  public void setDirection(double direction) {
+    this.direction = direction;
+  }
 
-	public void setLength(double length) {
-		this.length = length;
-	}
+  public double getLength() {
+    return length;
+  }
 
-	public double getWidth() {
-		return width;
-	}
+  public void setLength(double length) {
+    this.length = length;
+  }
 
-	public void setWidth(double width) {
-		this.width = width;
-	}	
+  public double getWidth() {
+    return width;
+  }
+
+  public void setWidth(double width) {
+    this.width = width;
+  }
 }

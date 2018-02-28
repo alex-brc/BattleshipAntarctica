@@ -2,7 +2,6 @@ package org.alien8.core;
 
 import java.io.Serializable;
 import org.alien8.physics.Position;
-import org.alien8.rendering.Renderer;
 
 /**
  * This abstract class implements the generic Entity. All things that are part of the game map are

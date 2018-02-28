@@ -2,31 +2,32 @@ package org.alien8.server;
 
 import org.alien8.physics.Position;
 
-public class AudioEvent extends GameEvent{
+public class AudioEvent extends GameEvent {
 
-	private static final long serialVersionUID = 8047674799697266330L;
+  private static final long serialVersionUID = 8047674799697266330L;
 
-	public enum Type {
-		SHOOT,ICE_CRASH,SHIP_CRASH;
-	}
-	private Type type;
-	private Position position;
-	
-	public AudioEvent(Type type, Position position) {
-		this.type = type;
-		this.position = position;
-	}
+  public enum Type {
+    SHOOT, ICE_CRASH, SHIP_CRASH;
+  }
 
-	public Type getType() {
-		return type;
-	}
+  private Type type;
+  private Position position;
 
-	public Position getPosition() {
-		return position;
-	}
-	
-	@Override
-	public String toString() {
-		return type.name() + " " + position.toString();
-	}
+  public AudioEvent(Type type, Position position) {
+    this.type = type;
+    this.position = position;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public Position getPosition() {
+    return position;
+  }
+
+  @Override
+  public String toString() {
+    return type.name() + " " + position.toString();
+  }
 }

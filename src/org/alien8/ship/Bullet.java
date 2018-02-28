@@ -3,7 +3,6 @@ package org.alien8.ship;
 import java.io.Serializable;
 import org.alien8.core.Entity;
 import org.alien8.physics.Position;
-import org.alien8.rendering.Renderer;
 
 public abstract class Bullet extends Entity implements Serializable {
 

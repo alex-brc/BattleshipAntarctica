@@ -101,7 +101,7 @@ public class ModelManager {
   /**
    * Server version of update()
    */
-  public void updateServer(ConcurrentHashMap<Player,ClientInputSample> latestCIS) {
+  public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion

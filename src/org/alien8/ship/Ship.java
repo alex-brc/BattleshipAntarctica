@@ -24,7 +24,7 @@ public class Ship extends Entity implements Serializable {
   private Turret rearTurret;
   private Turret midTurret;
   private int colour;
-  private Sprite sprite;  //for now
+  private Sprite sprite; // for now
 
   public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
@@ -112,8 +112,8 @@ public class Ship extends Entity implements Serializable {
   }
 
   public void render() {
-	Renderer r = Renderer.getInstance();
-	  
+    Renderer r = Renderer.getInstance();
+
     // Render four corners of bounding box
     for (int i = 0; i < 4; i++) {
       // Color front two points blue
@@ -129,8 +129,9 @@ public class Ship extends Entity implements Serializable {
     }
 
     // Render turrets
-	Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI/2));
-    r.drawSprite((int)position.getX() - currentSprite.getWidth()/2, (int)position.getY() - currentSprite.getHeight()/2, currentSprite, false);
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
     frontTurret.render();
     rearTurret.render();
     midTurret.render();
@@ -303,11 +304,11 @@ public class Ship extends Entity implements Serializable {
   public double getMidTurretDirection() {
     return midTurret.getDirection();
   }
-  
+
   public int getColour() {
-	  return this.colour;
+    return this.colour;
   }
-  
+
   public void frontTurretCharge() {
     frontTurret.charge();
   }
