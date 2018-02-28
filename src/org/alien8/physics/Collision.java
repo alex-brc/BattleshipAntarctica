@@ -3,6 +3,9 @@ package org.alien8.physics;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.mapgeneration.Ice;
+import org.alien8.score.ScoreBoard;
+import org.alien8.server.Player;
+import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 
@@ -133,9 +136,14 @@ public class Collision {
       System.out.println("bullet hit ship");
       // Bullet damages ship
       ship.damage(bullet.getDamage());
+      // Award score to the bullet owner
+      Player shooter = Server.getPlayer(bullet);
+      ScoreBoard.getInstance().giveHit(shooter, bullet);
       // See if ship has been destroyed
       if (ship.getHealth() <= 0) {
         ship.delete();
+        // Award score to the killer
+        ScoreBoard.getInstance().giveKill(shooter);
       }
       // Destroy bullet
       bullet.delete();

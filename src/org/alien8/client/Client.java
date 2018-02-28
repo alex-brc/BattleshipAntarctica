@@ -1,11 +1,11 @@
 package org.alien8.client;
 
-import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -13,37 +13,39 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import org.alien8.ai.AIController;
+import org.alien8.audio.AudioManager;
 import org.alien8.core.EntityLite;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.ModelManager;
 import org.alien8.rendering.Renderer;
+import org.alien8.score.Score;
+import org.alien8.score.ScoreBoard;
+import org.alien8.server.AudioEvent;
+import org.alien8.server.GameEvent;
 import org.alien8.ship.Ship;
+import org.alien8.util.ClientShutdownHook;
+import org.alien8.util.LogManager;
 
 public class Client implements Runnable {
   /**
-   * Volatile "running" boolean to avoid internal caching. Thread should stop when set to false.
+   * Volatile "running" boolean to avoid internal caching. Thread should stop cleanly when set to
+   * false.
    */
   private volatile boolean running = false;
   private Thread thread;
-  private Renderer renderer;
   private ModelManager model;
   private int FPS = 0;
   private Socket tcpSocket = null;
-  private static DatagramSocket udpSocket = null;
+  private DatagramSocket udpSocket = null;
+  private DatagramSocket eventSocket = null;
   private InetAddress serverIP = null;
-  private AIController aiPlayer;
-
-
-  public static void main(String[] args) {
-
-    Client game = new Client();
-    game.start();
-  }
+  private String serverIPstr;
+  private ScoreBoard scoreBoard;
 
   public Client() {
-    renderer = new Renderer(new Dimension(800, 600));
     model = ModelManager.getInstance();
+    scoreBoard = ScoreBoard.getInstance();
+    Runtime.getRuntime().addShutdownHook(new ClientShutdownHook());
   }
 
   /**
@@ -55,6 +57,10 @@ public class Client implements Runnable {
       return;
     running = true;
 
+    // Play the ambient music
+    AudioManager.getInstance().startAmbient();
+
+    LogManager.getInstance().log("Client", LogManager.Scope.INFO, "Booting client...");
     thread = new Thread(this, "Battleship Antarctica");
     thread.start();
     // Start the loop
@@ -78,43 +84,40 @@ public class Client implements Runnable {
   @Override
   public void run() {
     // Game loop goes here
+    long lastTime = getTime();
+    long currentTime = 0;
+    double catchUp = 0;
+
+    int frameRate = 0;
+    long frameTimer = getTime();
+    int tickRate = 0;
+    long tickTimer = getTime();
+
     while (running) {
-      long lastTime = getTime();
-      long currentTime = 0;
-      double catchUp = 0;
+      currentTime = getTime();
 
-      int frameRate = 0;
-      long frameTimer = getTime();
+      // Get the amount of update()s the model needs to catch up
+      //
+      // timeNow - timeLastUpdateWasDone --> time elapsed
+      // timeToCatchUp = ----------------------------------
+      // deltaTPerTick --> how long a "tick" is
+      //
+      catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
-      int tickRate = 0;
-      long tickTimer = getTime();
-
-      this.connect("192.168.56.1");
-      while (running) {
-        currentTime = getTime();
-
-        // Get the amount of update()s the model needs to catch up
-        //
-        // timeNow - timeLastUpdateWasDone -->
-        // timeToCatchUp = ----------------------------------
-        // deltaTPerTick --> how long a "tick" is
-        //
-        catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
-
-        // Call update() as many times as needed to compensate before rendering
-        while (catchUp >= 1) {
-          this.sendInputSample();
-          this.receiveAndUpdate();
-          tickRate++;
-          catchUp--;
-          // Update last time
-          lastTime = getTime();
-        }
-
-        // Call the renderer
-        // aiPlayer.update();
-        renderer.render(model);
+      // Call update() as many times as needed to compensate before rendering
+      while (catchUp >= 1) {
+        this.sendInputSample();
+        this.receiveEvents();
+        this.receiveAndUpdate();
+        tickRate++;
+        catchUp--;
+        // Update last time
+        lastTime = getTime();
       }
+
+      // Call the renderer
+      // aiPlayer.update();
+      Renderer.getInstance().render(model);
       frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
@@ -122,11 +125,11 @@ public class Client implements Runnable {
         frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
         FPS = frameRate * Parameters.FPS_FREQ;
         frameRate = 0;
-        // System.out.println(FPS);
+        System.out.println(FPS);
       }
       if (getTime() - tickTimer > Parameters.N_SECOND) {
         tickTimer += Parameters.N_SECOND;
-        // System.out.println(tickRate);
+        System.out.println(tickRate);
         tickRate = 0;
       }
     }
@@ -161,12 +164,16 @@ public class Client implements Runnable {
   /**
    * Should be called when the client clicks the 'Connect' button after entering an server IP.
    */
-  public void connect(String serverIPStr) {
+  public boolean connect(String serverIPStr) {
     if (tcpSocket == null && serverIP == null) {
+      this.serverIPstr = serverIPStr;
       try {
         serverIP = InetAddress.getByName(serverIPStr);
         tcpSocket = new Socket(serverIP, 4446);
-        udpSocket = new DatagramSocket(4445, serverIP);
+
+        System.out.println("Connected");
+        udpSocket = new DatagramSocket();
+        eventSocket = new DatagramSocket();
 
         // Serialize a TRUE Boolean object (representing connect request) into byte array
         Boolean connectRequest = new Boolean(true);
@@ -176,6 +183,8 @@ public class Client implements Runnable {
 
         // Wait for a full snapshot of current game state from server
         ArrayList<EntityLite> initialEntitiesLite = getFullSnapshot(fromServer);
+        Long seed = getMapSeed(fromServer);
+        model.makeMap(seed);
 
         // Full sync the game state
         model.fullSync(initialEntitiesLite);
@@ -183,14 +192,62 @@ public class Client implements Runnable {
         // Client's Ship is stored at the end of the synced entities queue
         Object[] entitiesArr = model.getEntities().toArray();
         model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
-      } catch (SocketException se) {
-        se.printStackTrace();
-      } catch (UnknownHostException uhe) {
-        uhe.printStackTrace();
-      } catch (IOException ioe) {
-        ioe.printStackTrace();
+
+        // Perform initial handshake with ClientHandler
+        try {
+          LogManager.getInstance().log("Client", LogManager.Scope.INFO,
+              "Sending handshakes to ClientHandler");
+          sendDummyPacket(udpSocket, 4446);
+          sendDummyPacket(eventSocket, 4447);
+        } catch (IOException e) {
+          LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
+              "Exception initialising ClientHandler - Client connection in a socket: "
+                  + e.toString());
+          System.exit(-1);
+        }
+      } catch (BindException e) {
+        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
+            "Could not bind to any port. Firewalls?\n" + e.toString());
+        return false;
+      } catch (SocketException e) {
+        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
+            "A socket exception occured.\n" + e.toString());
+        return false;
+      } catch (UnknownHostException e) {
+        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
+            "Unknown host. Check host details.\n" + e.toString());
+        return false;
+      } catch (IOException e) {
+        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
+            "IO exception.\n" + e.toString());
+        return false;
       }
+      LogManager.getInstance().log("Client", LogManager.Scope.INFO,
+          "Client succesfully connected to the server at " + serverIPStr);
+      return true;
     }
+    System.out.println("The client is already connected.");
+    LogManager.getInstance().log("Client", LogManager.Scope.WARNING,
+        "Connection attempted while already connected. ???");
+    return false;
+  }
+
+  private void sendDummyPacket(DatagramSocket udp, int destPort) throws IOException {
+
+    // Serialize the input sample object into byte array
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+    Boolean dummy = new Boolean(true);
+    objOut.writeObject(dummy);
+    byte[] clientInputSampleByte = byteOut.toByteArray();
+
+    // Create a packet for holding the input sample byte data
+    DatagramPacket packet =
+        new DatagramPacket(clientInputSampleByte, clientInputSampleByte.length, serverIP, destPort);
+
+    // Send the client input sample packet to the server
+    udp.send(packet);
+
   }
 
   private void sendInputSample() {
@@ -210,6 +267,36 @@ public class Client implements Runnable {
       udpSocket.send(packet);
     } catch (IOException ioe) {
       ioe.printStackTrace();
+    }
+  }
+
+  public void receiveEvents() {
+    try {
+      // Create a packet for receiving difference packet
+      byte[] buf = new byte[65536];
+      DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
+
+      eventSocket.receive(eventPacket);
+      byte[] eventBytes = eventPacket.getData();
+
+      // Deserialize the event data into object
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
+      ObjectInputStream objIn = new ObjectInputStream(byteIn);
+      GameEvent event = (GameEvent) objIn.readObject();
+
+      // Send audio events to AudioManager
+      if (event != null) {
+
+        System.out.println(event.toString());
+        if (event instanceof AudioEvent)
+          AudioManager.getInstance().addEvent((AudioEvent) event);
+        else if (event instanceof Score)
+          ScoreBoard.getInstance().update((Score) event);
+      }
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
     }
   }
 
@@ -233,8 +320,6 @@ public class Client implements Runnable {
 
       // Sync the game state with server
       ModelManager.getInstance().sync(difference);
-      // System.out.println("Entities: " + model.getEntities());
-      // System.out.println("Difference: " + difference);
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
@@ -256,6 +341,19 @@ public class Client implements Runnable {
     return fullSnapShot;
   }
 
+  private Long getMapSeed(ObjectInputStream fromServer) {
+    Long seed = null;
+    try {
+      seed = (Long) fromServer.readObject();
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
+    }
+
+    return seed;
+  }
+
   /**
    * Should be called when the client clicks the 'Exit' button from the in-game menu. TODO
    */
@@ -273,9 +371,12 @@ public class Client implements Runnable {
         // Reset the socket, serverIP and client-side threads after disconnecting
         tcpSocket = null;
         serverIP = null;
-      } catch (IOException ioe) {
-        ioe.printStackTrace();
+      } catch (IOException e) {
+        LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
+            "Something went wrong disconnecting client. " + e.toString());
+        System.exit(-1);
       }
     }
   }
+
 }

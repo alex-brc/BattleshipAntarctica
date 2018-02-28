@@ -4,7 +4,6 @@ import java.io.Serializable;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
-import org.alien8.rendering.Renderer;
 
 public class Ice extends Entity implements Serializable {
 
@@ -20,16 +19,22 @@ public class Ice extends Entity implements Serializable {
 
   }
 
-  @Override
-  public void render(Renderer r) {
-    // if (Parameters.RENDER_BOX)
-    // Adjust for the position being the center of the box
-    r.drawRect((int) this.position.getX() - Parameters.MAP_BOX_SIZE / 2 + 1,
-        (int) this.position.getY() - Parameters.MAP_BOX_SIZE / 2 + 1, 32, 32, 0xFF0000, false);
-  }
+  // @Override
+  // public void render(Renderer r) {
+  // // if (Parameters.RENDER_BOX)
+  // // Adjust for the position being the center of the box
+  // r.drawRect((int) this.position.getX() - Parameters.MAP_BOX_SIZE / 2 + 1,
+  // (int) this.position.getY() - Parameters.MAP_BOX_SIZE / 2 + 1, 32, 32, 0xFF0000, false);
+  // }
 
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void render() {
     // TODO Auto-generated method stub
 
   }

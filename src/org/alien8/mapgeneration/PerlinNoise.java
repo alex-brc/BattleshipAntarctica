@@ -83,7 +83,7 @@ public class PerlinNoise{
 		return outValue;
 	}
 	
-	public static double[][] generateNoiseGrid(int xPxlSize, int yPxlSize, int xGridSize, int yGridSize){
+	public static double[][] generateNoiseGrid(int xPxlSize, int yPxlSize, int xGridSize, int yGridSize, long seed){
 		/*
 		PxlSize dimensions are difining the whole picture of noise (as a grid of pixels)
 		GridSize dimensions are difining the grid on top of the noise that has a gradient vector at each point
@@ -91,7 +91,7 @@ public class PerlinNoise{
 		*/
 		double[][] noiseGrid = new double[xPxlSize][yPxlSize];
 		MapVector[][] gradientGrid = new MapVector[xGridSize+1][yGridSize+1];
-		Random rand = new Random();
+		Random rand = new Random(seed);
 		
 		//Defining the grid of gradient vectors (only contains the unit vectors defined at top of the class)
 		for (int y = 0; y < yGridSize+1; y++){

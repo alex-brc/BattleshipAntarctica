@@ -15,9 +15,9 @@ public class SmallBullet extends Bullet {
   }
 
   @Override
-  public void render(Renderer r) {
+  public void render() {
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
-    r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+    Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
   }
 }
