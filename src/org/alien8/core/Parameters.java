@@ -1,5 +1,7 @@
 package org.alien8.core;
 
+import java.awt.Dimension;
+
 /**
  * This class is meant to hold all the important <code> final </code> parameters for all classes to
  * easily access. If everyone uses these, we could technically just change these parameters, build,
@@ -13,16 +15,25 @@ package org.alien8.core;
  */
 public class Parameters {
 	public static final boolean RENDER_BOX = true;
-
+	/**
+	 * How many times to attempt connection to server before giving up.
+	 * Keep in mind the timeout is pretty long itself.
+	 */
+  public static final int NUMBER_CONNECT_ATTEMPTS = 3;
   /**
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
-   * than that. This value gives 58-60 ticks/second, hovering around 59
+   * than that. A value of 63 gives 58-60 ticks/second, hovering around 59
    */
   public static final int TICKS_PER_SECOND = 63;
   /**
    * Size of map hitboxes
    */
   public static final int MAP_BOX_SIZE = 32;
+  /**
+   * Dimension object for the renderer dimensions
+   */
+  public static final Dimension RENDERER_SIZE = new Dimension(800,600);
+  public static final int MAX_PLAYERS = 16;
   /**
    * How many ice pixels must be in a box to be considered an ice entity (%).
    * This is in [0,1]
@@ -95,4 +106,20 @@ public class Parameters {
    */
   public static final double COLLISION_DAMAGE_MODIFIER = 0.5;
   public static final double WATER_LEVEL = 0.4d;
+  /**
+   * Maximum number of "shoot" audio clips running at the same time
+   */
+  public static final int SFX_POOL_SIZE = 5;
+  public static final float INITIAL_VOLUME_SFX = 0.4f;
+  public static final float INITIAL_VOLUME_AMBIENT = 0.4f;
+  public static final int MAX_HEARING_DISTANCE = 1500;
+  /**
+   * See Score for details
+   */
+  public static final int SCORE_PER_KILL = 100;
+  public static final float KILL_STREAK_MULTIPLIER = 0.1f;
+  public static final float DISTANCE_MULTIPLIER = 1;
+  public static final int SCOREBOARD_HEIGHT = 500;
+  public static final int SCOREBOARD_WIDTH = 500;
+  
 }

@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.Random;
 
 import org.alien8.core.Entity;
+import org.alien8.core.ModelManager;
 import org.alien8.ship.Ship;
 import org.alien8.physics.Position;
-import org.alien8.managers.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 
@@ -30,7 +30,7 @@ public class AIController{
 	
 	public AIController(Position startPos){
 		model = ModelManager.getInstance();
-		myShip = new Ship(startPos, 0); //All ai ships start facing East - temporary
+		myShip = new Ship(startPos, 0, (new Random()).nextInt(0xFFFFFF)); //All ai ships start facing East - temporary
 		collisionCheckCountDown = collisionCheckStart;
 	}
 	

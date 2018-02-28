@@ -6,11 +6,13 @@ import org.alien8.ship.Ship;
 
 public class Player {
 	
+	private String name;
 	private InetAddress ip;
 	private int udpPort;
 	private Ship ship;
 	
-	public Player(InetAddress ip, int port, Ship s) {
+	public Player(String name, InetAddress ip, int port, Ship s) {
+		this.name = name;
 		this.ip = ip;
 		this.udpPort = port;
 		this.ship = s;
@@ -29,7 +31,11 @@ public class Player {
 	}
 	
 	public String toString() {
-		return ip.getHostAddress() + ", " + udpPort;
+		return name + ", " + ip.getHostAddress() + ", " + udpPort;
 	}
-
+		
+	public String getName() {
+		return this.name;
+	}
+	
 }

@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -21,42 +22,55 @@ import org.alien8.client.ClientInputSample;
 import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
+import org.alien8.score.ScoreBoard;
 import org.alien8.ship.BigBullet;
+import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
+import org.alien8.util.LogManager;
+import org.alien8.util.ServerShutdownHook;
 
 public class Server {
 	
-	private static InetAddress hostIP = null;
-	private static InetAddress groupIP = null;
-	private static String groupIPStr = "224.0.0.5"; // multicast group ipString
-	private static ServerSocket tcpSocket = null;
-	private static DatagramSocket udpSocket = null;
-	private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
-	private static ConcurrentHashMap<Player, ClientInputSample> latestCIS = new ConcurrentHashMap<Player, ClientInputSample>();
-	private static ModelManager model = ModelManager.getInstance();
-	private static ArrayList<Player> playerList = new ArrayList<Player>();
-	private static int serverPort = 4446;
-	private static int clientMultiCastPort = 4445;
-	private static volatile boolean run = true;
+  private static InetAddress hostIP = null;
+  private static InetAddress groupIP = null;
+  private static String groupIPStr = "224.0.0.5"; // multicast group ipString
+  private static ServerSocket tcpSocket = null;
+  private static DatagramSocket udpSocket = null;
+  // private static DatagramSocket eventSocket = null;
+  private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
+  private static ConcurrentHashMap<Player, ClientInputSample> latestCIS = new ConcurrentHashMap<Player, ClientInputSample>();
+  private static ModelManager model = ModelManager.getInstance();
+  private static ArrayList<Player> playerList = new ArrayList<Player>();
+  private static LinkedList<GameEvent> events = new LinkedList<GameEvent>();
+  private static int serverPort = 4446;
+  private static int clientMultiCastPort = 4445;
+  private static Long seed = (new Random()).nextLong();
+  private static volatile boolean run = true;
 	
-	public static void main(String[] args) {
+  public static void main(String[] args) {
+	    Runtime.getRuntime().addShutdownHook(new ServerShutdownHook());
+	    model.makeMap(seed);
 		try {
 			setHostIP();
 			tcpSocket = new ServerSocket(serverPort, 50, hostIP);
 			udpSocket = new DatagramSocket(serverPort, hostIP);
+			// eventSocket = new DatagramSocket(4447, hostIP);
 			System.out.println("TCP socket Port: " + tcpSocket.getLocalPort());
 			System.out.println("TCP socket IP: " + tcpSocket.getInetAddress());
 			System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
 			System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
-			
+		    // System.out.println("UDP event socket Port: " + eventSocket.getLocalPort());
+		    // System.out.println("UDP event socket IP: " + eventSocket.getLocalAddress());
+		    
 			// Process clients' connect/disconnect request
 			while (run) {
 				// Receive and process client's packet
-				System.out.println("Waiting for client request....");
+		        LogManager.getInstance().log("Server", LogManager.Scope.INFO,
+		                "Waiting for client request...");
 				Socket client = tcpSocket.accept();
 				InetAddress clientIP = client.getInetAddress();
 				ObjectInputStream fromClient = new ObjectInputStream(client.getInputStream());
@@ -80,9 +94,17 @@ public class Server {
 	}
 	
 	public static void initializeGameState() {
-	    Ship notPlayer = new Ship(new Position(100, 100), 0);
+	    LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
+	    Ship notPlayer = new Ship(new Position(100, 100), 0, 0xF8F8F8); // white
+
+	    // Initialise ScoreBoard
+	    // Without a thread, it doesn't listen on input.
+	    ScoreBoard.getInstance();
+
 	    notPlayer.setSpeed(0.8);
 	    model.addEntity(notPlayer);
+	    LogManager.getInstance().log("Server", LogManager.Scope.INFO,
+	        "Game set up. Waiting for players.");
 	}
 	
 	public static void processClientRequest(InetAddress clientIP, ClientRequest cr, ObjectOutputStream toClient) {
@@ -123,6 +145,8 @@ public class Server {
 	}
 
 	public static void setupClient(InetAddress clientIP, int clientUdpPort, ObjectOutputStream toClient) {
+	    LogManager.getInstance().log("Server", LogManager.Scope.INFO,
+	            "Client attempting connect from " + clientIP);
 		if (!isPlayerConnected(clientIP, clientUdpPort)) {
 			boolean[][] iceGrid = model.getMap().getIceGrid();
 			Random r = new Random();
@@ -140,11 +164,18 @@ public class Server {
 				}
 			}
 			
-			// Setup the player information for the client
-			Ship s = new Ship(new Position(randomX, randomY), 0);
-			Player p = new Player(clientIP, clientUdpPort, s);
+			// Setup client's ship
+			int randColour = (new Random()).nextInt(0xFFFFFF);
+			Ship s = new Ship(new Position(randomX, randomY), 0, randColour);
+			
+		    // TODO: ADD NAMES TO PLAYERS
+		    int k = (new Random()).nextInt(1000);
+		    String name = "RAND_NAME_" + k;
+			Player p = new Player(name, clientIP, clientUdpPort, s);
 			playerList.add(p);
-			System.out.println("Player added: " + p);
+			
+		    // Add player to scoreboard
+		    ScoreBoard.getInstance().add(p);
 			
 			// Initialize the game state if it is the first client connection
 			if (playerList.size() == 1)
@@ -162,9 +193,16 @@ public class Server {
 			// Send a full snapshot of current game state to the client
 			sendFullSnapshot(toClient, model.getEntities());
 			
+		    // Send the map seed to the client
+		    sendMapSeed(clientIP, toClient, seed);
+
 			// Start the ServerMulticastSender thread if it is the first client connection
 			if (playerList.size() == 1)
 				new ServerMulticastSender(udpSocket, clientMultiCastPort, groupIP, lastSyncedEntities, latestCIS).start();
+		}
+		else {
+		      LogManager.getInstance().log("Server", LogManager.Scope.INFO,
+		          "Client " + clientIP + " is already connected.");
 		}
 	}
 	
@@ -178,7 +216,7 @@ public class Server {
 			if (e instanceof Ship) {
 				Ship s = (Ship) e;
 				EntitiesLite.add(new EntityLite(s.getSerial(), 1, 0, s.getPosition(), s.isToBeDeleted(), s.getDirection(), s.getSpeed(), s.getHealth(), 
-						 s.getFrontTurretDirection(), s.getMidTurretDirection(), s.getRearTurretDirection()));	
+						 s.getFrontTurretDirection(), s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));	
 			}
 			else if (e instanceof SmallBullet) {
 				SmallBullet sb = (SmallBullet) e;
@@ -208,6 +246,15 @@ public class Server {
 		}
 	}
 	
+	private static void sendMapSeed(InetAddress clientIP, ObjectOutputStream toClient, Long seed) {
+		try {
+			toClient.writeObject(seed);
+		} catch (IOException ioe) {
+		    ioe.printStackTrace();
+		}
+	}
+
+	
 	public static void disconnectPlayer(InetAddress clientIP, int clientPort) {
 		if (isPlayerConnected(clientIP, clientPort)) {
 			for (Player p : playerList) {
@@ -216,10 +263,35 @@ public class Server {
 					model.getEntities().remove(p.getShip());
 					latestCIS.remove(p);
 					playerList.remove(p);
+			        // Remove player from scoreboard
+			        ScoreBoard.getInstance().remove(p);
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Gets player by bullet. Used in awarding score.
+	 * 
+	 * @param bullet the bullet belonging to the player
+	 * @return the player who owns the bullet
+	 */
+	 public static Player getPlayer(Bullet bullet) {
+
+	    for (Player p : playerList)
+	      if (p.getShip().getSerial() == bullet.getSource())
+	        return p;
+
+	    LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
+	        "Bullet source ship does not exist. Exiting...");
+	    System.exit(-1);
+	    return null;
+	  }
+
+	  public static void addEvent(GameEvent event) {
+	    events.add(event);
+	  }
+	
 	
 	/*
 	 * This method makes a "deep clone" of any Java object it is given.
@@ -239,4 +311,10 @@ public class Server {
 	   }
 	 }
 	 
+	 public static GameEvent getNextEvent() {
+	   if (events.size() == 0)
+	     return null;
+	   return events.removeFirst();
+     }
+
 }

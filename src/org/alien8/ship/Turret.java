@@ -1,11 +1,14 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
+
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.ModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
+import org.alien8.server.AudioEvent;
+import org.alien8.server.Server;
 
 public class Turret implements Serializable {
 
@@ -75,6 +78,8 @@ public class Turret implements Serializable {
       ModelManager.getInstance().addEntity(new SmallBullet(this.getPosition(), this.getDirection(),
           distance, this.getShip().getSerial()));
     }
+    
+    Server.addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
     this.startCooldown();
     this.distance = this.minDistance;
   }
@@ -115,7 +120,9 @@ public class Turret implements Serializable {
     return result;
   }
 
-  public void render(Renderer r) {
+  public void render() {
+	Renderer r = Renderer.getInstance();
+	
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);

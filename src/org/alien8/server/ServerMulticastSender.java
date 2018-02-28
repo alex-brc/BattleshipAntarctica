@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -16,18 +15,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
+import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.managers.ModelManager;
-import org.alien8.physics.Position;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
+import org.alien8.util.LogManager;
 
 public class ServerMulticastSender extends Thread{
 	
 	private Integer clientMultiCastPort;
 	private InetAddress groupIP;
-	private DatagramSocket socket;
+	private DatagramSocket udpSocket;
 	private ConcurrentLinkedQueue<Entity> lastSyncedEntities;
 	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
 	private ConcurrentHashMap<Player,ClientInputSample> latestCIS;
@@ -37,7 +36,7 @@ public class ServerMulticastSender extends Thread{
 	private boolean run = true;
 	
 	public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip, ConcurrentLinkedQueue<Entity> ents, ConcurrentHashMap<Player,ClientInputSample> latestCIS) {	
-		socket = ds;
+		udpSocket = ds;
 		clientMultiCastPort = port;
 		groupIP = ip;
 		lastSyncedEntities = ents;
@@ -57,7 +56,6 @@ public class ServerMulticastSender extends Thread{
 	        	readInputSample();
 				updateGameStateByCIS();
 				sendGameState();
-				System.out.println("Server Entities: " + ModelManager.getInstance().getEntities());
 				tick--;
 				// Update last time
 				lastTime = System.nanoTime();
@@ -72,7 +70,7 @@ public class ServerMulticastSender extends Thread{
 		    DatagramPacket packet = new DatagramPacket(buf, buf.length);
 		    
 		    // Receive an input sample packet and obtain its byte data
-		    socket.receive(packet);
+		    udpSocket.receive(packet);
 		    InetAddress clientIP = packet.getAddress();
 		    int clientPort = packet.getPort();
 		    byte[] cisByte = packet.getData();
@@ -107,8 +105,8 @@ public class ServerMulticastSender extends Thread{
 	public void sendGameState() {
 		try {
 			ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
-
-			// Update the last synced set of entities after calculating the difference
+			
+			// Update the last synced set of entities right before sending the difference to client for syncing
 			ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
 			for (Entity e : currentEntities) {
 				newLastSyncedEntities.add((Entity) deepClone(e));
@@ -125,12 +123,33 @@ public class ServerMulticastSender extends Thread{
 	        DatagramPacket packet = new DatagramPacket(differenceByte, differenceByte.length, groupIP, clientMultiCastPort);
 
 	        // Send the difference packet to client
-	        socket.send(packet);
+	        udpSocket.send(packet);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+//	private void sendEvents() {
+//		try {
+//			// Serialize the next event in a byte array
+//	        GameEvent event = Server.getNextEvent();
+//	        
+//			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+//			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+//	        objOut.writeObject(event);
+//	        byte[] eventByte = byteOut.toByteArray();
+//
+//	        // Create the packet for event bytes
+//	        DatagramPacket packet = new DatagramPacket(eventByte, eventByte.length, clientIP, eventPort);
+//
+//	        // Send the packet
+//	        udpSocket.send(packet);
+//		}
+//		catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	/* 
 	 * Calculate the difference between two set of entities, difference is represented as an arraylist of compressed entities that are modified or added or removed
@@ -150,7 +169,7 @@ public class ServerMulticastSender extends Thread{
 							if (!currentShip.equals(lastSyncedShip)) {
 								difference.add(new EntityLite(currentShip.getSerial(), 0, 0, currentShip.getPosition(), currentShip.isToBeDeleted(), 
 											   currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(), currentShip.getFrontTurretDirection(),
-											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection()));
+											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection(), currentShip.getColour()));
 							}
 						}
 						else if (ce instanceof SmallBullet) {
@@ -184,7 +203,7 @@ public class ServerMulticastSender extends Thread{
 						Ship currentShip = (Ship) ce;
 						difference.add(new EntityLite(currentShip.getSerial(), 1, 0, currentShip.getPosition(), currentShip.isToBeDeleted(), 
 								       currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(), currentShip.getFrontTurretDirection(),
-									   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection()));
+									   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection(), currentShip.getColour()));
 					}
 					else if (ce instanceof SmallBullet) {
 						SmallBullet currentSB = (SmallBullet) ce;
@@ -213,7 +232,7 @@ public class ServerMulticastSender extends Thread{
 							if (!lastSyncedShip.equals(currentShip)) {
 								difference.add(new EntityLite(currentShip.getSerial(), 0, 0, currentShip.getPosition(), currentShip.isToBeDeleted(), 
 											   currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(), currentShip.getFrontTurretDirection(),
-											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection()));
+											   currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection(), currentShip.getColour()));
 							}
 						}
 						else if (lse instanceof SmallBullet) {
@@ -245,7 +264,7 @@ public class ServerMulticastSender extends Thread{
 						Ship lastSyncedShip = (Ship) lse;
 						difference.add(new EntityLite(lastSyncedShip.getSerial(), 2, 0, lastSyncedShip.getPosition(), lastSyncedShip.isToBeDeleted(), 
 									   lastSyncedShip.getDirection(), lastSyncedShip.getSpeed(), lastSyncedShip.getHealth(), lastSyncedShip.getFrontTurretDirection(),
-									   lastSyncedShip.getMidTurretDirection(), lastSyncedShip.getRearTurretDirection()));
+									   lastSyncedShip.getMidTurretDirection(), lastSyncedShip.getRearTurretDirection(), lastSyncedShip.getColour()));
 					}
 					else if (lse instanceof SmallBullet) {
 						SmallBullet lastsyncedSB = (SmallBullet) lse;
