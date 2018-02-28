@@ -1,7 +1,7 @@
 package org.alien8.core;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
@@ -10,7 +10,7 @@ import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
-import org.alien8.server.Server;
+import org.alien8.server.Player;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
@@ -34,7 +34,6 @@ public class ModelManager {
   private Ship player;
 
   private ModelManager() {
-    // All setup should be done here, such as support for networking, etc.
     // Normally this exists only to defeat instantiation
 
     entities = new ConcurrentLinkedQueue<Entity>();
@@ -102,7 +101,7 @@ public class ModelManager {
   /**
    * Server version of update()
    */
-  public void updateServer(InetAddress clientIP, ClientInputSample cis) {
+  public void updateServer(ConcurrentHashMap<Player,ClientInputSample> latestCIS) {
     // Loop through all the entities
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
@@ -114,11 +113,13 @@ public class ModelManager {
         continue;
       }
       // Handle player stuff
-      if (ent == Server.getPlayerByIp(clientIP).getShip()) {
-        Ship player = (Ship) ent;
-        InputManager.processInputs(player, cis);
+      for (Player p : latestCIS.keySet()) {
+        if (ent == p.getShip()) {
+          Ship s = (Ship) ent;
+          ClientInputSample cis = latestCIS.get(p);
+          InputManager.processInputs(s, cis);
+        }
       }
-
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
     }
@@ -129,6 +130,7 @@ public class ModelManager {
       c.resolveCollision();
     }
   }
+
 
   /**
    * Syncs the client with the server

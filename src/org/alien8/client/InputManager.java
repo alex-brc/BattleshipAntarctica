@@ -1,4 +1,3 @@
-
 package org.alien8.client;
 
 import java.awt.event.KeyEvent;
@@ -6,7 +5,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
+import org.alien8.client.ClientInputSample;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
@@ -90,6 +89,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
           player.midTurretShoot();
 
 	}
+
 	
 	/**
 	 * @return true if left mouse button is pressed, false otherwise

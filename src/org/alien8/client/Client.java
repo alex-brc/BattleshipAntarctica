@@ -9,10 +9,14 @@ import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import org.alien8.ai.AIController;
+import org.alien8.core.ClientRequest;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
@@ -34,12 +38,17 @@ public class Client implements Runnable {
   private volatile boolean running = false;
   private Thread thread;
   private ModelManager model;
+  private AIController aiPlayer;
   private int FPS = 0;
+  private InetAddress serverIP = null;
+  private InetAddress multiServerIP = null;
+  private int clientMultiPort = 4445;
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
+  private MulticastSocket multiReceiver = null;
+  private String groupIPStr = "224.0.0.5";
+  private String serverIPstr = "192.168.0.15"; //<- change to the ip of the server to test
   private DatagramSocket eventSocket = null;
-  private InetAddress serverIP = null;
-  private String serverIPstr;
   private ScoreBoard scoreBoard;
 
   public Client() {
@@ -94,26 +103,26 @@ public class Client implements Runnable {
     long tickTimer = getTime();
 
     while (running) {
-      currentTime = getTime();
+       currentTime = getTime();
 
-      // Get the amount of update()s the model needs to catch up
-      //
-      // timeNow - timeLastUpdateWasDone --> time elapsed
-      // timeToCatchUp = ----------------------------------
-      // deltaTPerTick --> how long a "tick" is
-      //
-      catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+       // Get the amount of update()s the model needs to catch up
+       // 
+       //                  timeNow - timeLastUpdateWasDone    --> 
+       // timeToCatchUp = ----------------------------------
+       //							deltaTPerTick              --> how long a "tick" is
+       // 
+       catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
-      // Call update() as many times as needed to compensate before rendering
-      while (catchUp >= 1) {
-        this.sendInputSample();
-        this.receiveEvents();
-        this.receiveAndUpdate();
-        tickRate++;
-        catchUp--;
-        // Update last time
-        lastTime = getTime();
-      }
+       // Call update() as many times as needed to compensate before rendering
+       while (catchUp >= 1) {
+         this.sendInputSample();
+    	 // this.receiveEvents();
+         this.receiveAndUpdate();
+         tickRate++;
+         catchUp--;
+         // Update last time
+         lastTime = getTime();
+       }
 
       // Call the renderer
       // aiPlayer.update();
@@ -170,13 +179,11 @@ public class Client implements Runnable {
       try {
         serverIP = InetAddress.getByName(serverIPStr);
         tcpSocket = new Socket(serverIP, 4446);
-
-        System.out.println("Connected");
         udpSocket = new DatagramSocket();
-        eventSocket = new DatagramSocket();
+        // eventSocket = new DatagramSocket();
 
-        // Serialize a TRUE Boolean object (representing connect request) into byte array
-        Boolean connectRequest = new Boolean(true);
+        // Serialize a ClientRequest Object into byte array
+        ClientRequest connectRequest = new ClientRequest(0, udpSocket.getLocalPort());
         ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
         ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
         toServer.writeObject(connectRequest);
@@ -192,19 +199,12 @@ public class Client implements Runnable {
         // Client's Ship is stored at the end of the synced entities queue
         Object[] entitiesArr = model.getEntities().toArray();
         model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
+        
+		// set up multicast socket client receiver
+		multiServerIP = InetAddress.getByName(groupIPStr);
+		multiReceiver = new MulticastSocket(clientMultiPort);
+		multiReceiver.joinGroup(multiServerIP);
 
-        // Perform initial handshake with ClientHandler
-        try {
-          LogManager.getInstance().log("Client", LogManager.Scope.INFO,
-              "Sending handshakes to ClientHandler");
-          sendDummyPacket(udpSocket, 4446);
-          sendDummyPacket(eventSocket, 4447);
-        } catch (IOException e) {
-          LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
-              "Exception initialising ClientHandler - Client connection in a socket: "
-                  + e.toString());
-          System.exit(-1);
-        }
       } catch (BindException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
             "Could not bind to any port. Firewalls?\n" + e.toString());
@@ -232,24 +232,6 @@ public class Client implements Runnable {
     return false;
   }
 
-  private void sendDummyPacket(DatagramSocket udp, int destPort) throws IOException {
-
-    // Serialize the input sample object into byte array
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-    Boolean dummy = new Boolean(true);
-    objOut.writeObject(dummy);
-    byte[] clientInputSampleByte = byteOut.toByteArray();
-
-    // Create a packet for holding the input sample byte data
-    DatagramPacket packet =
-        new DatagramPacket(clientInputSampleByte, clientInputSampleByte.length, serverIP, destPort);
-
-    // Send the client input sample packet to the server
-    udp.send(packet);
-
-  }
-
   private void sendInputSample() {
     try {
       // Serialize the input sample object into byte array
@@ -270,35 +252,35 @@ public class Client implements Runnable {
     }
   }
 
-  public void receiveEvents() {
-    try {
-      // Create a packet for receiving difference packet
-      byte[] buf = new byte[65536];
-      DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
-
-      eventSocket.receive(eventPacket);
-      byte[] eventBytes = eventPacket.getData();
-
-      // Deserialize the event data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
-      ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      GameEvent event = (GameEvent) objIn.readObject();
-
-      // Send audio events to AudioManager
-      if (event != null) {
-
-        System.out.println(event.toString());
-        if (event instanceof AudioEvent)
-          AudioManager.getInstance().addEvent((AudioEvent) event);
-        else if (event instanceof Score)
-          ScoreBoard.getInstance().update((Score) event);
-      }
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    } catch (ClassNotFoundException cnfe) {
-      cnfe.printStackTrace();
-    }
-  }
+//  public void receiveEvents() {
+//    try {
+//      // Create a packet for receiving difference packet
+//      byte[] buf = new byte[65536];
+//      DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
+//
+//      eventSocket.receive(eventPacket);
+//      byte[] eventBytes = eventPacket.getData();
+//
+//      // Deserialize the event data into object
+//      ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
+//      ObjectInputStream objIn = new ObjectInputStream(byteIn);
+//      GameEvent event = (GameEvent) objIn.readObject();
+//
+//      // Send audio events to AudioManager
+//      if (event != null) {
+//
+//        System.out.println(event.toString());
+//        if (event instanceof AudioEvent)
+//          AudioManager.getInstance().addEvent((AudioEvent) event);
+//        else if (event instanceof Score)
+//          ScoreBoard.getInstance().update((Score) event);
+//      }
+//    } catch (IOException ioe) {
+//      ioe.printStackTrace();
+//    } catch (ClassNotFoundException cnfe) {
+//      cnfe.printStackTrace();
+//    }
+//  }
 
   /*
    * Receive the game state difference from the server and sync the game state with the server
@@ -310,7 +292,7 @@ public class Client implements Runnable {
       DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
       // Receive a difference packet and obtain the byte data
-      udpSocket.receive(packet);
+      multiReceiver.receive(packet);
       byte[] differenceByte = packet.getData();
 
       // Deserialize the difference byte data into object
@@ -370,6 +352,8 @@ public class Client implements Runnable {
 
         // Reset the socket, serverIP and client-side threads after disconnecting
         tcpSocket = null;
+        udpSocket = null;
+        multiReceiver = null;
         serverIP = null;
       } catch (IOException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.ERROR,

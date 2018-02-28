@@ -9,6 +9,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
@@ -20,70 +21,43 @@ import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
 
-public class ClientHandler extends Thread {
-	private DatagramSocket udpSocket = null;
-	private DatagramSocket eventSocket = null;
-	private InetAddress clientIP = null;
-	private Integer port = null;
-	private Integer eventPort = null;
-	private ModelManager model = ModelManager.getInstance();
-	private ConcurrentLinkedQueue<Entity> lastSyncedEntities = null;
-	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
-	long lastTime = System.nanoTime();
-    long currentTime = 0;
-    double tick = 0;
-	private static boolean run = true;
+public class ServerMulticastSender extends Thread{
 	
-	public ClientHandler(DatagramSocket udpSocket, DatagramSocket eventSocket, InetAddress clientIP, ConcurrentLinkedQueue<Entity> lastSyncedEntities) {
-		this.udpSocket = udpSocket;
-		this.eventSocket = eventSocket;
-		this.clientIP = clientIP;
-		this.lastSyncedEntities = lastSyncedEntities;
-	}
-	/**
-	 * Send some packets back and forth to client
-	 * to obtain IP and port numbers
-	 * 
-	 */
-	public void init() {
-		LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO, "Shaking hands with client...");
-		byte[] buf = new byte[65536];
-	    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-		// Init udp socket
-	    try {
-			udpSocket.receive(packet);
-		} catch (IOException e) {
-			LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in udp socket: " + e.toString());
-			System.exit(-1);
-		}
-		port = packet.getPort();
-	    clientIP = packet.getAddress();
-	    
-	    buf = new byte[65536];
-	    packet = new DatagramPacket(buf, buf.length);
-		
-	    try {
-			eventSocket.receive(packet);
-		} catch (IOException e) {
-			LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL, "Exception initialising ClientHandler - Client connection in event socket: " + e.toString());
-			System.exit(-1);
-		}
-	    eventPort = packet.getPort();
-	    
+	private Integer clientMultiCastPort;
+	private InetAddress groupIP;
+	private DatagramSocket udpSocket;
+	private ConcurrentLinkedQueue<Entity> lastSyncedEntities;
+	private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
+	private ConcurrentHashMap<Player,ClientInputSample> latestCIS;
+	long lastTime;
+	long currentTime;
+	long tick;
+	private boolean run = true;
+	
+	public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip, ConcurrentLinkedQueue<Entity> ents, ConcurrentHashMap<Player,ClientInputSample> latestCIS) {	
+		udpSocket = ds;
+		clientMultiCastPort = port;
+		groupIP = ip;
+		lastSyncedEntities = ents;
+		this.latestCIS = latestCIS;
 	}
 	
 	public void run() {
+		lastTime = System.nanoTime();
+		long currentTime = 0;
+		double tick = 0;
+		// Send game state snapshot 60 times per second
 		while (run) {
 			currentTime = System.nanoTime();
 			tick += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
-
+			
 	        while (tick >= 1) {
-	    	   this.readInputSample();
-	    	   this.sendEvents();
-	    	   this.sendGameState();
-	    	   tick--;
-	           // Update last time
-	           lastTime = System.nanoTime();
+	        	readInputSample();
+				updateGameStateByCIS();
+				sendGameState();
+				tick--;
+				// Update last time
+				lastTime = System.nanoTime();
 	        }
 		}
 	}
@@ -96,15 +70,24 @@ public class ClientHandler extends Thread {
 		    
 		    // Receive an input sample packet and obtain its byte data
 		    udpSocket.receive(packet);
-		    byte[] inputSampleByte = packet.getData();
+		    InetAddress clientIP = packet.getAddress();
+		    int clientPort = packet.getPort();
+		    byte[] cisByte = packet.getData();
 		    
 		    // Deserialize the input sample byte data into object
-		    ByteArrayInputStream byteIn = new ByteArrayInputStream(inputSampleByte);
+		    ByteArrayInputStream byteIn = new ByteArrayInputStream(cisByte);
 		    ObjectInputStream objIn = new ObjectInputStream(byteIn);
-		    ClientInputSample inputSample = (ClientInputSample) objIn.readObject();
+		    ClientInputSample cis = (ClientInputSample) objIn.readObject();
 		    
-		    // Update the game state according the input sample
-		    model.updateServer(clientIP, inputSample);
+		    // Identify which Player the CIS belongs to
+		    Player p = Server.getPlayerByIpAndPort(clientIP, clientPort);
+		    
+		    // Put the received input sample in the CIS hash map
+		    if (p != null && cis != null)
+		    	if (latestCIS.containsKey(p))
+		    		latestCIS.replace(p, cis);
+		    	else
+		    		latestCIS.put(p, cis);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -114,28 +97,11 @@ public class ClientHandler extends Thread {
 		}
 	}
 	
-	private void sendEvents() {
-		try {
-			// Serialize the next event in a byte array
-	        GameEvent event = Server.getNextEvent();
-	        
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-	        objOut.writeObject(event);
-	        byte[] eventByte = byteOut.toByteArray();
-
-	        // Create the packet for event bytes
-	        DatagramPacket packet = new DatagramPacket(eventByte, eventByte.length, clientIP, eventPort);
-
-	        // Send the packet
-	        udpSocket.send(packet);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void updateGameStateByCIS() {
+		ModelManager.getInstance().updateServer(latestCIS);
 	}
 	
-	private void sendGameState() {
+	public void sendGameState() {
 		try {
 			ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
 			
@@ -145,7 +111,7 @@ public class ClientHandler extends Thread {
 				newLastSyncedEntities.add((Entity) deepClone(e));
 			}
 			lastSyncedEntities = newLastSyncedEntities;
-			
+							
 			// Serialize the difference arraylist into byte array
 			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
@@ -153,8 +119,8 @@ public class ClientHandler extends Thread {
 			byte[] differenceByte = byteOut.toByteArray();
 			
 			// Create a packet for holding the difference byte data
-	        DatagramPacket packet = new DatagramPacket(differenceByte, differenceByte.length, clientIP, port);
-	        
+	        DatagramPacket packet = new DatagramPacket(differenceByte, differenceByte.length, groupIP, clientMultiCastPort);
+
 	        // Send the difference packet to client
 	        udpSocket.send(packet);
 		}
@@ -163,10 +129,31 @@ public class ClientHandler extends Thread {
 		}
 	}
 	
+//	private void sendEvents() {
+//		try {
+//			// Serialize the next event in a byte array
+//	        GameEvent event = Server.getNextEvent();
+//	        
+//			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+//			ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+//	        objOut.writeObject(event);
+//	        byte[] eventByte = byteOut.toByteArray();
+//
+//	        // Create the packet for event bytes
+//	        DatagramPacket packet = new DatagramPacket(eventByte, eventByte.length, clientIP, eventPort);
+//
+//	        // Send the packet
+//	        udpSocket.send(packet);
+//		}
+//		catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
+	
 	/* 
 	 * Calculate the difference between two set of entities, difference is represented as an arraylist of compressed entities that are modified or added or removed
 	 */
-	public static ArrayList<EntityLite> calculateDifference(ConcurrentLinkedQueue<Entity> lastSyncedEntities, ConcurrentLinkedQueue<Entity> currentEntities) {
+	public ArrayList<EntityLite> calculateDifference(ConcurrentLinkedQueue<Entity> lastSyncedEntities, ConcurrentLinkedQueue<Entity> currentEntities) {
 		ArrayList<EntityLite> difference = new ArrayList<EntityLite>();
 		
 		if (currentEntities.size() >= lastSyncedEntities.size()) {
@@ -295,12 +282,12 @@ public class ClientHandler extends Thread {
 		}
 		
 		return difference;
-	}
+	} 
 	
-	/**
+	/*
 	 * This method makes a "deep clone" of any Java object it is given.
 	 */
-	 public static Object deepClone(Object object) {
+	 public Object deepClone(Object object) {
 	   try {
 	     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	     ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -314,8 +301,5 @@ public class ClientHandler extends Thread {
 	     return null;
 	   }
 	 }
-	 
-	 public void end() {
-		 run = false;
-	 }
-}
+}	
+
