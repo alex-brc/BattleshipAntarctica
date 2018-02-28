@@ -6,7 +6,7 @@ import org.alien8.physics.Position;
 /**
  * This abstract class implements the generic Entity. All things that are part of the game map are
  * instances of classes that implement Entity. Such could be the Player class, the Terrain class,
- * etc.
+ * etc.d
  *
  */
 public abstract class Entity implements Serializable, Cloneable {
@@ -15,8 +15,8 @@ public abstract class Entity implements Serializable, Cloneable {
   protected Position position;
   protected long serial = -1;
   protected boolean toBeDeleted = false;
-  protected Properties properties = new Properties();
-  protected Attributes attributes = new Attributes();
+  // protected Properties properties = new Properties();
+  // protected Attributes attributes = new Attributes();
 
   private double mass;
   private double speed;
@@ -27,7 +27,7 @@ public abstract class Entity implements Serializable, Cloneable {
   private Position[] obb;
 
   /**
-   * Basic constructor for an entity
+   * Basic constructor for an Entity.
    * 
    * @param position the XY coordinates for this entity
    * @param id the ID of this entity. The ID determines the type of the entity
@@ -35,11 +35,35 @@ public abstract class Entity implements Serializable, Cloneable {
   public Entity(Position position, double direction, double speed, double mass, double length,
       double width) {
     this.position = position;
-    this.properties.setDirection(direction);
-    this.properties.setSpeed(speed);
-    this.properties.setMass(mass);
-    this.properties.setLength(length);
-    this.properties.setWidth(width);
+    // this.properties.setDirection(direction);
+    // this.properties.setSpeed(speed);
+    // this.properties.setMass(mass);
+    // this.properties.setLength(length);
+    // this.properties.setWidth(width);
+    this.direction = direction;
+    this.speed = speed;
+    this.mass = mass;
+    this.length = length;
+    this.width = width;
+
+    initObb();
+  }
+
+  public Entity(Position position, double direction, double speed, double mass, double length,
+      double width, double health) {
+    this.position = position;
+    // this.properties.setDirection(direction);
+    // this.properties.setSpeed(speed);
+    // this.properties.setMass(mass);
+    // this.properties.setLength(length);
+    // this.properties.setWidth(width);
+    // this.properties.setHealth(health);
+    this.direction = direction;
+    this.speed = speed;
+    this.mass = mass;
+    this.length = length;
+    this.width = width;
+    this.health = health;
 
     initObb();
   }
@@ -148,7 +172,13 @@ public abstract class Entity implements Serializable, Cloneable {
   public abstract void render();
 
   public void damage(double damage) {
-    this.setHealth(this.getHealth() - damage);
+    // System.out.println("Damage: " + damage);
+    // properties.setHealth(attributes.getHealth() - damage);
+    // // Destroy if health less than 0
+    // if (properties.getHealth() <= 0) {
+    // delete();
+    // }
+    health -= damage;
   }
 
   public boolean isPlayer() {
@@ -170,51 +200,63 @@ public abstract class Entity implements Serializable, Cloneable {
   public abstract void dealWithInIce(boolean[][] iceGrid);
 
   public double getHealth() {
-    return this.attributes.getHealth();
+    // return this.properties.getHealth();
+    return health;
   }
 
   public void setHealth(double health) {
-    this.attributes.setHealth(health);
+    // this.properties.setHealth(health);
+    this.health = health;
   }
 
   public double getMass() {
-    return this.properties.getMass();
+    // return this.properties.getMass();
+    return mass;
   }
 
   public void setMass(double mass) {
-    this.properties.setMass(mass);
+    // this.properties.setMass(mass);
+    this.mass = mass;
   }
 
   public double getSpeed() {
-    return this.properties.getSpeed();
+    // return this.properties.getSpeed();
+    return speed;
   }
 
   public void setSpeed(double speed) {
-    this.properties.setSpeed(speed);
+    // this.properties.setSpeed(speed);
+    this.speed = speed;
   }
 
   public double getDirection() {
-    return this.properties.getDirection();
+    // return this.properties.getDirection();
+    return direction;
   }
 
   public void setDirection(double direction) {
-    this.properties.setDirection(direction);
+    // this.properties.setDirection(direction);
+    this.direction = direction;
   }
 
   public double getLength() {
-    return this.properties.getLength();
+    // return this.properties.getLength();
+    return length;
   }
 
   public void setLength(double length) {
-    this.properties.setLength(length);
+    // this.properties.setLength(length);
+    this.length = length;
   }
 
   public double getWidth() {
-    return this.properties.getWidth();
+    // return this.properties.getWidth();
+    return width;
   }
 
   public void setWidth(double width) {
-    this.properties.setWidth(width);
+    // this.properties.setWidth(width);
+    this.width = width;
   }
 
   public Position[] getObb() {

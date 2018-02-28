@@ -12,6 +12,7 @@ public class Properties implements Serializable {
   public double direction;
   public double length;
   public double width;
+  private double health;
 
   public double getMass() {
     return mass;
@@ -41,6 +42,10 @@ public class Properties implements Serializable {
     return length;
   }
 
+  public double getHealth() {
+    return health;
+  }
+
   public void setLength(double length) {
     this.length = length;
   }
@@ -51,5 +56,9 @@ public class Properties implements Serializable {
 
   public void setWidth(double width) {
     this.width = width;
+  }
+
+  public void setHealth(double health) {
+    this.health = health;
   }
 }

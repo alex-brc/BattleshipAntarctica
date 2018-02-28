@@ -48,11 +48,17 @@ public class Parameters {
   public static final int MAP_HEIGHT = 2048;
   public static final int MAP_WIDTH = 2048;
   /**
-   * Length of the ship in units (the same units we use for the coordinate system) Currently, this
-   * number doesn't mean much
+   * Length of the ship in units (the same units we use for the coordinate system).
    */
   public static final double SHIP_LENGTH = 100;
+  /**
+   * Width of the ship in units (the same units we use for the coordinate system).
+   */
   public static final double SHIP_WIDTH = 25;
+  /**
+   * Amount of health a ship has.
+   */
+  public static final double SHIP_HEALTH = 100;
   /**
    * Interdependent stuff. Force required is computed according to how long it would take to reach
    * top speed
@@ -71,8 +77,14 @@ public class Parameters {
    */
   public static final double ROTATION_MODIFIER = 1;
   public static final double FRICTION = 0.997;
-  // Affects how much speed is lost when Entities collide
+  /**
+   * Affects how much speed is lost when Entities collide
+   */
   public static final double RESTITUTION_COEFFICIENT = 1;
+  /**
+   * Affects how 'bouncy' ice is when collided with.
+   */
+  public static final double ICE_BOUNCINESS = 0.02;
   /**
    * Bullet parameters
    */
@@ -100,10 +112,10 @@ public class Parameters {
    * tick
    */
   public static final double CHARGE_INCREMENT = 4;
-  /*
-   * This modifier affects how much damage ships take in collisions.
+  /**
+   * Affects how much damage ships take in collisions.
    */
-  public static final double COLLISION_DAMAGE_MODIFIER = 0.5;
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.1;
   public static final double WATER_LEVEL = 0.4d;
   /**
    * Maximum number of "shoot" audio clips running at the same time
@@ -120,5 +132,7 @@ public class Parameters {
   public static final float DISTANCE_MULTIPLIER = 1;
   public static final int SCOREBOARD_HEIGHT = 500;
   public static final int SCOREBOARD_WIDTH = 500;
+
+
 
 }
