@@ -159,10 +159,14 @@ public class Renderer extends Canvas {
       }
     }
   }
-
-  public void drawMap(boolean[][] grid) {
-    int x0 = xScroll;
-    int x1 = (xScroll + width + 1);
+  
+  public void drawText(String text, int x, int y, boolean fixed){
+	  Font.defaultFont.render(text, this, x, y, fixed);
+  }
+  
+  public void drawMap(boolean[][] grid){
+	int x0 = xScroll;
+	int x1 = (xScroll + width + 1);
     int y0 = yScroll;
     int y1 = (yScroll + height + 1);
 
