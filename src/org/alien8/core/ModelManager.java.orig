@@ -34,11 +34,19 @@ public class ModelManager {
   private Ship player;
 
   private ModelManager() {
+<<<<<<< HEAD
+    // All setup should be done here, such as support for networking, etc.
+=======
+>>>>>>> 318b1d657373e60e18af43f7bbab0e5bf590ff13
     // Normally this exists only to defeat instantiation
 
     entities = new ConcurrentLinkedQueue<Entity>();
     collisionDetector = new CollisionDetector();
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 318b1d657373e60e18af43f7bbab0e5bf590ff13
     // List<AABB> aabbs = map.getAABBs();
     // for (AABB aabb : aabbs) {
     // entities.add(aabb.getEntity());
@@ -101,7 +109,7 @@ public class ModelManager {
   /**
    * Server version of update()
    */
-  public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
+  public void updateServer(ConcurrentHashMap<Player,ClientInputSample> latestCIS) {
     // Loop through all the entities
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
@@ -113,6 +121,13 @@ public class ModelManager {
         continue;
       }
       // Handle player stuff
+<<<<<<< HEAD
+      if (ent == Server.getPlayerByIp(clientIP).getShip()) {
+        Ship player = (Ship) ent;
+        InputManager.processInputs(player, cis);
+      }
+
+=======
       for (Player p : latestCIS.keySet()) {
         if (ent == p.getShip()) {
           Ship s = (Ship) ent;
@@ -120,6 +135,7 @@ public class ModelManager {
           InputManager.processInputs(s, cis);
         }
       }
+>>>>>>> 318b1d657373e60e18af43f7bbab0e5bf590ff13
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
     }

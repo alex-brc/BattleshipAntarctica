@@ -3,7 +3,6 @@ package org.alien8.rendering;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
-
 import javax.imageio.ImageIO;
 
 public class Sprite implements Serializable {
@@ -47,6 +46,13 @@ public class Sprite implements Serializable {
 		System.arraycopy(s.getPixels(), 0, pixels, 0, s.getPixels().length);
 	}
 	
+	public Sprite(int[] pixels, int width, int height){
+		this.pixels = new int[width*height];
+		System.arraycopy(pixels, 0, this.pixels, 0, pixels.length);
+		this.width = width;
+		this.height = height;
+	}
+	
 	public Sprite rotateSprite(double a){
 		Sprite s = new Sprite((int)(height * Math.abs(Math.sin(a)) + width * Math.abs(Math.cos(a))), (int)(height * Math.abs(Math.cos(a)) + width * Math.abs(Math.sin(a))));
 		double cx = (double)width / 2;
@@ -73,6 +79,28 @@ public class Sprite implements Serializable {
 		}
 		
 		return s;
+	}
+	
+	public static Sprite[] split(Sprite sheet, int size){
+		int total = (sheet.getWidth() * sheet.getHeight()) / (size * size);
+		Sprite[] sprites = new Sprite[total];
+		int current = 0;
+		int[] pixels = new int[size * size];
+		
+		for (int yp = 0; yp < sheet.getHeight() / size; yp++){
+			for (int xp = 0; xp < sheet.getWidth() / size; xp++){
+				for (int y = 0; y < size; y++){
+					for (int x = 0; x < size; x++){
+						int xo = x + xp * size;
+						int yo = y + yp * size;
+						pixels[x+y*size] = sheet.pixels[xo + yo * sheet.getWidth()];
+					}
+				}
+				sprites[current++] = new Sprite(pixels, size, size);
+			}
+		}
+		
+		return sprites;
 	}
 	
 	private void load(){

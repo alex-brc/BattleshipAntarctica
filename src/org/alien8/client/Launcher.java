@@ -1,86 +1,81 @@
 package org.alien8.client;
 
-import java.awt.Dimension;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-
 import org.alien8.audio.AudioManager;
-import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
 public class Launcher {
-	public static Launcher instance;
-	private String loadStatus;
-	private Renderer renderer;
-	private String serverIPstr = "172.22.35.217";
-	private Client game;
-	
-	private Launcher() {
-		// Nothing
-	}
-	
-	public static void main(String[] args) {
-		Launcher launcher = new Launcher();
-		launcher.game = new Client();
-		Launcher.instance = launcher;
-		// Load log manager
-		launcher.loadStatus = "Preparing logger...";
-		launcher.loadLogManager();
-		
-		// Load renderer
-		launcher.loadStatus = "Building renderer...";
-		launcher.loadRenderer();
-		
-		// Load audio manager
-		launcher.loadStatus = "Loading sounds...";
-		launcher.loadAudioManager();
-		
-		// Connect to server
-		launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr +"...";
-		launcher.connect();
-		
-		// Make the scoreboard
-		launcher.loadStatus = "Constructing a scoreboard...";
-		launcher.loadScoreBoard();
-		
-		// Start the game
-		launcher.game.start();
-	}
-	
-	public static Launcher getInstance() {
-		return instance;
-	}
-	public Client getRunningClient() {
-		return game;
-	}
-	
-	private void loadLogManager() {
-		LogManager.getInstance();
-	}
+  public static Launcher instance;
+  private String loadStatus;
+  private Renderer renderer;
+  private String serverIPstr = "192.168.56.1";
+  private Client game;
 
-	private void loadRenderer() {
-		Renderer.getInstance();
-	}
+  private Launcher() {
+    // Nothing
+  }
 
-	private void loadAudioManager() {
-		AudioManager.getInstance();
-	}
-	
-	private void loadScoreBoard() {
-		ScoreBoard.getInstance().startListener();
-	}
+  public static void main(String[] args) {
+    Launcher launcher = new Launcher();
+    launcher.game = new Client();
+    Launcher.instance = launcher;
+    // Load log manager
+    launcher.loadStatus = "Preparing logger...";
+    launcher.loadLogManager();
 
-	private void connect() {
-		System.out.println("Connecting to " + serverIPstr + "...");
-		LogManager.getInstance().log("Networking", LogManager.Scope.INFO, "Connecting to host at " + serverIPstr + "...");
-		if(!game.connect(serverIPstr)) {
-			LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Connection failed.");
-			System.out.println("Connection failed. Are you running a server?");
-			System.exit(-1);
-		}
-	}
+    // Load renderer
+    launcher.loadStatus = "Building renderer...";
+    launcher.loadRenderer();
+
+    // Load audio manager
+    launcher.loadStatus = "Loading sounds...";
+    launcher.loadAudioManager();
+
+    // Connect to server
+    launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr + "...";
+    launcher.connect();
+
+    // Make the scoreboard
+    launcher.loadStatus = "Constructing a scoreboard...";
+    launcher.loadScoreBoard();
+
+    // Start the game
+    launcher.game.start();
+  }
+
+  public static Launcher getInstance() {
+    return instance;
+  }
+
+  public Client getRunningClient() {
+    return game;
+  }
+
+  private void loadLogManager() {
+    LogManager.getInstance();
+  }
+
+  private void loadRenderer() {
+    Renderer.getInstance();
+  }
+
+  private void loadAudioManager() {
+    AudioManager.getInstance();
+  }
+
+  private void loadScoreBoard() {
+    ScoreBoard.getInstance().startListener();
+  }
+
+  private void connect() {
+    System.out.println("Connecting to " + serverIPstr + "...");
+    LogManager.getInstance().log("Networking", LogManager.Scope.INFO,
+        "Connecting to host at " + serverIPstr + "...");
+    if (!game.connect(serverIPstr)) {
+      LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Connection failed.");
+      System.out.println("Connection failed. Are you running a server?");
+      System.exit(-1);
+    }
+  }
 }

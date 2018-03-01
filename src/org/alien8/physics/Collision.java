@@ -48,18 +48,18 @@ public class Collision {
     } else if ((entity1 instanceof Bullet) & (entity2 instanceof Ship)) {
       resolveBulletShipCollision((Bullet) entity1, (Ship) entity2);
     }
-    // Collision between a Ship and Ice
-    else if ((entity1 instanceof Ship) & (entity2 instanceof Ice)) {
-      resolveShipIceCollision((Ship) entity1, (Ice) entity2);
-    } else if ((entity1 instanceof Ice) & (entity2 instanceof Ship)) {
-      resolveShipIceCollision((Ship) entity2, (Ice) entity1);
-    }
-    // Collision between a Bullet and Ice
-    else if ((entity1 instanceof Bullet) & (entity2 instanceof Ice)) {
-      resolveBulletIceCollision((Bullet) entity1, (Ice) entity2);
-    } else if ((entity1 instanceof Ice) & (entity2 instanceof Bullet)) {
-      resolveBulletIceCollision((Bullet) entity2, (Ice) entity1);
-    }
+    // // Collision between a Ship and Ice
+    // else if ((entity1 instanceof Ship) & (entity2 instanceof Ice)) {
+    // resolveShipIceCollision((Ship) entity1, (Ice) entity2);
+    // } else if ((entity1 instanceof Ice) & (entity2 instanceof Ship)) {
+    // resolveShipIceCollision((Ship) entity2, (Ice) entity1);
+    // }
+    // // Collision between a Bullet and Ice
+    // else if ((entity1 instanceof Bullet) & (entity2 instanceof Ice)) {
+    // resolveBulletIceCollision((Bullet) entity1, (Ice) entity2);
+    // } else if ((entity1 instanceof Ice) & (entity2 instanceof Bullet)) {
+    // resolveBulletIceCollision((Bullet) entity2, (Ice) entity1);
+    // }
   }
 
   private void resolveShipShipCollision(Ship ship1, Ship ship2) {

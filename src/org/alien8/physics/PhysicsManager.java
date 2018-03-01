@@ -31,27 +31,26 @@ public class PhysicsManager {
     // TODO:this is causing weird stuff.
     // e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
   }
-  
+
   /**
-   * Slows the entity down by a constant scaling factor.
-   * Less complex than dealing with forces.
+   * Slows the entity down by a constant scaling factor. Less complex than dealing with forces.
    * 
    * @param e the entity to apply friction to
    */
   public static void applyFriction(Entity e) {
-	  e.setSpeed(e.getSpeed() * Parameters.FRICTION);
-	  // Makes friction less CPU-intensive sometimes
-	  if (e.getSpeed() < 0.001d) {
-		  e.setSpeed(0);
-	  }
+    e.setSpeed(e.getSpeed() * Parameters.FRICTION);
+    // Makes friction less CPU-intensive sometimes
+    if (e.getSpeed() < 0.001d) {
+      e.setSpeed(0);
+    }
   }
 
   /**
    * Updates the position of an Entity. Must be called every tick.
    * 
-   * @param e The Entity to be updated.	
+   * @param e The Entity to be updated.
    */
-  public static void updatePosition(Entity e) {
+  public static void updatePosition(Entity e, boolean[][] iceGrid) {
     Position pos = e.getPosition();
     double speed = e.getSpeed();
     double direction = e.getDirection();
@@ -64,6 +63,9 @@ public class PhysicsManager {
     // Update the Oriented Bounding Box
     // TODO: This causes an error.
     e.translateObb(xdiff, ydiff);
+    // Deal with terrain collision
+    e.dealWithInIce(iceGrid);
+    // Push the player back inside the map if they are out of bounds
     e.dealWithOutOfBounds();
   }
 
@@ -75,25 +77,26 @@ public class PhysicsManager {
    * @param clockwise Set to true if the rotation is clockwise, false if anti-clockwise.
    */
   public static void rotateEntity(Entity e, double angle) {
-	  /** First, squeeze the speed into the [0,pi] interval
-	   *
-	   * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,pi] */
-	  double squeezedSpeed = e.getSpeed() * Math.PI / Parameters.SHIP_TOP_SPEED_FORWARD;
-	  /**
-	   * Then put this speed through the function:
-	   *
-	   * f : (0,PI) -> [0,1]
-	   * f(x) = sin^2(x),
-	   *
-	   * to get a natural rotation modifier. 
-	   * Shift up by 0.3, feels more natural */
-	  double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2) + 0.3;
-	  // Then apply this modifier to the angle, with a parametrised weight
-	  angle *= rotModifier * Parameters.ROTATION_MODIFIER;
+    /**
+     * First, squeeze the speed into the [0,pi] interval
+     *
+     * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,pi]
+     */
+    double squeezedSpeed = e.getSpeed() * Math.PI / Parameters.SHIP_TOP_SPEED_FORWARD;
+    /**
+     * Then put this speed through the function:
+     *
+     * f : (0,PI) -> [0,1] f(x) = sin^2(x),
+     *
+     * to get a natural rotation modifier. Shift up by 0.3, feels more natural
+     */
+    double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2) + 0.3;
+    // Then apply this modifier to the angle, with a parametrised weight
+    angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 
-	  // Update the direction of the Entity, but also the bounding box
-	  e.setDirection(shiftAngle(e.getDirection() + angle));
-	  e.rotateObb(angle);
+    // Update the direction of the Entity, but also the bounding box
+    e.setDirection(shiftAngle(e.getDirection() + angle));
+    e.rotateObb(angle);
   }
 
   /**
