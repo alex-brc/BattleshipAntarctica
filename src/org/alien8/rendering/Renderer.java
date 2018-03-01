@@ -80,8 +80,9 @@ public class Renderer extends Canvas {
 
     // Render terrain here
     model.getMap().render(this);
-    drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false); // bounding box,
-                                                                                  // remove later?
+    // drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false); // bounding
+    // box,
+    // remove later?
 
     for (Entity e : model.getEntities()) {
       e.render();
@@ -140,6 +141,14 @@ public class Renderer extends Canvas {
       pixels[x + y * width] = col;
   }
 
+  /**
+   * Draws a Sprite on the screen.
+   * 
+   * @param xp
+   * @param yp
+   * @param sprite
+   * @param fixed
+   */
   public void drawSprite(int xp, int yp, Sprite sprite, boolean fixed) {
     if (!fixed) {
       xp -= xScroll;
@@ -159,14 +168,28 @@ public class Renderer extends Canvas {
       }
     }
   }
-  
-  public void drawText(String text, int x, int y, boolean fixed){
-	  Font.defaultFont.render(text, this, x, y, fixed);
+
+  /**
+   * Draws text on the screen.
+   * 
+   * @param text the text to display
+   * @param x x position to display at
+   * @param y y position to display at
+   * @param fixed {@code true} if the text is at a fixed screen position (for UI elements),
+   *        {@code false} if the text moves relative to the position of the player
+   */
+  public void drawText(String text, int x, int y, boolean fixed) {
+    Font.defaultFont.render(text, this, x, y, fixed);
   }
-  
-  public void drawMap(boolean[][] grid){
-	int x0 = xScroll;
-	int x1 = (xScroll + width + 1);
+
+  /**
+   * Draws the map on the screen.
+   * 
+   * @param grid
+   */
+  public void drawMap(boolean[][] grid) {
+    int x0 = xScroll;
+    int x1 = (xScroll + width + 1);
     int y0 = yScroll;
     int y1 = (yScroll + height + 1);
 
