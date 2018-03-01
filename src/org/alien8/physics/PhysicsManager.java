@@ -90,7 +90,9 @@ public class PhysicsManager {
      *
      * to get a natural rotation modifier. Shift up by 0.3, feels more natural
      */
-    double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2) + 0.3;
+    // double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2) + 0.3;
+    // Commented out the previous line to disallow turning when stationary
+    double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2);
     // Then apply this modifier to the angle, with a parametrised weight
     angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 
