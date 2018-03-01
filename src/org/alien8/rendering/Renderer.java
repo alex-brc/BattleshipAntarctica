@@ -88,8 +88,6 @@ public class Renderer extends Canvas {
 		e.render();
 	}
 	
-	drawText("Test", 50, 50, true);
-	
 	Graphics g = bs.getDrawGraphics(); //graphics object from buffer strategy
 	
 	g.setColor(Color.BLACK);

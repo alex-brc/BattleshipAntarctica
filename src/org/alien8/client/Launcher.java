@@ -9,7 +9,7 @@ public class Launcher {
 	public static Launcher instance;
 	private String loadStatus;
 	private Renderer renderer;
-	private String serverIPstr = "172.22.179.172";
+	private String serverIPstr = "192.168.56.1";
 	private Client game;
 	
 	private Launcher() {

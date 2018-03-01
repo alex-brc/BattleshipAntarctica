@@ -88,7 +88,7 @@ public class Sprite implements Serializable {
 		int current = 0;
 		int[] pixels = new int[size * size];
 		
-		for (int yp = 0; yp < sheet.getWidth() / sheet.getHeight(); yp++){
+		for (int yp = 0; yp < sheet.getHeight() / size; yp++){
 			for (int xp = 0; xp < sheet.getWidth() / size; xp++){
 				for (int y = 0; y < size; y++){
 					for (int x = 0; x < size; x++){
