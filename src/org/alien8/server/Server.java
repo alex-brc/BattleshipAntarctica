@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
@@ -39,7 +40,6 @@ public class Server {
   private static String groupIPStr = "224.0.0.5"; // multicast group ipString
   private static ServerSocket tcpSocket = null;
   private static DatagramSocket udpSocket = null;
-  // private static DatagramSocket eventSocket = null;
   private static ConcurrentLinkedQueue<Entity> lastSyncedEntities =
       new ConcurrentLinkedQueue<Entity>();
   private static ConcurrentHashMap<Player, ClientInputSample> latestCIS =
@@ -64,8 +64,6 @@ public class Server {
       System.out.println("TCP socket IP: " + tcpSocket.getInetAddress());
       System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
       System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
-      // System.out.println("UDP event socket Port: " + eventSocket.getLocalPort());
-      // System.out.println("UDP event socket IP: " + eventSocket.getLocalAddress());
 
       // Process clients' connect/disconnect request
       while (run) {
@@ -81,6 +79,7 @@ public class Server {
       }
 
       tcpSocket.close();
+      System.out.println("closed tcp");
       udpSocket.close();
     } catch (SocketException e) {
       e.printStackTrace();

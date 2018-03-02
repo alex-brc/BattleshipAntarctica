@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -125,35 +126,25 @@ public class ServerMulticastSender extends Thread {
       // Create a packet for holding the difference byte data
       DatagramPacket packet =
           new DatagramPacket(differenceByte, differenceByte.length, groupIP, clientMultiCastPort);
+      
+      // Make the game event packet
+      GameEvent event = Server.getNextEvent();
+      byteOut = new ByteArrayOutputStream();
+      objOut = new ObjectOutputStream(byteOut);
+      objOut.writeObject(event);
+      byte[] eventByte = byteOut.toByteArray();
+      
+      // Make packet
+      DatagramPacket eventPacket = new DatagramPacket(eventByte, eventByte.length, groupIP, clientMultiCastPort);
 
-      // Send the difference packet to client
+      // Send the difference packet and the event packet to client
       udpSocket.send(packet);
+      udpSocket.send(eventPacket);
     } catch (IOException e) {
       e.printStackTrace();
+      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL, "Packet error: " + e.toString());
     }
   }
-
-  // private void sendEvents() {
-  // try {
-  // // Serialize the next event in a byte array
-  // GameEvent event = Server.getNextEvent();
-  //
-  // ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-  // ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-  // objOut.writeObject(event);
-  // byte[] eventByte = byteOut.toByteArray();
-  //
-  // // Create the packet for event bytes
-  // DatagramPacket packet = new DatagramPacket(eventByte, eventByte.length, clientIP, eventPort);
-  //
-  // // Send the packet
-  // udpSocket.send(packet);
-  // }
-  // catch (IOException e) {
-  // e.printStackTrace();
-  // }
-  // }
-
   /*
    * Calculate the difference between two set of entities, difference is represented as an arraylist
    * of compressed entities that are modified or added or removed

@@ -14,14 +14,19 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
 import org.alien8.ai.AIController;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientRequest;
+import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
+import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
+import org.alien8.server.AudioEvent;
+import org.alien8.server.GameEvent;
 import org.alien8.ship.Ship;
 import org.alien8.util.ClientShutdownHook;
 import org.alien8.util.LogManager;
@@ -44,7 +49,6 @@ public class Client implements Runnable {
   private MulticastSocket multiReceiver = null;
   private String groupIPStr = "224.0.0.5";
   private String serverIPstr = "192.168.0.15"; // <- change to the ip of the server to test
-  private DatagramSocket eventSocket = null;
   private ScoreBoard scoreBoard;
 
   public Client() {
@@ -112,7 +116,6 @@ public class Client implements Runnable {
       // Call update() as many times as needed to compensate before rendering
       while (catchUp >= 1) {
         this.sendInputSample();
-        // this.receiveEvents();
         this.receiveAndUpdate();
         tickRate++;
         catchUp--;
@@ -248,35 +251,34 @@ public class Client implements Runnable {
     }
   }
 
-  // public void receiveEvents() {
-  // try {
-  // // Create a packet for receiving difference packet
-  // byte[] buf = new byte[65536];
-  // DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
-  //
-  // eventSocket.receive(eventPacket);
-  // byte[] eventBytes = eventPacket.getData();
-  //
-  // // Deserialize the event data into object
-  // ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
-  // ObjectInputStream objIn = new ObjectInputStream(byteIn);
-  // GameEvent event = (GameEvent) objIn.readObject();
-  //
-  // // Send audio events to AudioManager
-  // if (event != null) {
-  //
-  // System.out.println(event.toString());
-  // if (event instanceof AudioEvent)
-  // AudioManager.getInstance().addEvent((AudioEvent) event);
-  // else if (event instanceof Score)
-  // ScoreBoard.getInstance().update((Score) event);
-  // }
-  // } catch (IOException ioe) {
-  // ioe.printStackTrace();
-  // } catch (ClassNotFoundException cnfe) {
-  // cnfe.printStackTrace();
-  // }
-  // }
+  public void receiveEvents() {
+	  try {
+		  // Create a packet for receiving event packet
+		  byte[] buf = new byte[65536];
+		  DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
+
+		  multiReceiver.receive(eventPacket);
+		  byte[] eventBytes = eventPacket.getData();
+
+		  // Deserialize the event data into object
+		  ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
+		  ObjectInputStream objIn = new ObjectInputStream(byteIn);
+		  GameEvent event = (GameEvent) objIn.readObject();
+
+		  // Send audio events to AudioManager
+		  if (event != null) {
+			  System.out.println(event.toString());
+			  if (event instanceof AudioEvent)
+				  AudioManager.getInstance().addEvent((AudioEvent) event);
+			  else if (event instanceof Score)
+				  ScoreBoard.getInstance().update((Score) event);
+		  }
+	  } catch (IOException ioe) {
+		  ioe.printStackTrace();
+	  } catch (ClassNotFoundException cnfe) {
+		  cnfe.printStackTrace();
+	  }
+  }
 
   /*
    * Receive the game state difference from the server and sync the game state with the server
@@ -294,10 +296,22 @@ public class Client implements Runnable {
       // Deserialize the difference byte data into object
       ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      ArrayList<EntityLite> difference = (ArrayList<EntityLite>) objIn.readObject();
-
+      Object received = (Object) objIn.readObject();
+      
+      if(received instanceof ArrayList<?>) {
       // Sync the game state with server
-      ModelManager.getInstance().sync(difference);
+    	  ArrayList<EntityLite> difference = (ArrayList<EntityLite>) received;
+      	  ModelManager.getInstance().sync(difference);
+      }
+      else { // it is an event
+    	  GameEvent event = (GameEvent) received;
+    	  if(event == null)
+    		  return;
+		  if (event instanceof AudioEvent)
+			  AudioManager.getInstance().addEvent((AudioEvent) event);
+		  else if (event instanceof Score)
+			  ScoreBoard.getInstance().update((Score) event);
+      }
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
@@ -341,7 +355,6 @@ public class Client implements Runnable {
         // Serialize a FALSE Boolean object (representing disconnect request) into byte array
         Boolean disconnectRequest = new Boolean(false);
         ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
-        ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
 
         // Send the disconnect request
         toServer.writeObject(disconnectRequest);
@@ -354,6 +367,7 @@ public class Client implements Runnable {
       } catch (IOException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
             "Something went wrong disconnecting client. " + e.toString());
+        e.printStackTrace();
         System.exit(-1);
       }
     }
