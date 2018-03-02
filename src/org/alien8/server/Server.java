@@ -198,7 +198,7 @@ public class Server {
       // Start the ServerMulticastSender thread if it is the first client connection
       if (playerList.size() == 1)
         new ServerMulticastSender(udpSocket, clientMultiCastPort, groupIP, lastSyncedEntities,
-            latestCIS).start();
+            latestCIS, playerList).start();
     } else {
       LogManager.getInstance().log("Server", LogManager.Scope.INFO,
           "Client " + clientIP + " is already connected.");

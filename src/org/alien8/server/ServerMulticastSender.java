@@ -19,6 +19,7 @@ import org.alien8.core.Parameters;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
+import org.alien8.util.LogManager;
 
 public class ServerMulticastSender extends Thread {
 
@@ -28,18 +29,22 @@ public class ServerMulticastSender extends Thread {
   private ConcurrentLinkedQueue<Entity> lastSyncedEntities;
   private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS;
+  private ArrayList<Player> playerList;
   long lastTime;
   long currentTime;
   long tick;
   private boolean run = true;
 
+
   public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip,
-      ConcurrentLinkedQueue<Entity> ents, ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
+      ConcurrentLinkedQueue<Entity> ents, ConcurrentHashMap<Player, ClientInputSample> latestCIS,
+      ArrayList<Player> playerList) {
     udpSocket = ds;
     clientMultiCastPort = port;
     groupIP = ip;
     lastSyncedEntities = ents;
     this.latestCIS = latestCIS;
+    this.playerList = playerList;
   }
 
   public void run() {
@@ -50,7 +55,6 @@ public class ServerMulticastSender extends Thread {
     while (run) {
       currentTime = System.nanoTime();
       tick += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
-
       while (tick >= 1) {
         readInputSample();
         updateGameStateByCIS();
@@ -64,30 +68,32 @@ public class ServerMulticastSender extends Thread {
 
   private void readInputSample() {
     try {
-      // Create a packet for receiving input sample packet
-      byte[] buf = new byte[65536];
-      DatagramPacket packet = new DatagramPacket(buf, buf.length);
+      for (int i = 0; i < playerList.size(); i++) {
+        // Create a packet for receiving input sample packet
+        byte[] buf = new byte[65536];
+        DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
-      // Receive an input sample packet and obtain its byte data
-      udpSocket.receive(packet);
-      InetAddress clientIP = packet.getAddress();
-      int clientPort = packet.getPort();
-      byte[] cisByte = packet.getData();
+        // Receive an input sample packet and obtain its byte data
+        udpSocket.receive(packet);
+        InetAddress clientIP = packet.getAddress();
+        int clientPort = packet.getPort();
+        byte[] cisByte = packet.getData();
 
-      // Deserialize the input sample byte data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(cisByte);
-      ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      ClientInputSample cis = (ClientInputSample) objIn.readObject();
+        // Deserialize the input sample byte data into object
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(cisByte);
+        ObjectInputStream objIn = new ObjectInputStream(byteIn);
+        ClientInputSample cis = (ClientInputSample) objIn.readObject();
 
-      // Identify which Player the CIS belongs to
-      Player p = Server.getPlayerByIpAndPort(clientIP, clientPort);
+        // Identify which Player the CIS belongs to
+        Player p = Server.getPlayerByIpAndPort(clientIP, clientPort);
 
-      // Put the received input sample in the CIS hash map
-      if (p != null && cis != null)
-        if (latestCIS.containsKey(p))
-          latestCIS.replace(p, cis);
-        else
-          latestCIS.put(p, cis);
+        // Put the received input sample in the CIS hash map
+        if (p != null && cis != null)
+          if (latestCIS.containsKey(p))
+            latestCIS.replace(p, cis);
+          else
+            latestCIS.put(p, cis);
+      }
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
@@ -102,7 +108,6 @@ public class ServerMulticastSender extends Thread {
   public void sendGameState() {
     try {
       ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
-
       // Update the last synced set of entities right before sending the difference to client for
       // syncing
       ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
