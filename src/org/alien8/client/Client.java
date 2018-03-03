@@ -117,6 +117,7 @@ public class Client implements Runnable {
       while (catchUp >= 1) {
         this.sendInputSample();
         this.receiveAndUpdate();
+        this.receiveEvents();
         tickRate++;
         catchUp--;
         // Update last time
@@ -296,22 +297,11 @@ public class Client implements Runnable {
       // Deserialize the difference byte data into object
       ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      Object received = (Object) objIn.readObject();
-      
-      if(received instanceof ArrayList<?>) {
+      ArrayList<EntityLite> difference = (ArrayList<EntityLite>) objIn.readObject();
+
       // Sync the game state with server
-    	  ArrayList<EntityLite> difference = (ArrayList<EntityLite>) received;
-      	  ModelManager.getInstance().sync(difference);
-      }
-      else { // it is an event
-    	  GameEvent event = (GameEvent) received;
-    	  if(event == null)
-    		  return;
-		  if (event instanceof AudioEvent)
-			  AudioManager.getInstance().addEvent((AudioEvent) event);
-		  else if (event instanceof Score)
-			  ScoreBoard.getInstance().update((Score) event);
-      }
+      ModelManager.getInstance().sync(difference);
+      
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {

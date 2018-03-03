@@ -257,7 +257,9 @@ public class Server {
       for (Player p : playerList) {
         if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
           // Remove player from the PlayerList
-          model.getEntities().remove(p.getShip());
+          // Do not do entities.remove(), just have the ship marked for deletion.
+          // model.getEntities().remove(p.getShip());
+          p.getShip().delete();
           latestCIS.remove(p);
           playerList.remove(p);
           // Remove player from scoreboard
