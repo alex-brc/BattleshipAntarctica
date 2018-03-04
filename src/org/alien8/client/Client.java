@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import org.alien8.ai.AIController;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientRequest;
-import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
@@ -28,7 +27,6 @@ import org.alien8.score.ScoreBoard;
 import org.alien8.server.AudioEvent;
 import org.alien8.server.GameEvent;
 import org.alien8.ship.Ship;
-import org.alien8.util.ClientShutdownHook;
 import org.alien8.util.LogManager;
 
 public class Client implements Runnable {
@@ -54,7 +52,6 @@ public class Client implements Runnable {
   public Client() {
     model = ModelManager.getInstance();
     scoreBoard = ScoreBoard.getInstance();
-    Runtime.getRuntime().addShutdownHook(new ClientShutdownHook());
   }
 
   /**
@@ -93,6 +90,7 @@ public class Client implements Runnable {
   @Override
   public void run() {
     // Game loop goes here
+	
     long lastTime = getTime();
     long currentTime = 0;
     double catchUp = 0;
@@ -357,8 +355,6 @@ public class Client implements Runnable {
       } catch (IOException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
             "Something went wrong disconnecting client. " + e.toString());
-        e.printStackTrace();
-        System.exit(-1);
       }
     }
   }

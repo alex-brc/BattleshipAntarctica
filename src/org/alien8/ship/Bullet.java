@@ -4,6 +4,8 @@ import java.io.Serializable;
 import org.alien8.core.Entity;
 import org.alien8.physics.Position;
 
+import net.jafama.FastMath;
+
 public abstract class Bullet extends Entity implements Serializable {
 
   private static final long serialVersionUID = -4758229490654529751L;
@@ -76,8 +78,8 @@ public abstract class Bullet extends Entity implements Serializable {
 
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
-    int x = (int) Math.rint(getPosition().getX());
-    int y = (int) Math.rint(getPosition().getY());
+    int x = (int) FastMath.rint(getPosition().getX());
+    int y = (int) FastMath.rint(getPosition().getY());
     try {
       if (iceGrid[x][y] == true) {
         this.delete();

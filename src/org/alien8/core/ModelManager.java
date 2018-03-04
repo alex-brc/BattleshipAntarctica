@@ -11,7 +11,6 @@ import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
-import org.alien8.physics.Position;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.BigBullet;
@@ -30,7 +29,7 @@ import org.alien8.ship.SmallBullet;
 public class ModelManager {
 
   private long lastSerial = 0;
-  private static ModelManager instance = new ModelManager();
+  private static ModelManager instance;
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
   private CollisionDetector collisionDetector = new CollisionDetector();
   private Map map;
@@ -58,77 +57,35 @@ public class ModelManager {
     map = new Map(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH, 8, 8, seed);
   }
 
-
   /**
-   * DEPRECATED Old version, suitable for offline clients. Should not be used
-   * 
-   * The update() method updates the state of all entities
-   */
-  @Deprecated
-  public void update() {
-    // Loop through all the entities
-    for (Entity ent : entities) {
-      // Remove the entity if it's marked itself for deletion
-      if (ent.isToBeDeleted()) {
-        if (this.getPlayer() == ent) {
-          playerDied();
-          continue;
-        }
-        entities.remove(ent);
-        // Accelerate it's removal
-        ent = null;
-        // Skip the rest
-        continue;
-      }
-      // Handle player stuff
-      if (ent == this.getPlayer()) {
-        // Ship player = (Ship) ent;
-        // InputManager.processInputs(player);
-      }
-
-      // Update the position of the entity
-      PhysicsManager.updatePosition(ent, map.getIceGrid());
-    }
-    ArrayList<Collision> collisions =
-        (ArrayList<Collision>) collisionDetector.checkForCollisions(entities);
-    for (Collision c : collisions) {
-      // System.out.println("Collision");
-      c.resolveCollision();
-    }
-  }
-
-  /**
-   * Server version of update()
+   * Server update(). Loops through all the entities and updates the game state
    */
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
 	System.out.println(entities.size());
 	AIController ai = null;
+	Player pl = null;
+	Ship sh = null;
+	ClientInputSample cis = null;
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
-        // Accelerate it's removal
-        ent = null;
         // Skip the rest
         continue;
       }
       if(ent instanceof Ship) {
-    	  // Handle player stuff
-    	  Ship ship = (Ship) ent;
-    	  ai = Server.getAIByShip(ship);
+    	  sh = (Ship) ent;
+    	  ai = Server.getAIByShip(sh);
+    	  pl = Server.getPlayerByShip(sh);
+    	  
     	  if(ai != null) {
     		  ai.update();
     	  }
-    	  else for (Player p : latestCIS.keySet()) {
-    		  if (ent == p.getShip()) {
-    			  Ship s = (Ship) ent;
-    			  ClientInputSample cis = latestCIS.get(p);
-    			  InputManager.processInputs(s, cis);
-    			  break;
-    		  }
+    	  else if (pl != null) {
+    		  cis = latestCIS.get(pl);
+    		  InputManager.processInputs(sh, cis);
     	  }
-    	  
       }
       
       // Update the position of the entity
@@ -287,13 +244,6 @@ public class ModelManager {
     }
   }
 
-  private void playerDied() {
-    System.out.println("Player died! Respawning");
-    Ship playerNew = new Ship(new Position(200, 200), 0, 0xF8F8F8); // white
-    this.setPlayer(playerNew);
-    this.addEntity(playerNew);
-  }
-
   /**
    * Creates a serial number for it then adds the Entity to the entity list
    * 
@@ -309,8 +259,6 @@ public class ModelManager {
   }
 
   /**
-   * Getter for the entity list.
-   * 
    * @return the entity list as a LinkedList<Entity>
    */
   public ConcurrentLinkedQueue<Entity> getEntities() {

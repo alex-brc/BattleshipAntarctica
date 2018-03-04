@@ -2,6 +2,8 @@ package org.alien8.core;
 
 import java.awt.Dimension;
 
+import net.jafama.FastMath;
+
 /**
  * This class is meant to hold all the important <code> final </code> parameters for all classes to
  * easily access. If everyone uses these, we could technically just change these parameters, build,
@@ -71,7 +73,7 @@ public class Parameters {
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME; // N
   public static final double SHIP_BACKWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
-  public static final double SHIP_ROTATION_PER_SEC = Math.PI / 3;
+  public static final double SHIP_ROTATION_PER_SEC = FastMath.PI / 3;
   /**
    * Affects how much the speed impacts the turning rate.
    */

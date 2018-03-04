@@ -6,6 +6,9 @@ import java.util.Random;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.ship.Ship;
+
+import net.jafama.FastMath;
+
 import org.alien8.physics.Position;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
@@ -80,25 +83,25 @@ public class AIController{
 	public void calcCompassDirection(){
 		//Having the ship have a compass direction makes the isInFront function easier to compute
 		double currDirection = myShip.getDirection();
-		if ((currDirection >= (Math.PI/8)) && (currDirection < (3*Math.PI/8))){
+		if ((currDirection >= (FastMath.PI/8)) && (currDirection < (3*FastMath.PI/8))){
 			compassDirection = 1; //South-East
 		}
-		else if ((currDirection >= (3*Math.PI/8)) && (currDirection < (5*Math.PI/8))){
+		else if ((currDirection >= (3*FastMath.PI/8)) && (currDirection < (5*FastMath.PI/8))){
 			compassDirection = 2; //South
 		}
-		else if ((currDirection >= (5*Math.PI/8)) && (currDirection < (7*Math.PI/8))){
+		else if ((currDirection >= (5*FastMath.PI/8)) && (currDirection < (7*FastMath.PI/8))){
 			compassDirection = 3; //South-West
 		}
-		else if ((currDirection >= (7*Math.PI/8)) && (currDirection < (9*Math.PI/8))){
+		else if ((currDirection >= (7*FastMath.PI/8)) && (currDirection < (9*FastMath.PI/8))){
 			compassDirection = 4; //West
 		}
-		else if ((currDirection >= (9*Math.PI/8)) && (currDirection < (11*Math.PI/8))){
+		else if ((currDirection >= (9*FastMath.PI/8)) && (currDirection < (11*FastMath.PI/8))){
 			compassDirection = 5; //North-West
 		}
-		else if ((currDirection >= (11*Math.PI/8)) && (currDirection < (13*Math.PI/8))){
+		else if ((currDirection >= (11*FastMath.PI/8)) && (currDirection < (13*FastMath.PI/8))){
 			compassDirection = 6; //North
 		}
-		else if ((currDirection >= (13*Math.PI/8)) && (currDirection < (15*Math.PI/8))){
+		else if ((currDirection >= (13*FastMath.PI/8)) && (currDirection < (15*FastMath.PI/8))){
 			compassDirection = 7; //North-East
 		}
 		else{
@@ -114,7 +117,7 @@ public class AIController{
 		if ((collisionCheckCountDown == collisionCheckStart) && predictCollision()){
 			collisionCheckCountDown--;
 			PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE,
-              PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
+              PhysicsManager.shiftAngle(myShip.getDirection() + FastMath.PI));
 			PhysicsManager.rotateEntity(myShip,
               (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 		}
@@ -122,7 +125,7 @@ public class AIController{
 		else if (collisionCheckCountDown < collisionCheckStart){
 			collisionCheckCountDown--;
 			PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE,
-              PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
+              PhysicsManager.shiftAngle(myShip.getDirection() + FastMath.PI));
 			PhysicsManager.rotateEntity(myShip,
               (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 			  

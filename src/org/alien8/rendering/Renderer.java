@@ -79,7 +79,7 @@ public class Renderer extends Canvas {
     yScroll = (int) (player.getPosition().getY() - height / 2);
 
     // Render terrain here
-    model.getMap().render(this);
+    model.getMap().render();
     drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFF0000, false); // bounding box,
                                                                                   // remove later?
 

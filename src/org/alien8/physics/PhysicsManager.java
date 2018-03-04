@@ -3,6 +3,8 @@ package org.alien8.physics;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 
+import net.jafama.FastMath;
+
 public class PhysicsManager {
   /**
    * Applies a force to an Entity. Must be called for every tick that the force is applied.
@@ -15,21 +17,21 @@ public class PhysicsManager {
     // Calculate acceleration caused by force
     double acceleration = magnitude / e.getMass();
     // Calculate x and y components of Entity's speed
-    double speedX = e.getSpeed() * Math.cos(e.getDirection());
-    double speedY = e.getSpeed() * Math.sin(e.getDirection());
+    double speedX = e.getSpeed() * FastMath.cos(e.getDirection());
+    double speedY = e.getSpeed() * FastMath.sin(e.getDirection());
     // Calculate x and y components of acceleration
-    double accelerationX = acceleration * Math.cos(direction);
-    double accelerationY = acceleration * Math.sin(direction);
+    double accelerationX = acceleration * FastMath.cos(direction);
+    double accelerationY = acceleration * FastMath.sin(direction);
     // Calculate x and y components of new speed
     double newSpeedX = speedX + accelerationX;
     double newSpeedY = speedY + accelerationY;
 
     // Update the speed and direction of the Entity
-    e.setSpeed(Math.sqrt((newSpeedX * newSpeedX) + (newSpeedY * newSpeedY)));
+    e.setSpeed(FastMath.sqrt((newSpeedX * newSpeedX) + (newSpeedY * newSpeedY)));
     if (e.getSpeed() > Parameters.SHIP_TOP_SPEED_FORWARD)
       e.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD);
     // TODO:this is causing weird stuff.
-    // e.setDirection(shiftAngle(Math.atan(newSpeedY / newSpeedX)));
+    // e.setDirection(shiftAngle(FastMath.atan(newSpeedY / newSpeedX)));
   }
 
   /**
@@ -55,8 +57,8 @@ public class PhysicsManager {
     double speed = e.getSpeed();
     double direction = e.getDirection();
     // Calculate difference in x and y
-    double xdiff = speed * Math.cos(direction);
-    double ydiff = speed * Math.sin(direction);
+    double xdiff = speed * FastMath.cos(direction);
+    double ydiff = speed * FastMath.sin(direction);
     // Sets the new position
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
 
@@ -83,14 +85,14 @@ public class PhysicsManager {
      *
      * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,4pi/5]
      */
-    double squeezedSpeed = e.getSpeed() * (4 * Math.PI / 5) / Parameters.SHIP_TOP_SPEED_FORWARD;
+    double squeezedSpeed = e.getSpeed() * (4 * FastMath.PI / 5) / Parameters.SHIP_TOP_SPEED_FORWARD;
     /**
      * Then put this speed through the function:
      *
      * f : (0,PI) -> [0,1] f(x) = sin^2(x),
      *
      */
-    double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2);
+    double rotModifier = FastMath.pow(FastMath.sin(squeezedSpeed), 2);
     // Then apply this modifier to the angle, with a parametrised weight
     angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 
@@ -106,9 +108,9 @@ public class PhysicsManager {
    */
   public static double shiftAngle(double rads) {
     while (rads < 0)
-      rads += 2 * Math.PI;
-    while (rads >= 2 * Math.PI)
-      rads -= 2 * Math.PI;
+      rads += 2 * FastMath.PI;
+    while (rads >= 2 * FastMath.PI)
+      rads -= 2 * FastMath.PI;
     return rads;
   }
 }

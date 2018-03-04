@@ -3,6 +3,8 @@ package org.alien8.core;
 import java.io.Serializable;
 import org.alien8.physics.Position;
 
+import net.jafama.FastMath;
+
 /**
  * This abstract class implements the generic Entity. All things that are part of the game map are
  * instances of classes that implement Entity. Such could be the Player class, the Terrain class,
@@ -156,8 +158,8 @@ public abstract class Entity implements Serializable, Cloneable {
       double tempX = cornerX - centerX;
       double tempY = cornerY - centerY;
       // Perform rotation
-      double rotatedX = tempX * Math.cos(angle) - tempY * Math.sin(angle);
-      double rotatedY = tempX * Math.sin(angle) + tempY * Math.cos(angle);
+      double rotatedX = tempX * FastMath.cos(angle) - tempY * FastMath.sin(angle);
+      double rotatedY = tempX * FastMath.sin(angle) + tempY * FastMath.cos(angle);
       // Translate corner back to find true position
       cornerX = rotatedX + centerX;
       cornerY = rotatedY + centerY;

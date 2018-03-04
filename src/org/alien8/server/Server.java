@@ -32,7 +32,6 @@ import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
-import org.alien8.util.ServerShutdownHook;
 
 public class Server {
 
@@ -44,6 +43,7 @@ public class Server {
   private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
   private static ConcurrentHashMap<Player, ClientInputSample> latestCIS = new ConcurrentHashMap<Player, ClientInputSample>();
   private static ConcurrentHashMap<Ship, AIController> aiMap = new ConcurrentHashMap<Ship, AIController>();
+  private static ConcurrentHashMap<Ship, Player> playerMap = new ConcurrentHashMap<Ship, Player>();
   private static ModelManager model = ModelManager.getInstance();
   private static ArrayList<Player> playerList = new ArrayList<Player>();
   private static LinkedList<GameEvent> events = new LinkedList<GameEvent>();
@@ -53,7 +53,6 @@ public class Server {
   private static volatile boolean run = true;
 
   public static void main(String[] args) {
-    Runtime.getRuntime().addShutdownHook(new ServerShutdownHook());
     model.makeMap(seed);
     try {
       setHostIP();
@@ -92,16 +91,13 @@ public class Server {
 
   public static void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
-    Ship notPlayer = new Ship(new Position(100, 100), 0, 0xF8F8F8); // white
-
+    
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
     ScoreBoard.getInstance();
     
     initializeAIs();
     
-    notPlayer.setSpeed(0.8);
-    model.addEntity(notPlayer);
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
   }
@@ -186,6 +182,7 @@ public class Server {
       String name = "RAND_NAME_" + k;
       Player p = new Player(name, clientIP, clientUdpPort, s);
       playerList.add(p);
+      playerMap.put(s, p);
 
       // Add player to scoreboard
       ScoreBoard.getInstance().add(p);
@@ -231,7 +228,8 @@ public class Server {
         Ship s = (Ship) e;
         EntitiesLite.add(new EntityLite(s.getSerial(), 1, 0, s.getPosition(), s.isToBeDeleted(),
             s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-            s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));
+            s.getMidTurretDirection(), s.getRearTurretDirection(),
+            s.getColour()));
       } else if (e instanceof SmallBullet) {
         SmallBullet sb = (SmallBullet) e;
         EntitiesLite.add(new EntityLite(sb.getSerial(), 1, 1, sb.getPosition(), sb.isToBeDeleted(),
@@ -255,6 +253,7 @@ public class Server {
     try {
       toClient.writeObject(entitiesLite);
     } catch (IOException ioe) {
+      LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL, "Could not send full snapshot to client. " + ioe.toString());
       ioe.printStackTrace();
     }
   }
@@ -263,6 +262,7 @@ public class Server {
     try {
       toClient.writeObject(seed);
     } catch (IOException ioe) {
+      LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL, "Could not send map seed to client. " + ioe.toString());
       ioe.printStackTrace();
     }
   }
@@ -333,6 +333,10 @@ public class Server {
   
   public static AIController getAIByShip(Ship ship) {
 	  return aiMap.get(ship);
+  }
+
+  public static Player getPlayerByShip(Ship ship) {
+	  return playerMap.get(ship);
   }
 
 }

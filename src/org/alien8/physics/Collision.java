@@ -9,6 +9,8 @@ import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 
+import net.jafama.FastMath;
+
 public class Collision {
   private Entity entity1;
   private Entity entity2;
@@ -152,7 +154,7 @@ public class Collision {
 
   private void resolveShipIceCollision(Ship ship, Ice ice) {
     System.out.println("ship hit ice");
-    ship.setDirection(Math.PI + ship.getDirection());
+    ship.setDirection(FastMath.PI + ship.getDirection());
   }
 
   private void resolveBulletIceCollision(Bullet bullet, Ice ice) {

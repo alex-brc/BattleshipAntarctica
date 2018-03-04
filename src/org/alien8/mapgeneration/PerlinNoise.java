@@ -2,6 +2,8 @@ package org.alien8.mapgeneration;
 
 import java.util.Random;
 
+import net.jafama.FastMath;
+
 public class PerlinNoise {
 
   // The gradient vectors can only be one of the 4 unit vectors
@@ -42,10 +44,10 @@ public class PerlinNoise {
      * x0y1 -------- x1y1 | | | | | | x0y0 -------- x1y0 E.g. grad00 refers to the gradient vector
      * on the bottom left corner of the square
      */
-    double x0 = Math.floor(x);
-    double y0 = Math.floor(y);
-    double x1 = Math.ceil(x);
-    double y1 = Math.ceil(y);
+    double x0 = FastMath.floor(x);
+    double y0 = FastMath.floor(y);
+    double x1 = FastMath.ceil(x);
+    double y1 = FastMath.ceil(y);
     // These are the points coordinates as if it were in the unit square (important for calcation of
     // the distance vector)
     double unitX = x - x0;
@@ -121,7 +123,7 @@ public class PerlinNoise {
    * = 0; Color c = new Color(0,0,0);
    * 
    * for (int y = 0; y < pxlSize; y++){ for (int x = 0; x < pxlSize; x++){ //colV =
-   * (int)Math.floor(testNoise[x][y]*255d); if (testNoise[x][y] > 0.4){ if (testNoise[x][y] <= 0.7){
+   * (int)FastMath.floor(testNoise[x][y]*255d); if (testNoise[x][y] > 0.4){ if (testNoise[x][y] <= 0.7){
    * c = new Color(0,64,128); }else if (testNoise[x][y] <= 0.9){ c = new Color(0,51,102); }else{ c =
    * new Color(0,38,77); } } else{ if (testNoise[x][y] >= 0.2){ c = new Color(179,255,255); }else if
    * (testNoise[x][y] >= 0.1){ c = new Color(204,255,255); }else { c = new Color(230,255,255); } }

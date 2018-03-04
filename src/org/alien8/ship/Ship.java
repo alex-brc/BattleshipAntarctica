@@ -10,6 +10,8 @@ import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 
+import net.jafama.FastMath;
+
 /**
  * Developer's notes:
  * 
@@ -24,7 +26,7 @@ public class Ship extends Entity implements Serializable {
   private Turret rearTurret;
   private Turret midTurret;
   private int colour;
-  private Sprite sprite; // for now
+  private Sprite sprite;
 
   public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
@@ -68,25 +70,25 @@ public class Ship extends Entity implements Serializable {
 
     // Front
     double angle = Renderer.getScreenPosition(frontTurret.getPosition()).getAngleTo(mousePosition);
-    angle = (-1) * angle + Math.PI / 2;
-    ra = angle + (Math.PI - this.getDirection());
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
     // Range of motion: [pi/4,7*pi/4]
-    if (ra > 1.0 * Math.PI / 4 && ra < 7.0 * Math.PI / 4)
+    if (ra > 1.0 * FastMath.PI / 4 && ra < 7.0 * FastMath.PI / 4)
       frontTurret.setDirection(angle);
 
     // Rear
     angle = Renderer.getScreenPosition(rearTurret.getPosition()).getAngleTo(mousePosition);
-    angle = (-1) * angle + Math.PI / 2;
-    ra = angle + (Math.PI - this.getDirection());
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
     // Range of motion: [5*pi/4, 3*pi/4]
-    if (ra < 3.0 * Math.PI / 4 || ra > 5.0 * Math.PI / 4)
+    if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
       rearTurret.setDirection(angle);
 
     // Mid
     angle = Renderer.getScreenPosition(midTurret.getPosition()).getAngleTo(mousePosition);
-    angle = PhysicsManager.shiftAngle((-1) * angle + Math.PI / 2);
+    angle = PhysicsManager.shiftAngle((-1) * angle + FastMath.PI / 2);
     // No need to get relative angle.
     // This can go shoot it wants
     midTurret.setDirection(angle);
@@ -104,10 +106,10 @@ public class Ship extends Entity implements Serializable {
     double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
 
     frontTurret.setPosition(this.getPosition().addPosition(
-        new Position(r * Math.cos(this.getDirection()), r * Math.sin(this.getDirection()))));
+        new Position(r * FastMath.cos(this.getDirection()), r * FastMath.sin(this.getDirection()))));
 
     rearTurret.setPosition(this.getPosition().addPosition(
-        new Position((-r) * Math.cos(this.getDirection()), (-r) * Math.sin(this.getDirection()))));
+        new Position((-r) * FastMath.cos(this.getDirection()), (-r) * FastMath.sin(this.getDirection()))));
 
     midTurret.setPosition(this.getPosition());
   }
@@ -130,7 +132,7 @@ public class Ship extends Entity implements Serializable {
     // }
 
     // Render turrets
-    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
     frontTurret.render();
@@ -187,8 +189,8 @@ public class Ship extends Entity implements Serializable {
     for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
       Position corner = (Position) iterator.next();
       // Rounds the Position (stored as double) to int so we can use it access the map array
-      int x = (int) Math.rint(corner.getX());
-      int y = (int) Math.rint(corner.getY());
+      int x = (int) FastMath.rint(corner.getX());
+      int y = (int) FastMath.rint(corner.getY());
 
       try {
         // The technique here is to search in all directions (up, down, left, right) to find the
@@ -223,7 +225,7 @@ public class Ship extends Entity implements Serializable {
             ydiff = posYdiff;
           }
           // Finds minimum overall distance and adjusts ship Position and bounding box
-          if (Math.abs(xdiff) >= Math.abs(ydiff)) {
+          if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
             setPosition(new Position(shipX, shipY + ydiff));
             translateObb(0, ydiff);
             if (ydiff <= 0) {
@@ -238,10 +240,10 @@ public class Ship extends Entity implements Serializable {
             // initObb();
           }
 
-          // if (getDirection() >= 0 && getDirection() < Math.PI) {
-          // PhysicsManager.rotateEntity(this, Math.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+          // if (getDirection() >= 0 && getDirection() < FastMath.PI) {
+          // PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
           // } else {
-          // PhysicsManager.rotateEntity(this, -Math.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+          // PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
           // }
 
           // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
@@ -283,7 +285,7 @@ public class Ship extends Entity implements Serializable {
     // Return the difference anyway
     return diff;
   }
-
+  
   public Turret getFrontTurret() {
     return this.frontTurret;
   }

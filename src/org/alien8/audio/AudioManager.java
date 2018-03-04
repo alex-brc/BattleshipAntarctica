@@ -3,13 +3,17 @@ package org.alien8.audio;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.server.AudioEvent;
 import org.alien8.util.LogManager;
+
+import net.jafama.FastMath;
 
 /**
  * This audio manager is responsible for all game audio, handles sound FX and also volume.
@@ -266,7 +270,7 @@ public class AudioManager implements Runnable {
    */
   private float getVolume(Clip clip) {
     FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    return (float) Math.pow(10f, gainControl.getValue() / 20f);
+    return (float) FastMath.pow(10f, gainControl.getValue() / 20f);
   }
 
   /**
@@ -280,7 +284,7 @@ public class AudioManager implements Runnable {
       return;
 
     FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    gainControl.setValue(20f * (float) Math.log10(volume));
+    gainControl.setValue(20f * (float) FastMath.log10(volume));
   }
 
   public void addEvent(AudioEvent event) {

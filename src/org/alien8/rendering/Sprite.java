@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import javax.imageio.ImageIO;
 
+import net.jafama.FastMath;
+
 public class Sprite implements Serializable {
 
 	private static final long serialVersionUID = -7826033026339264249L;
@@ -54,7 +56,7 @@ public class Sprite implements Serializable {
 	}
 	
 	public Sprite rotateSprite(double a){
-		Sprite s = new Sprite((int)(height * Math.abs(Math.sin(a)) + width * Math.abs(Math.cos(a))), (int)(height * Math.abs(Math.cos(a)) + width * Math.abs(Math.sin(a))));
+		Sprite s = new Sprite((int)(height * FastMath.abs(FastMath.sin(a)) + width * FastMath.abs(FastMath.cos(a))), (int)(height * FastMath.abs(FastMath.cos(a)) + width * FastMath.abs(FastMath.sin(a))));
 		double cx = (double)width / 2;
 		double cy = (double)height / 2;
 		double cxNew = (double)s.getWidth() / 2;
@@ -68,12 +70,12 @@ public class Sprite implements Serializable {
 			for (int x = 0; x < width; x++){
 				double dx = x - cx;
 				double dy = y - cy;
-				double dist = Math.sqrt(dx*dx + dy*dy);
-				double da = Math.atan(dx/dy);
-				if (y > cy) da += Math.PI;
+				double dist = FastMath.sqrt(dx*dx + dy*dy);
+				double da = FastMath.atan(dx/dy);
+				if (y > cy) da += FastMath.PI;
 				double na = da + a;
-				double nx = cxNew + dist * Math.sin(na);
-				double ny = cyNew + dist * Math.cos(na);
+				double nx = cxNew + dist * FastMath.sin(na);
+				double ny = cyNew + dist * FastMath.cos(na);
 				if (nx >= 0 && ny >= 00 && nx < s.getWidth() && ny < s.getHeight()) s.getPixels()[(int)nx + (int)ny * s.getWidth()] = pixels[x + y * width];
 			}
 		}

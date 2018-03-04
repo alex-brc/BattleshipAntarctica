@@ -1,6 +1,8 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
+
+import org.alien8.client.InputManager;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
@@ -8,6 +10,8 @@ import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import org.alien8.server.AudioEvent;
 import org.alien8.server.Server;
+
+import net.jafama.FastMath;
 
 public class Turret implements Serializable {
 
@@ -29,8 +33,8 @@ public class Turret implements Serializable {
   private long cooldown;
   // Charged distance of this turret
   private double distance;
-  private double minDistance;
-  private double maxDistance;
+  private final double minDistance;
+  private final double maxDistance;
 
   private Sprite sprite = Sprite.turret; // for now
 
@@ -118,27 +122,30 @@ public class Turret implements Serializable {
       return 0;
     return result;
   }
+  
+  public Position getTargetPosition() {
+	  Position result = new Position(0,0);
+	  
+	  result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
+	  result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
+	  
+	  return result;
+  }
 
   public void render() {
     Renderer r = Renderer.getInstance();
 
-    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
-    if (this.isOnCooldown())
-      r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
-    else
-      r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
+    
+    if(distance != minDistance) {
+    	Position pos = getTargetPosition();
+    	r.drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
+    }
   }
-
-  public Position getScreenPosition() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
+  
   /**
-   *
-   * 
    * @param direction the direction to set
    */
   public void setDirection(double direction) {
@@ -161,5 +168,9 @@ public class Turret implements Serializable {
 
   protected Ship getShip() {
     return ship;
+  }
+
+  public double getDistance() {
+	return distance;
   }
 }

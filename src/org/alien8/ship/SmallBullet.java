@@ -5,6 +5,8 @@ import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 
+import net.jafama.FastMath;
+
 public class SmallBullet extends Bullet {
   protected Sprite sprite = Sprite.bullet;
 
@@ -16,7 +18,7 @@ public class SmallBullet extends Bullet {
 
   @Override
   public void render() {
-    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
   }
