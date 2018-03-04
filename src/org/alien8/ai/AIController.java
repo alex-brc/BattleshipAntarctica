@@ -20,17 +20,17 @@ public class AIController{
 	public AIController(Ship ship){
 		// Note: changed this to a Ship constructor, easier to handle in server and more practical
 		model = ModelManager.getInstance();
+		iceGrid = model.getMap().getIceGrid();
 		myShip = ship; //All ai ships start facing East - temporary
-		collisionCheckCountDown = collisionCheckStart;
 	}
 	
 	public void update(){
 		target = findClosestTarget();
 		myShip.setTurretsDirection(target.getPosition());
 		//At the moment it just fires all turrets at the closest ship
-		myShip.frontTurretCharge();
-		myShip.midTurretCharge();
-		myShip.rearTurretCharge();
+		//myShip.frontTurretCharge();
+		//myShip.midTurretCharge();
+		//myShip.rearTurretCharge();
 		wander(); //Moves mostly aimlessly around the map
 	}
 	
@@ -71,7 +71,7 @@ public class AIController{
 		double xNose = (corners[0].getX() + corners[1].getX())/2.0;
 		double yNose = (corners[0].getY() + corners[1].getY())/2.0;
 		Position nose = new Position(xNose,yNose);
-		return drawRay(corners[0], direction, rayLength) && drawRay(corners[1], direction, rayLength) && drawRay(nose, direction, rayLength); 
+		return drawRay(corners[0], direction, rayLength) || drawRay(corners[1], direction, rayLength) || drawRay(nose, direction, rayLength); 
 		
 	}
 	
@@ -81,7 +81,7 @@ public class AIController{
 		for (int r = 1;r <=maxR; r++){
 			int x = (int)Math.round(x0 + r*Math.cos(dir));
 			int y = (int)Math.round(y0 - r*Math.sin(dir)); //This is minus due to our weird coordinate system..
-			if (iceGrid[x][y] || x < 0 || y < 0 || x > Parameters.MAP_WIDTH || y > Parameters.MAP_HEIGHT){
+			if (y >= Parameters.MAP_HEIGHT || x < 0 || y < 0 || x >= Parameters.MAP_WIDTH || iceGrid[x][y] ){
 				return true;
 			}
 		}
@@ -89,9 +89,29 @@ public class AIController{
 	}
 	
 	public void wander(){
-		PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
 		if (rayDetect((int)Parameters.SHIP_LENGTH)){
-			PhysicsManager.rotateEntity(myShip,Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+			if (myShip.getSpeed() < 0.3){
+				PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
+			}
+			else{
+				PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
+			}
+			double locEastDir = myShip.getDirection();
+			if (locEastDir < (Math.PI/2d)){
+				locEastDir = (2d*Math.PI) + locEastDir - (Math.PI/2d);
+			}
+			else{
+				locEastDir = locEastDir - (Math.PI/2d);
+			}
+			if (drawRay(myShip.getPosition(), locEastDir, (int)Parameters.SHIP_LENGTH)){
+				PhysicsManager.rotateEntity(myShip,(-1)*Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+			}
+			else{
+				PhysicsManager.rotateEntity(myShip,Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+			}
+		}
+		else{
+			PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
 		}
 	}
 

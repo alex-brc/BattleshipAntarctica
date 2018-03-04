@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Enumeration;
 
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
@@ -93,7 +94,7 @@ public class Server {
 
   public static void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
-    AIController notPlayer = new AIController(new Position(100, 100)); // white
+    Ship notPlayer = new Ship(new Position(100, 100), 0, 0xF8F8F8); // white
 
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
@@ -114,7 +115,7 @@ public class Server {
 	  // also, remember to give them colours
 	  
 	  // test ai 
-	  Ship sh = new Ship(new Position(100,100), 0, 0xFFFFFF);
+	  Ship sh = new Ship(new Position(1000,1000), 0, 0xFFFFFF);
 	  AIController ai = new AIController(sh);
 	  model.addEntity(sh);
 	  aiMap.put(sh, ai);
@@ -180,7 +181,7 @@ public class Server {
 
       // Setup client's ship
       int randColour = (new Random()).nextInt(0xFFFFFF);
-      Ship s = new Ship(new Position(randomX, randomY), 0, randColour);
+      Ship s = new Ship(new Position(1200, 1200), 0, randColour); //CHANGE BACK TO randomX randomY
 
       // TODO: ADD NAMES TO PLAYERS
       int k = (new Random()).nextInt(1000);
