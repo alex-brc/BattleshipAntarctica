@@ -28,9 +28,10 @@ public class AIController{
 	private static int collisionCheckStart = 60; //Checks every 2 seconds (120 ticks) for a collision
 	protected int collisionCheckCountDown;
 	
-	public AIController(Position startPos){
+	public AIController(Ship ship){
+		// Note: changed this to a Ship constructor, easier to handle in server and more practical
 		model = ModelManager.getInstance();
-		myShip = new Ship(startPos, 0, (new Random()).nextInt(0xFFFFFF)); //All ai ships start facing East - temporary
+		myShip = ship; //All ai ships start facing East - temporary
 		collisionCheckCountDown = collisionCheckStart;
 	}
 	
