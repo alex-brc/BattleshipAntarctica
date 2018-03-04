@@ -13,16 +13,7 @@ public class ClientWindowListener implements WindowListener {
 
   @Override
   public void windowClosed(WindowEvent e) {
-    // Disconnect client
-    Launcher.getInstance().getRunningClient().disconnect();
-    // Shutdown audio clips
-    AudioManager.getInstance().shutDown();
-    // Tear down ScoreBoard
-    ScoreBoard.getInstance().killListener();
-    // Do other stuff maybe
-
-    // Log status
-    System.out.println("System exit in a controlled fashion. Check log for crash information");
+    // Do ClientShutdownHook
     System.exit(0);
   }
 
@@ -34,17 +25,8 @@ public class ClientWindowListener implements WindowListener {
 
   @Override
   public void windowClosing(WindowEvent e) {
-    // Disconnect client
-    Launcher.getInstance().getRunningClient().disconnect();
-    // Shutdown audio clips
-    AudioManager.getInstance().shutDown();
-    // Tear down ScoreBoard
-    ScoreBoard.getInstance().killListener();
-    // Do other stuff maybe
-
-    // Log status
-    System.out.println("System exit in a controlled fashion. Check log for crash information");
-    System.exit(0);
+	// Do ClientShutdownHook
+	System.exit(0);
 
   }
 

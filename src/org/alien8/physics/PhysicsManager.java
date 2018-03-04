@@ -78,19 +78,19 @@ public class PhysicsManager {
    */
   public static void rotateEntity(Entity e, double angle) {
     /**
-     * First, squeeze the speed into the [0,pi] interval
+     * First, squeeze the speed into the [0,4pi/5] interval
+     * 								4pi/5 since we want the ship at top speed to be able to turn slowly
      *
-     * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,pi]
+     * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,4pi/5]
      */
-    double squeezedSpeed = e.getSpeed() * Math.PI / Parameters.SHIP_TOP_SPEED_FORWARD;
+    double squeezedSpeed = e.getSpeed() * (4 * Math.PI / 5) / Parameters.SHIP_TOP_SPEED_FORWARD;
     /**
      * Then put this speed through the function:
      *
      * f : (0,PI) -> [0,1] f(x) = sin^2(x),
      *
-     * to get a natural rotation modifier. Shift up by 0.3, feels more natural
      */
-    double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2) + 0.3;
+    double rotModifier = Math.pow(Math.sin(squeezedSpeed), 2);
     // Then apply this modifier to the angle, with a parametrised weight
     angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 

@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -19,6 +20,7 @@ import org.alien8.core.Parameters;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
+import org.alien8.util.LogManager;
 
 public class ServerMulticastSender extends Thread {
 
@@ -28,18 +30,22 @@ public class ServerMulticastSender extends Thread {
   private ConcurrentLinkedQueue<Entity> lastSyncedEntities;
   private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS;
+  private ArrayList<Player> playerList;
   long lastTime;
   long currentTime;
   long tick;
   private boolean run = true;
 
+
   public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip,
-      ConcurrentLinkedQueue<Entity> ents, ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
+      ConcurrentLinkedQueue<Entity> ents, ConcurrentHashMap<Player, ClientInputSample> latestCIS,
+      ArrayList<Player> playerList) {
     udpSocket = ds;
     clientMultiCastPort = port;
     groupIP = ip;
     lastSyncedEntities = ents;
     this.latestCIS = latestCIS;
+    this.playerList = playerList;
   }
 
   public void run() {
@@ -49,8 +55,7 @@ public class ServerMulticastSender extends Thread {
     // Send game state snapshot 60 times per second
     while (run) {
       currentTime = System.nanoTime();
-      tick += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
-
+      tick += 1.0 * (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
       while (tick >= 1) {
         readInputSample();
         updateGameStateByCIS();
@@ -64,30 +69,32 @@ public class ServerMulticastSender extends Thread {
 
   private void readInputSample() {
     try {
-      // Create a packet for receiving input sample packet
-      byte[] buf = new byte[65536];
-      DatagramPacket packet = new DatagramPacket(buf, buf.length);
+      for (int i = 0; i < playerList.size(); i++) {
+        // Create a packet for receiving input sample packet
+        byte[] buf = new byte[65536];
+        DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
-      // Receive an input sample packet and obtain its byte data
-      udpSocket.receive(packet);
-      InetAddress clientIP = packet.getAddress();
-      int clientPort = packet.getPort();
-      byte[] cisByte = packet.getData();
+        // Receive an input sample packet and obtain its byte data
+        udpSocket.receive(packet);
+        InetAddress clientIP = packet.getAddress();
+        int clientPort = packet.getPort();
+        byte[] cisByte = packet.getData();
 
-      // Deserialize the input sample byte data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(cisByte);
-      ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      ClientInputSample cis = (ClientInputSample) objIn.readObject();
+        // Deserialize the input sample byte data into object
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(cisByte);
+        ObjectInputStream objIn = new ObjectInputStream(byteIn);
+        ClientInputSample cis = (ClientInputSample) objIn.readObject();
 
-      // Identify which Player the CIS belongs to
-      Player p = Server.getPlayerByIpAndPort(clientIP, clientPort);
+        // Identify which Player the CIS belongs to
+        Player p = Server.getPlayerByIpAndPort(clientIP, clientPort);
 
-      // Put the received input sample in the CIS hash map
-      if (p != null && cis != null)
-        if (latestCIS.containsKey(p))
-          latestCIS.replace(p, cis);
-        else
-          latestCIS.put(p, cis);
+        // Put the received input sample in the CIS hash map
+        if (p != null && cis != null)
+          if (latestCIS.containsKey(p))
+            latestCIS.replace(p, cis);
+          else
+            latestCIS.put(p, cis);
+      }
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
@@ -102,7 +109,6 @@ public class ServerMulticastSender extends Thread {
   public void sendGameState() {
     try {
       ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
-
       // Update the last synced set of entities right before sending the difference to client for
       // syncing
       ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
@@ -120,35 +126,25 @@ public class ServerMulticastSender extends Thread {
       // Create a packet for holding the difference byte data
       DatagramPacket packet =
           new DatagramPacket(differenceByte, differenceByte.length, groupIP, clientMultiCastPort);
+      
+      // Make the game event packet
+      GameEvent event = Server.getNextEvent();
+      byteOut = new ByteArrayOutputStream();
+      objOut = new ObjectOutputStream(byteOut);
+      objOut.writeObject(event);
+      byte[] eventByte = byteOut.toByteArray();
+      
+      // Make packet
+      DatagramPacket eventPacket = new DatagramPacket(eventByte, eventByte.length, groupIP, clientMultiCastPort);
 
-      // Send the difference packet to client
+      // Send the difference packet and the event packet to client
       udpSocket.send(packet);
+      udpSocket.send(eventPacket);
     } catch (IOException e) {
       e.printStackTrace();
+      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL, "Packet error: " + e.toString());
     }
   }
-
-  // private void sendEvents() {
-  // try {
-  // // Serialize the next event in a byte array
-  // GameEvent event = Server.getNextEvent();
-  //
-  // ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-  // ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-  // objOut.writeObject(event);
-  // byte[] eventByte = byteOut.toByteArray();
-  //
-  // // Create the packet for event bytes
-  // DatagramPacket packet = new DatagramPacket(eventByte, eventByte.length, clientIP, eventPort);
-  //
-  // // Send the packet
-  // udpSocket.send(packet);
-  // }
-  // catch (IOException e) {
-  // e.printStackTrace();
-  // }
-  // }
-
   /*
    * Calculate the difference between two set of entities, difference is represented as an arraylist
    * of compressed entities that are modified or added or removed
