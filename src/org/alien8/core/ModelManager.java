@@ -3,6 +3,8 @@ package org.alien8.core;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
 import org.alien8.mapgeneration.Map;
@@ -11,6 +13,7 @@ import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.server.Player;
+import org.alien8.server.Server;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
@@ -30,7 +33,7 @@ public class ModelManager {
   private static ModelManager instance = new ModelManager();
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
   private CollisionDetector collisionDetector = new CollisionDetector();
-  private Map map/* = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8) */;
+  private Map map;
   private Ship player;
 
   private ModelManager() {
@@ -38,10 +41,6 @@ public class ModelManager {
 
     entities = new ConcurrentLinkedQueue<Entity>();
     collisionDetector = new CollisionDetector();
-
-    // List<AABB> aabbs = map.getAABBs();
-    // for (AABB aabb : aabbs) {
-    // entities.add(aabb.getEntity());
   }
 
   /**
@@ -104,6 +103,7 @@ public class ModelManager {
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
 	System.out.println(entities.size());
+	AIController ai = null;
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
@@ -113,14 +113,24 @@ public class ModelManager {
         // Skip the rest
         continue;
       }
-      // Handle player stuff
-      for (Player p : latestCIS.keySet()) {
-        if (ent == p.getShip()) {
-          Ship s = (Ship) ent;
-          ClientInputSample cis = latestCIS.get(p);
-          InputManager.processInputs(s, cis);
-        }
+      if(ent instanceof Ship) {
+    	  // Handle player stuff
+    	  Ship ship = (Ship) ent;
+    	  ai = Server.getAIByShip(ship);
+    	  if(ai != null) {
+    		  ai.update();
+    	  }
+    	  else for (Player p : latestCIS.keySet()) {
+    		  if (ent == p.getShip()) {
+    			  Ship s = (Ship) ent;
+    			  ClientInputSample cis = latestCIS.get(p);
+    			  InputManager.processInputs(s, cis);
+    			  break;
+    		  }
+    	  }
+    	  
       }
+      
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
     }
@@ -308,7 +318,7 @@ public class ModelManager {
   }
 
   /**
-   * Sets the designated ship player.
+   * Sets the designated ship as player.
    * 
    * @param player ship to set as the player
    */

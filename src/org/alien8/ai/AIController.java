@@ -17,10 +17,11 @@ public class AIController{
 	protected Entity target;
 	protected boolean[][] iceGrid;
 	
-	public AIController(Position startPos){
+	public AIController(Ship ship){
+		// Note: changed this to a Ship constructor, easier to handle in server and more practical
 		model = ModelManager.getInstance();
-		iceGrid = model.getMap().getIceGrid();
-		myShip = new Ship(startPos, 0, (new Random()).nextInt(0xFFFFFF)); //All ai ships start facing East - temporary
+		myShip = ship; //All ai ships start facing East - temporary
+		collisionCheckCountDown = collisionCheckStart;
 	}
 	
 	public void update(){

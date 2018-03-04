@@ -18,6 +18,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
@@ -41,10 +42,9 @@ public class Server {
   private static String groupIPStr = "224.0.0.5"; // multicast group ipString
   private static ServerSocket tcpSocket = null;
   private static DatagramSocket udpSocket = null;
-  private static ConcurrentLinkedQueue<Entity> lastSyncedEntities =
-      new ConcurrentLinkedQueue<Entity>();
-  private static ConcurrentHashMap<Player, ClientInputSample> latestCIS =
-      new ConcurrentHashMap<Player, ClientInputSample>();
+  private static ConcurrentLinkedQueue<Entity> lastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
+  private static ConcurrentHashMap<Player, ClientInputSample> latestCIS = new ConcurrentHashMap<Player, ClientInputSample>();
+  private static ConcurrentHashMap<Ship, AIController> aiMap = new ConcurrentHashMap<Ship, AIController>();
   private static ModelManager model = ModelManager.getInstance();
   private static ArrayList<Player> playerList = new ArrayList<Player>();
   private static LinkedList<GameEvent> events = new LinkedList<GameEvent>();
@@ -98,11 +98,27 @@ public class Server {
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
     ScoreBoard.getInstance();
-
-    //notPlayer.setSpeed(0.8);
-    model.addEntity(notPlayer.getShip());
+    
+    initializeAIs();
+    
+    notPlayer.setSpeed(0.8);
+    model.addEntity(notPlayer);
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
+  }
+  
+  private static void initializeAIs() {
+	  // Ai controllers should be put in the
+	  // ConcurrentHashMap<Ship, AIController> aiMap
+	  // so the loop has constant time access to the AI controller given the ship
+	  // also, remember to give them colours
+	  
+	  // test ai 
+	  Ship sh = new Ship(new Position(100,100), 0, 0xFFFFFF);
+	  AIController ai = new AIController(sh);
+	  model.addEntity(sh);
+	  aiMap.put(sh, ai);
+	  
   }
 
   public static void processClientRequest(InetAddress clientIP, ClientRequest cr,
@@ -314,6 +330,10 @@ public class Server {
     if (events.size() == 0)
       return null;
     return events.removeFirst();
+  }
+  
+  public static AIController getAIByShip(Ship ship) {
+	  return aiMap.get(ship);
   }
 
 }
