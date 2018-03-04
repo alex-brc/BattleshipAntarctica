@@ -32,6 +32,7 @@ import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
 import org.alien8.util.ServerShutdownHook;
+import org.alien8.ai.AIController;
 
 public class Server {
 
@@ -92,14 +93,14 @@ public class Server {
 
   public static void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
-    Ship notPlayer = new Ship(new Position(100, 100), 0, 0xF8F8F8); // white
+    AIController notPlayer = new AIController(new Position(100, 100)); // white
 
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
     ScoreBoard.getInstance();
 
-    notPlayer.setSpeed(0.8);
-    model.addEntity(notPlayer);
+    //notPlayer.setSpeed(0.8);
+    model.addEntity(notPlayer.getShip());
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
   }
