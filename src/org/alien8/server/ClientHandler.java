@@ -42,7 +42,6 @@ public class ClientHandler extends Thread {
   }
 
   public void run() {
-    // System.out.println("Client handler started: " + clientIP + ", " + clientUdpPort);
     boolean[][] iceGrid = model.getMap().getIceGrid();
     Random r = new Random();
     double randomX = 0;
@@ -59,23 +58,27 @@ public class ClientHandler extends Thread {
       }
     }
 
+    // TODO: ADD NAMES TO PLAYERS
+    int k = (new Random()).nextInt(1000);
+    String name = "RAND_NAME_" + k;
+    
     // Setup client's ship
     int randColour = (new Random()).nextInt(0xFFFFFF);
     Ship s = new Ship(new Position(randomX, randomY), 0, randColour);
     model.addEntity(s);
 
-    // Send the map seed to the client
-    sendMapSeed(clientIP, toClient, mapSeed);
-
-    // TODO: ADD NAMES TO PLAYERS
-    int k = (new Random()).nextInt(1000);
-    String name = "RAND_NAME_" + k;
+    // Setup client's player info
     Player p = new Player(name, clientIP, clientUdpPort, s);
-
     playerMap.put(s, p);
     ScoreBoard.getInstance().add(p);
     playerList.add(p);
 
+    // Start the server game loop if it is the first client connecting
+    if (playerList.size() == 1) {
+      Server.startSMCS();
+    }
+    
+    sendMapSeed(clientIP, toClient, mapSeed);
     sendGameState(toClient);
   }
 
@@ -99,12 +102,12 @@ public class ClientHandler extends Thread {
       if (e instanceof Ship) {
         Ship s = (Ship) e;
         Player p = Server.getPlayerByShip(s);
-        if (p != null) { // It is a player's ship
+        if (p != null) { // Player ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
               s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour(), p.getIP(),
               p.getPort()));
-        } else {
+        } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
               s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));

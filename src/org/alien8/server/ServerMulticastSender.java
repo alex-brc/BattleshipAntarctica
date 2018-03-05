@@ -23,8 +23,8 @@ import org.alien8.util.LogManager;
 
 public class ServerMulticastSender extends Thread {
 
-  private Integer clientMultiCastPort;
-  private InetAddress groupIP;
+  private Integer multiCastPort;
+  private InetAddress multiCastIP;
   private DatagramSocket udpSocket;
   private ConcurrentLinkedQueue<Entity> entities;
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS;
@@ -35,28 +35,23 @@ public class ServerMulticastSender extends Thread {
       ConcurrentLinkedQueue<Entity> entities,
       ConcurrentHashMap<Player, ClientInputSample> latestCIS, ArrayList<Player> playerList) {
     udpSocket = ds;
-    clientMultiCastPort = port;
-    groupIP = ip;
+    multiCastPort = port;
+    multiCastIP = ip;
     this.entities = entities;
     this.latestCIS = latestCIS;
     this.playerList = playerList;
   }
 
   public void run() {
-    // Not running the game loop before the first client connects.
-    while (playerList.isEmpty()) {
-      System.out.println(playerList);
-    }
-    
-    System.out.println("ok");
     long lastTime = System.nanoTime();
     long currentTime = 0;
     double tick = 0;
-    // Send game state snapshot 60 times per second
+
     while (run) {
       currentTime = System.nanoTime();
       tick += 1.0 * (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
       while (tick >= 1) {
+        System.out.println("Server entities: " + entities);
         readInputSample();
         updateGameStateByCIS();
         sendGameState();
@@ -65,6 +60,7 @@ public class ServerMulticastSender extends Thread {
         lastTime = System.nanoTime();
       }
     }
+
   }
 
   private void readInputSample() {
@@ -116,12 +112,12 @@ public class ServerMulticastSender extends Thread {
       if (e instanceof Ship) {
         Ship s = (Ship) e;
         Player p = Server.getPlayerByShip(s);
-        if (p != null) { // It is a player's ship
+        if (p != null) { // Player ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
               s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour(), p.getIP(),
               p.getPort()));
-        } else { // It is an AI ship
+        } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
               s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));
@@ -145,15 +141,15 @@ public class ServerMulticastSender extends Thread {
     try {
       ArrayList<EntityLite> entsLite = calculateEntitiesLite(entities);
 
-      // Serialize the entLite arraylist into byte array
+      // Serialize the entsLite arraylist into byte array
       ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
       objOut.writeObject(entsLite);
       byte[] entsLiteByte = byteOut.toByteArray();
 
-      // Create a packet for holding the entLite byte data
+      // Create a packet for holding the entsLite byte data
       DatagramPacket entsLitePacket =
-          new DatagramPacket(entsLiteByte, entsLiteByte.length, groupIP, clientMultiCastPort);
+          new DatagramPacket(entsLiteByte, entsLiteByte.length, multiCastIP, multiCastPort);
 
       // Make the game event packet
       GameEvent event = Server.getNextEvent();
@@ -164,9 +160,9 @@ public class ServerMulticastSender extends Thread {
 
       // Make packet
       DatagramPacket eventPacket =
-          new DatagramPacket(eventByte, eventByte.length, groupIP, clientMultiCastPort);
+          new DatagramPacket(eventByte, eventByte.length, multiCastIP, multiCastPort);
 
-      // Send the difference packet and the event packet to client
+      // Send the entsLite packet and the event packet to client
       udpSocket.send(entsLitePacket);
       udpSocket.send(eventPacket);
     } catch (IOException e) {
@@ -176,23 +172,5 @@ public class ServerMulticastSender extends Thread {
     }
   }
 
-
-
-  /*
-   * This method makes a "deep clone" of any Java object it is given.
-   */
-  public Object deepClone(Object object) {
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ObjectOutputStream oos = new ObjectOutputStream(baos);
-      oos.writeObject(object);
-      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-      ObjectInputStream ois = new ObjectInputStream(bais);
-      return ois.readObject();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
 }
 

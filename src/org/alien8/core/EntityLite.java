@@ -14,6 +14,12 @@ public class EntityLite implements Serializable {
 
   // For Ship and bullet
   public long serial;
+  /*
+   * 0 - Player Ship
+   * 1 - AI Ship
+   * 2 - Small Bullet
+   * 3 - Big Bullet
+   */
   public int entityType;
   public Position position;
   public boolean toBeDeleted = false;
@@ -90,7 +96,7 @@ public class EntityLite implements Serializable {
   }
 
   public String toString() {
-    return serial + "," + entityType;
+    return "Serial: " + serial + ", " + "EntityType: " + entityType;
   }
 
 }

@@ -112,6 +112,7 @@ public class Client implements Runnable {
 
       // Call update() as many times as needed to compensate before rendering
       while (catchUp >= 1) {
+        System.out.println("Client entities: " + model.getEntities());
         this.sendInputSample();
         this.receiveAndUpdate();
         this.receiveEvents();
@@ -276,9 +277,9 @@ public class Client implements Runnable {
   }
 
   /*
-   * Receive the game state difference from the server and sync the game state with the server
+   * Receive the game state from the server and sync the game state with the server (UDP)
    */
-  public void receiveAndUpdate() {
+  private void receiveAndUpdate() {
     try {
       // Create a packet for receiving difference packet
       byte[] buf = new byte[65536];
@@ -286,10 +287,10 @@ public class Client implements Runnable {
 
       // Receive a entsLite packet and obtain the byte data
       multiCastSocket.receive(packet);
-      byte[] differenceByte = packet.getData();
+      byte[] entsLiteByte = packet.getData();
 
       // Deserialize the entsLite byte data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(entsLiteByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
       ArrayList<EntityLite> entsLite = (ArrayList<EntityLite>) objIn.readObject();
 
@@ -303,18 +304,21 @@ public class Client implements Runnable {
     }
   }
 
+  /*
+   * Receive the game state from the server through TCP connection
+   */
   private ArrayList<EntityLite> receiveGameStateTCP(ObjectInputStream fromServer) {
-    ArrayList<EntityLite> gameState = null;
+    ArrayList<EntityLite> entsLite = null;
 
     try {
-      gameState = (ArrayList<EntityLite>) fromServer.readObject();
+      entsLite = (ArrayList<EntityLite>) fromServer.readObject();
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
       cnfe.printStackTrace();
     }
 
-    return gameState;
+    return entsLite;
   }
 
   private Long getMapSeed(ObjectInputStream fromServer) {

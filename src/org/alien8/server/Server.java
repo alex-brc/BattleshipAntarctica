@@ -58,9 +58,6 @@ public class Server {
       System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
       System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
       initializeGameState();
-      ServerMulticastSender smcs = new ServerMulticastSender(udpSocket, multiCastPort,
-          multiCastIP, entities, latestCIS, playerList);
-      smcs.start();
 
       // Process clients' connect/disconnect request
       while (run) {
@@ -87,6 +84,18 @@ public class Server {
     }
   }
 
+  private static void setHostIP() {
+    try {
+      hostIP = Inet4Address.getLocalHost();
+      multiCastIP = InetAddress.getByName("224.0.0.5");
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /*
+   * Only initialize the game state, will not start the server game loop
+   */
   public static void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
 
@@ -114,7 +123,7 @@ public class Server {
 
   }
 
-  public static void processClientRequest(InetAddress clientIP, ClientRequest cr,
+  private static void processClientRequest(InetAddress clientIP, ClientRequest cr,
       ObjectOutputStream toClient) {
     if (cr.getType() == 0) { // Connect request
       ClientHandler ch = new ClientHandler(clientIP, cr.getUdpPort(), playerList, entities,
@@ -126,31 +135,13 @@ public class Server {
     }
   }
 
-  public static boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
+  private static boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
     for (Player p : playerList) {
       if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
         return true;
       }
     }
     return false;
-  }
-
-  public static Player getPlayerByIpAndPort(InetAddress clientIP, int clientPort) {
-    for (Player p : playerList) {
-      if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
-        return p;
-      }
-    }
-    return null;
-  }
-
-  public static void setHostIP() {
-    try {
-      hostIP = Inet4Address.getLocalHost();
-      multiCastIP = InetAddress.getByName("224.0.0.5");
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    }
   }
 
   public static void disconnectPlayer(InetAddress clientIP, int clientPort) {
@@ -197,6 +188,21 @@ public class Server {
     if (events.size() == 0)
       return null;
     return events.removeFirst();
+  }
+
+  public static void startSMCS() {
+    ServerMulticastSender smcs = new ServerMulticastSender(udpSocket, multiCastPort, multiCastIP,
+        entities, latestCIS, playerList);
+    smcs.start();
+  }
+
+  public static Player getPlayerByIpAndPort(InetAddress clientIP, int clientPort) {
+    for (Player p : playerList) {
+      if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
+        return p;
+      }
+    }
+    return null;
   }
 
   public static AIController getAIByShip(Ship ship) {

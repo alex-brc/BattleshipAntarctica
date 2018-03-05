@@ -31,7 +31,6 @@ public class Ship extends Entity implements Serializable {
   public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
         Parameters.SHIP_WIDTH, Parameters.SHIP_HEALTH);
-    System.out.println(getHealth());
     this.colour = colour;
     sprite = Sprite.makeShipSprite(colour);
 
