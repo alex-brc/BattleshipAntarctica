@@ -25,8 +25,6 @@ import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.AudioEvent;
 import org.alien8.server.GameEvent;
-import org.alien8.server.GameStartEvent;
-import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
 public class Client implements Runnable {
@@ -133,11 +131,11 @@ public class Client implements Runnable {
         frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
         FPS = frameRate * Parameters.FPS_FREQ;
         frameRate = 0;
-        System.out.println(FPS);
+        //System.out.println(FPS);
       }
       if (getTime() - tickTimer > Parameters.N_SECOND) {
         tickTimer += Parameters.N_SECOND;
-        System.out.println(tickRate);
+        //System.out.println(tickRate);
         tickRate = 0;
       }
     }
@@ -201,14 +199,7 @@ public class Client implements Runnable {
         multiCastIP = InetAddress.getByName("224.0.0.5");
         multiCastSocket = new MulticastSocket(multiCastPort);
         multiCastSocket.joinGroup(multiCastIP);
-
-        // Keep blocking until receiving the game start event from server
-        try {
-          GameStartEvent gse = (GameStartEvent) fromServer.readObject();
-        } catch (ClassNotFoundException cnfe) {
-          LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
-              "Class of a serialized object cannot be found." + cnfe.toString());
-        }
+        
       } catch (BindException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
             "Could not bind to any port. Firewalls?\n" + e.toString());
@@ -272,7 +263,6 @@ public class Client implements Runnable {
 
       // Send audio events to AudioManager
       if (event != null) {
-        System.out.println(event.toString());
         if (event instanceof AudioEvent)
           AudioManager.getInstance().addEvent((AudioEvent) event);
         else if (event instanceof Score)

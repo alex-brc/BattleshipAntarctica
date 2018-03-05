@@ -26,24 +26,23 @@ public class ClientHandler extends Thread {
   private ConcurrentLinkedQueue<Entity> entities;
   private ConcurrentHashMap<Ship, Player> playerMap;
   private Long mapSeed;
-  private int numberOfPlayer;
   private ObjectOutputStream toClient;
   private ModelManager model = ModelManager.getInstance();
 
   public ClientHandler(InetAddress clientIP, int clientUdpPort, ArrayList<Player> playerList,
       ConcurrentLinkedQueue<Entity> entities, ConcurrentHashMap<Ship, Player> playerMap,
-      Long mapSeed, int numberOfPlayer, ObjectOutputStream toClient) {
+      Long mapSeed, ObjectOutputStream toClient) {
     this.clientIP = clientIP;
     this.clientUdpPort = clientUdpPort;
     this.playerList = playerList;
     this.entities = entities;
     this.playerMap = playerMap;
     this.mapSeed = mapSeed;
-    this.numberOfPlayer = numberOfPlayer;
     this.toClient = toClient;
   }
 
   public void run() {
+    // System.out.println("Client handler started: " + clientIP + ", " + clientUdpPort);
     boolean[][] iceGrid = model.getMap().getIceGrid();
     Random r = new Random();
     double randomX = 0;
@@ -77,12 +76,7 @@ public class ClientHandler extends Thread {
     ScoreBoard.getInstance().add(p);
     playerList.add(p);
 
-    while (playerList.size() != numberOfPlayer) {
-      // Wait until the required number of player has connected
-    }
-
     sendGameState(toClient);
-    sendGameStartEvent(toClient);
   }
 
   private void sendMapSeed(InetAddress clientIP, ObjectOutputStream toClient, Long seed) {
@@ -111,16 +105,18 @@ public class ClientHandler extends Thread {
               s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour(), p.getIP(),
               p.getPort()));
         } else {
-          // call EntityLite constructor for AI ship
+          EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
+              s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
+              s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));
         }
 
       } else if (e instanceof SmallBullet) {
         SmallBullet sb = (SmallBullet) e;
-        EntitiesLite.add(new EntityLite(sb.getSerial(), 1, sb.getPosition(), sb.isToBeDeleted(),
+        EntitiesLite.add(new EntityLite(sb.getSerial(), 2, sb.getPosition(), sb.isToBeDeleted(),
             sb.getDirection(), sb.getSpeed(), sb.getDistance(), sb.getTravelled(), sb.getSource()));
       } else if (e instanceof BigBullet) {
         BigBullet bb = (BigBullet) e;
-        EntitiesLite.add(new EntityLite(bb.getSerial(), 2, bb.getPosition(), bb.isToBeDeleted(),
+        EntitiesLite.add(new EntityLite(bb.getSerial(), 3, bb.getPosition(), bb.isToBeDeleted(),
             bb.getDirection(), bb.getSpeed(), bb.getDistance(), bb.getTravelled(), bb.getSource()));
       }
     }
@@ -135,17 +131,6 @@ public class ClientHandler extends Thread {
     } catch (IOException ioe) {
       LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
           "Could not send entsLite to client. " + ioe.toString());
-      ioe.printStackTrace();
-    }
-  }
-
-  private void sendGameStartEvent(ObjectOutputStream toClient) {
-    try {
-      GameStartEvent gse = new GameStartEvent();
-      toClient.writeObject(gse);
-    } catch (IOException ioe) {
-      LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-          "Could not send game start notificaiton to client. " + ioe.toString());
       ioe.printStackTrace();
     }
   }

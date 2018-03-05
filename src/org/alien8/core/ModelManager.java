@@ -62,7 +62,6 @@ public class ModelManager {
    */
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
-    System.out.println(entities.size());
     AIController ai = null;
     Player pl = null;
     Ship sh = null;
@@ -83,7 +82,8 @@ public class ModelManager {
           ai.update();
         } else if (pl != null) {
           cis = latestCIS.get(pl);
-          InputManager.processInputs(sh, cis);
+          if (cis != null)
+            InputManager.processInputs(sh, cis);
         }
       }
 
@@ -111,11 +111,14 @@ public class ModelManager {
 
     // Add updated entities
     for (EntityLite el : entitiesLite) {
-      if (el.entityType == 0) { // Ship
+      if (el.entityType == 0) { // Player Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
         s.setSerial(el.serial);
         s.setSpeed(el.speed);
         s.setHealth(el.health);
+        s.getFrontTurret().setDirection(el.frontTurretDirection);
+        s.getMidTurret().setDirection(el.midTurretDirection);
+        s.getRearTurret().setDirection(el.rearTurretDirection);
 
         if (el.toBeDeleted) {
           s.delete();
@@ -126,7 +129,21 @@ public class ModelManager {
         }
 
         this.addEntity(s);
-      } else if (el.entityType == 1) { // SmallBullet
+      } else if (el.entityType == 1) { // AI Ship
+        Ship s = new Ship(el.position, el.direction, el.colour);
+        s.setSerial(el.serial);
+        s.setSpeed(el.speed);
+        s.setHealth(el.health);
+        s.getFrontTurret().setDirection(el.frontTurretDirection);
+        s.getMidTurret().setDirection(el.midTurretDirection);
+        s.getRearTurret().setDirection(el.rearTurretDirection);
+
+        if (el.toBeDeleted) {
+          s.delete();
+        }
+
+        this.addEntity(s);
+      } else if (el.entityType == 2) { // SmallBullet
         SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
         sb.setSerial(el.serial);
         sb.setSpeed(el.speed);
@@ -137,7 +154,7 @@ public class ModelManager {
         }
 
         this.addEntity(sb);
-      } else if (el.entityType == 2) { // BigBullet
+      } else if (el.entityType == 3) { // BigBullet
         BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
         bb.setSerial(el.serial);
         bb.setSpeed(el.speed);

@@ -29,30 +29,26 @@ public class ServerMulticastSender extends Thread {
   private ConcurrentLinkedQueue<Entity> entities;
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS;
   private ArrayList<Player> playerList;
-  private int numberOfPlayer;
   private boolean run = true;
 
   public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip,
       ConcurrentLinkedQueue<Entity> entities,
-      ConcurrentHashMap<Player, ClientInputSample> latestCIS, ArrayList<Player> playerList,
-      int numberOfPlayer) {
+      ConcurrentHashMap<Player, ClientInputSample> latestCIS, ArrayList<Player> playerList) {
     udpSocket = ds;
     clientMultiCastPort = port;
     groupIP = ip;
     this.entities = entities;
     this.latestCIS = latestCIS;
     this.playerList = playerList;
-    this.numberOfPlayer = numberOfPlayer;
   }
 
   public void run() {
-    while (playerList.size() != numberOfPlayer) {
-      System.out.println("Number of players connected: " + playerList.size() + "/" + numberOfPlayer);
-      // Wait until the required number of player has connected
+    // Not running the game loop before the first client connects.
+    while (playerList.isEmpty()) {
+      System.out.println(playerList);
     }
     
-    Server.initializeGameState();
-
+    System.out.println("ok");
     long lastTime = System.nanoTime();
     long currentTime = 0;
     double tick = 0;
@@ -123,19 +119,21 @@ public class ServerMulticastSender extends Thread {
         if (p != null) { // It is a player's ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour(), p.getIP(), p.getPort()));
-        }
-        else {
-          // call EntityLite constructor for AI ship
+              s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour(), p.getIP(),
+              p.getPort()));
+        } else { // It is an AI ship
+          EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
+              s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
+              s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));
         }
 
       } else if (e instanceof SmallBullet) {
         SmallBullet sb = (SmallBullet) e;
-        EntitiesLite.add(new EntityLite(sb.getSerial(), 1, sb.getPosition(), sb.isToBeDeleted(),
+        EntitiesLite.add(new EntityLite(sb.getSerial(), 2, sb.getPosition(), sb.isToBeDeleted(),
             sb.getDirection(), sb.getSpeed(), sb.getDistance(), sb.getTravelled(), sb.getSource()));
       } else if (e instanceof BigBullet) {
         BigBullet bb = (BigBullet) e;
-        EntitiesLite.add(new EntityLite(bb.getSerial(), 2, bb.getPosition(), bb.isToBeDeleted(),
+        EntitiesLite.add(new EntityLite(bb.getSerial(), 3, bb.getPosition(), bb.isToBeDeleted(),
             bb.getDirection(), bb.getSpeed(), bb.getDistance(), bb.getTravelled(), bb.getSource()));
       }
     }

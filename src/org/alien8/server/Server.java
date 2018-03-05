@@ -43,9 +43,8 @@ public class Server {
   private static ArrayList<ClientHandler> chList = new ArrayList<ClientHandler>();
   private static LinkedList<GameEvent> events = new LinkedList<GameEvent>();
   private static int serverPort = 4446;
-  private static int clientMultiCastPort = 4445;
+  private static int multiCastPort = 4445;
   private static Long seed = (new Random()).nextLong();
-  private static int numberOfPlayer = 2; // For now, change the value here to test multiple client
   private static volatile boolean run = true;
 
   public static void main(String[] args) {
@@ -58,8 +57,9 @@ public class Server {
       System.out.println("TCP socket IP: " + tcpSocket.getInetAddress());
       System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
       System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
-      ServerMulticastSender smcs = new ServerMulticastSender(udpSocket, clientMultiCastPort,
-          multiCastIP, entities, latestCIS, playerList, numberOfPlayer);
+      initializeGameState();
+      ServerMulticastSender smcs = new ServerMulticastSender(udpSocket, multiCastPort,
+          multiCastIP, entities, latestCIS, playerList);
       smcs.start();
 
       // Process clients' connect/disconnect request
@@ -117,7 +117,8 @@ public class Server {
   public static void processClientRequest(InetAddress clientIP, ClientRequest cr,
       ObjectOutputStream toClient) {
     if (cr.getType() == 0) { // Connect request
-      ClientHandler ch = new ClientHandler(clientIP, cr.getUdpPort(), playerList, entities, playerMap, seed, numberOfPlayer, toClient);
+      ClientHandler ch = new ClientHandler(clientIP, cr.getUdpPort(), playerList, entities,
+          playerMap, seed, toClient);
       chList.add(ch);
       ch.start();
     } else if (cr.getType() == 1) { // Disconnect Request
@@ -205,7 +206,7 @@ public class Server {
   public static Player getPlayerByShip(Ship ship) {
     return playerMap.get(ship);
   }
-  
+
   public static ClientHandler getClientHandlerByIpAndPort(InetAddress clientIP, int clientUdpPort) {
     for (ClientHandler ch : chList) {
       if (ch.getClientIP().equals(clientIP) && ch.getClientUdpPort() == clientUdpPort) {
