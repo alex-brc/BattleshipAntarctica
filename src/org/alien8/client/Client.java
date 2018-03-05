@@ -14,7 +14,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-
 import org.alien8.ai.AIController;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientRequest;
@@ -26,6 +25,7 @@ import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.AudioEvent;
 import org.alien8.server.GameEvent;
+import org.alien8.server.GameStartEvent;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
@@ -39,14 +39,15 @@ public class Client implements Runnable {
   private ModelManager model;
   private AIController aiPlayer;
   private int FPS = 0;
+  private InetAddress clientIP = null;
   private InetAddress serverIP = null;
-  private InetAddress multiServerIP = null;
-  private int clientMultiPort = 4445;
+  private InetAddress multiCastIP = null;
+  private Integer clientUdpPort = null;
+  private Integer serverPort = 4446;
+  private int multiCastPort = 4445;
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
-  private MulticastSocket multiReceiver = null;
-  private String groupIPStr = "224.0.0.5";
-  private String serverIPstr = "192.168.0.15"; // <- change to the ip of the server to test
+  private MulticastSocket multiCastSocket = null;
   private ScoreBoard scoreBoard;
 
   public Client() {
@@ -90,7 +91,7 @@ public class Client implements Runnable {
   @Override
   public void run() {
     // Game loop goes here
-	
+
     long lastTime = getTime();
     long currentTime = 0;
     double catchUp = 0;
@@ -172,12 +173,14 @@ public class Client implements Runnable {
    * Should be called when the client clicks the 'Connect' button after entering an server IP.
    */
   public boolean connect(String serverIPStr) {
-    if (tcpSocket == null && serverIP == null) {
-      this.serverIPstr = serverIPStr;
+    if (clientIP == null && serverIP == null && multiCastIP == null && clientUdpPort == null
+        && tcpSocket == null && udpSocket == null && multiCastSocket == null) {
       try {
+        clientIP = InetAddress.getLocalHost();
         serverIP = InetAddress.getByName(serverIPStr);
-        tcpSocket = new Socket(serverIP, 4446);
+        tcpSocket = new Socket(serverIP, serverPort);
         udpSocket = new DatagramSocket();
+        clientUdpPort = udpSocket.getLocalPort();
         // eventSocket = new DatagramSocket();
 
         // Serialize a ClientRequest Object into byte array
@@ -186,23 +189,26 @@ public class Client implements Runnable {
         ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
         toServer.writeObject(connectRequest);
 
-        // Wait for a full snapshot of current game state from server
-        ArrayList<EntityLite> initialEntitiesLite = getFullSnapshot(fromServer);
+        // Receive map seed from server
         Long seed = getMapSeed(fromServer);
         model.makeMap(seed);
+        
+        // Receive the initial game state from server
+        ArrayList<EntityLite> entsLite = receiveGameStateTCP(fromServer);
+        model.sync(entsLite, clientIP, clientUdpPort);
 
-        // Full sync the game state
-        model.fullSync(initialEntitiesLite);
+        // Set up multicast socket for receiving game states from server
+        multiCastIP = InetAddress.getByName("224.0.0.5");
+        multiCastSocket = new MulticastSocket(multiCastPort);
+        multiCastSocket.joinGroup(multiCastIP);
 
-        // Client's Ship is stored at the end of the synced entities queue
-        Object[] entitiesArr = model.getEntities().toArray();
-        model.setPlayer((Ship) entitiesArr[entitiesArr.length - 1]);
-
-        // set up multicast socket client receiver
-        multiServerIP = InetAddress.getByName(groupIPStr);
-        multiReceiver = new MulticastSocket(clientMultiPort);
-        multiReceiver.joinGroup(multiServerIP);
-
+        // Keep blocking until receiving the game start event from server
+        try {
+          GameStartEvent gse = (GameStartEvent) fromServer.readObject();
+        } catch (ClassNotFoundException cnfe) {
+          LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
+              "Class of a serialized object cannot be found." + cnfe.toString());
+        }
       } catch (BindException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
             "Could not bind to any port. Firewalls?\n" + e.toString());
@@ -251,32 +257,32 @@ public class Client implements Runnable {
   }
 
   public void receiveEvents() {
-	  try {
-		  // Create a packet for receiving event packet
-		  byte[] buf = new byte[65536];
-		  DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
+    try {
+      // Create a packet for receiving event packet
+      byte[] buf = new byte[65536];
+      DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
 
-		  multiReceiver.receive(eventPacket);
-		  byte[] eventBytes = eventPacket.getData();
+      multiCastSocket.receive(eventPacket);
+      byte[] eventBytes = eventPacket.getData();
 
-		  // Deserialize the event data into object
-		  ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
-		  ObjectInputStream objIn = new ObjectInputStream(byteIn);
-		  GameEvent event = (GameEvent) objIn.readObject();
+      // Deserialize the event data into object
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
+      ObjectInputStream objIn = new ObjectInputStream(byteIn);
+      GameEvent event = (GameEvent) objIn.readObject();
 
-		  // Send audio events to AudioManager
-		  if (event != null) {
-			  System.out.println(event.toString());
-			  if (event instanceof AudioEvent)
-				  AudioManager.getInstance().addEvent((AudioEvent) event);
-			  else if (event instanceof Score)
-				  ScoreBoard.getInstance().update((Score) event);
-		  }
-	  } catch (IOException ioe) {
-		  ioe.printStackTrace();
-	  } catch (ClassNotFoundException cnfe) {
-		  cnfe.printStackTrace();
-	  }
+      // Send audio events to AudioManager
+      if (event != null) {
+        System.out.println(event.toString());
+        if (event instanceof AudioEvent)
+          AudioManager.getInstance().addEvent((AudioEvent) event);
+        else if (event instanceof Score)
+          ScoreBoard.getInstance().update((Score) event);
+      }
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
+    }
   }
 
   /*
@@ -288,18 +294,18 @@ public class Client implements Runnable {
       byte[] buf = new byte[65536];
       DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
-      // Receive a difference packet and obtain the byte data
-      multiReceiver.receive(packet);
+      // Receive a entsLite packet and obtain the byte data
+      multiCastSocket.receive(packet);
       byte[] differenceByte = packet.getData();
 
-      // Deserialize the difference byte data into object
+      // Deserialize the entsLite byte data into object
       ByteArrayInputStream byteIn = new ByteArrayInputStream(differenceByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      ArrayList<EntityLite> difference = (ArrayList<EntityLite>) objIn.readObject();
+      ArrayList<EntityLite> entsLite = (ArrayList<EntityLite>) objIn.readObject();
 
       // Sync the game state with server
-      ModelManager.getInstance().sync(difference);
-      
+      ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
+
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
@@ -307,18 +313,18 @@ public class Client implements Runnable {
     }
   }
 
-  private ArrayList<EntityLite> getFullSnapshot(ObjectInputStream fromServer) {
-    ArrayList<EntityLite> fullSnapShot = null;
+  private ArrayList<EntityLite> receiveGameStateTCP(ObjectInputStream fromServer) {
+    ArrayList<EntityLite> gameState = null;
 
     try {
-      fullSnapShot = (ArrayList<EntityLite>) fromServer.readObject();
+      gameState = (ArrayList<EntityLite>) fromServer.readObject();
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
       cnfe.printStackTrace();
     }
 
-    return fullSnapShot;
+    return gameState;
   }
 
   private Long getMapSeed(ObjectInputStream fromServer) {
@@ -335,23 +341,27 @@ public class Client implements Runnable {
   }
 
   /**
-   * Should be called when the client clicks the 'Exit' button from the in-game menu. TODO
+   * Should be called when the client clicks the 'Exit' button from the in-game menu.
    */
   public void disconnect() {
-    if (tcpSocket != null && serverIP != null) {
+    if (clientIP != null && serverIP != null && multiCastIP != null && clientUdpPort != null
+        && tcpSocket != null && udpSocket != null && multiCastSocket != null) {
       try {
-        // Serialize a FALSE Boolean object (representing disconnect request) into byte array
-        Boolean disconnectRequest = new Boolean(false);
+        // Serialize a ClientRequest Object into byte array
+        ClientRequest disconnectRequest = new ClientRequest(1, udpSocket.getLocalPort());
         ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
 
         // Send the disconnect request
         toServer.writeObject(disconnectRequest);
 
-        // Reset the socket, serverIP and client-side threads after disconnecting
+        // Reset every networking related field
+        clientIP = null;
+        serverIP = null;
+        multiCastIP = null;
+        clientUdpPort = null;
         tcpSocket = null;
         udpSocket = null;
-        multiReceiver = null;
-        serverIP = null;
+        multiCastSocket = null;
       } catch (IOException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
             "Something went wrong disconnecting client. " + e.toString());

@@ -1,6 +1,7 @@
 package org.alien8.core;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import org.alien8.physics.Position;
 
 /*
@@ -13,7 +14,6 @@ public class EntityLite implements Serializable {
 
   // For Ship and bullet
   public long serial;
-  public int changeType; // The way the entity change. 0 for modification, 1 for add, 2 for removal
   public int entityType;
   public Position position;
   public boolean toBeDeleted = false;
@@ -26,20 +26,42 @@ public class EntityLite implements Serializable {
   public double midTurretDirection;
   public double rearTurretDirection;
   public int colour;
+  
+  // For player's Ship
+  public InetAddress clientIP;
+  public int clientUdpPort;
 
   // For bullet
   public double distance;
   public double travelled;
   public long source;
 
-
-  // For Ship
-  public EntityLite(long serial, int changeType, int entityType, Position position,
+  // For Player Ship
+  public EntityLite(long serial, int entityType, Position position,
+      boolean toBeDeleted, double direction, double speed, double health,
+      double frontTurretDirection, double midTurretDirection, double rearTurretDirection,
+      int colour, InetAddress clientIP, int clientUdpPort) {
+    this.serial = serial;
+    this.entityType = entityType;
+    this.position = position;
+    this.toBeDeleted = toBeDeleted;
+    this.direction = direction;
+    this.speed = speed;
+    this.health = health;
+    this.frontTurretDirection = frontTurretDirection;
+    this.midTurretDirection = midTurretDirection;
+    this.rearTurretDirection = rearTurretDirection;
+    this.colour = colour;
+    this.clientIP = clientIP;
+    this.clientUdpPort = clientUdpPort;
+  }
+  
+  // For AI Ship
+  public EntityLite(long serial, int entityType, Position position,
       boolean toBeDeleted, double direction, double speed, double health,
       double frontTurretDirection, double midTurretDirection, double rearTurretDirection,
       int colour) {
     this.serial = serial;
-    this.changeType = changeType;
     this.entityType = entityType;
     this.position = position;
     this.toBeDeleted = toBeDeleted;
@@ -53,11 +75,10 @@ public class EntityLite implements Serializable {
   }
 
   // For Bullet
-  public EntityLite(long serial, int changeType, int entityType, Position position,
+  public EntityLite(long serial, int entityType, Position position,
       boolean toBeDeleted, double direction, double speed, double distance, double travelled,
       long source) {
     this.serial = serial;
-    this.changeType = changeType;
     this.entityType = entityType;
     this.position = position;
     this.toBeDeleted = toBeDeleted;
@@ -69,7 +90,7 @@ public class EntityLite implements Serializable {
   }
 
   public String toString() {
-    return serial + "," + changeType + "," + entityType;
+    return serial + "," + entityType;
   }
 
 }

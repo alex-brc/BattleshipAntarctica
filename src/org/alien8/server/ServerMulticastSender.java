@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -27,29 +26,34 @@ public class ServerMulticastSender extends Thread {
   private Integer clientMultiCastPort;
   private InetAddress groupIP;
   private DatagramSocket udpSocket;
-  private ConcurrentLinkedQueue<Entity> lastSyncedEntities;
-  private ConcurrentLinkedQueue<Entity> currentEntities = ModelManager.getInstance().getEntities();
+  private ConcurrentLinkedQueue<Entity> entities;
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS;
   private ArrayList<Player> playerList;
-  long lastTime;
-  long currentTime;
-  long tick;
+  private int numberOfPlayer;
   private boolean run = true;
 
-
   public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip,
-      ConcurrentLinkedQueue<Entity> ents, ConcurrentHashMap<Player, ClientInputSample> latestCIS,
-      ArrayList<Player> playerList) {
+      ConcurrentLinkedQueue<Entity> entities,
+      ConcurrentHashMap<Player, ClientInputSample> latestCIS, ArrayList<Player> playerList,
+      int numberOfPlayer) {
     udpSocket = ds;
     clientMultiCastPort = port;
     groupIP = ip;
-    lastSyncedEntities = ents;
+    this.entities = entities;
     this.latestCIS = latestCIS;
     this.playerList = playerList;
+    this.numberOfPlayer = numberOfPlayer;
   }
 
   public void run() {
-    lastTime = System.nanoTime();
+    while (playerList.size() != numberOfPlayer) {
+      System.out.println("Number of players connected: " + playerList.size() + "/" + numberOfPlayer);
+      // Wait until the required number of player has connected
+    }
+    
+    Server.initializeGameState();
+
+    long lastTime = System.nanoTime();
     long currentTime = 0;
     double tick = 0;
     // Send game state snapshot 60 times per second
@@ -106,182 +110,75 @@ public class ServerMulticastSender extends Thread {
     ModelManager.getInstance().updateServer(latestCIS);
   }
 
+  /*
+   * Create a compressed set of entities (game state) from the original set of entities
+   */
+  private static ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
+    ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
+
+    for (Entity e : ents) {
+      if (e instanceof Ship) {
+        Ship s = (Ship) e;
+        Player p = Server.getPlayerByShip(s);
+        if (p != null) { // It is a player's ship
+          EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
+              s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
+              s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour(), p.getIP(), p.getPort()));
+        }
+        else {
+          // call EntityLite constructor for AI ship
+        }
+
+      } else if (e instanceof SmallBullet) {
+        SmallBullet sb = (SmallBullet) e;
+        EntitiesLite.add(new EntityLite(sb.getSerial(), 1, sb.getPosition(), sb.isToBeDeleted(),
+            sb.getDirection(), sb.getSpeed(), sb.getDistance(), sb.getTravelled(), sb.getSource()));
+      } else if (e instanceof BigBullet) {
+        BigBullet bb = (BigBullet) e;
+        EntitiesLite.add(new EntityLite(bb.getSerial(), 2, bb.getPosition(), bb.isToBeDeleted(),
+            bb.getDirection(), bb.getSpeed(), bb.getDistance(), bb.getTravelled(), bb.getSource()));
+      }
+    }
+
+    return EntitiesLite;
+  }
+
   public void sendGameState() {
     try {
-      ArrayList<EntityLite> difference = calculateDifference(lastSyncedEntities, currentEntities);
-      // Update the last synced set of entities right before sending the difference to client for
-      // syncing
-      ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
-      for (Entity e : currentEntities) {
-        newLastSyncedEntities.add((Entity) deepClone(e));
-      }
-      lastSyncedEntities = newLastSyncedEntities;
+      ArrayList<EntityLite> entsLite = calculateEntitiesLite(entities);
 
-      // Serialize the difference arraylist into byte array
+      // Serialize the entLite arraylist into byte array
       ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-      objOut.writeObject(difference);
-      byte[] differenceByte = byteOut.toByteArray();
+      objOut.writeObject(entsLite);
+      byte[] entsLiteByte = byteOut.toByteArray();
 
-      // Create a packet for holding the difference byte data
-      DatagramPacket packet =
-          new DatagramPacket(differenceByte, differenceByte.length, groupIP, clientMultiCastPort);
-      
+      // Create a packet for holding the entLite byte data
+      DatagramPacket entsLitePacket =
+          new DatagramPacket(entsLiteByte, entsLiteByte.length, groupIP, clientMultiCastPort);
+
       // Make the game event packet
       GameEvent event = Server.getNextEvent();
       byteOut = new ByteArrayOutputStream();
       objOut = new ObjectOutputStream(byteOut);
       objOut.writeObject(event);
       byte[] eventByte = byteOut.toByteArray();
-      
+
       // Make packet
-      DatagramPacket eventPacket = new DatagramPacket(eventByte, eventByte.length, groupIP, clientMultiCastPort);
+      DatagramPacket eventPacket =
+          new DatagramPacket(eventByte, eventByte.length, groupIP, clientMultiCastPort);
 
       // Send the difference packet and the event packet to client
-      udpSocket.send(packet);
+      udpSocket.send(entsLitePacket);
       udpSocket.send(eventPacket);
     } catch (IOException e) {
       e.printStackTrace();
-      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL, "Packet error: " + e.toString());
+      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL,
+          "Packet error: " + e.toString());
     }
   }
-  /*
-   * Calculate the difference between two set of entities, difference is represented as an arraylist
-   * of compressed entities that are modified or added or removed
-   */
-  public ArrayList<EntityLite> calculateDifference(ConcurrentLinkedQueue<Entity> lastSyncedEntities,
-      ConcurrentLinkedQueue<Entity> currentEntities) {
-    ArrayList<EntityLite> difference = new ArrayList<EntityLite>();
 
-    if (currentEntities.size() >= lastSyncedEntities.size()) {
-      for (Entity ce : currentEntities) {
-        boolean entityToBeAdded = true;
-        // See if the entity is being modified
-        for (Entity lse : lastSyncedEntities) {
-          if (ce.getSerial() == lse.getSerial()) {
-            if (ce instanceof Ship) {
-              Ship currentShip = (Ship) ce;
-              Ship lastSyncedShip = (Ship) lse;
-              if (!currentShip.equals(lastSyncedShip)) {
-                difference.add(new EntityLite(currentShip.getSerial(), 0, 0,
-                    currentShip.getPosition(), currentShip.isToBeDeleted(),
-                    currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(),
-                    currentShip.getFrontTurretDirection(), currentShip.getMidTurretDirection(),
-                    currentShip.getRearTurretDirection(), currentShip.getColour()));
-              }
-            } else if (ce instanceof SmallBullet) {
-              SmallBullet currentSB = (SmallBullet) ce;
-              SmallBullet lastSyncedSB = (SmallBullet) lse;
-              if (!currentSB.equals(lastSyncedSB)) {
-                difference.add(new EntityLite(currentSB.getSerial(), 0, 1, currentSB.getPosition(),
-                    currentSB.isToBeDeleted(), currentSB.getDirection(), currentSB.getSpeed(),
-                    currentSB.getDistance(), currentSB.getTravelled(), currentSB.getSource()));
 
-              }
-            } else if (ce instanceof BigBullet) {
-              BigBullet currentBB = (BigBullet) ce;
-              BigBullet lastSyncedBB = (BigBullet) lse;
-              if (!currentBB.equals(lastSyncedBB)) {
-                difference.add(new EntityLite(currentBB.getSerial(), 0, 2, currentBB.getPosition(),
-                    currentBB.isToBeDeleted(), currentBB.getDirection(), currentBB.getSpeed(),
-                    currentBB.getDistance(), currentBB.getTravelled(), currentBB.getSource()));
-
-              }
-            }
-            entityToBeAdded = false;
-            break;
-          }
-        }
-
-        // If reaches this point, the entity is to be added
-        if (entityToBeAdded) {
-          if (ce instanceof Ship) {
-            Ship currentShip = (Ship) ce;
-            difference.add(new EntityLite(currentShip.getSerial(), 1, 0, currentShip.getPosition(),
-                currentShip.isToBeDeleted(), currentShip.getDirection(), currentShip.getSpeed(),
-                currentShip.getHealth(), currentShip.getFrontTurretDirection(),
-                currentShip.getMidTurretDirection(), currentShip.getRearTurretDirection(),
-                currentShip.getColour()));
-          } else if (ce instanceof SmallBullet) {
-            SmallBullet currentSB = (SmallBullet) ce;
-            difference.add(new EntityLite(currentSB.getSerial(), 1, 1, currentSB.getPosition(),
-                currentSB.isToBeDeleted(), currentSB.getDirection(), currentSB.getSpeed(),
-                currentSB.getDistance(), currentSB.getTravelled(), currentSB.getSource()));
-          } else if (ce instanceof BigBullet) {
-            BigBullet currentBB = (BigBullet) ce;
-            difference.add(new EntityLite(currentBB.getSerial(), 1, 2, currentBB.getPosition(),
-                currentBB.isToBeDeleted(), currentBB.getDirection(), currentBB.getSpeed(),
-                currentBB.getDistance(), currentBB.getTravelled(), currentBB.getSource()));
-          }
-        }
-      }
-    } else if (lastSyncedEntities.size() > currentEntities.size()) {
-      for (Entity lse : lastSyncedEntities) {
-        boolean entityToBeRemoved = true;
-        // See if the entity is being modified
-        for (Entity ce : currentEntities) {
-          if (ce.getSerial() == lse.getSerial()) {
-            if (lse instanceof Ship) {
-              Ship lastSyncedShip = (Ship) lse;
-              Ship currentShip = (Ship) ce;
-              if (!lastSyncedShip.equals(currentShip)) {
-                difference.add(new EntityLite(currentShip.getSerial(), 0, 0,
-                    currentShip.getPosition(), currentShip.isToBeDeleted(),
-                    currentShip.getDirection(), currentShip.getSpeed(), currentShip.getHealth(),
-                    currentShip.getFrontTurretDirection(), currentShip.getMidTurretDirection(),
-                    currentShip.getRearTurretDirection(), currentShip.getColour()));
-              }
-            } else if (lse instanceof SmallBullet) {
-              SmallBullet lastSyncedSB = (SmallBullet) lse;
-              SmallBullet currentSB = (SmallBullet) ce;
-              if (!lastSyncedSB.equals(currentSB)) {
-                difference.add(new EntityLite(currentSB.getSerial(), 0, 1, currentSB.getPosition(),
-                    currentSB.isToBeDeleted(), currentSB.getDirection(), currentSB.getSpeed(),
-                    currentSB.getDistance(), currentSB.getTravelled(), currentSB.getSource()));
-              }
-            } else if (lse instanceof BigBullet) {
-              BigBullet lastSyncedBB = (BigBullet) lse;
-              BigBullet currentBB = (BigBullet) ce;
-              if (!lastSyncedBB.equals(currentBB)) {
-                difference.add(new EntityLite(currentBB.getSerial(), 0, 2, currentBB.getPosition(),
-                    currentBB.isToBeDeleted(), currentBB.getDirection(), currentBB.getSpeed(),
-                    currentBB.getDistance(), currentBB.getTravelled(), currentBB.getSource()));
-              }
-            }
-            entityToBeRemoved = false;
-            break;
-          }
-        }
-
-        // If reaches this point, the entity is to be removed
-        if (entityToBeRemoved) {
-          if (lse instanceof Ship) {
-            Ship lastSyncedShip = (Ship) lse;
-            difference.add(new EntityLite(lastSyncedShip.getSerial(), 2, 0,
-                lastSyncedShip.getPosition(), lastSyncedShip.isToBeDeleted(),
-                lastSyncedShip.getDirection(), lastSyncedShip.getSpeed(),
-                lastSyncedShip.getHealth(), lastSyncedShip.getFrontTurretDirection(),
-                lastSyncedShip.getMidTurretDirection(), lastSyncedShip.getRearTurretDirection(),
-                lastSyncedShip.getColour()));
-          } else if (lse instanceof SmallBullet) {
-            SmallBullet lastsyncedSB = (SmallBullet) lse;
-            difference.add(new EntityLite(lastsyncedSB.getSerial(), 2, 1,
-                lastsyncedSB.getPosition(), lastsyncedSB.isToBeDeleted(),
-                lastsyncedSB.getDirection(), lastsyncedSB.getSpeed(), lastsyncedSB.getDistance(),
-                lastsyncedSB.getTravelled(), lastsyncedSB.getSource()));
-          } else if (lse instanceof BigBullet) {
-            BigBullet lastSyncedBB = (BigBullet) lse;
-            difference.add(new EntityLite(lastSyncedBB.getSerial(), 2, 2,
-                lastSyncedBB.getPosition(), lastSyncedBB.isToBeDeleted(),
-                lastSyncedBB.getDirection(), lastSyncedBB.getSpeed(), lastSyncedBB.getDistance(),
-                lastSyncedBB.getTravelled(), lastSyncedBB.getSource()));
-          }
-        }
-      }
-    }
-
-    return difference;
-  }
 
   /*
    * This method makes a "deep clone" of any Java object it is given.
