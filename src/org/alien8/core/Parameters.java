@@ -16,7 +16,6 @@ import net.jafama.FastMath;
  * 
  */
 public class Parameters {
-  public static final boolean RENDER_BOX = true;
   /**
    * How many times to attempt connection to server before giving up. Keep in mind the timeout is
    * pretty long itself.
@@ -88,26 +87,28 @@ public class Parameters {
    */
   public static final double ICE_BOUNCINESS = 0.02;
   /**
-   * Bullet parameters
+   * Bullet parameters.
+   * Cooldowns in milliseconds.
    */
   public static final double SMALL_BULLET_MASS = 10;
   public static final double SMALL_BULLET_WIDTH = 2;
   public static final double SMALL_BULLET_LENGTH = 4;
   public static final double SMALL_BULLET_SPEED = 4;
   public static final double SMALL_BULLET_DAMAGE = 10;
-  // Bullet cooldown in milliseconds
-  public static final int SMALL_BULLET_CD = 500;
+  public static final int SMALL_BULLET_CD = 1000;
   public static final int SMALL_BULLET_MIN_DIST = 50;
   public static final int SMALL_BULLET_MAX_DIST = 400;
-
+  public static final int SMALL_BULLET_POOL_SIZE = 50;
+  
   public static final double BIG_BULLET_MASS = 30;
   public static final double BIG_BULLET_WIDTH = 4;
-  public static final double BIG_BULLET_LENGTH = 6;
+  public static final double BIG_BULLET_LENGTH = 8;
   public static final double BIG_BULLET_SPEED = 2;
   public static final double BIG_BULLET_DAMAGE = 10;
   public static final int BIG_BULLET_CD = 2000;
   public static final int BIG_BULLET_MIN_DIST = 50;
   public static final int BIG_BULLET_MAX_DIST = 400;
+  public static final int BIG_BULLET_POOL_SIZE = 50;
 
   /**
    * This modifier affects how much distance holding down a button gives to the turret shot every
@@ -123,8 +124,8 @@ public class Parameters {
    * Maximum number of "shoot" audio clips running at the same time
    */
   public static final int SFX_POOL_SIZE = 5;
-  public static final float INITIAL_VOLUME_SFX = 0.4f;
-  public static final float INITIAL_VOLUME_AMBIENT = 0.4f;
+  public static final float INITIAL_VOLUME_SFX = 0.8f;
+  public static final float INITIAL_VOLUME_AMBIENT = 0.8f;
   public static final int MAX_HEARING_DISTANCE = 1500;
   /**
    * See Score for details
@@ -134,7 +135,4 @@ public class Parameters {
   public static final float DISTANCE_MULTIPLIER = 1;
   public static final int SCOREBOARD_HEIGHT = 500;
   public static final int SCOREBOARD_WIDTH = 500;
-
-
-
 }

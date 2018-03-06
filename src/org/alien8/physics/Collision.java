@@ -140,12 +140,17 @@ public class Collision {
       ship.damage(bullet.getDamage());
       // Award score to the bullet owner
       Player shooter = Server.getPlayer(bullet);
-      ScoreBoard.getInstance().giveHit(shooter, bullet);
+      // If it's AI, no points
+      if(shooter != null)
+      	ScoreBoard.getInstance().giveHit(shooter, bullet);
       // See if ship has been destroyed
       if (ship.getHealth() <= 0) {
+    	System.out.println("A ship died!");
         ship.delete();
         // Award score to the killer
-        ScoreBoard.getInstance().giveKill(shooter);
+        // If it's AI, no points
+        if(shooter != null)
+        	ScoreBoard.getInstance().giveKill(shooter);
       }
       // Destroy bullet
       bullet.delete();

@@ -70,6 +70,7 @@ public class ModelManager {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
+        System.out.println("Removed " + ent.toString());
         // Skip the rest
         continue;
       }

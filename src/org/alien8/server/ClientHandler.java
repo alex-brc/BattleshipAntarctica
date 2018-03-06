@@ -42,29 +42,15 @@ public class ClientHandler extends Thread {
   }
 
   public void run() {
-    boolean[][] iceGrid = model.getMap().getIceGrid();
-    Random r = new Random();
-    double randomX = 0;
-    double randomY = 0;
-    boolean isIcePosition = true;
-
-    // Choose a random position without ice for ship spawning
-    while (isIcePosition) {
-      randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
-      randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
-
-      if (!iceGrid[(int) randomX][(int) randomY]) {
-        isIcePosition = false;
-      }
-    }
-
+    Position randPos = Server.getRandomPosition();
+    
     // TODO: ADD NAMES TO PLAYERS
     int k = (new Random()).nextInt(1000);
     String name = "RAND_NAME_" + k;
     
     // Setup client's ship
     int randColour = (new Random()).nextInt(0xFFFFFF);
-    Ship s = new Ship(new Position(randomX, randomY), 0, randColour);
+    Ship s = new Ship(new Position(randPos.getX(), randPos.getY()), 0, randColour);
     model.addEntity(s);
 
     // Setup client's player info

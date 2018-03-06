@@ -37,6 +37,7 @@ public class Client implements Runnable {
   private ModelManager model;
   private AIController aiPlayer;
   private int FPS = 0;
+  private int TICKS = 0;
   private InetAddress clientIP = null;
   private InetAddress serverIP = null;
   private InetAddress multiCastIP = null;
@@ -112,7 +113,6 @@ public class Client implements Runnable {
 
       // Call update() as many times as needed to compensate before rendering
       while (catchUp >= 1) {
-        System.out.println("Client entities: " + model.getEntities());
         this.sendInputSample();
         this.receiveAndUpdate();
         this.receiveEvents();
@@ -130,13 +130,14 @@ public class Client implements Runnable {
       // Update the FPS timer every FPS_FREQ^-1 seconds
       if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
         frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-        FPS = frameRate * Parameters.FPS_FREQ;
+        FPS = ( frameRate * Parameters.FPS_FREQ + FPS ) / 2;
         frameRate = 0;
-        //System.out.println(FPS);
+        System.out.println(FPS);
       }
       if (getTime() - tickTimer > Parameters.N_SECOND) {
         tickTimer += Parameters.N_SECOND;
-        //System.out.println(tickRate);
+        TICKS = (TICKS + tickRate) / 2;
+        System.out.println(TICKS);
         tickRate = 0;
       }
     }

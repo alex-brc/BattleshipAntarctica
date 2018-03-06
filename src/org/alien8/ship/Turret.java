@@ -75,10 +75,10 @@ public class Turret implements Serializable {
       return;
 
     if (type == Turret.BIG) {
-      ModelManager.getInstance().addEntity(new BigBullet(this.getPosition(), this.getDirection(),
+      ModelManager.getInstance().addEntity(Server.getBigBullet(this.getPosition(), this.getDirection(),
           distance, this.getShip().getSerial()));
     } else {
-      ModelManager.getInstance().addEntity(new SmallBullet(this.getPosition(), this.getDirection(),
+      ModelManager.getInstance().addEntity(Server.getSmallBullet(this.getPosition(), this.getDirection(),
           distance, this.getShip().getSerial()));
     }
 

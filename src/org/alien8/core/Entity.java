@@ -37,11 +37,6 @@ public abstract class Entity implements Serializable, Cloneable {
   public Entity(Position position, double direction, double speed, double mass, double length,
       double width) {
     this.position = position;
-    // this.properties.setDirection(direction);
-    // this.properties.setSpeed(speed);
-    // this.properties.setMass(mass);
-    // this.properties.setLength(length);
-    // this.properties.setWidth(width);
     this.direction = direction;
     this.speed = speed;
     this.mass = mass;
@@ -54,12 +49,6 @@ public abstract class Entity implements Serializable, Cloneable {
   public Entity(Position position, double direction, double speed, double mass, double length,
       double width, double health) {
     this.position = position;
-    // this.properties.setDirection(direction);
-    // this.properties.setSpeed(speed);
-    // this.properties.setMass(mass);
-    // this.properties.setLength(length);
-    // this.properties.setWidth(width);
-    // this.properties.setHealth(health);
     this.direction = direction;
     this.speed = speed;
     this.mass = mass;
@@ -68,40 +57,6 @@ public abstract class Entity implements Serializable, Cloneable {
     this.health = health;
 
     initObb();
-  }
-
-  /**
-   * @return the position in XY coordinates
-   */
-  public Position getPosition() {
-    return position;
-  }
-
-  /**
-   * @param position the position to set, in XY coordinates
-   */
-  public void setPosition(Position position) {
-    this.position = position;
-  }
-
-  public long getSerial() {
-    return serial;
-  }
-
-  public void setSerial(long serial) {
-    if (this.serial == -1) {
-      this.serial = serial;
-    }
-    // Only works once.
-
-  }
-
-  public void delete() {
-    this.toBeDeleted = true;
-  }
-
-  public boolean isToBeDeleted() {
-    return toBeDeleted;
   }
 
   /**
@@ -174,12 +129,7 @@ public abstract class Entity implements Serializable, Cloneable {
   public abstract void render();
 
   public void damage(double damage) {
-    // System.out.println("Damage: " + damage);
-    // properties.setHealth(attributes.getHealth() - damage);
-    // // Destroy if health less than 0
-    // if (properties.getHealth() <= 0) {
-    // delete();
-    // }
+    // Dying handled externally
     health -= damage;
   }
 
@@ -265,6 +215,41 @@ public abstract class Entity implements Serializable, Cloneable {
     return obb;
   }
 
+  /**
+   * @return the position in XY coordinates
+   */
+  public Position getPosition() {
+    return position;
+  }
+
+  /**
+   * @param position the position to set, in XY coordinates
+   */
+  public void setPosition(Position position) {
+    this.position = position;
+  }
+
+  public long getSerial() {
+    return serial;
+  }
+
+  public void setSerial(long serial) {
+	this.serial = serial;
+  }
+
+  public void save() {
+	  this.toBeDeleted = false;
+  }
+  
+  public void delete() {
+    this.toBeDeleted = true;
+  }
+
+  public boolean isToBeDeleted() {
+    return toBeDeleted;
+  }
+
+  
   @Override
   public Object clone() throws CloneNotSupportedException {
     return super.clone();

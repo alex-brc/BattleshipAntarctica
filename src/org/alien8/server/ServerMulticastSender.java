@@ -51,7 +51,6 @@ public class ServerMulticastSender extends Thread {
       currentTime = System.nanoTime();
       tick += 1.0 * (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
       while (tick >= 1) {
-        System.out.println("Server entities: " + entities);
         readInputSample();
         updateGameStateByCIS();
         sendGameState();

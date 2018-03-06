@@ -15,15 +15,19 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
+import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.score.ScoreBoard;
+import org.alien8.ship.BigBullet;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
+import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
 
 public class Server {
@@ -45,6 +49,8 @@ public class Server {
   private static int serverPort = 4446;
   private static int multiCastPort = 4445;
   private static Long seed = (new Random()).nextLong();
+  private static volatile LinkedList<BigBullet> bigBullets = new LinkedList<BigBullet>();
+  private static volatile LinkedList<SmallBullet> smallBullets = new LinkedList<SmallBullet>();
   private static volatile boolean run = true;
 
   public static void main(String[] args) {
@@ -73,7 +79,6 @@ public class Server {
       }
 
       tcpSocket.close();
-      System.out.println("closed tcp");
       udpSocket.close();
     } catch (SocketException e) {
       e.printStackTrace();
@@ -99,6 +104,14 @@ public class Server {
   public static void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
 
+    // Populate bullet pools
+    for(int i = 0; i < Parameters.SMALL_BULLET_POOL_SIZE; i++) {
+    	smallBullets.add(new SmallBullet(new Position(0,0), 0, 0, 0));
+    }
+    for(int i = 0; i < Parameters.BIG_BULLET_POOL_SIZE; i++) {
+    	bigBullets.add(new BigBullet(new Position(0,0), 0, 0, 0));
+    }
+    
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
     ScoreBoard.getInstance();
@@ -116,10 +129,13 @@ public class Server {
     // also, remember to give them colours
 
     // test ai
-    Ship sh = new Ship(new Position(100, 100), 0, 0xFFFFFF);
-    AIController ai = new AIController(sh);
-    model.addEntity(sh);
-    aiMap.put(sh, ai);
+	for(int i = 1; i <= 7; i++) {
+		Ship sh = new Ship(getRandomPosition(), 0, 0xFFFFFF);
+	    AIController ai = new AIController(sh);
+	    model.addEntity(sh);
+	    aiMap.put(sh, ai);
+	}
+    
 
   }
 
@@ -166,17 +182,12 @@ public class Server {
    * Gets player by bullet. Used in awarding score.
    * 
    * @param bullet the bullet belonging to the player
-   * @return the player who owns the bullet
+   * @return the player who owns the bullet, null if it's AI
    */
   public static Player getPlayer(Bullet bullet) {
-
     for (Player p : playerList)
       if (p.getShip().getSerial() == bullet.getSource())
         return p;
-
-    LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
-        "Bullet source ship does not exist. Exiting...");
-    System.exit(-1);
     return null;
   }
 
@@ -221,5 +232,54 @@ public class Server {
     }
     return null;
   }
+
+public static Position getRandomPosition() {
+	boolean[][] iceGrid = model.getMap().getIceGrid();
+    Random r = new Random();
+    double randomX = 0;
+    double randomY = 0;
+    boolean isIcePosition = true;
+
+    // Choose a random position without ice for ship spawning
+    while (isIcePosition) {
+      randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
+      randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
+
+      if (!iceGrid[(int) randomX][(int) randomY]) {
+        isIcePosition = false;
+      }
+    }
+	return new Position(randomX,randomY);
+}
+
+public static BigBullet getBigBullet(Position position, double direction, double distance, long serial) {
+	
+	// Take one from the top
+	BigBullet b = bigBullets.pollFirst();
+	// Modify it
+	b.setPosition(position);
+	b.setDirection(direction);
+	b.setDistance(distance);
+	b.setSource(serial);
+	b.save();
+	// Add it to the end before passing it to the caller
+	bigBullets.addLast(b);
+	System.out.println("Summoned " + b);
+	return b;
+}
+
+public static SmallBullet getSmallBullet(Position position, double direction, double distance, long serial) {
+	// Take one from the top
+	SmallBullet b = smallBullets.pollFirst();
+	// Modify it
+	b.setDirection(direction);
+	b.setDistance(distance);
+	b.setPosition(position);
+	b.setSource(serial);
+	b.save();
+	// Add it to the end before passing it to the caller
+	smallBullets.addLast(b);
+	return b;
+}
 
 }

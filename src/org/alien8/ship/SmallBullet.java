@@ -10,10 +10,10 @@ import net.jafama.FastMath;
 public class SmallBullet extends Bullet {
   protected Sprite sprite = Sprite.bullet;
 
-  public SmallBullet(Position position, double direction, double distance, long serial) {
+  public SmallBullet(Position position, double direction, double distance, long sourceSerial) {
     super(position, direction, distance, Parameters.SMALL_BULLET_MASS,
         Parameters.SMALL_BULLET_WIDTH, Parameters.SMALL_BULLET_LENGTH,
-        Parameters.SMALL_BULLET_SPEED, Parameters.SMALL_BULLET_DAMAGE, serial);
+        Parameters.SMALL_BULLET_SPEED, Parameters.SMALL_BULLET_DAMAGE, sourceSerial);
   }
 
   @Override
