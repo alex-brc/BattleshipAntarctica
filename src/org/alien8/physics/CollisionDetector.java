@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alien8.core.Entity;
 
+import net.jafama.FastMath;
+
 public class CollisionDetector {
   /**
    * Checks for Collisions between a set of Entities.
@@ -58,10 +60,10 @@ public class CollisionDetector {
       Position pos = e.getPosition();
       double length = e.getLength();
       // Calculate max and min points
-      Position max = new Position((pos.getX() + 0.5 * length * Math.cos(e.getDirection())),
-          (pos.getY() + 0.5 * length * Math.sin(e.getDirection())));
-      Position min = new Position((pos.getX() - 0.5 * length * Math.cos(e.getDirection())),
-          (pos.getY() - 0.5 * length * Math.sin(e.getDirection())));
+      Position max = new Position((pos.getX() + 0.5 * length * FastMath.cos(e.getDirection())),
+          (pos.getY() + 0.5 * length * FastMath.sin(e.getDirection())));
+      Position min = new Position((pos.getX() - 0.5 * length * FastMath.cos(e.getDirection())),
+          (pos.getY() - 0.5 * length * FastMath.sin(e.getDirection())));
       // Create new AABB
       AABB box = new AABB(max, min, e);
       aabbs.add(box);
@@ -278,11 +280,11 @@ public class CollisionDetector {
   private double getOverlap(Projection p1, Projection p2) {
     double thing1 = p2.getMin() - p1.getMax();
     double thing2 = p1.getMin() - p2.getMax();
-    double abs1 = Math.abs(thing1);
-    double abs2 = Math.abs(thing2);
-    double res = Math.min(abs1, abs2);
+    double abs1 = FastMath.abs(thing1);
+    double abs2 = FastMath.abs(thing2);
+    double res = FastMath.min(abs1, abs2);
     return res / 1000;
-    // return Math.min(Math.abs(p2.getMin() - p1.getMax()), Math.abs(p1.getMin() - p2.getMax()));
+    // return FastMath.min(FastMath.abs(p2.getMin() - p1.getMax()), FastMath.abs(p1.getMin() - p2.getMax()));
   }
 }
 

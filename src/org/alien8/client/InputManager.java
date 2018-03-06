@@ -1,3 +1,4 @@
+
 package org.alien8.client;
 
 import java.awt.event.KeyEvent;
@@ -10,6 +11,8 @@ import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
+
+import net.jafama.FastMath;
 
 /**
  * This singleton class is a listener to be added to the main window. It adds all relevant input
@@ -53,7 +56,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
       PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
     else if (cis.sPressed)
       PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
-          PhysicsManager.shiftAngle(player.getDirection()));
+          PhysicsManager.shiftAngle(player.getDirection() + FastMath.PI));
 
     // Apply rotation
     if (cis.aPressed)

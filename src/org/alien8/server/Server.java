@@ -1,7 +1,5 @@
 package org.alien8.server;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,10 +15,11 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
-import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
@@ -30,42 +29,41 @@ import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
-import org.alien8.util.ServerShutdownHook;
 
 public class Server {
 
   private static InetAddress hostIP = null;
-  private static InetAddress groupIP = null;
-  private static String groupIPStr = "224.0.0.5"; // multicast group ipString
+  private static InetAddress multiCastIP = null;
   private static ServerSocket tcpSocket = null;
   private static DatagramSocket udpSocket = null;
-  // private static DatagramSocket eventSocket = null;
-  private static ConcurrentLinkedQueue<Entity> lastSyncedEntities =
-      new ConcurrentLinkedQueue<Entity>();
+  private static ModelManager model = ModelManager.getInstance();
+  private static ConcurrentLinkedQueue<Entity> entities = model.getEntities();
   private static ConcurrentHashMap<Player, ClientInputSample> latestCIS =
       new ConcurrentHashMap<Player, ClientInputSample>();
-  private static ModelManager model = ModelManager.getInstance();
+  private static ConcurrentHashMap<Ship, AIController> aiMap =
+      new ConcurrentHashMap<Ship, AIController>();
+  private static ConcurrentHashMap<Ship, Player> playerMap = new ConcurrentHashMap<Ship, Player>();
   private static ArrayList<Player> playerList = new ArrayList<Player>();
+  private static ArrayList<ClientHandler> chList = new ArrayList<ClientHandler>();
   private static LinkedList<GameEvent> events = new LinkedList<GameEvent>();
   private static int serverPort = 4446;
-  private static int clientMultiCastPort = 4445;
+  private static int multiCastPort = 4445;
   private static Long seed = (new Random()).nextLong();
+  private static volatile LinkedList<BigBullet> bigBullets = new LinkedList<BigBullet>();
+  private static volatile LinkedList<SmallBullet> smallBullets = new LinkedList<SmallBullet>();
   private static volatile boolean run = true;
 
   public static void main(String[] args) {
-    Runtime.getRuntime().addShutdownHook(new ServerShutdownHook());
     model.makeMap(seed);
     try {
       setHostIP();
       tcpSocket = new ServerSocket(serverPort, 50, hostIP);
       udpSocket = new DatagramSocket(serverPort, hostIP);
-      // eventSocket = new DatagramSocket(4447, hostIP);
       System.out.println("TCP socket Port: " + tcpSocket.getLocalPort());
       System.out.println("TCP socket IP: " + tcpSocket.getInetAddress());
       System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
       System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
-      // System.out.println("UDP event socket Port: " + eventSocket.getLocalPort());
-      // System.out.println("UDP event socket IP: " + eventSocket.getLocalAddress());
+      initializeGameState();
 
       // Process clients' connect/disconnect request
       while (run) {
@@ -91,30 +89,69 @@ public class Server {
     }
   }
 
+  private static void setHostIP() {
+    try {
+      hostIP = Inet4Address.getLocalHost();
+      multiCastIP = InetAddress.getByName("224.0.0.5");
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /*
+   * Only initialize the game state, will not start the server game loop
+   */
   public static void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
-    Ship notPlayer = new Ship(new Position(100, 100), 0, 0xF8F8F8); // white
 
+    // Populate bullet pools
+    for(int i = 0; i < Parameters.SMALL_BULLET_POOL_SIZE; i++) {
+    	smallBullets.add(new SmallBullet(new Position(0,0), 0, 0, 0));
+    }
+    for(int i = 0; i < Parameters.BIG_BULLET_POOL_SIZE; i++) {
+    	bigBullets.add(new BigBullet(new Position(0,0), 0, 0, 0));
+    }
+    
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
     ScoreBoard.getInstance();
 
-    notPlayer.setSpeed(0.8);
-    model.addEntity(notPlayer);
+    initializeAIs();
+
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
   }
 
-  public static void processClientRequest(InetAddress clientIP, ClientRequest cr,
+  private static void initializeAIs() {
+    // Ai controllers should be put in the
+    // ConcurrentHashMap<Ship, AIController> aiMap
+    // so the loop has constant time access to the AI controller given the ship
+    // also, remember to give them colours
+
+    // test ai
+	for(int i = 1; i <= 7; i++) {
+		Ship sh = new Ship(getRandomPosition(), 0, 0xFFFFFF);
+	    AIController ai = new AIController(sh);
+	    model.addEntity(sh);
+	    aiMap.put(sh, ai);
+	}
+    
+
+  }
+
+  private static void processClientRequest(InetAddress clientIP, ClientRequest cr,
       ObjectOutputStream toClient) {
     if (cr.getType() == 0) { // Connect request
-      setupClient(clientIP, cr.getUdpPort(), toClient);
+      ClientHandler ch = new ClientHandler(clientIP, cr.getUdpPort(), playerList, entities,
+          playerMap, seed, toClient);
+      chList.add(ch);
+      ch.start();
     } else if (cr.getType() == 1) { // Disconnect Request
       disconnectPlayer(clientIP, cr.getUdpPort());
     }
   }
 
-  public static boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
+  private static boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
     for (Player p : playerList) {
       if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
         return true;
@@ -123,144 +160,17 @@ public class Server {
     return false;
   }
 
-  public static Player getPlayerByIpAndPort(InetAddress clientIP, int clientPort) {
-    for (Player p : playerList) {
-      if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
-        return p;
-      }
-    }
-    return null;
-  }
-
-  public static void setHostIP() {
-    try {
-      hostIP = Inet4Address.getLocalHost();
-      groupIP = InetAddress.getByName(groupIPStr);
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static void setupClient(InetAddress clientIP, int clientUdpPort,
-      ObjectOutputStream toClient) {
-    LogManager.getInstance().log("Server", LogManager.Scope.INFO,
-        "Client attempting connect from " + clientIP);
-    if (!isPlayerConnected(clientIP, clientUdpPort)) {
-      boolean[][] iceGrid = model.getMap().getIceGrid();
-      Random r = new Random();
-      double randomX = 0;
-      double randomY = 0;
-      boolean isIcePosition = true;
-
-      // Choose a random position without ice for ship spawning
-      while (isIcePosition) {
-        randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
-        randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
-
-        if (!iceGrid[(int) randomX][(int) randomY]) {
-          isIcePosition = false;
-        }
-      }
-
-      // Setup client's ship
-      int randColour = (new Random()).nextInt(0xFFFFFF);
-      Ship s = new Ship(new Position(randomX, randomY), 0, randColour);
-
-      // TODO: ADD NAMES TO PLAYERS
-      int k = (new Random()).nextInt(1000);
-      String name = "RAND_NAME_" + k;
-      Player p = new Player(name, clientIP, clientUdpPort, s);
-      playerList.add(p);
-
-      // Add player to scoreboard
-      ScoreBoard.getInstance().add(p);
-
-      // Initialize the game state if it is the first client connection
-      if (playerList.size() == 1)
-        initializeGameState();
-
-      model.addEntity(s);
-
-      // Update the last synced set of entities right before sending a full snapshot to client for
-      // full sync
-      ConcurrentLinkedQueue<Entity> newLastSyncedEntities = new ConcurrentLinkedQueue<Entity>();
-      for (Entity e : model.getEntities()) {
-        newLastSyncedEntities.add((Entity) deepClone(e));
-      }
-      lastSyncedEntities = newLastSyncedEntities;
-
-      // Send a full snapshot of current game state to the client
-      sendFullSnapshot(toClient, model.getEntities());
-
-      // Send the map seed to the client
-      sendMapSeed(clientIP, toClient, seed);
-
-      // Start the ServerMulticastSender thread if it is the first client connection
-      if (playerList.size() == 1)
-        new ServerMulticastSender(udpSocket, clientMultiCastPort, groupIP, lastSyncedEntities,
-            latestCIS).start();
-    } else {
-      LogManager.getInstance().log("Server", LogManager.Scope.INFO,
-          "Client " + clientIP + " is already connected.");
-    }
-  }
-
-  /*
-   * Create a compressed set of entities (game state) from the original set of entities
-   */
-  private static ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
-    ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
-
-    for (Entity e : ents) {
-      if (e instanceof Ship) {
-        Ship s = (Ship) e;
-        EntitiesLite.add(new EntityLite(s.getSerial(), 1, 0, s.getPosition(), s.isToBeDeleted(),
-            s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-            s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));
-      } else if (e instanceof SmallBullet) {
-        SmallBullet sb = (SmallBullet) e;
-        EntitiesLite.add(new EntityLite(sb.getSerial(), 1, 1, sb.getPosition(), sb.isToBeDeleted(),
-            sb.getDirection(), sb.getSpeed(), sb.getDistance(), sb.getTravelled(), sb.getSource()));
-      } else if (e instanceof BigBullet) {
-        BigBullet bb = (BigBullet) e;
-        EntitiesLite.add(new EntityLite(bb.getSerial(), 1, 2, bb.getPosition(), bb.isToBeDeleted(),
-            bb.getDirection(), bb.getSpeed(), bb.getDistance(), bb.getTravelled(), bb.getSource()));
-      }
-    }
-
-    return EntitiesLite;
-  }
-
-  /*
-   * Send the compressed set of all entities (full snapshot) to client
-   */
-  private static void sendFullSnapshot(ObjectOutputStream toClient,
-      ConcurrentLinkedQueue<Entity> ents) {
-    ArrayList<EntityLite> entitiesLite = calculateEntitiesLite(ents);
-    try {
-      toClient.writeObject(entitiesLite);
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    }
-  }
-
-  private static void sendMapSeed(InetAddress clientIP, ObjectOutputStream toClient, Long seed) {
-    try {
-      toClient.writeObject(seed);
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    }
-  }
-
-
   public static void disconnectPlayer(InetAddress clientIP, int clientPort) {
     if (isPlayerConnected(clientIP, clientPort)) {
       for (Player p : playerList) {
         if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
           // Remove player from the PlayerList
-          model.getEntities().remove(p.getShip());
+          // Do not do entities.remove(), just have the ship marked for deletion.
+          // model.getEntities().remove(p.getShip());
+          p.getShip().delete();
           latestCIS.remove(p);
           playerList.remove(p);
+          chList.remove(getClientHandlerByIpAndPort(clientIP, clientPort));
           // Remove player from scoreboard
           ScoreBoard.getInstance().remove(p);
         }
@@ -272,17 +182,12 @@ public class Server {
    * Gets player by bullet. Used in awarding score.
    * 
    * @param bullet the bullet belonging to the player
-   * @return the player who owns the bullet
+   * @return the player who owns the bullet, null if it's AI
    */
   public static Player getPlayer(Bullet bullet) {
-
     for (Player p : playerList)
       if (p.getShip().getSerial() == bullet.getSource())
         return p;
-
-    LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
-        "Bullet source ship does not exist. Exiting...");
-    System.exit(-1);
     return null;
   }
 
@@ -290,28 +195,93 @@ public class Server {
     events.add(event);
   }
 
-
-  /*
-   * This method makes a "deep clone" of any Java object it is given.
-   */
-  public static Object deepClone(Object object) {
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ObjectOutputStream oos = new ObjectOutputStream(baos);
-      oos.writeObject(object);
-      ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-      ObjectInputStream ois = new ObjectInputStream(bais);
-      return ois.readObject();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
-
   public static GameEvent getNextEvent() {
     if (events.size() == 0)
       return null;
     return events.removeFirst();
   }
+
+  public static void startSMCS() {
+    ServerMulticastSender smcs = new ServerMulticastSender(udpSocket, multiCastPort, multiCastIP,
+        entities, latestCIS, playerList);
+    smcs.start();
+  }
+
+  public static Player getPlayerByIpAndPort(InetAddress clientIP, int clientPort) {
+    for (Player p : playerList) {
+      if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
+        return p;
+      }
+    }
+    return null;
+  }
+
+  public static AIController getAIByShip(Ship ship) {
+    return aiMap.get(ship);
+  }
+
+  public static Player getPlayerByShip(Ship ship) {
+    return playerMap.get(ship);
+  }
+
+  public static ClientHandler getClientHandlerByIpAndPort(InetAddress clientIP, int clientUdpPort) {
+    for (ClientHandler ch : chList) {
+      if (ch.getClientIP().equals(clientIP) && ch.getClientUdpPort() == clientUdpPort) {
+        return ch;
+      }
+    }
+    return null;
+  }
+
+public static Position getRandomPosition() {
+	boolean[][] iceGrid = model.getMap().getIceGrid();
+    Random r = new Random();
+    double randomX = 0;
+    double randomY = 0;
+    boolean isIcePosition = true;
+
+    // Choose a random position without ice for ship spawning
+    while (isIcePosition) {
+      randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
+      randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
+
+      if (!iceGrid[(int) randomX][(int) randomY]) {
+        isIcePosition = false;
+      }
+    }
+	return new Position(randomX,randomY);
+}
+
+public static BigBullet getBigBullet(Position position, double direction, double distance, long serial) {
+	
+	// Take one from the top
+	BigBullet b = bigBullets.pollFirst();
+	// Modify it
+	b.setPosition(position);
+	b.setDirection(direction);
+	b.setDistance(distance);
+	b.setTravelled(0);
+	b.setSource(serial);
+	b.save();
+	// Add it to the end before passing it to the caller
+	bigBullets.addLast(b);
+	return b;
+}
+
+public static SmallBullet getSmallBullet(Position position, double direction, double distance, long serial) {
+	// Take one from the top
+	SmallBullet b = smallBullets.pollFirst();
+	// Modify it
+	b.setDirection(direction);
+	b.setDistance(distance);
+	b.setTravelled(0);
+	b.setPosition(position);
+	b.setSource(serial);
+	b.save();
+	// Add it to the end before passing it to the caller
+	smallBullets.addLast(b);
+	System.out.println("Summoned " + b);
+	return b;
+}
 
 }

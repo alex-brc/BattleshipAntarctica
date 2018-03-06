@@ -72,25 +72,25 @@ public class Ship extends Entity implements Serializable {
 
     // Front
     double angle = Renderer.getScreenPosition(frontTurret.getPosition()).getAngleTo(mousePosition);
-    angle = (-1) * angle + Math.PI / 2;
-    ra = angle + (Math.PI - this.getDirection());
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
     // Range of motion: [pi/4,7*pi/4]
-    if (ra > 1.0 * Math.PI / 4 && ra < 7.0 * Math.PI / 4)
+    if (ra > 1.0 * FastMath.PI / 4 && ra < 7.0 * FastMath.PI / 4)
       frontTurret.setDirection(angle);
 
     // Rear
     angle = Renderer.getScreenPosition(rearTurret.getPosition()).getAngleTo(mousePosition);
-    angle = (-1) * angle + Math.PI / 2;
-    ra = angle + (Math.PI - this.getDirection());
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
     // Range of motion: [5*pi/4, 3*pi/4]
-    if (ra < 3.0 * Math.PI / 4 || ra > 5.0 * Math.PI / 4)
+    if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
       rearTurret.setDirection(angle);
 
     // Mid
     angle = Renderer.getScreenPosition(midTurret.getPosition()).getAngleTo(mousePosition);
-    angle = PhysicsManager.shiftAngle((-1) * angle + Math.PI / 2);
+    angle = PhysicsManager.shiftAngle((-1) * angle + FastMath.PI / 2);
     // No need to get relative angle.
     // This can go shoot it wants
     midTurret.setDirection(angle);
@@ -108,10 +108,10 @@ public class Ship extends Entity implements Serializable {
     double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
 
     frontTurret.setPosition(this.getPosition().addPosition(
-        new Position(r * Math.cos(this.getDirection()), r * Math.sin(this.getDirection()))));
+        new Position(r * FastMath.cos(this.getDirection()), r * FastMath.sin(this.getDirection()))));
 
     rearTurret.setPosition(this.getPosition().addPosition(
-        new Position((-r) * Math.cos(this.getDirection()), (-r) * Math.sin(this.getDirection()))));
+        new Position((-r) * FastMath.cos(this.getDirection()), (-r) * FastMath.sin(this.getDirection()))));
 
     midTurret.setPosition(this.getPosition());
   }
@@ -144,14 +144,14 @@ public class Ship extends Entity implements Serializable {
 
     // Render turrets
 <<<<<<< HEAD
-    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
     frontTurret.render(r);
     rearTurret.render(r);
     midTurret.render(r);
 =======
-	Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI/2));
+	Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI/2));
     r.drawSprite((int)position.getX() - currentSprite.getWidth()/2, (int)position.getY() - currentSprite.getHeight()/2, currentSprite, false);
     frontTurret.render();
     rearTurret.render();
@@ -208,8 +208,8 @@ public class Ship extends Entity implements Serializable {
       // for (Position corner: getObb()) {
       Position corner = (Position) iterator.next();
       // System.out.println("Position: " + corner);
-      int x = (int) Math.rint(corner.getX());
-      int y = (int) Math.rint(corner.getY());
+      int x = (int) FastMath.rint(corner.getX());
+      int y = (int) FastMath.rint(corner.getY());
       // System.out.println("Rounded X: " + x + "Y: " + y);
 
       try {
@@ -238,7 +238,7 @@ public class Ship extends Entity implements Serializable {
             ydiff = posYdiff;
           }
 
-          if (Math.abs(xdiff) >= Math.abs(ydiff)) {
+          if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
             setPosition(new Position(shipX, shipY + ydiff));
             translateObb(0, ydiff);
             setSpeed(getSpeed() / 2);
@@ -259,21 +259,21 @@ public class Ship extends Entity implements Serializable {
           // setPosition(new Position(shipX + xdiff, shipY + ydiff));
           // translateObb(xdiff, ydiff);
           /*
-           * if (direction >= 0 && direction < Math.PI / 4) { setPosition(new Position(shipX, shipY
+           * if (direction >= 0 && direction < FastMath.PI / 4) { setPosition(new Position(shipX, shipY
            * + 1)); System.out.println("1"); this.translateObb(0, 1); } else if (direction >=
-           * Math.PI / 4 && direction < Math.PI / 2) { setPosition(new Position(shipX - 1, shipY));
-           * System.out.println("2"); this.translateObb(-1, 0); } else if (direction >= Math.PI / 2
-           * && direction < 3 * Math.PI / 4) { setPosition(new Position(shipX - 1, shipY));
-           * System.out.println("3"); this.translateObb(-1, 0); } else if (direction >= 3 * Math.PI
-           * / 4 && direction < Math.PI) { setPosition(new Position(shipX, shipY - 1));
-           * System.out.println("4"); this.translateObb(0, -1); } else if (direction >= Math.PI &&
-           * direction < 5 * Math.PI / 4) { setPosition(new Position(shipX, shipY - 1));
-           * System.out.println("5"); this.translateObb(0, -1); } else if (direction >= 5 * Math.PI
-           * / 4 && direction < 3 * Math.PI / 2) { setPosition(new Position(shipX + 1, shipY));
-           * System.out.println("6"); this.translateObb(1, 0); } else if (direction >= 3 * Math.PI /
-           * 2 && direction < 7 * Math.PI / 4) { setPosition(new Position(shipX + 1, shipY));
-           * System.out.println("7"); this.translateObb(1, 0); } else if (direction >= 7 * Math.PI /
-           * 4 && direction < Math.PI) { setPosition(new Position(shipX, shipY + 1));
+           * FastMath.PI / 4 && direction < FastMath.PI / 2) { setPosition(new Position(shipX - 1, shipY));
+           * System.out.println("2"); this.translateObb(-1, 0); } else if (direction >= FastMath.PI / 2
+           * && direction < 3 * FastMath.PI / 4) { setPosition(new Position(shipX - 1, shipY));
+           * System.out.println("3"); this.translateObb(-1, 0); } else if (direction >= 3 * FastMath.PI
+           * / 4 && direction < FastMath.PI) { setPosition(new Position(shipX, shipY - 1));
+           * System.out.println("4"); this.translateObb(0, -1); } else if (direction >= FastMath.PI &&
+           * direction < 5 * FastMath.PI / 4) { setPosition(new Position(shipX, shipY - 1));
+           * System.out.println("5"); this.translateObb(0, -1); } else if (direction >= 5 * FastMath.PI
+           * / 4 && direction < 3 * FastMath.PI / 2) { setPosition(new Position(shipX + 1, shipY));
+           * System.out.println("6"); this.translateObb(1, 0); } else if (direction >= 3 * FastMath.PI /
+           * 2 && direction < 7 * FastMath.PI / 4) { setPosition(new Position(shipX + 1, shipY));
+           * System.out.println("7"); this.translateObb(1, 0); } else if (direction >= 7 * FastMath.PI /
+           * 4 && direction < FastMath.PI) { setPosition(new Position(shipX, shipY + 1));
            * System.out.println("8"); this.translateObb(0, 1); }
            */
         }

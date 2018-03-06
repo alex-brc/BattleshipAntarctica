@@ -1,16 +1,18 @@
 package org.alien8.core;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
-import org.alien8.physics.Position;
 import org.alien8.server.Player;
+import org.alien8.server.Server;
 import org.alien8.ship.BigBullet;
 import org.alien8.ship.Ship;
 import org.alien8.ship.SmallBullet;
@@ -27,10 +29,10 @@ import org.alien8.ship.SmallBullet;
 public class ModelManager {
 
   private long lastSerial = 0;
-  private static ModelManager instance = new ModelManager();
+  private static ModelManager instance;
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
   private CollisionDetector collisionDetector = new CollisionDetector();
-  private Map map/* = new Map(Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 8, 8) */;
+  private Map map;
   private Ship player;
 
   private ModelManager() {
@@ -38,10 +40,6 @@ public class ModelManager {
 
     entities = new ConcurrentLinkedQueue<Entity>();
     collisionDetector = new CollisionDetector();
-
-    // List<AABB> aabbs = map.getAABBs();
-    // for (AABB aabb : aabbs) {
-    // entities.add(aabb.getEntity());
   }
 
   /**
@@ -59,67 +57,37 @@ public class ModelManager {
     map = new Map(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH, 8, 8, seed);
   }
 
-
   /**
-   * DEPRECATED Old version, suitable for offline clients. Should not be used
-   * 
-   * The update() method updates the state of all entities
-   */
-  @Deprecated
-  public void update() {
-    // Loop through all the entities
-    for (Entity ent : entities) {
-      // Remove the entity if it's marked itself for deletion
-      if (ent.isToBeDeleted()) {
-        if (this.getPlayer() == ent) {
-          playerDied();
-          continue;
-        }
-        entities.remove(ent);
-        // Accelerate it's removal
-        ent = null;
-        // Skip the rest
-        continue;
-      }
-      // Handle player stuff
-      if (ent == this.getPlayer()) {
-        // Ship player = (Ship) ent;
-        // InputManager.processInputs(player);
-      }
-
-      // Update the position of the entity
-      PhysicsManager.updatePosition(ent, map.getIceGrid());
-    }
-    ArrayList<Collision> collisions =
-        (ArrayList<Collision>) collisionDetector.checkForCollisions(entities);
-    for (Collision c : collisions) {
-      // System.out.println("Collision");
-      c.resolveCollision();
-    }
-  }
-
-  /**
-   * Server version of update()
+   * Server update(). Loops through all the entities and updates the game state
    */
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
+    AIController ai = null;
+    Player pl = null;
+    Ship sh = null;
+    ClientInputSample cis = null;
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
-        // Accelerate it's removal
-        ent = null;
+        System.out.println("Removed " + ent.toString());
         // Skip the rest
         continue;
       }
-      // Handle player stuff
-      for (Player p : latestCIS.keySet()) {
-        if (ent == p.getShip()) {
-          Ship s = (Ship) ent;
-          ClientInputSample cis = latestCIS.get(p);
-          InputManager.processInputs(s, cis);
+      if (ent instanceof Ship) {
+        sh = (Ship) ent;
+        ai = Server.getAIByShip(sh);
+        pl = Server.getPlayerByShip(sh);
+
+        if (ai != null) {
+          ai.update();
+        } else if (pl != null) {
+          cis = latestCIS.get(pl);
+          if (cis != null)
+            InputManager.processInputs(sh, cis);
         }
       }
+
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
     }
@@ -133,31 +101,36 @@ public class ModelManager {
 
 
   /**
-   * Syncs the client with the server
+   * Sync the client with the server
    */
-  public void sync(ArrayList<EntityLite> difference) {
-    for (EntityLite el : difference) {
-      if (el.entityType == 0 && el.changeType == 0) { // Modify Ship
-        for (Entity e : entities) {
-          if (el.serial == e.getSerial()) {
-            Ship s = (Ship) e;
-            s.setPosition(el.position);
-            s.setDirection(el.direction);
-            s.setSpeed(el.speed);
-            s.setHealth(el.health);
-            s.getFrontTurret().setDirection(el.frontTurretDirection);
-            s.getMidTurret().setDirection(el.midTurretDirection);
-            s.getRearTurret().setDirection(el.rearTurretDirection);
-            s.initObb();
+  public void sync(ArrayList<EntityLite> entitiesLite, InetAddress clientIP,
+      Integer clientUdpPort) {
+    // Remove all entities
+    for (Entity e : entities) {
+      entities.remove(e);
+    }
 
-            if (el.toBeDeleted) {
-              s.delete();
-            }
+    // Add updated entities
+    for (EntityLite el : entitiesLite) {
+      if (el.entityType == 0) { // Player Ship
+        Ship s = new Ship(el.position, el.direction, el.colour);
+        s.setSerial(el.serial);
+        s.setSpeed(el.speed);
+        s.setHealth(el.health);
+        s.getFrontTurret().setDirection(el.frontTurretDirection);
+        s.getMidTurret().setDirection(el.midTurretDirection);
+        s.getRearTurret().setDirection(el.rearTurretDirection);
 
-            break;
-          }
+        if (el.toBeDeleted) {
+          s.delete();
         }
-      } else if (el.entityType == 0 && el.changeType == 1) { // Add Ship
+
+        if (el.clientIP.equals(clientIP) && el.clientUdpPort == clientUdpPort) { // Client's ship
+          this.setPlayer(s);
+        }
+
+        this.addEntity(s);
+      } else if (el.entityType == 1) { // AI Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
         s.setSerial(el.serial);
         s.setSpeed(el.speed);
@@ -171,24 +144,7 @@ public class ModelManager {
         }
 
         this.addEntity(s);
-      } else if (el.entityType == 1 && el.changeType == 0) { // Modify small bullet
-        for (Entity e : entities) {
-          if (el.serial == e.getSerial()) {
-            SmallBullet sb = (SmallBullet) e;
-            sb.setPosition(el.position);
-            sb.setDirection(el.direction);
-            sb.setSpeed(el.speed);
-            sb.setTravelled(el.travelled);
-            sb.initObb();
-
-            if (el.toBeDeleted) {
-              sb.delete();
-            }
-
-            break;
-          }
-        }
-      } else if (el.entityType == 1 && el.changeType == 1) { // Add small bullet
+      } else if (el.entityType == 2) { // SmallBullet
         SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
         sb.setSerial(el.serial);
         sb.setSpeed(el.speed);
@@ -199,69 +155,7 @@ public class ModelManager {
         }
 
         this.addEntity(sb);
-      } else if (el.entityType == 2 && el.changeType == 0) { // Modify big bullet
-        for (Entity e : entities) {
-          if (el.serial == e.getSerial()) {
-            BigBullet bb = (BigBullet) e;
-            bb.setPosition(el.position);
-            bb.setDirection(el.direction);
-            bb.setSpeed(el.speed);
-            bb.setTravelled(el.travelled);
-            bb.initObb();
-
-            if (el.toBeDeleted) {
-              bb.delete();
-            }
-
-            break;
-          }
-        }
-      } else if (el.entityType == 2 && el.changeType == 1) { // Add big bullet
-        BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
-        bb.setSerial(el.serial);
-        bb.setSpeed(el.speed);
-        bb.setTravelled(el.travelled);
-
-        if (el.toBeDeleted) {
-          bb.delete();
-        }
-
-        this.addEntity(bb);
-      } else if (el.changeType == 2) { // Remove Entity
-        for (Entity e : entities) {
-          if (el.serial == e.getSerial()) {
-            entities.remove(e);
-          }
-        }
-      }
-    }
-  }
-
-  public void fullSync(ArrayList<EntityLite> entitiesLite) {
-    for (EntityLite el : entitiesLite) {
-      if (el.entityType == 0) {
-        Ship s = new Ship(el.position, el.direction, el.colour);
-        s.setSerial(el.serial);
-        s.setSpeed(el.speed);
-        s.setHealth(el.health);
-
-        if (el.toBeDeleted) {
-          s.delete();
-        }
-
-        this.addEntity(s);
-      } else if (el.entityType == 1) {
-        SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
-        sb.setSerial(el.serial);
-        sb.setSpeed(el.speed);
-        sb.setTravelled(el.travelled);
-
-        if (el.toBeDeleted) {
-          sb.delete();
-        }
-
-        this.addEntity(sb);
-      } else if (el.entityType == 2) {
+      } else if (el.entityType == 3) { // BigBullet
         BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
         bb.setSerial(el.serial);
         bb.setSpeed(el.speed);
@@ -274,13 +168,6 @@ public class ModelManager {
         this.addEntity(bb);
       }
     }
-  }
-
-  private void playerDied() {
-    System.out.println("Player died! Respawning");
-    Ship playerNew = new Ship(new Position(200, 200), 0, 0xF8F8F8); // white
-    this.setPlayer(playerNew);
-    this.addEntity(playerNew);
   }
 
   /**
@@ -298,8 +185,6 @@ public class ModelManager {
   }
 
   /**
-   * Getter for the entity list.
-   * 
    * @return the entity list as a LinkedList<Entity>
    */
   public ConcurrentLinkedQueue<Entity> getEntities() {
@@ -307,7 +192,7 @@ public class ModelManager {
   }
 
   /**
-   * Sets the designated ship player.
+   * Sets the designated ship as player.
    * 
    * @param player ship to set as the player
    */

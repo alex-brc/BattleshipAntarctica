@@ -4,6 +4,8 @@ import java.io.Serializable;
 import org.alien8.core.Entity;
 import org.alien8.physics.Position;
 
+import net.jafama.FastMath;
+
 public abstract class Bullet extends Entity implements Serializable {
 
   private static final long serialVersionUID = -4758229490654529751L;
@@ -45,11 +47,19 @@ public abstract class Bullet extends Entity implements Serializable {
       this.delete();
     }
   }
+  
+  public void setSource(long source) {
+	  this.source = source;
+  }
 
   public long getSource() {
     return source;
   }
 
+  public void setDistance(double distance) {
+	  this.distance = distance;
+  }
+  
   public double getDistance() {
     return distance;
   }
@@ -71,13 +81,13 @@ public abstract class Bullet extends Entity implements Serializable {
   }
 
   public String toString() {
-    return "Bullet " + this.getSerial() + "," + this.getPosition();
+    return "Bullet: " + this.travelled + "/" + this.getDistance() + ", " + this.getSerial() + ", " + this.getPosition();
   }
 
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
-    int x = (int) Math.rint(getPosition().getX());
-    int y = (int) Math.rint(getPosition().getY());
+    int x = (int) FastMath.rint(getPosition().getX());
+    int y = (int) FastMath.rint(getPosition().getY());
     try {
       if (iceGrid[x][y] == true) {
         this.delete();
