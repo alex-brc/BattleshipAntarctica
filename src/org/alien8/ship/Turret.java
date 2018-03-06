@@ -125,10 +125,10 @@ public class Turret implements Serializable {
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
-    if (this.isOnCooldown())
-      r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
-    else
-      r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
+    // if (this.isOnCooldown())
+    // r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
+    // else
+    // r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
   }
 
   public Position getScreenPosition() {

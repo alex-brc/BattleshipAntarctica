@@ -2,8 +2,8 @@ package org.alien8.rendering;
 
 public class Font {
 
-  private static Sprite font = new Sprite("/org/alien8/assets/font.png");
-  private static Sprite[] characters = Sprite.split(font, 8);
+  private static Sprite font = new Sprite("/org/alien8/assets/fontBig.png");
+  private static Sprite[] characters = Sprite.split(font, 16);
 
   public static Font defaultFont = new Font();
 
@@ -26,10 +26,8 @@ public class Font {
     for (int i = 0; i < text.length(); i++) {
       char currentChar = text.charAt(i);
       int index = charIndex.indexOf(currentChar);
-      r.drawSprite(x + i * 8, y, characters[index], fixed);
+      r.drawSprite(x + i * 16, y, characters[index], fixed);
     }
-
   }
-
 }
 

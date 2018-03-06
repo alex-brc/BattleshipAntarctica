@@ -87,6 +87,7 @@ public class Map {
   }
 
   public void render(Renderer r) {
-    r.drawMap(iceGrid);
+    // r.drawMap(iceGrid);
+    r.drawViewport(iceGrid);
   }
 }

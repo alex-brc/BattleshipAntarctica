@@ -123,6 +123,7 @@ public class Client implements Runnable {
       // Call the renderer
       // aiPlayer.update();
       Renderer.getInstance().render(model);
+      // Renderer.getInstance(model.getMap().getIceGrid()).render(model);
       frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
@@ -358,5 +359,9 @@ public class Client implements Runnable {
       }
     }
   }
+
+  // public boolean[][] getMapIceGrid() {
+  // return model.getMap().getIceGrid();
+  // }
 
 }

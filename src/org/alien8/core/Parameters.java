@@ -33,6 +33,10 @@ public class Parameters {
    * Dimension object for the renderer dimensions
    */
   public static final Dimension RENDERER_SIZE = new Dimension(800, 600);
+  // public static final Dimension VIEWPORT_SIZE = new Dimension(600, 400);
+  public static final int SMALL_BORDER = 16;
+  public static final int BIG_BORDER = 96;
+
   public static final int MAX_PLAYERS = 16;
   /**
    * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
@@ -70,7 +74,7 @@ public class Parameters {
   public static final double SHIP_FORWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME; // N
   public static final double SHIP_BACKWARD_FORCE =
-      SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
+      -SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
   public static final double SHIP_ROTATION_PER_SEC = Math.PI / 3;
   /**
    * Affects how much the speed impacts the turning rate.
@@ -132,6 +136,10 @@ public class Parameters {
   public static final float DISTANCE_MULTIPLIER = 1;
   public static final int SCOREBOARD_HEIGHT = 500;
   public static final int SCOREBOARD_WIDTH = 500;
+
+
+  public static final int MINIMAP_WIDTH = 64;
+  public static final int MINIMAP_HEIGHT = 64;
 
 
 

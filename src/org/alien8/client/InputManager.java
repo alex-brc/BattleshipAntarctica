@@ -53,7 +53,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
       PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
     else if (cis.sPressed)
       PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
-          PhysicsManager.shiftAngle(player.getDirection() + Math.PI));
+          PhysicsManager.shiftAngle(player.getDirection()));
 
     // Apply rotation
     if (cis.aPressed)

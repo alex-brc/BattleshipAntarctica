@@ -128,6 +128,9 @@ public class Ship extends Entity implements Serializable {
     // false);
     // }
     // }
+    //
+    // r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
+    // false);
 
     // Render turrets
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - Math.PI / 2));
