@@ -2,14 +2,12 @@ package org.alien8.mapgeneration;
 
 import java.util.ArrayList;
 import java.util.List;
-<<<<<<< HEAD
-import java.util.concurrent.ThreadLocalRandom;
-=======
->>>>>>> a5d58fcbffe9e84cfd653f7a8b779e997b4f9008
 import org.alien8.core.Parameters;
 import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
+
+import net.jafama.FastMath;
 
 public class Map {
   protected int length;
@@ -18,80 +16,23 @@ public class Map {
   protected int widthDensity;
   protected boolean[][] iceGrid;
   protected List<AABB> roughAABBs = new ArrayList<AABB>();
-<<<<<<< HEAD
-
-  public Map() { // Basic constructor - probably won't be used
-    length = 0;
-    width = 0;
-    lengthDensity = 0;
-    widthDensity = 0;
-  }
-
-  public Map(int l, int w, int lD, int wD) {
-=======
   protected long seed;
 
   public Map(int l, int w, int lD, int wD, long s) {
->>>>>>> a5d58fcbffe9e84cfd653f7a8b779e997b4f9008
     length = l;
     width = w;
     lengthDensity = lD;
     widthDensity = wD;
-<<<<<<< HEAD
-    // Map is a 2-D array depicting if each pixel is either ice or water (True = ice, False = water)
-    iceGrid = new boolean[l][w];
-    makeMap(); // Actually generates the Map using the PerlinNoise class
-    // makeRoughAABBs(Parameters.MAP_BOX_SIZE); //Gives the ice hitboxes
-=======
     seed = s;
     // Map is a 2-D array depicting if each pixel is either ice or water (True = ice, False = water)
     iceGrid = new boolean[l][w];
     makeMap(); // Actually generates the Map using the PerlinNoise class
-    makeRoughAABBs(Parameters.MAP_BOX_SIZE); // Gives the ice hitboxes
->>>>>>> a5d58fcbffe9e84cfd653f7a8b779e997b4f9008
+    // makeRoughAABBs(Parameters.MAP_BOX_SIZE); //Gives the ice hitboxes
   }
 
   protected void makeMap() {
     double waterLevel = Parameters.WATER_LEVEL; // Defines the cut-off point for water or ice
     // Gets a noise grid from the PerlinNoise class
-<<<<<<< HEAD
-    // double[][] noiseGrid =
-    // PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity);
-    // // Loops over all the pixels setting them to either ice (True) or water (False) based on the
-    // // water level
-    // for (int y = 0; y < width; y++) {
-    // for (int x = 0; x < length; x++) {
-    // boolean isIce = (noiseGrid[x][y] <= waterLevel);
-    // iceGrid[x][y] = isIce;
-    // }
-    // }
-
-    // JAMES CHANGES FOR TESTING TERRAIN COLLISIONS
-    for (int i = 0; i < 10; i++) {
-      int start = ThreadLocalRandom.current().nextInt(1000) + 150;
-      int width = ThreadLocalRandom.current().nextInt(200);
-      int height = ThreadLocalRandom.current().nextInt(200);
-
-      for (int y = start; y < start + height; y++) {
-        for (int x = start; x < start + width; x++) {
-          iceGrid[x][y] = true;
-        }
-      }
-    }
-    // for (int y = 10; y < 100; y++) {
-    // for (int x = 10; x < 100; x++) {
-    // iceGrid[x][y] = true;
-    // }
-    // }
-    // for (int y = 220; y < 400; y++) {
-    // for (int x = 100; x < 200; x++) {
-    // iceGrid[x][y] = true;
-    // }
-    // }
-    for (int y = 100; y < 300; y++) {
-      for (int x = 50; x < 100; x++) {
-        iceGrid[x][y] = true;
-=======
     double[][] noiseGrid =
         PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity, seed);
     // Loops over all the pixels setting them to either ice (True) or water (False) based on the
@@ -100,7 +41,6 @@ public class Map {
       for (int x = 0; x < length; x++) {
         boolean isIce = (noiseGrid[x][y] <= waterLevel);
         iceGrid[x][y] = isIce;
->>>>>>> a5d58fcbffe9e84cfd653f7a8b779e997b4f9008
       }
     }
   }
@@ -148,7 +88,13 @@ public class Map {
     return iceGrid;
   }
 
+<<<<<<< HEAD
   public void render(Renderer r) {
-    r.drawMap(iceGrid);
+    // r.drawMap(iceGrid);
+    r.drawViewport(iceGrid);
+=======
+  public void render() {
+    Renderer.getInstance().drawMap(iceGrid);
+>>>>>>> d16fc90107f20c631452fcc70202cbe54d032238
   }
 }
