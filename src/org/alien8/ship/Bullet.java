@@ -30,7 +30,6 @@ public abstract class Bullet extends Entity implements Serializable {
     // If this distance calculation is too slow,
     // we can change to a limited life span of
     // bullets, after which they are deleted
-    System.out.println("For bullet " + this.getSerial() + " test travelled=" + travelled + " > " + distance);
     if (this.getPosition().isOutOfBounds() || this.travelled > this.distance)
       this.delete();
   }

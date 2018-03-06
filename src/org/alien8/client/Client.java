@@ -261,7 +261,14 @@ public class Client implements Runnable {
       // Deserialize the event data into object
       ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      GameEvent event = (GameEvent) objIn.readObject();
+      GameEvent event = null;
+      try {
+    	  event = (GameEvent) objIn.readObject();
+      }
+      catch(ClassCastException e) {
+    	  // Desync'd. Drop packet, move on
+    	  LogManager.getInstance().log("Client", LogManager.Scope.ERROR, "Desync'd socket receive. Tried to cast ArrayList to GameEvent");
+      }
 
       // Send audio events to AudioManager
       if (event != null) {

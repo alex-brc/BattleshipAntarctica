@@ -76,6 +76,9 @@ public class ClientHandler extends Thread {
           "Could not send map seed to client. " + ioe.toString());
       ioe.printStackTrace();
     }
+    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
+            "Sent seed to client. ");
+    
   }
 
   /*
@@ -122,6 +125,8 @@ public class ClientHandler extends Thread {
           "Could not send entsLite to client. " + ioe.toString());
       ioe.printStackTrace();
     }
+    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
+            "Sent entLites to client. ");
   }
 
   public InetAddress getClientIP() {

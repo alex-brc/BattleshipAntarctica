@@ -260,11 +260,11 @@ public static BigBullet getBigBullet(Position position, double direction, double
 	b.setPosition(position);
 	b.setDirection(direction);
 	b.setDistance(distance);
+	b.setTravelled(0);
 	b.setSource(serial);
 	b.save();
 	// Add it to the end before passing it to the caller
 	bigBullets.addLast(b);
-	System.out.println("Summoned " + b);
 	return b;
 }
 
@@ -274,11 +274,13 @@ public static SmallBullet getSmallBullet(Position position, double direction, do
 	// Modify it
 	b.setDirection(direction);
 	b.setDistance(distance);
+	b.setTravelled(0);
 	b.setPosition(position);
 	b.setSource(serial);
 	b.save();
 	// Add it to the end before passing it to the caller
 	smallBullets.addLast(b);
+	System.out.println("Summoned " + b);
 	return b;
 }
 
