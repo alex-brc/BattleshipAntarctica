@@ -80,8 +80,8 @@ public class AIController{
 		double y0 = start.getY();
 		for (int r = 1;r <=maxR; r++){
 			int x = (int)Math.round(x0 + r*Math.cos(dir));
-			int y = (int)Math.round(y0 - r*Math.sin(dir)); //This is minus due to our weird coordinate system..
-			if (y >= Parameters.MAP_HEIGHT || x < 0 || y < 0 || x >= Parameters.MAP_WIDTH || iceGrid[x][y] ){
+			int y = (int)Math.round(y0 + r*Math.sin(dir)); //This is minus due to our weird coordinate system..
+			if (y >= Parameters.MAP_HEIGHT || x <= 0 || y <= 0 || x >= Parameters.MAP_WIDTH || iceGrid[x][y] ){
 				return true;
 			}
 		}
@@ -90,10 +90,12 @@ public class AIController{
 	
 	public void wander(){
 		if (rayDetect((int)Parameters.SHIP_LENGTH)){
-			if (myShip.getSpeed() < 0.3){
+			if (myShip.getSpeed() < 1){
+				System.out.println("Case 1");
 				PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
 			}
 			else{
+				System.out.println("Case 2");
 				PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
 			}
 			double locEastDir = myShip.getDirection();
@@ -103,14 +105,21 @@ public class AIController{
 			else{
 				locEastDir = locEastDir - (Math.PI/2d);
 			}
+			double locWestDir = locEastDir + Math.PI;
+			if (locWestDir >= Math.PI){
+				locWestDir = locWestDir - 2d*Math.PI;
+			}
 			if (drawRay(myShip.getPosition(), locEastDir, (int)Parameters.SHIP_LENGTH)){
+				System.out.println("Case L");
 				PhysicsManager.rotateEntity(myShip,(-1)*Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 			}
 			else{
+				System.out.println("Case R");
 				PhysicsManager.rotateEntity(myShip,Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 			}
 		}
 		else{
+			System.out.println("Case 0");
 			PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
 		}
 	}
