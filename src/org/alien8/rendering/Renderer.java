@@ -13,6 +13,7 @@ import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
+import org.alien8.ship.Ship;
 
 public class Renderer extends Canvas {
 
@@ -145,7 +146,7 @@ public class Renderer extends Canvas {
     clear();
 
     // Get x and y scroll from the player
-    Entity player = model.getPlayer();
+    Ship player = model.getPlayer();
     xScroll = (int) (player.getPosition().getX() - width / 2);
     yScroll = (int) (player.getPosition().getY() - height / 2);
 
@@ -162,24 +163,40 @@ public class Renderer extends Canvas {
     /// HUD components
     // Render black frame round the edge of the screen
     drawHudFrame();
-    // TODO: INTRODUCE TEXT COLORS
-    // TODO: Render score header
+    // Render score header
     drawText("SCORE", 16, 16, true);
+    drawText("n-a", 16, 40, true);
     // TODO: Render current score
-    drawText("00200", 16, 40, true);
-    // TODO: Render high score header
-    drawText("HI-SCORE", 128, 16, true);
-    // TODO: Render high score
-    drawText("01200", 128, 40, true);
-    // // TODO: Render health bar
-    drawText("HEALTH", 290, 16, true);
-    drawBar(player.getHealth(), Parameters.SHIP_HEALTH, 290, 40, 60, 32, 4, 0x0000FF, 0x00FF00,
-        true);
-    // drawText(Integer.toString((int) Math.rint(player.getHealth())), 274, 40, true);
-    // System.out.println((int) Math.rint(player.getHealth()));
-    // // TODO: Render turret charge
+    // drawText(ScoreBoard.getInstance().getScore(player).getScore(), 16, 40, true);
+    /*
+     * Commented this out as we are not having high scores for each player // TODO: Render high
+     * score header drawText("HI-SCORE", 128, 16, true); // TODO: Render high score
+     * drawText("00000", 128, 40, true);
+     */
+    // Render health bar
+    drawText("HEALTH", 154, 16, true);
+    drawBar("/org/alien8/assets/health_bar.png", player.getHealth(), Parameters.SHIP_HEALTH, 154,
+        40, true);
+    // TODO: Render turret charge
+    drawText("TURRET1", 324, 16, true);
+    drawBar("/org/alien8/assets/turret_bar.png", player.getFrontTurret().getDistance(),
+        player.getFrontTurret().getMaxDistance(), 326, 40, true);
+    drawText("TURRET2", 462, 16, true);
+    drawBar("/org/alien8/assets/turret_bar.png", player.getRearTurret().getDistance(),
+        player.getRearTurret().getMaxDistance(), 464, 40, true);
+
+    // TODO: Render use item
+    drawText("ITEM", 612, 18, true);
+    drawSprite(624, 40, new Sprite("/org/alien8/assets/item_frame.png"), true);
+    // drawSprite(/* USE ITEM IN HERE*/);
+
     // // TODO: Render minimap
+    drawText("M", 704, 16, true);
+    drawText("A", 704, 36, true);
+    drawText("P", 704, 56, true);
+    drawFilledRect(720, 16, 64, 64, 0x5555FF, true); // TEMPORARY BOX, DELETE LATER
     // // drawMinimap(0, 0, true);
+
 
     // Graphics object from buffer strategy
     Graphics g = bs.getDrawGraphics();
@@ -195,9 +212,27 @@ public class Renderer extends Canvas {
     g.dispose();
     // Displays the buffer strategy to the monitor
     bs.show();
+
+
   }
 
+  private void drawBar(String path, double value, double maxValue, int xp, int yp, boolean fixed) {
+    Sprite bar = new Sprite(path);
+    drawSprite(xp, yp, bar, fixed);
+    int barHeight = 22;
+    int maxBarLength = 76;
+    int barLength = (int) (value / maxValue) * maxBarLength;
+    int color = 0x00B800;
+    drawFilledRect(xp + 7, yp + 7, barHeight, barLength, color, fixed);
+  }
 
+  private void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
+    for (int y = yp; y < yp + height; y++) {
+      for (int x = xp; x < xp + length; x++) {
+        drawPixel(x, y, color, fixed);
+      }
+    }
+  }
 
   private void drawBar(double value, double maxValue, int x, int y, int width, int height,
       int thickness, int borderColor, int barColor, boolean fixed) {

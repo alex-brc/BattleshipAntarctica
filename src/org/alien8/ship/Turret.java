@@ -119,6 +119,24 @@ public class Turret implements Serializable {
     return result;
   }
 
+  /**
+   * Gets the distance of the shot that the turret will fire.
+   * 
+   * @return the distance of the shot
+   */
+  public double getDistance() {
+    return distance;
+  }
+
+  /**
+   * Gets the maximum distance of the shot that the turret will fire.
+   * 
+   * @return the maximum distance of the shot
+   */
+  public double getMaxDistance() {
+    return maxDistance;
+  }
+
   public void render() {
     Renderer r = Renderer.getInstance();
 
