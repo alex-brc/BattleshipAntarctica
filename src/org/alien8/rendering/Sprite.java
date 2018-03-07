@@ -21,6 +21,7 @@ public class Sprite implements Serializable {
 	public static Sprite ship_red = new Sprite("/org/alien8/assets/ship_red.png");
 	public static Sprite ship_turquoise = new Sprite("/org/alien8/assets/ship_turquoise.png");
 	public static Sprite turret = new Sprite("/org/alien8/assets/turret.png");
+	//public static Sprite health_item = new Sprite(""); //TODO
 	
 	public Sprite(String path){
 		this.path = path;

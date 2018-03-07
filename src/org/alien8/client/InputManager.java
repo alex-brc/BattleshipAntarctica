@@ -6,6 +6,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
+import org.alien8.audio.AudioManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
@@ -84,9 +86,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
       player.rearTurretShoot();
 
     if (cis.spacePressed)
-      player.midTurretCharge();
-    else
-      player.midTurretShoot();
+      ; // TODO use item
 
   }
 
@@ -286,6 +286,10 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
   @Override
   public void keyTyped(KeyEvent e) {
-    // Not interesting
+	// Mute all sounds with M
+    if(e.getKeyCode() == KeyEvent.VK_M) {
+    	AudioManager.getInstance().ambientMuteToggle();
+    	AudioManager.getInstance().sfxMuteToggle();
+    }
   }
 }

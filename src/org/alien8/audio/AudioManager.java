@@ -11,7 +11,6 @@ import javax.sound.sampled.FloatControl.Type;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
-import org.alien8.server.AudioEvent;
 import org.alien8.util.LogManager;
 
 import net.jafama.FastMath;
