@@ -6,9 +6,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-
 import javax.swing.JFrame;
-
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
 import org.alien8.core.Entity;
@@ -169,13 +167,12 @@ public class Renderer extends Canvas {
     drawHudFrame();
     // Render score header
     drawText("SCORE", 16, 16, true);
-    Score score = ScoreBoard.getInstance()
-    		.getScore(model.getPlayer().getSerial());
-    if(score == null)
-        drawText("0", 16, 40, true);
-    else 
-    	drawText(Long.toString(score.getScore()), 16, 40, true);
-    
+    Score score = ScoreBoard.getInstance().getScore(model.getPlayer().getSerial());
+    if (score == null)
+      drawText("0", 16, 40, true);
+    else
+      drawText(Long.toString(score.getScore()), 16, 40, true);
+
     // TODO: Render current score
     // drawText(ScoreBoard.getInstance().getScore(player).getScore(), 16, 40, true);
     /*
@@ -189,11 +186,11 @@ public class Renderer extends Canvas {
         40, true);
     // TODO: Render turret charge
     drawText("TURRET1", 324, 16, true);
-    drawBar("/org/alien8/assets/turret_bar.png", player.getFrontTurret().getDistance(),
-        player.getFrontTurret().getMaxDistance(), 326, 40, true);
+    drawBar("/org/alien8/assets/turret_bar.png", player.getFrontTurretCharge(),
+        Parameters.TURRET_MAX_DIST, 326, 40, true);
     drawText("TURRET2", 462, 16, true);
-    drawBar("/org/alien8/assets/turret_bar.png", player.getRearTurret().getDistance(),
-        player.getRearTurret().getMaxDistance(), 464, 40, true);
+    drawBar("/org/alien8/assets/turret_bar.png", player.getRearTurretCharge(),
+        Parameters.TURRET_MAX_DIST, 464, 40, true);
 
     // TODO: Render use item
     drawText("ITEM", 612, 18, true);
@@ -229,7 +226,7 @@ public class Renderer extends Canvas {
     drawSprite(xp, yp, bar, fixed);
     int barHeight = 22;
     int maxBarLength = 76;
-    int barLength = (int) (value / maxValue) * maxBarLength;
+    int barLength = new Double(value / maxValue * maxBarLength).intValue();
     int color = 0x00B800;
     drawFilledRect(xp + 7, yp + 7, barHeight, barLength, color, fixed);
   }

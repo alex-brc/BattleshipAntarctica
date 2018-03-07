@@ -9,7 +9,6 @@ import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-
 import net.jafama.FastMath;
 
 /**
@@ -94,11 +93,13 @@ public class Ship extends Entity implements Serializable {
     // the tip of the ship.
     double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
 
-    frontTurret.setPosition(this.getPosition().addPosition(
-        new Position(FastMath.floor(r * FastMath.cos(this.getDirection())), FastMath.floor(r * FastMath.sin(this.getDirection())))));
+    frontTurret.setPosition(this.getPosition()
+        .addPosition(new Position(FastMath.floor(r * FastMath.cos(this.getDirection())),
+            FastMath.floor(r * FastMath.sin(this.getDirection())))));
 
-    rearTurret.setPosition(this.getPosition().addPosition(
-        new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())), FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
+    rearTurret.setPosition(this.getPosition()
+        .addPosition(new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())),
+            FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
 
   }
 
@@ -275,7 +276,7 @@ public class Ship extends Entity implements Serializable {
     // Return the difference anyway
     return diff;
   }
-  
+
   public Turret getFrontTurret() {
     return this.frontTurret;
   }
@@ -285,19 +286,19 @@ public class Ship extends Entity implements Serializable {
   }
 
   public double getFrontTurretDirection() {
-	  return frontTurret.getDirection();
+    return frontTurret.getDirection();
   }
 
   public double getRearTurretDirection() {
-	  return rearTurret.getDirection();
+    return rearTurret.getDirection();
   }
 
   public double getFrontTurretCharge() {
-	  return frontTurret.getDistance();
+    return frontTurret.getDistance();
   }
 
   public double getRearTurretCharge() {
-	  return rearTurret.getDistance();
+    return rearTurret.getDistance();
   }
 
   public int getColour() {

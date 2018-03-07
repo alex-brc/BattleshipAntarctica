@@ -1,7 +1,6 @@
 package org.alien8.core;
 
 import java.awt.Dimension;
-
 import net.jafama.FastMath;
 
 /**
@@ -52,7 +51,7 @@ public class Parameters {
   public static final double WATER_LEVEL = 0.4d;
   public static final int MINIMAP_WIDTH = 64;
   public static final int MINIMAP_HEIGHT = 64;
-  
+
   /**
    * Length of the ship in units (the same units we use for the coordinate system).
    */
@@ -92,8 +91,7 @@ public class Parameters {
    */
   public static final double ICE_BOUNCINESS = 0.02;
   /**
-   * Bullet parameters.
-   * Cooldowns in milliseconds.
+   * Bullet parameters. Cooldowns in milliseconds.
    */
   public static final double BULLET_MASS = 10;
   public static final double BULLET_WIDTH = 2;
@@ -102,7 +100,7 @@ public class Parameters {
   public static final double BULLET_DAMAGE = 10;
   public static final int BULLET_POOL_SIZE = 50;
   public static final int TURRET_CD = 1000;
-  public static final int TURRET_MIN_DIST = 50;
+  public static final int TURRET_MIN_DIST = 0;
   public static final int TURRET_MAX_DIST = 400;
 
   /**
@@ -135,7 +133,7 @@ public class Parameters {
   public static final double ITEM_WIDTH = 16;
   public static final double ITEM_LENGTH = 16;
   public static final double ITEM_HEALTH_ITEM_VALUE = 25;
-  
+
 
 
 }

@@ -8,7 +8,6 @@ import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
-
 import net.jafama.FastMath;
 
 public class Collision {
@@ -135,22 +134,22 @@ public class Collision {
   private void resolveBulletShipCollision(Bullet bullet, Ship ship) {
     // This allows us to ignore cases where a ship shoots itself
     if (bullet.getSource() != ship.getSerial()) {
-      System.out.println("bullet hit ship");
+      // System.out.println("bullet hit ship");
       // Bullet damages ship
       ship.damage(bullet.getDamage());
       // Award score to the bullet owner
       Player shooter = Server.getPlayer(bullet);
       // If it's AI, no points
-      if(shooter != null)
-      	ScoreBoard.getInstance().giveHit(shooter, bullet);
+      if (shooter != null)
+        ScoreBoard.getInstance().giveHit(shooter, bullet);
       // See if ship has been destroyed
       if (ship.getHealth() <= 0) {
-    	System.out.println("A ship died!");
+        System.out.println("A ship died!");
         ship.delete();
         // Award score to the killer
         // If it's AI, no points
-        if(shooter != null)
-        	ScoreBoard.getInstance().giveKill(shooter);
+        if (shooter != null)
+          ScoreBoard.getInstance().giveKill(shooter);
       }
       // Destroy bullet
       bullet.delete();
