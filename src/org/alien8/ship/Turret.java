@@ -75,14 +75,14 @@ public class Turret implements Serializable {
       return;
 
     if (type == Turret.BIG) {
-      ModelManager.getInstance().addEntity(Server.getBigBullet(this.getPosition(), this.getDirection(),
+      ModelManager.getInstance().addEntity(Server.getInstance().getBigBullet(this.getPosition(), this.getDirection(),
           distance, this.getShip().getSerial()));
     } else {
-      ModelManager.getInstance().addEntity(Server.getSmallBullet(this.getPosition(), this.getDirection(),
+      ModelManager.getInstance().addEntity(Server.getInstance().getSmallBullet(this.getPosition(), this.getDirection(),
           distance, this.getShip().getSerial()));
     }
 
-    Server.addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
+    Server.getInstance().addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
     this.startCooldown();
     this.distance = this.minDistance;
   }
@@ -124,12 +124,12 @@ public class Turret implements Serializable {
   }
   
   public Position getTargetPosition() {
-	  Position result = new Position(0,0);
-	  
-	  result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
-	  result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
-	  
-	  return result;
+      Position result = new Position(0,0);
+      
+      result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
+      result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
+      
+      return result;
   }
 
   /**
@@ -168,8 +168,8 @@ public class Turret implements Serializable {
     return null;
 
     if(distance != minDistance) {
-    	Position pos = getTargetPosition();
-    	r.drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
+        Position pos = getTargetPosition();
+        r.drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
     }
 
   }
@@ -200,6 +200,6 @@ public class Turret implements Serializable {
   }
 
   public double getDistance() {
-	return distance;
+    return distance;
   }
 }

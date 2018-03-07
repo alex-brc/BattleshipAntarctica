@@ -29,6 +29,7 @@ public class ServerMulticastSender extends Thread {
   private ConcurrentLinkedQueue<Entity> entities;
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS;
   private ArrayList<Player> playerList;
+  private byte[] buf = new byte[65536]; 
   private boolean run = true;
 
   public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip,
@@ -65,8 +66,6 @@ public class ServerMulticastSender extends Thread {
   private void readInputSample() {
     try {
       for (int i = 0; i < playerList.size(); i++) {
-        // Create a packet for receiving input sample packet
-        byte[] buf = new byte[65536];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
         // Receive an input sample packet and obtain its byte data
@@ -81,7 +80,7 @@ public class ServerMulticastSender extends Thread {
         ClientInputSample cis = (ClientInputSample) objIn.readObject();
 
         // Identify which Player the CIS belongs to
-        Player p = Server.getPlayerByIpAndPort(clientIP, clientPort);
+        Player p = Server.getInstance().getPlayerByIpAndPort(clientIP, clientPort);
 
         // Put the received input sample in the CIS hash map
         if (p != null && cis != null)
@@ -91,8 +90,12 @@ public class ServerMulticastSender extends Thread {
             latestCIS.put(p, cis);
       }
     } catch (IOException ioe) {
+      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL,
+          "Something wrong when deserializing input sample byte");
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
+      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL,
+          "Cannot find the class of the received serialized object");
       cnfe.printStackTrace();
     }
   }
@@ -110,7 +113,7 @@ public class ServerMulticastSender extends Thread {
     for (Entity e : ents) {
       if (e instanceof Ship) {
         Ship s = (Ship) e;
-        Player p = Server.getPlayerByShip(s);
+        Player p = Server.getInstance().getPlayerByShip(s);
         if (p != null) { // Player ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
@@ -151,7 +154,7 @@ public class ServerMulticastSender extends Thread {
           new DatagramPacket(entsLiteByte, entsLiteByte.length, multiCastIP, multiCastPort);
 
       // Make the game event packet
-      GameEvent event = Server.getNextEvent();
+      GameEvent event = Server.getInstance().getNextEvent();
       byteOut = new ByteArrayOutputStream();
       objOut = new ObjectOutputStream(byteOut);
       objOut.writeObject(event);
@@ -164,10 +167,10 @@ public class ServerMulticastSender extends Thread {
       // Send the entsLite packet and the event packet to client
       udpSocket.send(entsLitePacket);
       udpSocket.send(eventPacket);
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException ioe) {
       LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL,
-          "Packet error: " + e.toString());
+          "Packet error: " + ioe.toString());
+      ioe.printStackTrace();
     }
   }
 
