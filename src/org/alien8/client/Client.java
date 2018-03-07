@@ -25,6 +25,8 @@ import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.AudioEvent;
 import org.alien8.server.GameEvent;
+import org.alien8.ui.MainMenu;
+import org.alien8.ui.SplashScreen;
 import org.alien8.util.LogManager;
 
 public class Client implements Runnable {
@@ -48,8 +50,17 @@ public class Client implements Runnable {
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
   private ScoreBoard scoreBoard;
+  private SplashScreen splash = null;
+  private MainMenu menu = null;
+  
+  public enum State {
+	  MAIN_MENU, SPLASH_SCREEN, IN_GAME
+  }
+  private State state = State.SPLASH_SCREEN;
 
   public Client() {
+	splash = new SplashScreen();
+	menu = new MainMenu();
     model = ModelManager.getInstance();
     scoreBoard = ScoreBoard.getInstance();
   }
@@ -111,20 +122,34 @@ public class Client implements Runnable {
       //
       catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
+      if (state == State.IN_GAME){
       // Call update() as many times as needed to compensate before rendering
-      while (catchUp >= 1) {
-        this.sendInputSample();
-        this.receiveAndUpdate();
-        this.receiveEvents();
-        tickRate++;
-        catchUp--;
-        // Update last time
-        lastTime = getTime();
+        while (catchUp >= 1) {
+    	
+    	  this.sendInputSample();
+          this.receiveAndUpdate();
+          this.receiveEvents();
+    	
+          tickRate++;
+          catchUp--;
+          // Update last time
+          lastTime = getTime();
+        }
       }
-
       // Call the renderer
       // aiPlayer.update();
-      Renderer.getInstance().render(model);
+      switch(state){
+        case SPLASH_SCREEN:
+          Renderer.getInstance().render(splash);
+          break;
+        case MAIN_MENU:
+          Renderer.getInstance().render(menu);
+          break;
+        case IN_GAME:
+          Renderer.getInstance().render(model);
+          break;
+      }
+      
       // Renderer.getInstance(model.getMap().getIceGrid()).render(model);
       frameRate++;
 
@@ -370,6 +395,10 @@ public class Client implements Runnable {
             "Something went wrong disconnecting client. " + e.toString());
       }
     }
+  }
+  
+  public void setState(State s){
+	  state = s;
   }
 
   // public boolean[][] getMapIceGrid() {

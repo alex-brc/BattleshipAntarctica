@@ -36,6 +36,9 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   private boolean escPressed = false; // Pull up menu
   private boolean shiftPressed = false; // Show scoreboard
   private boolean mPressed = false; // Mute sounds
+  private boolean anyPressed = false; //Any key
+  
+  private char typed = 0; //most recently typed key
 
   private InputManager() {
     // Normally this exists only to defeat instantiation
@@ -153,6 +156,10 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   public boolean shiftPressed() {
     return shiftPressed;
   }
+  
+  public boolean anyPressed() {
+	return anyPressed;
+  }
 
   /**
    * @return the latest mouse position, in screen XY coordinates
@@ -209,31 +216,32 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
     switch (e.getKeyCode()) {
       case KeyEvent.VK_W:
         wPressed = true;
-        return;
+        break;
       case KeyEvent.VK_A:
         aPressed = true;
-        return;
+        break;
       case KeyEvent.VK_S:
         sPressed = true;
-        return;
+        break;
       case KeyEvent.VK_D:
         dPressed = true;
-        return;
+        break;
       case KeyEvent.VK_SPACE:
         spacePressed = true;
-        return;
+        break;
       // Local controls
       case KeyEvent.VK_ESCAPE:
         escPressed = true;
-        return;
+        break;
       case KeyEvent.VK_SHIFT:
         shiftPressed = true;
         ScoreBoard.getInstance().notifyShift();
-        return;
+        break;
       default:
         // Not a game control
-        return;
+        break;
     }
+    anyPressed = true;
   }
 
   @Override
@@ -241,30 +249,31 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
     switch (e.getKeyCode()) {
       case KeyEvent.VK_W:
         wPressed = false;
-        return;
+        break;
       case KeyEvent.VK_A:
         aPressed = false;
-        return;
+        break;
       case KeyEvent.VK_S:
         sPressed = false;
-        return;
+        break;
       case KeyEvent.VK_D:
         dPressed = false;
-        return;
+        break;
       case KeyEvent.VK_SPACE:
         spacePressed = false;
-        return;
+        break;
       // Local controls
       case KeyEvent.VK_ESCAPE:
         escPressed = false;
-        return;
+        break;
       case KeyEvent.VK_SHIFT:
         shiftPressed = false;
-        return;
+        break;
       default:
         // Not a game control
-        return;
+    	break;
     }
+    anyPressed = false;
   }
 
   @Override
@@ -283,9 +292,18 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
     // Not interesting
 
   }
+  
+  public char getKeyTyped(){
+	  char c = typed;
+	  typed = 0;
+	  return c;
+  }
 
   @Override
   public void keyTyped(KeyEvent e) {
-    // Not interesting
+	if (e.getKeyCode() != KeyEvent.VK_ENTER){
+	  typed = e.getKeyChar();
+	  //System.out.println(c);
+	}
   }
 }

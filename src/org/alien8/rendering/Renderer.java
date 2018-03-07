@@ -14,6 +14,8 @@ import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.ship.Ship;
+import org.alien8.ui.MainMenu;
+import org.alien8.ui.SplashScreen;
 
 public class Renderer extends Canvas {
 
@@ -131,20 +133,19 @@ public class Renderer extends Canvas {
   // instance = new Renderer(iceGrid);
   // return instance;
   // }
-
+  
   /**
    * The render() method renders all entities to the screen in their current state
    */
   public void render(ModelManager model) {
-    BufferStrategy bs = getBufferStrategy(); // gets canvas buffer strategy
-    if (bs == null) {
-      createBufferStrategy(3); // if none found, create a triple buffering strategy
-      requestFocus();
-      return;
-    }
-
-    clear();
-
+	BufferStrategy bs = getBufferStrategy(); // gets canvas buffer strategy
+	if (bs == null) {
+		  createBufferStrategy(3); // if none found, create a triple buffering strategy
+		  requestFocus();
+		  return;
+		}
+	clear();
+	
     // Get x and y scroll from the player
     Ship player = model.getPlayer();
     xScroll = (int) (player.getPosition().getX() - width / 2);
@@ -196,26 +197,71 @@ public class Renderer extends Canvas {
     drawText("P", 704, 56, true);
     drawFilledRect(720, 16, 64, 64, 0x5555FF, true); // TEMPORARY BOX, DELETE LATER
     // // drawMinimap(0, 0, true);
-
-
+    
     // Graphics object from buffer strategy
-    Graphics g = bs.getDrawGraphics();
-    g.setColor(Color.BLACK);
-    // Background rectangle same size as canvas
-    g.fillRect(0, 0, getWidth(), getHeight());
-    // Draw image with pixel data from image raster
+ 	Graphics g = bs.getDrawGraphics();
+ 	g.setColor(Color.BLACK);
+ 	// Background rectangle same size as canvas
+ 	g.fillRect(0, 0, getWidth(), getHeight());
+ 	// Draw image with pixel data from image raster
     g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-
+ 	// g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
+ 	// Necessary to clear memory
+ 	g.dispose();
+ 	// Displays the buffer strategy to the monitor
+ 	bs.show();
+  }
+  
+  public void render(SplashScreen splash){
+	BufferStrategy bs = getBufferStrategy();
+	if (bs == null) {
+	  createBufferStrategy(3); // if none found, create a triple buffering strategy
+	  requestFocus();
+	  return;
+	}
+    clear();
+	  
+	splash.render(this);
+	  
+	// Graphics object from buffer strategy
+	Graphics g = bs.getDrawGraphics();
+	g.setColor(Color.BLACK);
+	// Background rectangle same size as canvas
+	g.fillRect(0, 0, getWidth(), getHeight());
+	// Draw image with pixel data from image raster
+	g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
     // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
-
-    // Necessary to clear memory
-    g.dispose();
-    // Displays the buffer strategy to the monitor
-    bs.show();
-
-
+	// Necessary to clear memory
+	g.dispose();
+	// Displays the buffer strategy to the monitor
+	bs.show();
   }
 
+  public void render(MainMenu menu){
+	BufferStrategy bs = getBufferStrategy();
+	if (bs == null) {
+	  createBufferStrategy(3); // if none found, create a triple buffering strategy
+	  requestFocus();
+	  return;
+	}
+    clear();
+	  
+	menu.render(this);
+	  
+	// Graphics object from buffer strategy
+	Graphics g = bs.getDrawGraphics();
+	g.setColor(Color.BLACK);
+	// Background rectangle same size as canvas
+	g.fillRect(0, 0, getWidth(), getHeight());
+	// Draw image with pixel data from image raster
+	g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+	// g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
+	// Necessary to clear memory
+	g.dispose();
+	// Displays the buffer strategy to the monitor
+	bs.show();
+  }
+  
   private void drawBar(String path, double value, double maxValue, int xp, int yp, boolean fixed) {
     Sprite bar = new Sprite(path);
     drawSprite(xp, yp, bar, fixed);
@@ -226,13 +272,13 @@ public class Renderer extends Canvas {
     drawFilledRect(xp + 7, yp + 7, barHeight, barLength, color, fixed);
   }
 
-  private void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
+  /*private void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
     for (int y = yp; y < yp + height; y++) {
       for (int x = xp; x < xp + length; x++) {
         drawPixel(x, y, color, fixed);
       }
     }
-  }
+  }*/
 
   private void drawBar(double value, double maxValue, int x, int y, int width, int height,
       int thickness, int borderColor, int barColor, boolean fixed) {
@@ -350,6 +396,23 @@ public class Renderer extends Canvas {
       if (xp + width > 0)
         pixels[(xp + width) + y * this.width] = col;
     }
+  }
+  
+  public void drawFilledRect(int xp, int yp, int width, int height, int col, boolean fixed){
+	  if (!fixed){
+			xp -= xScroll;
+			yp -= yScroll;
+		}
+		//Like renderTileColour but a specified rectangle of any size
+		for (int y = 0; y < height; y++){
+			int ya = y + yp;
+			for (int x = 0; x < width; x++){
+				int xa = x + xp;
+				if (xa < -width || xa >= this.width|| ya < 0 || ya >= this.height) break;
+				if (xa < 0) xa = 0;
+				pixels[xa+ya*this.width] = col;
+			}
+		}
   }
 
   public void drawPixel(int x, int y, int col, boolean fixed) {
