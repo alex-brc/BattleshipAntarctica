@@ -26,7 +26,7 @@ public class Parameters {
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
    * than that. A value of 63 gives 58-60 ticks/second, hovering around 59
    */
-  public static final int TICKS_PER_SECOND = 63;
+  public static final int TICKS_PER_SECOND = 103;
   /**
    * Dimension object for the renderer dimensions
    */
