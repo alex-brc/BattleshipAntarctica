@@ -29,7 +29,9 @@ public class ServerMulticastSender extends Thread {
   private ConcurrentLinkedQueue<Entity> entities;
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS;
   private ArrayList<Player> playerList;
-  private byte[] buf = new byte[65536]; 
+  private byte[] buf = new byte[65536];
+  private byte[] receivedByte;
+  private byte[] sendingByte;
   private boolean run = true;
 
   public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip,
@@ -72,10 +74,10 @@ public class ServerMulticastSender extends Thread {
         udpSocket.receive(packet);
         InetAddress clientIP = packet.getAddress();
         int clientPort = packet.getPort();
-        byte[] cisByte = packet.getData();
+        receivedByte = packet.getData();
 
         // Deserialize the input sample byte data into object
-        ByteArrayInputStream byteIn = new ByteArrayInputStream(cisByte);
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
         ObjectInputStream objIn = new ObjectInputStream(byteIn);
         ClientInputSample cis = (ClientInputSample) objIn.readObject();
 
@@ -147,22 +149,22 @@ public class ServerMulticastSender extends Thread {
       ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
       objOut.writeObject(entsLite);
-      byte[] entsLiteByte = byteOut.toByteArray();
+      sendingByte = byteOut.toByteArray();
 
       // Create a packet for holding the entsLite byte data
       DatagramPacket entsLitePacket =
-          new DatagramPacket(entsLiteByte, entsLiteByte.length, multiCastIP, multiCastPort);
+          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, multiCastPort);
 
       // Make the game event packet
       GameEvent event = Server.getInstance().getNextEvent();
       byteOut = new ByteArrayOutputStream();
       objOut = new ObjectOutputStream(byteOut);
       objOut.writeObject(event);
-      byte[] eventByte = byteOut.toByteArray();
+      sendingByte = byteOut.toByteArray();
 
       // Make packet
       DatagramPacket eventPacket =
-          new DatagramPacket(eventByte, eventByte.length, multiCastIP, multiCastPort);
+          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, multiCastPort);
 
       // Send the entsLite packet and the event packet to client
       udpSocket.send(entsLitePacket);
