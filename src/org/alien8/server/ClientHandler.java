@@ -56,6 +56,8 @@ public class ClientHandler extends Thread {
     Player p = new Player(name, clientIP, clientUdpPort, s);
     playerMap.put(s, p);
     ScoreBoard.getInstance().add(p);
+    System.out.println(ScoreBoard.getInstance().getScores().get(0).toString());
+    // Update the client's scoreBoard asap
     playerList.add(p);
 
     // Start the server game loop if it is the first client connecting
@@ -93,8 +95,8 @@ public class ClientHandler extends Thread {
         if (p != null) { // Player ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getRearTurretDirection(), s.getColour(), p.getIP(),
-              p.getPort()));
+              s.getRearTurretDirection(), s.getFrontTurretCharge(), s.getRearTurretCharge(),
+              s.getColour(), p.getIP(), p.getPort()));
         } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),

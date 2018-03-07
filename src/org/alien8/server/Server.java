@@ -109,8 +109,10 @@ public class Server {
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
     ScoreBoard.getInstance();
-
-    initializeAIs();
+    
+    // Initialise AIs
+    if(Parameters.AI_ON)
+    	initializeAIs();
 
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
@@ -129,8 +131,6 @@ public class Server {
 	    model.addEntity(sh);
 	    aiMap.put(sh, ai);
 	}
-    
-
   }
 
   private static void processClientRequest(InetAddress clientIP, ClientRequest cr,

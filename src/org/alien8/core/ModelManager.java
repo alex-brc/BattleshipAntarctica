@@ -12,6 +12,7 @@ import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
+import org.alien8.score.ScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
@@ -66,11 +67,11 @@ public class ModelManager {
     Player pl = null;
     Ship sh = null;
     ClientInputSample cis = null;
+
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
-        System.out.println("Removed " + ent.toString());
         // Skip the rest
         continue;
       }
@@ -78,7 +79,6 @@ public class ModelManager {
         sh = (Ship) ent;
         ai = Server.getAIByShip(sh);
         pl = Server.getPlayerByShip(sh);
-
         if (ai != null) {
           ai.update();
         } else if (pl != null) {
@@ -108,6 +108,7 @@ public class ModelManager {
     // Remove all entities
     for (Entity e : entities) {
       entities.remove(e);
+      this.lastSerial = 0;
     }
 
     // Add updated entities
@@ -119,6 +120,8 @@ public class ModelManager {
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
+        s.getFrontTurret().setDistance(el.frontTurretCharge);
+        s.getRearTurret().setDistance(el.rearTurretCharge);
 
         if (el.toBeDeleted) {
           s.delete();

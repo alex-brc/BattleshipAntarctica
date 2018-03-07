@@ -2,12 +2,12 @@ package org.alien8.ship;
 
 import java.io.Serializable;
 
+import org.alien8.audio.AudioEvent;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-import org.alien8.server.AudioEvent;
 import org.alien8.server.Server;
 
 import net.jafama.FastMath;
@@ -124,7 +124,7 @@ public class Turret implements Serializable {
   public double getDistance() {
     return distance;
   }
-
+  
   /**
    * Gets the maximum distance of the shot that the turret will fire.
    * 
@@ -175,6 +175,10 @@ public class Turret implements Serializable {
   }
 
   protected long getShipSerial() {
-    return shipSerial;
+	return shipSerial;
+  }
+
+  public void setDistance(double distance) {
+	this.distance = distance;
   }
 }

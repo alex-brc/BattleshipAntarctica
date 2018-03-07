@@ -28,18 +28,14 @@ public class Parameters {
    */
   public static final int TICKS_PER_SECOND = 63;
   /**
-   * Size of map hitboxes
-   */
-  public static final int MAP_BOX_SIZE = 1;
-  /**
    * Dimension object for the renderer dimensions
    */
   public static final Dimension RENDERER_SIZE = new Dimension(800, 600);
   // public static final Dimension VIEWPORT_SIZE = new Dimension(600, 400);
   public static final int SMALL_BORDER = 16;
   public static final int BIG_BORDER = 96;
-
   public static final int MAX_PLAYERS = 16;
+  public static final boolean AI_ON = false;
   /**
    * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
    */
@@ -53,6 +49,10 @@ public class Parameters {
   public static final int N_SECOND = 1000000000;
   public static final int MAP_HEIGHT = 2048;
   public static final int MAP_WIDTH = 2048;
+  public static final double WATER_LEVEL = 0.4d;
+  public static final int MINIMAP_WIDTH = 64;
+  public static final int MINIMAP_HEIGHT = 64;
+  
   /**
    * Length of the ship in units (the same units we use for the coordinate system).
    */
@@ -114,7 +114,6 @@ public class Parameters {
    * Affects how much damage ships take in collisions.
    */
   public static final double COLLISION_DAMAGE_MODIFIER = 0.1;
-  public static final double WATER_LEVEL = 0.4d;
   /**
    * Maximum number of "shoot" audio clips running at the same time
    */
@@ -125,16 +124,18 @@ public class Parameters {
   /**
    * See Score for details
    */
-  public static final int SCORE_PER_KILL = 100;
+  public static final int SCORE_PER_KILL = 1000;
   public static final float KILL_STREAK_MULTIPLIER = 0.1f;
-  public static final float DISTANCE_MULTIPLIER = 1;
+  public static final float DISTANCE_MULTIPLIER = 0.1f;
   public static final int SCOREBOARD_HEIGHT = 500;
   public static final int SCOREBOARD_WIDTH = 500;
-
-
-  public static final int MINIMAP_WIDTH = 64;
-  public static final int MINIMAP_HEIGHT = 64;
-
+  /**
+   * Items
+   */
+  public static final double ITEM_WIDTH = 16;
+  public static final double ITEM_LENGTH = 16;
+  public static final double ITEM_HEALTH_ITEM_VALUE = 25;
+  
 
 
 }

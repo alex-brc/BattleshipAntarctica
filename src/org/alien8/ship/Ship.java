@@ -285,11 +285,19 @@ public class Ship extends Entity implements Serializable {
   }
 
   public double getFrontTurretDirection() {
-    return frontTurret.getDirection();
+	  return frontTurret.getDirection();
   }
 
   public double getRearTurretDirection() {
-    return rearTurret.getDirection();
+	  return rearTurret.getDirection();
+  }
+
+  public double getFrontTurretCharge() {
+	  return frontTurret.getDistance();
+  }
+
+  public double getRearTurretCharge() {
+	  return rearTurret.getDistance();
   }
 
   public int getColour() {

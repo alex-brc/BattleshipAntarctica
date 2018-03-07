@@ -35,7 +35,7 @@ public class ScoreBoard implements Runnable {
 
   public void update(Score sc) {
     for (Score score : scores)
-      if (score.getName().equals(sc.getName()))
+      if (sc.getShipSerial() == score.getShipSerial())
         score = sc;
   }
 
@@ -46,7 +46,7 @@ public class ScoreBoard implements Runnable {
     for (Player p : players) {
       Score score = new Score(p);
       scores.add(score);
-      Server.addEvent(score);
+      Server.addEvent(score.exportToEvent());
     }
   }
 
@@ -55,30 +55,30 @@ public class ScoreBoard implements Runnable {
         "Adding player " + player.getName() + " to scoreboard");
     Score score = new Score(player);
     scores.add(score);
-    Server.addEvent(score);
+    Server.addEvent(score.exportToEvent());
   }
 
   public void remove(Player player) {
     scores.remove(this.getScore(player));
   }
 
-  public void giveKill(Player p) {
+  public void giveKill(Player player) {
     for (Score score : scores)
-      if (p.getName().equals(score.getName())) {
+      if (player.getShip().getSerial() == score.getShipSerial()) {
         score.giveKill();
-        Server.addEvent(score);
+        Server.addEvent(score.exportToEvent());
         return;
       }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
         "In giveKill(): given player not found on the scoreboard.");
   }
 
-  public void giveHit(Player p, Bullet b) {
+  public void giveHit(Player player, Bullet bullet) {
     try {
       for (Score score : scores)
-        if (p.getName().equals(score.getName())) {
-          score.giveHit(b);
-          Server.addEvent(score);
+        if (player.getShip().getSerial() == score.getShipSerial()) {
+          score.giveHit(bullet);
+          Server.addEvent(score.exportToEvent());
           return;
         }
     } catch (NullPointerException e) {
@@ -91,11 +91,11 @@ public class ScoreBoard implements Runnable {
         "In giveHit(): given player not found on the scoreboard.");
   }
 
-  public void kill(Player p) {
+  public void kill(Player player) {
     for (Score score : scores)
-      if (p.getName().equals(score.getName())) {
+      if (player.getShip().getSerial() == score.getShipSerial()) {
         score.kill();
-        Server.addEvent(score);
+        Server.addEvent(score.exportToEvent());
         return;
       }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
@@ -113,10 +113,20 @@ public class ScoreBoard implements Runnable {
 
   public Score getScore(Player player) {
     for (Score score : scores) {
-      if (player.getName().equals(score.getName()))
+      System.out.println(score.toString());
+      if (player.getShip().getSerial() == score.getShipSerial())
         return score;
     }
     return null;
+  }
+  
+  public Score getScore(long shipSerial) {
+    for (Score score : scores) {
+      System.out.println(score.toString());
+		  if (score.getShipSerial() == shipSerial)
+			  return score;
+	  }
+	  return null;
   }
 
   public void render() {

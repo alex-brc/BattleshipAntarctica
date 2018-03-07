@@ -6,13 +6,17 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+
 import javax.swing.JFrame;
+
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
+import org.alien8.score.Score;
+import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
 
 public class Renderer extends Canvas {
@@ -165,7 +169,13 @@ public class Renderer extends Canvas {
     drawHudFrame();
     // Render score header
     drawText("SCORE", 16, 16, true);
-    drawText("n-a", 16, 40, true);
+    Score score = ScoreBoard.getInstance()
+    		.getScore(model.getPlayer().getSerial());
+    if(score == null)
+        drawText("0", 16, 40, true);
+    else 
+    	drawText(Long.toString(score.getScore()), 16, 40, true);
+    
     // TODO: Render current score
     // drawText(ScoreBoard.getInstance().getScore(player).getScore(), 16, 40, true);
     /*
@@ -212,8 +222,6 @@ public class Renderer extends Canvas {
     g.dispose();
     // Displays the buffer strategy to the monitor
     bs.show();
-
-
   }
 
   private void drawBar(String path, double value, double maxValue, int xp, int yp, boolean fixed) {

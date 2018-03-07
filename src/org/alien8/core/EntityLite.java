@@ -35,6 +35,8 @@ public class EntityLite implements Serializable {
   // For player's Ship
   public InetAddress clientIP;
   public int clientUdpPort;
+  public double frontTurretCharge;
+  public double rearTurretCharge;
 
   // For bullet
   public double distance;
@@ -45,6 +47,7 @@ public class EntityLite implements Serializable {
   public EntityLite(long serial, int entityType, Position position,
       boolean toBeDeleted, double direction, double speed, double health,
       double frontTurretDirection, double rearTurretDirection,
+      double frontTurretCharge, double rearTurretCharge,
       int colour, InetAddress clientIP, int clientUdpPort) {
     this.serial = serial;
     this.entityType = entityType;
@@ -55,6 +58,8 @@ public class EntityLite implements Serializable {
     this.health = health;
     this.frontTurretDirection = frontTurretDirection;
     this.rearTurretDirection = rearTurretDirection;
+    this.frontTurretCharge = frontTurretCharge;
+    this.rearTurretCharge = rearTurretCharge;
     this.colour = colour;
     this.clientIP = clientIP;
     this.clientUdpPort = clientUdpPort;

@@ -14,7 +14,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
 import org.alien8.ai.AIController;
+import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientRequest;
 import org.alien8.core.EntityLite;
@@ -23,7 +25,7 @@ import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
-import org.alien8.server.AudioEvent;
+import org.alien8.score.ScoreEvent;
 import org.alien8.server.GameEvent;
 import org.alien8.util.LogManager;
 
@@ -123,9 +125,7 @@ public class Client implements Runnable {
       }
 
       // Call the renderer
-      // aiPlayer.update();
       Renderer.getInstance().render(model);
-      // Renderer.getInstance(model.getMap().getIceGrid()).render(model);
       frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
@@ -275,8 +275,9 @@ public class Client implements Runnable {
       if (event != null) {
         if (event instanceof AudioEvent)
           AudioManager.getInstance().addEvent((AudioEvent) event);
-        else if (event instanceof Score)
-          ScoreBoard.getInstance().update((Score) event);
+        else if (event instanceof ScoreEvent) {
+          ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
+        }
       }
     } catch (IOException ioe) {
       ioe.printStackTrace();
