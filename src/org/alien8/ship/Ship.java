@@ -24,7 +24,6 @@ public class Ship extends Entity implements Serializable {
   private static final long serialVersionUID = -432334137390727161L;
   private Turret frontTurret;
   private Turret rearTurret;
-  private Turret midTurret;
   private int colour;
   private Sprite sprite;
 
@@ -34,9 +33,8 @@ public class Ship extends Entity implements Serializable {
     this.colour = colour;
     sprite = Sprite.makeShipSprite(colour);
 
-    frontTurret = new Turret(position, Turret.SMALL, this);
-    midTurret = new Turret(position, Turret.BIG, this);
-    rearTurret = new Turret(position, Turret.SMALL, this);
+    frontTurret = new Turret(position, this.getSerial());
+    rearTurret = new Turret(position, this.getSerial());
 
     setTurretsDirection(new Position(0, 0));
     setTurretsPosition();
@@ -47,7 +45,6 @@ public class Ship extends Entity implements Serializable {
     this.position = position;
 
     setTurretsPosition();
-    // Turrets direction set in model
   }
 
   /**
@@ -84,13 +81,6 @@ public class Ship extends Entity implements Serializable {
     // Range of motion: [5*pi/4, 3*pi/4]
     if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
       rearTurret.setDirection(angle);
-
-    // Mid
-    angle = Renderer.getScreenPosition(midTurret.getPosition()).getAngleTo(mousePosition);
-    angle = PhysicsManager.shiftAngle((-1) * angle + FastMath.PI / 2);
-    // No need to get relative angle.
-    // This can go shoot it wants
-    midTurret.setDirection(angle);
   }
 
   /**
@@ -105,12 +95,11 @@ public class Ship extends Entity implements Serializable {
     double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
 
     frontTurret.setPosition(this.getPosition().addPosition(
-        new Position(r * FastMath.cos(this.getDirection()), r * FastMath.sin(this.getDirection()))));
+        new Position(FastMath.floor(r * FastMath.cos(this.getDirection())), FastMath.floor(r * FastMath.sin(this.getDirection())))));
 
     rearTurret.setPosition(this.getPosition().addPosition(
-        new Position((-r) * FastMath.cos(this.getDirection()), (-r) * FastMath.sin(this.getDirection()))));
+        new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())), FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
 
-    midTurret.setPosition(this.getPosition());
   }
 
   public void render() {
@@ -139,7 +128,6 @@ public class Ship extends Entity implements Serializable {
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
     frontTurret.render();
     rearTurret.render();
-    midTurret.render();
   }
 
   /**
@@ -292,10 +280,6 @@ public class Ship extends Entity implements Serializable {
     return this.frontTurret;
   }
 
-  public Turret getMidTurret() {
-    return this.midTurret;
-  }
-
   public Turret getRearTurret() {
     return this.rearTurret;
   }
@@ -308,10 +292,6 @@ public class Ship extends Entity implements Serializable {
     return rearTurret.getDirection();
   }
 
-  public double getMidTurretDirection() {
-    return midTurret.getDirection();
-  }
-
   public int getColour() {
     return this.colour;
   }
@@ -320,20 +300,12 @@ public class Ship extends Entity implements Serializable {
     frontTurret.charge();
   }
 
-  public void midTurretCharge() {
-    midTurret.charge();
-  }
-
   public void rearTurretCharge() {
     rearTurret.charge();
   }
 
   public void frontTurretShoot() {
     frontTurret.shoot();
-  }
-
-  public void midTurretShoot() {
-    midTurret.shoot();
   }
 
   public void rearTurretShoot() {

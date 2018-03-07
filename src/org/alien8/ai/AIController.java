@@ -44,7 +44,6 @@ public class AIController{
 		myShip.setTurretsDirection(target.getPosition());
 		//At the moment it just fires all turrets at the closest ship
 		myShip.frontTurretCharge();
-		myShip.midTurretCharge();
 		myShip.rearTurretCharge();
 		wander(); //Moves mostly aimlessly around the map
 	}

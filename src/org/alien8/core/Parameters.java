@@ -95,25 +95,15 @@ public class Parameters {
    * Bullet parameters.
    * Cooldowns in milliseconds.
    */
-  public static final double SMALL_BULLET_MASS = 10;
-  public static final double SMALL_BULLET_WIDTH = 2;
-  public static final double SMALL_BULLET_LENGTH = 4;
-  public static final double SMALL_BULLET_SPEED = 4;
-  public static final double SMALL_BULLET_DAMAGE = 10;
-  public static final int SMALL_BULLET_CD = 1000;
-  public static final int SMALL_BULLET_MIN_DIST = 50;
-  public static final int SMALL_BULLET_MAX_DIST = 400;
-  public static final int SMALL_BULLET_POOL_SIZE = 50;
-  
-  public static final double BIG_BULLET_MASS = 30;
-  public static final double BIG_BULLET_WIDTH = 4;
-  public static final double BIG_BULLET_LENGTH = 8;
-  public static final double BIG_BULLET_SPEED = 2;
-  public static final double BIG_BULLET_DAMAGE = 10;
-  public static final int BIG_BULLET_CD = 2000;
-  public static final int BIG_BULLET_MIN_DIST = 50;
-  public static final int BIG_BULLET_MAX_DIST = 400;
-  public static final int BIG_BULLET_POOL_SIZE = 50;
+  public static final double BULLET_MASS = 10;
+  public static final double BULLET_WIDTH = 2;
+  public static final double BULLET_LENGTH = 4;
+  public static final double BULLET_SPEED = 4;
+  public static final double BULLET_DAMAGE = 10;
+  public static final int BULLET_POOL_SIZE = 50;
+  public static final int TURRET_CD = 1000;
+  public static final int TURRET_MIN_DIST = 50;
+  public static final int TURRET_MAX_DIST = 400;
 
   /**
    * This modifier affects how much distance holding down a button gives to the turret shot every

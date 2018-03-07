@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
@@ -13,9 +14,8 @@ import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
-import org.alien8.ship.BigBullet;
+import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
-import org.alien8.ship.SmallBullet;
 
 
 /**
@@ -118,7 +118,6 @@ public class ModelManager {
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
-        s.getMidTurret().setDirection(el.midTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
 
         if (el.toBeDeleted) {
@@ -136,7 +135,6 @@ public class ModelManager {
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
-        s.getMidTurret().setDirection(el.midTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
 
         if (el.toBeDeleted) {
@@ -145,27 +143,16 @@ public class ModelManager {
 
         this.addEntity(s);
       } else if (el.entityType == 2) { // SmallBullet
-        SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
-        sb.setSerial(el.serial);
-        sb.setSpeed(el.speed);
-        sb.setTravelled(el.travelled);
+        Bullet b = new Bullet(el.position, el.direction, el.distance, el.source);
+        b.setSerial(el.serial);
+        b.setSpeed(el.speed);
+        b.setTravelled(el.travelled);
 
         if (el.toBeDeleted) {
-          sb.delete();
+          b.delete();
         }
 
-        this.addEntity(sb);
-      } else if (el.entityType == 3) { // BigBullet
-        BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
-        bb.setSerial(el.serial);
-        bb.setSpeed(el.speed);
-        bb.setTravelled(el.travelled);
-
-        if (el.toBeDeleted) {
-          bb.delete();
-        }
-
-        this.addEntity(bb);
+        this.addEntity(b);
       }
     }
   }

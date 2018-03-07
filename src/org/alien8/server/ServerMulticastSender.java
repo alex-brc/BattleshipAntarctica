@@ -11,14 +11,14 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
-import org.alien8.ship.BigBullet;
+import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
-import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
 
 public class ServerMulticastSender extends Thread {
@@ -114,22 +114,18 @@ public class ServerMulticastSender extends Thread {
         if (p != null) { // Player ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour(), p.getIP(),
+              s.getRearTurretDirection(), s.getColour(), p.getIP(),
               p.getPort()));
         } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getMidTurretDirection(), s.getRearTurretDirection(), s.getColour()));
+              s.getRearTurretDirection(), s.getColour()));
         }
 
-      } else if (e instanceof SmallBullet) {
-        SmallBullet sb = (SmallBullet) e;
-        EntitiesLite.add(new EntityLite(sb.getSerial(), 2, sb.getPosition(), sb.isToBeDeleted(),
-            sb.getDirection(), sb.getSpeed(), sb.getDistance(), sb.getTravelled(), sb.getSource()));
-      } else if (e instanceof BigBullet) {
-        BigBullet bb = (BigBullet) e;
-        EntitiesLite.add(new EntityLite(bb.getSerial(), 3, bb.getPosition(), bb.isToBeDeleted(),
-            bb.getDirection(), bb.getSpeed(), bb.getDistance(), bb.getTravelled(), bb.getSource()));
+      } else if (e instanceof Bullet) {
+        Bullet b = (Bullet) e;
+        EntitiesLite.add(new EntityLite(b.getSerial(), 2, b.getPosition(), b.isToBeDeleted(),
+            b.getDirection(), b.getSpeed(), b.getDistance(), b.getTravelled(), b.getSource()));
       }
     }
 

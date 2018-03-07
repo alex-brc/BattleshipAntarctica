@@ -24,10 +24,8 @@ import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.score.ScoreBoard;
-import org.alien8.ship.BigBullet;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
-import org.alien8.ship.SmallBullet;
 import org.alien8.util.LogManager;
 
 public class Server {
@@ -49,8 +47,8 @@ public class Server {
   private static int serverPort = 4446;
   private static int multiCastPort = 4445;
   private static Long seed = (new Random()).nextLong();
-  private static volatile LinkedList<BigBullet> bigBullets = new LinkedList<BigBullet>();
-  private static volatile LinkedList<SmallBullet> smallBullets = new LinkedList<SmallBullet>();
+  
+  private static volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
   private static volatile boolean run = true;
 
   public static void main(String[] args) {
@@ -105,12 +103,8 @@ public class Server {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
 
     // Populate bullet pools
-    for(int i = 0; i < Parameters.SMALL_BULLET_POOL_SIZE; i++) {
-    	smallBullets.add(new SmallBullet(new Position(0,0), 0, 0, 0));
-    }
-    for(int i = 0; i < Parameters.BIG_BULLET_POOL_SIZE; i++) {
-    	bigBullets.add(new BigBullet(new Position(0,0), 0, 0, 0));
-    }
+    for(int i = 0; i < Parameters.BULLET_POOL_SIZE; i++)
+    	bullets.add(new Bullet(new Position(0,0), 0, 0, 0));
     
     // Initialise ScoreBoard
     // Without a thread, it doesn't listen on input.
@@ -233,55 +227,39 @@ public class Server {
     return null;
   }
 
-public static Position getRandomPosition() {
-	boolean[][] iceGrid = model.getMap().getIceGrid();
-    Random r = new Random();
-    double randomX = 0;
-    double randomY = 0;
-    boolean isIcePosition = true;
+  public static Position getRandomPosition() {
+	  boolean[][] iceGrid = model.getMap().getIceGrid();
+	  Random r = new Random();
+	  double randomX = 0;
+	  double randomY = 0;
+	  boolean isIcePosition = true;
 
-    // Choose a random position without ice for ship spawning
-    while (isIcePosition) {
-      randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
-      randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
+	  // Choose a random position without ice for ship spawning
+	  while (isIcePosition) {
+		  randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
+		  randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
 
-      if (!iceGrid[(int) randomX][(int) randomY]) {
-        isIcePosition = false;
-      }
-    }
-	return new Position(randomX,randomY);
-}
+		  if (!iceGrid[(int) randomX][(int) randomY]) {
+			  isIcePosition = false;
+		  }
+	  }
+	  return new Position(randomX,randomY);
+  }
 
-public static BigBullet getBigBullet(Position position, double direction, double distance, long serial) {
-	
-	// Take one from the top
-	BigBullet b = bigBullets.pollFirst();
-	// Modify it
-	b.setPosition(position);
-	b.setDirection(direction);
-	b.setDistance(distance);
-	b.setTravelled(0);
-	b.setSource(serial);
-	b.save();
-	// Add it to the end before passing it to the caller
-	bigBullets.addLast(b);
-	return b;
-}
+  public static Bullet getBullet(Position position, double direction, double distance, long serial) {
 
-public static SmallBullet getSmallBullet(Position position, double direction, double distance, long serial) {
-	// Take one from the top
-	SmallBullet b = smallBullets.pollFirst();
-	// Modify it
-	b.setDirection(direction);
-	b.setDistance(distance);
-	b.setTravelled(0);
-	b.setPosition(position);
-	b.setSource(serial);
-	b.save();
-	// Add it to the end before passing it to the caller
-	smallBullets.addLast(b);
-	System.out.println("Summoned " + b);
-	return b;
-}
+	  // Take one from the top
+	  Bullet b = bullets.pollFirst();
+	  // Modify it
+	  b.setPosition(position);
+	  b.setDirection(direction);
+	  b.setDistance(distance);
+	  b.setTravelled(0);
+	  b.setSource(serial);
+	  b.save();
+	  // Add it to the end before passing it to the caller
+	  bullets.addLast(b);
+	  return b;
+  }
 
 }
