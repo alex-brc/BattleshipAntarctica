@@ -47,6 +47,7 @@ public class Client implements Runnable {
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
+  private byte[] buf = new byte[65536];
   private ScoreBoard scoreBoard;
 
   public Client() {
@@ -253,7 +254,6 @@ public class Client implements Runnable {
   public void receiveEvents() {
     try {
       // Create a packet for receiving event packet
-      byte[] buf = new byte[65536];
       DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
 
       multiCastSocket.receive(eventPacket);
@@ -290,8 +290,7 @@ public class Client implements Runnable {
    */
   private void receiveAndUpdate() {
     try {
-      // Create a packet for receiving difference packet
-      byte[] buf = new byte[65536];
+      // Create a packet for receiving entsLite packet
       DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
       // Receive a entsLite packet and obtain the byte data
