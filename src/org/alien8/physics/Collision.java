@@ -71,7 +71,6 @@ public class Collision {
     double direction2 = entity2.getDirection();
 
     // Move ships apart according to the Minimum Translation Vector
-    // System.out.println("Cur" + entity1.getPosition());
     // mod 10 allows distance to be scaled down so that objects don't fly away from each other as
     // much
     double mtvX = mtv.getDistance() * mtv.getAxis().getX() % 10;
@@ -129,6 +128,15 @@ public class Collision {
     // Each ship takes damage proportional to the momentum of the other ship
     entity1.damage(speed2 * entity2.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
     entity2.damage(speed1 * entity1.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
+    // Delete ships if dead
+    if (entity1.getHealth() <= 0) {
+      System.out.println("A ship died!");
+      entity1.delete();
+    }
+    if (entity2.getHealth() <= 0) {
+      System.out.println("A ship died!");
+      entity2.delete();
+    }
   }
 
   private void resolveBulletShipCollision(Bullet bullet, Ship ship) {
