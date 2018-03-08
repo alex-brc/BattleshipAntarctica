@@ -1,8 +1,6 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
@@ -103,6 +101,13 @@ public class Ship extends Entity implements Serializable {
 
   }
 
+  @Override
+  public void setSerial(long serial) {
+    this.serial = serial;
+    frontTurret.setShipSerial(serial);
+    rearTurret.setShipSerial(serial);
+  }
+
   public void render() {
     Renderer r = Renderer.getInstance();
 
@@ -123,10 +128,15 @@ public class Ship extends Entity implements Serializable {
     // r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
     // false);
 
-    // Render turrets
+    // Render ship sprite
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+    // Display health
+    r.drawText(new Integer(new Double(getHealth()).intValue()).toString(),
+        new Double(getPosition().getX()).intValue() + 20,
+        new Double(getPosition().getY()).intValue(), false);
+    // Render turrets
     frontTurret.render();
     rearTurret.render();
   }
@@ -173,80 +183,80 @@ public class Ship extends Entity implements Serializable {
    * ice.
    */
   public void dealWithInIce(boolean[][] iceGrid) {
-    double shipX = getPosition().getX();
-    double shipY = getPosition().getY();
-
-    // Checks each corner of the ship
-    for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
-      Position corner = (Position) iterator.next();
-      // Rounds the Position (stored as double) to int so we can use it access the map array
-      int x = (int) FastMath.rint(corner.getX());
-      int y = (int) FastMath.rint(corner.getY());
-
-      try {
-        // The technique here is to search in all directions (up, down, left, right) to find the
-        // minimum distance a ship would have to be moved to push it out of the ice. This should
-        // give good performance as the ship will not have strayed too far into the ice, so the
-        // minimum distance is the accurate direction to 'push' it out of the ice
-        if (iceGrid[x][y]) {
-          // System.out.println("Collision with ice");
-          int posXdiff = findDiff(iceGrid, x, y, 1, 0);
-          // System.out.println("posX done");
-          int posYdiff = findDiff(iceGrid, x, y, 0, 1);
-          // System.out.println("posY done");
-          int negXdiff = findDiff(iceGrid, x, y, -1, 0);
-          // System.out.println("negX done");
-          int negYdiff = findDiff(iceGrid, x, y, 0, -1);
-          // System.out.println("negY done");
-
-          int xdiff;
-          int ydiff;
-
-
-          // Finds minimum x distance
-          if (posXdiff >= negXdiff) {
-            xdiff = -negXdiff;
-          } else {
-            xdiff = posXdiff;
-          }
-          // Finds minimum y distance
-          if (posYdiff >= negYdiff) {
-            ydiff = -negYdiff;
-          } else {
-            ydiff = posYdiff;
-          }
-          // Finds minimum overall distance and adjusts ship Position and bounding box
-          if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
-            setPosition(new Position(shipX, shipY + ydiff));
-            translateObb(0, ydiff);
-            if (ydiff <= 0) {
-
-            }
-            // PhysicsManager.rotateEntity(this, -ydiff * Parameters.ICE_BOUNCINESS);
-            // initObb();
-          } else {
-            setPosition(new Position(shipX + xdiff, shipY));
-            translateObb(xdiff, 0);
-            // PhysicsManager.rotateEntity(this, -xdiff * Parameters.ICE_BOUNCINESS);
-            // initObb();
-          }
-
-          // if (getDirection() >= 0 && getDirection() < FastMath.PI) {
-          // PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
-          // } else {
-          // PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
-          // }
-
-          // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
-          // System.out.println("Health: " + getHealth());
-
-          // Halve the ship's speed for now
-          // setSpeed(getSpeed() / 2);
-        }
-      } catch (ArrayIndexOutOfBoundsException e) {
-        // This happens if the entity touches the edge of the map, so we deal with it gracefully
-      }
-    }
+    // double shipX = getPosition().getX();
+    // double shipY = getPosition().getY();
+    //
+    // // Checks each corner of the ship
+    // for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
+    // Position corner = (Position) iterator.next();
+    // // Rounds the Position (stored as double) to int so we can use it access the map array
+    // int x = (int) FastMath.rint(corner.getX());
+    // int y = (int) FastMath.rint(corner.getY());
+    //
+    // try {
+    // // The technique here is to search in all directions (up, down, left, right) to find the
+    // // minimum distance a ship would have to be moved to push it out of the ice. This should
+    // // give good performance as the ship will not have strayed too far into the ice, so the
+    // // minimum distance is the accurate direction to 'push' it out of the ice
+    // if (iceGrid[x][y]) {
+    // // System.out.println("Collision with ice");
+    // int posXdiff = findDiff(iceGrid, x, y, 1, 0);
+    // // System.out.println("posX done");
+    // int posYdiff = findDiff(iceGrid, x, y, 0, 1);
+    // // System.out.println("posY done");
+    // int negXdiff = findDiff(iceGrid, x, y, -1, 0);
+    // // System.out.println("negX done");
+    // int negYdiff = findDiff(iceGrid, x, y, 0, -1);
+    // // System.out.println("negY done");
+    //
+    // int xdiff;
+    // int ydiff;
+    //
+    //
+    // // Finds minimum x distance
+    // if (posXdiff >= negXdiff) {
+    // xdiff = -negXdiff;
+    // } else {
+    // xdiff = posXdiff;
+    // }
+    // // Finds minimum y distance
+    // if (posYdiff >= negYdiff) {
+    // ydiff = -negYdiff;
+    // } else {
+    // ydiff = posYdiff;
+    // }
+    // // Finds minimum overall distance and adjusts ship Position and bounding box
+    // if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
+    // setPosition(new Position(shipX, shipY + ydiff));
+    // translateObb(0, ydiff);
+    // if (ydiff <= 0) {
+    //
+    // }
+    // // PhysicsManager.rotateEntity(this, -ydiff * Parameters.ICE_BOUNCINESS);
+    // // initObb();
+    // } else {
+    // setPosition(new Position(shipX + xdiff, shipY));
+    // translateObb(xdiff, 0);
+    // // PhysicsManager.rotateEntity(this, -xdiff * Parameters.ICE_BOUNCINESS);
+    // // initObb();
+    // }
+    //
+    // // if (getDirection() >= 0 && getDirection() < FastMath.PI) {
+    // // PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+    // // } else {
+    // // PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+    // // }
+    //
+    // // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
+    // // System.out.println("Health: " + getHealth());
+    //
+    // // Halve the ship's speed for now
+    // // setSpeed(getSpeed() / 2);
+    // }
+    // } catch (ArrayIndexOutOfBoundsException e) {
+    // // This happens if the entity touches the edge of the map, so we deal with it gracefully
+    // }
+    // }
   }
 
   /**

@@ -31,7 +31,7 @@ public class Renderer extends Canvas {
   private BufferedImage image; // image which is rendered onto canvas
   private int[] pixels;
 
-  // private int[][] minimapTerrain;
+  private int[][] minimapTerrain = new int[Parameters.MINIMAP_WIDTH][Parameters.MINIMAP_HEIGHT];
 
   private Renderer() {
     setPreferredSize(Parameters.RENDERER_SIZE);
@@ -56,7 +56,9 @@ public class Renderer extends Canvas {
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
 
-    // minimapTerrain = new int[Parameters.MINIMAP_WIDTH][Parameters.MINIMAP_HEIGHT];
+
+
+    // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
   }
 
   // private Renderer(boolean[][] iceGrid) {
@@ -200,8 +202,10 @@ public class Renderer extends Canvas {
     drawText("M", 704, 16, true);
     drawText("A", 704, 36, true);
     drawText("P", 704, 56, true);
-    drawFilledRect(720, 16, 64, 64, 0x5555FF, true); // TEMPORARY BOX, DELETE LATER
-    // // drawMinimap(0, 0, true);
+    // drawFilledRect(720, 16, 64, 64, 0x5555FF, true); // TEMPORARY BOX, DELETE LATER
+    // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
+    // System.out.println(minimapTerrain);
+    // drawMinimap(720, 16, true);
 
 
     // Graphics object from buffer strategy
@@ -407,14 +411,14 @@ public class Renderer extends Canvas {
     Font.defaultFont.render(text, this, x, y, fixed);
   }
 
-  // private void drawMinimap(int x, int y, boolean fixed) {
-  // System.out.println(minimapTerrain.length);
-  // for (int j = y; j < minimapTerrain.length; j++) {
-  // for (int i = x; i < minimapTerrain[0].length; i++) {
-  // pixels[x + y * width] = minimapTerrain[x][y];
-  // }
-  // }
-  // }
+  private void drawMinimap(int x, int y, boolean fixed) {
+    // System.out.println(minimapTerrain.length);
+    for (int j = y; j < minimapTerrain.length; j++) {
+      for (int i = x; i < minimapTerrain[0].length; i++) {
+        pixels[x + y * width] = minimapTerrain[x][y];
+      }
+    }
+  }
 
   /**
    * Draws the map on the screen.

@@ -2,7 +2,6 @@ package org.alien8.core;
 
 import java.io.Serializable;
 import org.alien8.physics.Position;
-
 import net.jafama.FastMath;
 
 /**
@@ -234,13 +233,13 @@ public abstract class Entity implements Serializable, Cloneable {
   }
 
   public void setSerial(long serial) {
-	this.serial = serial;
+    this.serial = serial;
   }
 
   public void save() {
-	  this.toBeDeleted = false;
+    this.toBeDeleted = false;
   }
-  
+
   public void delete() {
     this.toBeDeleted = true;
   }
@@ -249,7 +248,7 @@ public abstract class Entity implements Serializable, Cloneable {
     return toBeDeleted;
   }
 
-  
+
   @Override
   public Object clone() throws CloneNotSupportedException {
     return super.clone();

@@ -1,7 +1,6 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
-
 import org.alien8.audio.AudioEvent;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
@@ -9,7 +8,6 @@ import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import org.alien8.server.Server;
-
 import net.jafama.FastMath;
 
 public class Turret implements Serializable {
@@ -30,7 +28,7 @@ public class Turret implements Serializable {
   private final double minDistance;
   private final double maxDistance;
 
-  private Sprite sprite = Sprite.turret; // for now
+  private Sprite sprite = Sprite.turret;
 
   public Turret(Position position, long shipSerial) {
     this.shipSerial = shipSerial;
@@ -63,8 +61,11 @@ public class Turret implements Serializable {
     if (distance == this.minDistance || this.isOnCooldown())
       return;
 
-    ModelManager.getInstance().addEntity(Server.getBullet(this.getPosition(), this.getDirection(),
-    		distance, this.getShipSerial()));
+    ModelManager.getInstance().addEntity(
+        Server.getBullet(this.getPosition(), this.getDirection(), distance, this.getShipSerial()));
+
+    // ModelManager.getInstance().addEntity(
+    // new Bullet(this.getPosition(), this.getDirection(), distance, this.getShipSerial()));
 
     Server.addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
     this.startCooldown();
@@ -106,14 +107,14 @@ public class Turret implements Serializable {
       return 0;
     return result;
   }
-  
+
   public Position getTargetPosition() {
-	  Position result = new Position(0,0);
-	  
-	  result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
-	  result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
-	  
-	  return result;
+    Position result = new Position(0, 0);
+
+    result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
+    result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
+
+    return result;
   }
 
   /**
@@ -124,7 +125,7 @@ public class Turret implements Serializable {
   public double getDistance() {
     return distance;
   }
-  
+
   /**
    * Gets the maximum distance of the shot that the turret will fire.
    * 
@@ -146,13 +147,13 @@ public class Turret implements Serializable {
     // else
     // r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
 
-    if(distance != minDistance) {
-    	Position pos = getTargetPosition();
-    	Renderer.getInstance().drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
+    if (distance != minDistance) {
+      Position pos = getTargetPosition();
+      Renderer.getInstance().drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
     }
 
   }
-  
+
   /**
    * @param direction the direction to set
    */
@@ -175,10 +176,14 @@ public class Turret implements Serializable {
   }
 
   protected long getShipSerial() {
-	return shipSerial;
+    return shipSerial;
   }
 
   public void setDistance(double distance) {
-	this.distance = distance;
+    this.distance = distance;
+  }
+
+  public void setShipSerial(long shipSerial) {
+    this.shipSerial = shipSerial;
   }
 }

@@ -6,7 +6,6 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-
 import net.jafama.FastMath;
 
 public class Bullet extends Entity implements Serializable {
@@ -19,8 +18,9 @@ public class Bullet extends Entity implements Serializable {
   private long source;
 
   public Bullet(Position position, double direction, double distance, long source) {
-    super(position, direction, Parameters.BULLET_SPEED, Parameters.BULLET_MASS, Parameters.BULLET_LENGTH, Parameters.BULLET_WIDTH);
-    
+    super(position, direction, Parameters.BULLET_SPEED, Parameters.BULLET_MASS,
+        Parameters.BULLET_LENGTH, Parameters.BULLET_WIDTH);
+
     this.distance = distance;
     this.damage = Parameters.BULLET_DAMAGE;
     this.travelled = 0;
@@ -51,9 +51,9 @@ public class Bullet extends Entity implements Serializable {
       this.delete();
     }
   }
-  
+
   public void setSource(long source) {
-	  this.source = source;
+    this.source = source;
   }
 
   public long getSource() {
@@ -61,9 +61,9 @@ public class Bullet extends Entity implements Serializable {
   }
 
   public void setDistance(double distance) {
-	  this.distance = distance;
+    this.distance = distance;
   }
-  
+
   public double getDistance() {
     return distance;
   }
@@ -85,26 +85,27 @@ public class Bullet extends Entity implements Serializable {
   }
 
   public String toString() {
-    return "Bullet: " + this.travelled + "/" + this.getDistance() + ", " + this.getSerial() + ", " + this.getPosition();
+    return "Bullet: " + this.travelled + "/" + this.getDistance() + ", " + this.getSerial() + ", "
+        + this.getPosition();
   }
 
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
-    int x = (int) FastMath.rint(getPosition().getX());
-    int y = (int) FastMath.rint(getPosition().getY());
-    try {
-      if (iceGrid[x][y] == true) {
-        this.delete();
-      }
-    } catch (ArrayIndexOutOfBoundsException e) {
-      // This happens if the entity touches the edge of the map
-    }
+    // int x = (int) FastMath.rint(getPosition().getX());
+    // int y = (int) FastMath.rint(getPosition().getY());
+    // try {
+    // if (iceGrid[x][y] == true) {
+    // this.delete();
+    // }
+    // } catch (ArrayIndexOutOfBoundsException e) {
+    // // This happens if the entity touches the edge of the map
+    // }
   }
-  
+
   @Override
   public void render() {
-	    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
-	    Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
-	        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
   }
 }

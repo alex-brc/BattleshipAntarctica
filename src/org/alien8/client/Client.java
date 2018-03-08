@@ -14,7 +14,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-
 import org.alien8.ai.AIController;
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
@@ -131,14 +130,14 @@ public class Client implements Runnable {
       // Update the FPS timer every FPS_FREQ^-1 seconds
       if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
         frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-        FPS = ( frameRate * Parameters.FPS_FREQ + FPS ) / 2;
+        FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
         frameRate = 0;
-        System.out.println(FPS);
+        // System.out.println("FPS: " + FPS);
       }
       if (getTime() - tickTimer > Parameters.N_SECOND) {
         tickTimer += Parameters.N_SECOND;
         TICKS = (TICKS + tickRate) / 2;
-        System.out.println(TICKS);
+        // System.out.println("Ticks: " + TICKS);
         tickRate = 0;
       }
     }
@@ -193,7 +192,7 @@ public class Client implements Runnable {
         // Receive map seed from server
         Long seed = getMapSeed(fromServer);
         model.makeMap(seed);
-        
+
         // Receive the initial game state from server
         ArrayList<EntityLite> entsLite = receiveGameStateTCP(fromServer);
         model.sync(entsLite, clientIP, clientUdpPort);
@@ -202,7 +201,7 @@ public class Client implements Runnable {
         multiCastIP = InetAddress.getByName("224.0.0.5");
         multiCastSocket = new MulticastSocket(multiCastPort);
         multiCastSocket.joinGroup(multiCastIP);
-        
+
       } catch (BindException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
             "Could not bind to any port. Firewalls?\n" + e.toString());
@@ -264,11 +263,11 @@ public class Client implements Runnable {
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
       GameEvent event = null;
       try {
-    	  event = (GameEvent) objIn.readObject();
-      }
-      catch(ClassCastException e) {
-    	  // Desync'd. Drop packet, move on
-    	  LogManager.getInstance().log("Client", LogManager.Scope.ERROR, "Desync'd socket receive. Tried to cast ArrayList to GameEvent");
+        event = (GameEvent) objIn.readObject();
+      } catch (ClassCastException e) {
+        // Desync'd. Drop packet, move on
+        LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
+            "Desync'd socket receive. Tried to cast ArrayList to GameEvent");
       }
 
       // Send audio events to AudioManager

@@ -34,7 +34,7 @@ public class Parameters {
   public static final int SMALL_BORDER = 16;
   public static final int BIG_BORDER = 96;
   public static final int MAX_PLAYERS = 16;
-  public static final boolean AI_ON = false;
+  public static final boolean AI_ON = true;
   /**
    * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
    */
@@ -111,7 +111,7 @@ public class Parameters {
   /**
    * Affects how much damage ships take in collisions.
    */
-  public static final double COLLISION_DAMAGE_MODIFIER = 0.1;
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
   /**
    * Maximum number of "shoot" audio clips running at the same time
    */

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
@@ -42,11 +41,11 @@ public class ClientHandler extends Thread {
 
   public void run() {
     Position randPos = Server.getRandomPosition();
-    
+
     // TODO: ADD NAMES TO PLAYERS
     int k = (new Random()).nextInt(1000);
     String name = "RAND_NAME_" + k;
-    
+
     // Setup client's ship
     int randColour = (new Random()).nextInt(0xFFFFFF);
     Ship s = new Ship(new Position(randPos.getX(), randPos.getY()), 0, randColour);
@@ -56,7 +55,7 @@ public class ClientHandler extends Thread {
     Player p = new Player(name, clientIP, clientUdpPort, s);
     playerMap.put(s, p);
     ScoreBoard.getInstance().add(p);
-    System.out.println(ScoreBoard.getInstance().getScores().get(0).toString());
+    System.out.println("FIRST SCORE: " + ScoreBoard.getInstance().getScores().get(0).toString());
     // Update the client's scoreBoard asap
     playerList.add(p);
 
@@ -64,7 +63,7 @@ public class ClientHandler extends Thread {
     if (playerList.size() == 1) {
       Server.startSMCS();
     }
-    
+
     sendMapSeed(clientIP, toClient, mapSeed);
     sendGameState(toClient);
   }
@@ -77,9 +76,8 @@ public class ClientHandler extends Thread {
           "Could not send map seed to client. " + ioe.toString());
       ioe.printStackTrace();
     }
-    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
-            "Sent seed to client. ");
-    
+    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO, "Sent seed to client. ");
+
   }
 
   /*
@@ -123,7 +121,7 @@ public class ClientHandler extends Thread {
       ioe.printStackTrace();
     }
     LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
-            "Sent entLites to client. ");
+        "Sent entLites to client. ");
   }
 
   public InetAddress getClientIP() {

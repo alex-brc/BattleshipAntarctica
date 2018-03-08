@@ -133,8 +133,9 @@ public class Collision {
 
   private void resolveBulletShipCollision(Bullet bullet, Ship ship) {
     // This allows us to ignore cases where a ship shoots itself
+    System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
     if (bullet.getSource() != ship.getSerial()) {
-      // System.out.println("bullet hit ship");
+      System.out.println("bullet hit ship");
       // Bullet damages ship
       ship.damage(bullet.getDamage());
       // Award score to the bullet owner

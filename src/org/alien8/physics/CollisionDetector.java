@@ -1,11 +1,8 @@
 package org.alien8.physics;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.core.Entity;
-
 import net.jafama.FastMath;
 
 public class CollisionDetector {
@@ -15,7 +12,7 @@ public class CollisionDetector {
    * @param entities a List of Entities which are being checked for collisions
    * @return a List of Collisions
    */
-  public List<Collision> checkForCollisions(ConcurrentLinkedQueue<Entity> entities) {
+  public ArrayList<Collision> checkForCollisions(ConcurrentLinkedQueue<Entity> entities) {
     /*
      * BROAD PHASE: In this phase, we do some rough spatial examination of the Entities to rule out
      * collisions between objects that are very far away. We end up with a list of potential
@@ -284,7 +281,8 @@ public class CollisionDetector {
     double abs2 = FastMath.abs(thing2);
     double res = FastMath.min(abs1, abs2);
     return res / 1000;
-    // return FastMath.min(FastMath.abs(p2.getMin() - p1.getMax()), FastMath.abs(p1.getMin() - p2.getMax()));
+    // return FastMath.min(FastMath.abs(p2.getMin() - p1.getMax()), FastMath.abs(p1.getMin() -
+    // p2.getMax()));
   }
 }
 
