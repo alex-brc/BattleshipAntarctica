@@ -189,6 +189,7 @@ public class Server implements Runnable {
 
   public void disconnectPlayer(InetAddress clientIP, int clientPort) {
     if (isPlayerConnected(clientIP, clientPort)) {
+      Player pToBeRemoved = null;
       for (Player p : playerList) {
         if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
           // Remove player from the PlayerList
@@ -196,7 +197,7 @@ public class Server implements Runnable {
           // model.getEntities().remove(p.getShip());
           p.getShip().delete();
           latestCIS.remove(p);
-          playerList.remove(p);
+          pToBeRemoved = p;
           ClientHandler ch = getClientHandlerByIpAndPort(clientIP, clientPort);
           ch.end();
           chList.remove(ch);
@@ -204,6 +205,7 @@ public class Server implements Runnable {
           ScoreBoard.getInstance().remove(p);
         }
       }
+      playerList.remove(pToBeRemoved);
     }
   }
 

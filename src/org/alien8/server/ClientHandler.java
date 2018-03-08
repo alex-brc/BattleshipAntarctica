@@ -86,7 +86,6 @@ public class ClientHandler extends Thread {
       } catch (IOException ioe) {
         LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
             "Something is wrong when reading client's request" + ioe.toString());
-        ioe.printStackTrace();
         Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
       }
     }
