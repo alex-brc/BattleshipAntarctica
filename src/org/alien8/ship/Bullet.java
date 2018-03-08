@@ -31,9 +31,8 @@ public class Bullet extends Entity implements Serializable {
   public void setPosition(Position position) {
     this.position = position;
     this.travelled += this.getSpeed();
-    // If this distance calculation is too slow,
-    // we can change to a limited life span of
-    // bullets, after which they are deleted
+    // If this distance calculation is too slow, we can change to a limited life span of bullets,
+    // after which they are deleted
     if (this.getPosition().isOutOfBounds() || this.travelled > this.distance)
       this.delete();
   }
@@ -91,15 +90,17 @@ public class Bullet extends Entity implements Serializable {
 
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
-    // int x = (int) FastMath.rint(getPosition().getX());
-    // int y = (int) FastMath.rint(getPosition().getY());
-    // try {
-    // if (iceGrid[x][y] == true) {
-    // this.delete();
-    // }
-    // } catch (ArrayIndexOutOfBoundsException e) {
-    // // This happens if the entity touches the edge of the map
-    // }
+    if (Parameters.ICE_IS_SOLID) {
+      int x = (int) FastMath.rint(getPosition().getX());
+      int y = (int) FastMath.rint(getPosition().getY());
+      try {
+        if (iceGrid[x][y] == true) {
+          this.delete();
+        }
+      } catch (ArrayIndexOutOfBoundsException e) {
+        // This happens if the entity touches the edge of the map
+      }
+    }
   }
 
   @Override

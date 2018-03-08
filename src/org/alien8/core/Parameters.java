@@ -106,8 +106,8 @@ public class Parameters {
    * Bullet parameters. Cooldowns in milliseconds.
    */
   public static final double BULLET_MASS = 10;
-  public static final double BULLET_WIDTH = 2;
-  public static final double BULLET_LENGTH = 4;
+  public static final double BULLET_WIDTH = 4;
+  public static final double BULLET_LENGTH = 8;
   public static final double BULLET_SPEED = 4;
   public static final double BULLET_DAMAGE = 10;
   public static final int BULLET_POOL_SIZE = 50;
