@@ -182,15 +182,14 @@ public class Renderer extends Canvas {
      */
     // Render health bar
     drawText("HEALTH", 154, 16, true);
-    drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 154,
-        40, true);
+    drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 154, 40, true);
     // TODO: Render turret charge
     drawText("TURRET1", 324, 16, true);
-    drawBar("/org/alien8/assets/turret_bar.png", player.getFrontTurretCharge(),
-        Parameters.TURRET_MAX_DIST, 326, 40, true);
+    drawBar(Sprite.turret_bar, player.getFrontTurretCharge(), Parameters.TURRET_MAX_DIST, 326, 40,
+        true);
     drawText("TURRET2", 462, 16, true);
-    drawBar("/org/alien8/assets/turret_bar.png", player.getRearTurretCharge(),
-        Parameters.TURRET_MAX_DIST, 464, 40, true);
+    drawBar(Sprite.turret_bar, player.getRearTurretCharge(), Parameters.TURRET_MAX_DIST, 464, 40,
+        true);
 
     // TODO: Render use item
     drawText("ITEM", 612, 18, true);
@@ -221,7 +220,8 @@ public class Renderer extends Canvas {
     bs.show();
   }
 
-  private void drawBar(Sprite barSprite, double value, double maxValue, int xp, int yp, boolean fixed) {
+  private void drawBar(Sprite barSprite, double value, double maxValue, int xp, int yp,
+      boolean fixed) {
     drawSprite(xp, yp, barSprite, fixed);
     int barHeight = 22;
     int maxBarLength = 76;
