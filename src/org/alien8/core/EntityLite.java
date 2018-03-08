@@ -29,13 +29,14 @@ public class EntityLite implements Serializable {
   // For Ship
   public double health;
   public double frontTurretDirection;
-  public double midTurretDirection;
   public double rearTurretDirection;
   public int colour;
   
   // For player's Ship
   public InetAddress clientIP;
   public int clientUdpPort;
+  public double frontTurretCharge;
+  public double rearTurretCharge;
 
   // For bullet
   public double distance;
@@ -45,7 +46,8 @@ public class EntityLite implements Serializable {
   // For Player Ship
   public EntityLite(long serial, int entityType, Position position,
       boolean toBeDeleted, double direction, double speed, double health,
-      double frontTurretDirection, double midTurretDirection, double rearTurretDirection,
+      double frontTurretDirection, double rearTurretDirection,
+      double frontTurretCharge, double rearTurretCharge,
       int colour, InetAddress clientIP, int clientUdpPort) {
     this.serial = serial;
     this.entityType = entityType;
@@ -55,8 +57,9 @@ public class EntityLite implements Serializable {
     this.speed = speed;
     this.health = health;
     this.frontTurretDirection = frontTurretDirection;
-    this.midTurretDirection = midTurretDirection;
     this.rearTurretDirection = rearTurretDirection;
+    this.frontTurretCharge = frontTurretCharge;
+    this.rearTurretCharge = rearTurretCharge;
     this.colour = colour;
     this.clientIP = clientIP;
     this.clientUdpPort = clientUdpPort;
@@ -65,7 +68,7 @@ public class EntityLite implements Serializable {
   // For AI Ship
   public EntityLite(long serial, int entityType, Position position,
       boolean toBeDeleted, double direction, double speed, double health,
-      double frontTurretDirection, double midTurretDirection, double rearTurretDirection,
+      double frontTurretDirection, double rearTurretDirection,
       int colour) {
     this.serial = serial;
     this.entityType = entityType;
@@ -75,7 +78,6 @@ public class EntityLite implements Serializable {
     this.speed = speed;
     this.health = health;
     this.frontTurretDirection = frontTurretDirection;
-    this.midTurretDirection = midTurretDirection;
     this.rearTurretDirection = rearTurretDirection;
     this.colour = colour;
   }

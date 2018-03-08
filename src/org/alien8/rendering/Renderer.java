@@ -13,6 +13,8 @@ import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
+import org.alien8.score.Score;
+import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
 
 public class Renderer extends Canvas {
@@ -165,7 +167,12 @@ public class Renderer extends Canvas {
     drawHudFrame();
     // Render score header
     drawText("SCORE", 16, 16, true);
-    drawText("n-a", 16, 40, true);
+    Score score = ScoreBoard.getInstance().getScore(model.getPlayer().getSerial());
+    if (score == null)
+      drawText("0", 16, 40, true);
+    else
+      drawText(Long.toString(score.getScore()), 16, 40, true);
+
     // TODO: Render current score
     // drawText(ScoreBoard.getInstance().getScore(player).getScore(), 16, 40, true);
     /*
@@ -175,15 +182,14 @@ public class Renderer extends Canvas {
      */
     // Render health bar
     drawText("HEALTH", 154, 16, true);
-    drawBar("/org/alien8/assets/health_bar.png", player.getHealth(), Parameters.SHIP_HEALTH, 154,
-        40, true);
+    drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 154, 40, true);
     // TODO: Render turret charge
     drawText("TURRET1", 324, 16, true);
-    drawBar("/org/alien8/assets/turret_bar.png", player.getFrontTurret().getDistance(),
-        player.getFrontTurret().getMaxDistance(), 326, 40, true);
+    drawBar(Sprite.turret_bar, player.getFrontTurretCharge(), Parameters.TURRET_MAX_DIST, 326, 40,
+        true);
     drawText("TURRET2", 462, 16, true);
-    drawBar("/org/alien8/assets/turret_bar.png", player.getRearTurret().getDistance(),
-        player.getRearTurret().getMaxDistance(), 464, 40, true);
+    drawBar(Sprite.turret_bar, player.getRearTurretCharge(), Parameters.TURRET_MAX_DIST, 464, 40,
+        true);
 
     // TODO: Render use item
     drawText("ITEM", 612, 18, true);
@@ -212,16 +218,14 @@ public class Renderer extends Canvas {
     g.dispose();
     // Displays the buffer strategy to the monitor
     bs.show();
-
-
   }
 
-  private void drawBar(String path, double value, double maxValue, int xp, int yp, boolean fixed) {
-    Sprite bar = new Sprite(path);
-    drawSprite(xp, yp, bar, fixed);
+  private void drawBar(Sprite barSprite, double value, double maxValue, int xp, int yp,
+      boolean fixed) {
+    drawSprite(xp, yp, barSprite, fixed);
     int barHeight = 22;
     int maxBarLength = 76;
-    int barLength = (int) (value / maxValue) * maxBarLength;
+    int barLength = new Double(value / maxValue * maxBarLength).intValue();
     int color = 0x00B800;
     drawFilledRect(xp + 7, yp + 7, barHeight, barLength, color, fixed);
   }

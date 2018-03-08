@@ -2,23 +2,27 @@ package org.alien8.ship;
 
 import java.io.Serializable;
 import org.alien8.core.Entity;
+import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
+import org.alien8.rendering.Renderer;
+import org.alien8.rendering.Sprite;
 
 import net.jafama.FastMath;
 
-public abstract class Bullet extends Entity implements Serializable {
+public class Bullet extends Entity implements Serializable {
 
   private static final long serialVersionUID = -4758229490654529751L;
+  protected Sprite sprite = Sprite.bullet;
   private double distance;
   private double damage;
   private double travelled;
   private long source;
 
-  public Bullet(Position position, double direction, double distance, double mass, double width,
-      double length, double speed, double damage, long source) {
-    super(position, direction, speed, mass, length, width);
+  public Bullet(Position position, double direction, double distance, long source) {
+    super(position, direction, Parameters.BULLET_SPEED, Parameters.BULLET_MASS, Parameters.BULLET_LENGTH, Parameters.BULLET_WIDTH);
+    
     this.distance = distance;
-    this.damage = damage;
+    this.damage = Parameters.BULLET_DAMAGE;
     this.travelled = 0;
     this.source = source;
   }
@@ -95,5 +99,12 @@ public abstract class Bullet extends Entity implements Serializable {
     } catch (ArrayIndexOutOfBoundsException e) {
       // This happens if the entity touches the edge of the map
     }
+  }
+  
+  @Override
+  public void render() {
+	    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+	    Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+	        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
   }
 }
