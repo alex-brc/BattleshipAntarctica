@@ -67,7 +67,6 @@ public class ModelManager {
     ClientInputSample cis = null;
 
     for (Entity ent : entities) {
-      System.out.println(ent.getSerial());
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);

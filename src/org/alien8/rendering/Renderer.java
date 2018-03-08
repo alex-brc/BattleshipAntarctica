@@ -168,12 +168,12 @@ public class Renderer extends Canvas {
     // Render black frame round the edge of the screen
     drawHudFrame();
     // Render score header
-    drawText("SCORE", 16, 16, true);
+    drawText("SCORE", 16, 16, true, FontColor.WHITE);
     Score score = ScoreBoard.getInstance().getScore(model.getPlayer().getSerial());
     if (score == null)
-      drawText("0", 16, 40, true);
+      drawText("0", 16, 40, true, FontColor.WHITE);
     else
-      drawText(Long.toString(score.getScore()), 16, 40, true);
+      drawText(Long.toString(score.getScore()), 16, 40, true, FontColor.WHITE);
 
     // TODO: Render current score
     // drawText(ScoreBoard.getInstance().getScore(player).getScore(), 16, 40, true);
@@ -183,25 +183,25 @@ public class Renderer extends Canvas {
      * drawText("00000", 128, 40, true);
      */
     // Render health bar
-    drawText("HEALTH", 154, 16, true);
+    drawText("HEALTH", 154, 16, true, FontColor.WHITE);
     drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 154, 40, true);
     // TODO: Render turret charge
-    drawText("TURRET1", 324, 16, true);
+    drawText("TURRET1", 324, 16, true, FontColor.WHITE);
     drawBar(Sprite.turret_bar, player.getFrontTurretCharge(), Parameters.TURRET_MAX_DIST, 326, 40,
         true);
-    drawText("TURRET2", 462, 16, true);
+    drawText("TURRET2", 462, 16, true, FontColor.WHITE);
     drawBar(Sprite.turret_bar, player.getRearTurretCharge(), Parameters.TURRET_MAX_DIST, 464, 40,
         true);
 
     // TODO: Render use item
-    drawText("ITEM", 612, 18, true);
+    drawText("ITEM", 612, 18, true, FontColor.WHITE);
     drawSprite(624, 40, new Sprite("/org/alien8/assets/item_frame.png"), true);
     // drawSprite(/* USE ITEM IN HERE*/);
 
     // // TODO: Render minimap
-    drawText("M", 704, 16, true);
-    drawText("A", 704, 36, true);
-    drawText("P", 704, 56, true);
+    drawText("M", 704, 16, true, FontColor.WHITE);
+    drawText("A", 704, 36, true, FontColor.WHITE);
+    drawText("P", 704, 56, true, FontColor.WHITE);
     // drawFilledRect(720, 16, 64, 64, 0x5555FF, true); // TEMPORARY BOX, DELETE LATER
     // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
     // System.out.println(minimapTerrain);
@@ -406,9 +406,10 @@ public class Renderer extends Canvas {
    * @param y y position to display at
    * @param fixed {@code true} if the text is at a fixed screen position (for UI elements),
    *        {@code false} if the text moves relative to the position of the player
+   * @param color
    */
-  public void drawText(String text, int x, int y, boolean fixed) {
-    Font.defaultFont.render(text, this, x, y, fixed);
+  public void drawText(String text, int x, int y, boolean fixed, FontColor color) {
+    Font.defaultFont.render(text, this, x, y, fixed, color);
   }
 
   private void drawMinimap(int x, int y, boolean fixed) {

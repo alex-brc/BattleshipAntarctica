@@ -5,6 +5,7 @@ import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
+import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import net.jafama.FastMath;
@@ -135,7 +136,7 @@ public class Ship extends Entity implements Serializable {
     // Display health
     r.drawText(new Integer(new Double(getHealth()).intValue()).toString(),
         new Double(getPosition().getX()).intValue() + 20,
-        new Double(getPosition().getY()).intValue(), false);
+        new Double(getPosition().getY()).intValue(), false, FontColor.BLACK);
     // Render turrets
     frontTurret.render();
     rearTurret.render();
