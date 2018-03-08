@@ -48,6 +48,9 @@ public class Client implements Runnable {
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
+  private byte[] buf = new byte[65536];
+  private byte[] receivedByte;
+  private byte[] sendingByte;
   private ScoreBoard scoreBoard;
 
   public Client() {
@@ -236,11 +239,11 @@ public class Client implements Runnable {
       ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
       ClientInputSample cis = new ClientInputSample();
       objOut.writeObject(cis);
-      byte[] clientInputSampleByte = byteOut.toByteArray();
+      sendingByte = byteOut.toByteArray();
 
       // Create a packet for holding the input sample byte data
       DatagramPacket packet =
-          new DatagramPacket(clientInputSampleByte, clientInputSampleByte.length, serverIP, 4446);
+          new DatagramPacket(sendingByte, sendingByte.length, serverIP, 4446);
 
       // Send the client input sample packet to the server
       udpSocket.send(packet);
@@ -252,14 +255,13 @@ public class Client implements Runnable {
   public void receiveEvents() {
     try {
       // Create a packet for receiving event packet
-      byte[] buf = new byte[65536];
       DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
 
       multiCastSocket.receive(eventPacket);
-      byte[] eventBytes = eventPacket.getData();
+      receivedByte = eventPacket.getData();
 
       // Deserialize the event data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(eventBytes);
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
       GameEvent event = null;
       try {
@@ -290,16 +292,15 @@ public class Client implements Runnable {
    */
   private void receiveAndUpdate() {
     try {
-      // Create a packet for receiving difference packet
-      byte[] buf = new byte[65536];
+      // Create a packet for receiving entsLite packet
       DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
       // Receive a entsLite packet and obtain the byte data
       multiCastSocket.receive(packet);
-      byte[] entsLiteByte = packet.getData();
+      receivedByte = packet.getData();
 
       // Deserialize the entsLite byte data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(entsLiteByte);
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
       ArrayList<EntityLite> entsLite = (ArrayList<EntityLite>) objIn.readObject();
 

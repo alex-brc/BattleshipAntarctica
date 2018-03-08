@@ -61,13 +61,10 @@ public class Turret implements Serializable {
     if (distance == this.minDistance || this.isOnCooldown())
       return;
 
-    ModelManager.getInstance().addEntity(
-        Server.getBullet(this.getPosition(), this.getDirection(), distance, this.getShipSerial()));
+    ModelManager.getInstance().addEntity(Server.getBullet(this.getPosition(), this.getDirection(),
+    		distance, this.getShipSerial()));
 
-    // ModelManager.getInstance().addEntity(
-    // new Bullet(this.getPosition(), this.getDirection(), distance, this.getShipSerial()));
-
-    Server.addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
+    Server.getInstance().addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
     this.startCooldown();
     this.distance = this.minDistance;
   }
@@ -109,12 +106,12 @@ public class Turret implements Serializable {
   }
 
   public Position getTargetPosition() {
-    Position result = new Position(0, 0);
-
-    result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
-    result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
-
-    return result;
+      Position result = new Position(0,0);
+      
+      result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
+      result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
+      
+      return result;
   }
 
   /**

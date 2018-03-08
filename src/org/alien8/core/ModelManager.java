@@ -76,8 +76,8 @@ public class ModelManager {
       }
       if (ent instanceof Ship) {
         sh = (Ship) ent;
-        ai = Server.getAIByShip(sh);
-        pl = Server.getPlayerByShip(sh);
+        ai = Server.getInstance().getAIByShip(sh);
+        pl = Server.getInstance().getPlayerByShip(sh);
         if (ai != null) {
           ai.update();
         } else if (pl != null) {

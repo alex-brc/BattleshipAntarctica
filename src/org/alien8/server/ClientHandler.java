@@ -1,12 +1,14 @@
 package org.alien8.server;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
@@ -25,11 +27,13 @@ public class ClientHandler extends Thread {
   private ConcurrentHashMap<Ship, Player> playerMap;
   private Long mapSeed;
   private ObjectOutputStream toClient;
+  private ObjectInputStream fromClient;
   private ModelManager model = ModelManager.getInstance();
+  private volatile boolean run = true;
 
   public ClientHandler(InetAddress clientIP, int clientUdpPort, ArrayList<Player> playerList,
       ConcurrentLinkedQueue<Entity> entities, ConcurrentHashMap<Ship, Player> playerMap,
-      Long mapSeed, ObjectOutputStream toClient) {
+      Long mapSeed, ObjectOutputStream toClient, ObjectInputStream fromClient) {
     this.clientIP = clientIP;
     this.clientUdpPort = clientUdpPort;
     this.playerList = playerList;
@@ -37,11 +41,12 @@ public class ClientHandler extends Thread {
     this.playerMap = playerMap;
     this.mapSeed = mapSeed;
     this.toClient = toClient;
+    this.fromClient = fromClient;
   }
 
   public void run() {
-    Position randPos = Server.getRandomPosition();
-
+    Position randPos = Server.getInstance().getRandomPosition();
+    
     // TODO: ADD NAMES TO PLAYERS
     int k = (new Random()).nextInt(1000);
     String name = "RAND_NAME_" + k;
@@ -61,11 +66,29 @@ public class ClientHandler extends Thread {
 
     // Start the server game loop if it is the first client connecting
     if (playerList.size() == 1) {
-      Server.startSMCS();
+      Server.getInstance().startSMCS();
     }
 
     sendMapSeed(clientIP, toClient, mapSeed);
     sendGameState(toClient);
+    
+    // Keep reading for various client's request (only disconnect request at this moment)
+    while (run) {
+      try {
+        ClientRequest cr = (ClientRequest) fromClient.readObject();
+        if (cr.getType() == 1) { // Disconnect request
+          Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
+        }
+      } catch(ClassNotFoundException cnfe) {
+        LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
+            "Class of serialized object cannot be found." + cnfe.toString());
+        cnfe.printStackTrace();
+      } catch (IOException ioe) {
+        LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
+            "Something is wrong when reading client's request" + ioe.toString());
+        Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
+      }
+    }
   }
 
   private void sendMapSeed(InetAddress clientIP, ObjectOutputStream toClient, Long seed) {
@@ -76,8 +99,8 @@ public class ClientHandler extends Thread {
           "Could not send map seed to client. " + ioe.toString());
       ioe.printStackTrace();
     }
-    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO, "Sent seed to client. ");
-
+    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
+            "Sent seed to client. ");
   }
 
   /*
@@ -89,7 +112,7 @@ public class ClientHandler extends Thread {
     for (Entity e : ents) {
       if (e instanceof Ship) {
         Ship s = (Ship) e;
-        Player p = Server.getPlayerByShip(s);
+        Player p = Server.getInstance().getPlayerByShip(s);
         if (p != null) { // Player ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
@@ -130,5 +153,9 @@ public class ClientHandler extends Thread {
 
   public int getClientUdpPort() {
     return this.clientUdpPort;
+  }
+  
+  public void end() {
+    run = false;
   }
 }

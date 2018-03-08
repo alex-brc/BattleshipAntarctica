@@ -46,7 +46,7 @@ public class ScoreBoard implements Runnable {
     for (Player p : players) {
       Score score = new Score(p);
       scores.add(score);
-      Server.addEvent(score.exportToEvent());
+      Server.getInstance().addEvent(score.exportToEvent());
     }
   }
 
@@ -55,7 +55,7 @@ public class ScoreBoard implements Runnable {
         "Adding player " + player.getName() + " to scoreboard");
     Score score = new Score(player);
     scores.add(score);
-    Server.addEvent(score.exportToEvent());
+    Server.getInstance().addEvent(score.exportToEvent());
   }
 
   public void remove(Player player) {
@@ -66,7 +66,7 @@ public class ScoreBoard implements Runnable {
     for (Score score : scores)
       if (player.getShip().getSerial() == score.getShipSerial()) {
         score.giveKill();
-        Server.addEvent(score.exportToEvent());
+        Server.getInstance().addEvent(score.exportToEvent());
         return;
       }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
@@ -78,7 +78,7 @@ public class ScoreBoard implements Runnable {
       for (Score score : scores)
         if (player.getShip().getSerial() == score.getShipSerial()) {
           score.giveHit(bullet);
-          Server.addEvent(score.exportToEvent());
+          Server.getInstance().addEvent(score.exportToEvent());
           return;
         }
     } catch (NullPointerException e) {
@@ -95,7 +95,7 @@ public class ScoreBoard implements Runnable {
     for (Score score : scores)
       if (player.getShip().getSerial() == score.getShipSerial()) {
         score.kill();
-        Server.addEvent(score.exportToEvent());
+        Server.getInstance().addEvent(score.exportToEvent());
         return;
       }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,

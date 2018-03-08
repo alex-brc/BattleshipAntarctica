@@ -139,7 +139,7 @@ public class Collision {
       // Bullet damages ship
       ship.damage(bullet.getDamage());
       // Award score to the bullet owner
-      Player shooter = Server.getPlayer(bullet);
+      Player shooter = Server.getInstance().getPlayer(bullet);
       // If it's AI, no points
       if (shooter != null)
         ScoreBoard.getInstance().giveHit(shooter, bullet);
