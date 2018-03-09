@@ -49,11 +49,12 @@ public class Client implements Runnable {
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
-  private ScoreBoard scoreBoard;
+  private byte[] buf = new byte[65536];
+  private byte[] receivedByte;
+  private byte[] sendingByte;
 
   public Client() {
     model = ModelManager.getInstance();
-    scoreBoard = ScoreBoard.getInstance();
   }
 
   /**

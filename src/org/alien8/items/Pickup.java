@@ -15,11 +15,13 @@ public abstract class Pickup extends Entity {
 	protected Item item;
 	protected Position position;
 	protected Sprite sprite;
+	protected int pickupType;
 	
-	public Pickup(Position position, Item item, Sprite sprite) {
+	public Pickup(Position position, Item item, Sprite sprite, int pickupType) {
 		super(position, 0, 0, 0, Parameters.ITEM_LENGTH, Parameters.ITEM_WIDTH);
 		this.item = item;
 		this.sprite = sprite;
+		this.pickupType = pickupType;
 	}
 	
 	/**
@@ -46,5 +48,11 @@ public abstract class Pickup extends Entity {
 	public void dealWithInIce(boolean[][] iceGrid) {
 		// Will never be in ice
 	}
+
+	public int getPickupType() {
+		return pickupType;
+	}
+	
+	
 	
 }
