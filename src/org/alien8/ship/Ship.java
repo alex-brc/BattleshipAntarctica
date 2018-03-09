@@ -3,6 +3,7 @@ package org.alien8.ship;
 import java.io.Serializable;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.items.Item;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -21,6 +22,7 @@ public class Ship extends Entity implements Serializable {
   private static final long serialVersionUID = -432334137390727161L;
   private Turret frontTurret;
   private Turret rearTurret;
+  private Item item;
   private int colour;
   private Sprite sprite;
 
@@ -33,8 +35,8 @@ public class Ship extends Entity implements Serializable {
     frontTurret = new Turret(position, this.getSerial());
     rearTurret = new Turret(position, this.getSerial());
 
-    setTurretsDirection(new Position(0, 0));
     setTurretsPosition();
+    setTurretsDirection(new Position(0, 0));
   }
 
   @Override
@@ -61,8 +63,10 @@ public class Ship extends Entity implements Serializable {
     // ra = a + (pi - s);
     double ra = 0;
 
+    System.out.println(frontTurret.getPosition() + " " + rearTurret.getPosition());
+    
     // Front
-    double angle = Renderer.getScreenPosition(frontTurret.getPosition()).getAngleTo(mousePosition);
+    double angle = Renderer.getInstance().getScreenPosition(frontTurret.getPosition()).getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -71,7 +75,7 @@ public class Ship extends Entity implements Serializable {
       frontTurret.setDirection(angle);
 
     // Rear
-    angle = Renderer.getScreenPosition(rearTurret.getPosition()).getAngleTo(mousePosition);
+    angle = Renderer.getInstance().getScreenPosition(rearTurret.getPosition()).getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -340,7 +344,11 @@ public class Ship extends Entity implements Serializable {
   }
 
   public String toString() {
-    return "Ship " + this.getSerial() + "," + this.getPosition();
+	  return "Ship " + this.getSerial() + "," + this.getPosition();
+  }
+
+  public void giveItem(Item item) {
+	  this.item = item;
   }
 
 }

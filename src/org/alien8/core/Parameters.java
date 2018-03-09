@@ -130,6 +130,7 @@ public class Parameters {
   /**
    * Items
    */
+  public static final double PLANE_SPEED = 3;
   public static final double ITEM_WIDTH = 16;
   public static final double ITEM_LENGTH = 16;
   public static final double ITEM_HEALTH_ITEM_VALUE = 25;
