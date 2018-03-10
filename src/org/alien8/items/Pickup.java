@@ -27,8 +27,9 @@ public abstract class Pickup extends Entity {
 	 * Called when item is picked up (i.e. when a player runs over it)
 	 */
 	public void onPickup(Ship ship) {
-		ship.giveItem(item);
 		item.setShip(ship);
+		ship.giveItem(item);
+		this.delete();
 	}
 	
 	@Override

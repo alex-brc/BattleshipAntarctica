@@ -31,6 +31,7 @@ public class Ship extends Entity implements Serializable {
         Parameters.SHIP_WIDTH, Parameters.SHIP_HEALTH);
     this.colour = colour;
     sprite = Sprite.makeShipSprite(colour);
+    this.item = null;
 
     frontTurret = new Turret(position, this.getSerial());
     rearTurret = new Turret(position, this.getSerial());
@@ -112,24 +113,24 @@ public class Ship extends Entity implements Serializable {
 
   public void render() {
     Renderer r = Renderer.getInstance();
+    if(Parameters.RENDER_OBB) {
+    	// Render four corners of bounding box
+    	for (int i = 0; i < 4; i++) {
+    		// Color front two points blue
+    		if (i == 1 || i == 2) {
+    			r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0x0000FF,
+    					false);
+    		}
+    		// Color back two points red
+    		else {
+    			r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0xFF0000,
+    					false);
+    		}
+    	}
 
-    // // Render four corners of bounding box
-    // for (int i = 0; i < 4; i++) {
-    // // Color front two points blue
-    // if (i == 1 || i == 2) {
-    // r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0x0000FF,
-    // false);
-    // }
-    // // Color back two points red
-    // else {
-    // r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0xFF0000,
-    // false);
-    // }
-    // }
-    //
-    // r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
-    // false);
-
+    	r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
+    			false);
+    }
     // Render ship sprite
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
@@ -347,6 +348,11 @@ public class Ship extends Entity implements Serializable {
 
   public void giveItem(Item item) {
 	  this.item = item;
+  }
+  
+  public void useItem() {
+	  if(item != null)
+		  this.item.use();
   }
 
 }

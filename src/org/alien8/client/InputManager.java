@@ -32,7 +32,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   private boolean aPressed = false; // Turn left
   private boolean sPressed = false; // Slow down
   private boolean dPressed = false; // Turn right
-  private boolean spacePressed = false; // Shoot 3
+  private boolean spacePressed = false; // Use item
 
   // Not synced - local controls
   private boolean escPressed = false; // Pull up menu
@@ -67,10 +67,14 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
     if (cis.dPressed)
       PhysicsManager.rotateEntity(player,
           Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-
+    
     // Apply "friction"
     PhysicsManager.applyFriction(player);
-
+    
+    // Use item
+    if(cis.spacePressed)
+    	player.useItem();
+    
     // Prepare for shooting
     // Orientation
     player.setTurretsDirection(cis.mousePosition);

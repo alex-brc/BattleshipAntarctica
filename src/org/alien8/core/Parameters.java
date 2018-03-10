@@ -19,8 +19,11 @@ public class Parameters {
   public static final int SERVER_PORT = 4446;
   public static final int MULTI_CAST_PORT = 4445;
   public static final int SERVER_SOCKET_BLOCK_TIME = 100;
-      
-  public static final boolean RENDER_BOX = true;
+  
+  // Game controls
+  public static final boolean RENDER_OBB = false;
+  public static final boolean AI_ON = true;
+
   /**
    * How many times to attempt connection to server before giving up. Keep in mind the timeout is
    * pretty long itself.
@@ -39,7 +42,6 @@ public class Parameters {
   public static final int SMALL_BORDER = 16;
   public static final int BIG_BORDER = 96;
   public static final int MAX_PLAYERS = 16;
-  public static final boolean AI_ON = true;
   /**
    * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
    */
@@ -139,7 +141,6 @@ public class Parameters {
   public static final double ITEM_WIDTH = 16;
   public static final double ITEM_LENGTH = 16;
   public static final double ITEM_HEALTH_ITEM_VALUE = 25;
-
 
 
 }
