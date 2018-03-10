@@ -124,7 +124,7 @@ public class ModelManager {
         s.getRearTurret().setDirection(el.rearTurretDirection);
         s.getFrontTurret().setDistance(el.frontTurretCharge);
         s.getRearTurret().setDistance(el.rearTurretCharge);
-
+        
         if (el.toBeDeleted) {
           s.delete();
         }
@@ -176,7 +176,7 @@ public class ModelManager {
     	  this.addEntity(p);
       } else if(el.entityType == 4) { // Plane
     	  PlaneDropper pd = new PlaneDropper(el.position, el.direction);
-
+    	  System.out.println("got plane at " + pd.getPosition());
     	  if(el.toBeDeleted) {
     		  pd.delete();
     	  }

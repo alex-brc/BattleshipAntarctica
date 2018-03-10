@@ -102,6 +102,7 @@ public class EntityLite implements Serializable {
   
   // For pickup
   public EntityLite(int entityType, Position position, int pickupType, boolean toBeDeleted) {
+	  this.entityType = entityType;
 	  this.position = position;
 	  this.pickupType = pickupType;
 	  this.toBeDeleted = toBeDeleted;

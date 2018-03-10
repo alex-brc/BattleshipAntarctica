@@ -13,7 +13,6 @@ public abstract class Pickup extends Entity {
 	public static final int HEALTH_PICKUP = 0;
 	
 	protected Item item;
-	protected Position position;
 	protected Sprite sprite;
 	protected int pickupType;
 	
@@ -34,7 +33,8 @@ public abstract class Pickup extends Entity {
 	
 	@Override
 	public void render() {
-		Renderer.getInstance().drawSprite((int) position.getX() - sprite.getWidth() / 2,
+		Renderer.getInstance().drawSprite((int) position.getX()
+				- sprite.getWidth() / 2,
 		        (int) position.getY() - sprite.getHeight() / 2, sprite, false);
 	}
 
