@@ -10,11 +10,11 @@ import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
 import org.alien8.items.HealthPickup;
 import org.alien8.items.Pickup;
+import org.alien8.items.PlaneDropper;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
-import org.alien8.score.ScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
@@ -129,7 +129,10 @@ public class ModelManager {
           s.delete();
         }
 
-        if (el.clientIP.equals(clientIP) && el.clientUdpPort == clientUdpPort) { // Client's ship
+        if (el.clientIP.equals(
+        		clientIP) && 
+        		el.clientUdpPort == 
+        		clientUdpPort) { // Client's ship
           this.setPlayer(s);
         }
 
@@ -169,6 +172,16 @@ public class ModelManager {
     	  if(el.toBeDeleted) {
     		  p.delete();
     	  }
+    	  
+    	  this.addEntity(p);
+      } else if(el.entityType == 4) { // Plane
+    	  PlaneDropper pd = new PlaneDropper(el.position, el.direction);
+
+    	  if(el.toBeDeleted) {
+    		  pd.delete();
+    	  }
+    	  
+    	  this.addEntity(pd);
       }
       
     }

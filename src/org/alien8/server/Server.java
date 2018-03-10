@@ -22,6 +22,7 @@ import org.alien8.core.ClientRequest;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
+import org.alien8.items.PlaneDropper;
 import org.alien8.physics.Position;
 import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Bullet;
@@ -114,6 +115,8 @@ public class Server {
     if(Parameters.AI_ON)
     	initializeAIs();
 
+    model.addEntity(new PlaneDropper());
+    
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
   }
@@ -143,6 +146,7 @@ public class Server {
     } else if (cr.getType() == 1) { // Disconnect Request
       disconnectPlayer(clientIP, cr.getUdpPort());
     }
+    
   }
 
   private static boolean isPlayerConnected(InetAddress clientIP, int clientPort) {

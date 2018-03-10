@@ -18,6 +18,7 @@ import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.items.Pickup;
+import org.alien8.items.PlaneDropper;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
@@ -130,6 +131,9 @@ public class ServerMulticastSender extends Thread {
       } else if (e instanceof Pickup) {
     	Pickup p = (Pickup) e;
     	EntitiesLite.add(new EntityLite(3, p.getPosition(), p.getPickupType(), p.isToBeDeleted()));
+      } else if (e instanceof PlaneDropper) {
+    	  PlaneDropper pd = (PlaneDropper) e;
+    	  EntitiesLite.add(new EntityLite(4, pd.getPosition(), pd.isToBeDeleted(), pd.getDirection()));
       }
     }
 

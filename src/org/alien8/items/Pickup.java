@@ -10,7 +10,7 @@ import org.alien8.ship.Ship;
 public abstract class Pickup extends Entity {
 	private static final long serialVersionUID = 2171627902685805520L;
 	public static final int NUMBER_OF_PICKUPS = 1;
-	public static final int HEALTH_PICKUP = 1;
+	public static final int HEALTH_PICKUP = 0;
 	
 	protected Item item;
 	protected Position position;

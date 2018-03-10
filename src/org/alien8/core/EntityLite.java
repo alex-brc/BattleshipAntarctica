@@ -106,6 +106,14 @@ public class EntityLite implements Serializable {
 	  this.pickupType = pickupType;
 	  this.toBeDeleted = toBeDeleted;
   }
+  
+  // For PlaneDropper
+  public EntityLite(int entityType, Position position, boolean toBeDeleted, double direction) {
+	    this.entityType = entityType;
+	    this.position = position;
+	    this.toBeDeleted = toBeDeleted;
+	    this.direction = direction;
+	  }
 
   public String toString() {
     return "Serial: " + serial + ", " + "EntityType: " + entityType;

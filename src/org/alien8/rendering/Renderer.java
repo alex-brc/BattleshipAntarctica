@@ -476,7 +476,6 @@ public class Renderer extends Canvas {
    */
   public Position getScreenPosition(Position position) {
 	Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
-    System.out.println(pos);
 	return new Position(400,300);
   }
 }
