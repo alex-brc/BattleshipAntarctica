@@ -50,11 +50,9 @@ public class Client implements Runnable {
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
-  private ScoreBoard scoreBoard;
 
   public Client() {
     model = ModelManager.getInstance();
-    scoreBoard = ScoreBoard.getInstance();
   }
 
   /**

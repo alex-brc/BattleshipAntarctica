@@ -10,16 +10,17 @@ import org.alien8.ship.Ship;
 public abstract class Pickup extends Entity {
 	private static final long serialVersionUID = 2171627902685805520L;
 	public static final int NUMBER_OF_PICKUPS = 1;
-	public static final int HEALTH_PICKUP = 1;
+	public static final int HEALTH_PICKUP = 0;
 	
 	protected Item item;
-	protected Position position;
 	protected Sprite sprite;
+	protected int pickupType;
 	
-	public Pickup(Position position, Item item, Sprite sprite) {
+	public Pickup(Position position, Item item, Sprite sprite, int pickupType) {
 		super(position, 0, 0, 0, Parameters.ITEM_LENGTH, Parameters.ITEM_WIDTH);
 		this.item = item;
 		this.sprite = sprite;
+		this.pickupType = pickupType;
 	}
 	
 	/**
@@ -32,7 +33,8 @@ public abstract class Pickup extends Entity {
 	
 	@Override
 	public void render() {
-		Renderer.getInstance().drawSprite((int) position.getX() - sprite.getWidth() / 2,
+		Renderer.getInstance().drawSprite((int) position.getX()
+				- sprite.getWidth() / 2,
 		        (int) position.getY() - sprite.getHeight() / 2, sprite, false);
 	}
 
@@ -46,5 +48,11 @@ public abstract class Pickup extends Entity {
 	public void dealWithInIce(boolean[][] iceGrid) {
 		// Will never be in ice
 	}
+
+	public int getPickupType() {
+		return pickupType;
+	}
+	
+	
 	
 }

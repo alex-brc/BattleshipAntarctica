@@ -126,7 +126,8 @@ public class Position implements Serializable{
 	 * @return true if they are approximately equal, false otherwise
 	 */
 	public boolean approximately(Position position, int margin) {
-		if(FastMath.abs(this.getX() - position.getX()) > margin)
+		if(FastMath.abs(this.getX() 
+				- position.getX()) > margin)
 			return false;
 		
 		if(FastMath.abs(this.getY() - position.getY()) > margin)
