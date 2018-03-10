@@ -67,7 +67,7 @@ public class ModelManager {
     ClientInputSample cis = null;
 
     for (Entity ent : entities) {
-      System.out.println(ent.getSerial());
+      // System.out.println(ent.getSerial());
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
@@ -97,7 +97,6 @@ public class ModelManager {
     }
   }
 
-
   /**
    * Sync the client with the server
    */
@@ -113,7 +112,6 @@ public class ModelManager {
     for (EntityLite el : entitiesLite) {
       if (el.entityType == 0) { // Player Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
-        s.setSerial(el.serial);
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
@@ -130,9 +128,9 @@ public class ModelManager {
         }
 
         this.addEntity(s);
+        s.setSerial(el.serial);
       } else if (el.entityType == 1) { // AI Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
-        s.setSerial(el.serial);
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
@@ -143,9 +141,9 @@ public class ModelManager {
         }
 
         this.addEntity(s);
-      } else if (el.entityType == 2) { // SmallBullet
+        s.setSerial(el.serial);
+      } else if (el.entityType == 2) { // Bullet
         Bullet b = new Bullet(el.position, el.direction, el.distance, el.source);
-        b.setSerial(el.serial);
         b.setSpeed(el.speed);
         b.setTravelled(el.travelled);
 
@@ -154,6 +152,7 @@ public class ModelManager {
         }
 
         this.addEntity(b);
+        b.setSerial(el.serial);
       }
     }
   }

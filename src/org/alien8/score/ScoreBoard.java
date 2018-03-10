@@ -113,7 +113,7 @@ public class ScoreBoard implements Runnable {
 
   public Score getScore(Player player) {
     for (Score score : scores) {
-      System.out.println("SCORE: " + score.toString());
+      //System.out.println("SCORE: " + score.toString());
       if (player.getShip().getSerial() == score.getShipSerial())
         return score;
     }
@@ -122,7 +122,7 @@ public class ScoreBoard implements Runnable {
 
   public Score getScore(long shipSerial) {
     for (Score score : scores) {
-      System.out.println("SCORE: " + score.toString());
+      //System.out.println("SCORE: " + score.toString());
       if (score.getShipSerial() == shipSerial)
         return score;
     }

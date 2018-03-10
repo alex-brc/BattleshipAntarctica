@@ -63,7 +63,7 @@ public class Ship extends Entity implements Serializable {
     // ra = a + (pi - s);
     double ra = 0;
 
-    System.out.println(frontTurret.getPosition() + " " + rearTurret.getPosition());
+    //System.out.println(frontTurret.getPosition() + " " + rearTurret.getPosition());
     
     // Front
     double angle = Renderer.getInstance().getScreenPosition(frontTurret.getPosition()).getAngleTo(mousePosition);

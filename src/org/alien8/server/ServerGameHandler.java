@@ -8,10 +8,10 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -21,9 +21,8 @@ import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
-public class ServerMulticastSender extends Thread {
+public class ServerGameHandler extends Thread {
 
-  private Integer multiCastPort;
   private InetAddress multiCastIP;
   private DatagramSocket udpSocket;
   private ConcurrentLinkedQueue<Entity> entities;
@@ -32,13 +31,12 @@ public class ServerMulticastSender extends Thread {
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
-  private boolean run = true;
+  private volatile boolean run = true;
 
-  public ServerMulticastSender(DatagramSocket ds, int port, InetAddress ip,
+  public ServerGameHandler(DatagramSocket ds, InetAddress ip,
       ConcurrentLinkedQueue<Entity> entities,
       ConcurrentHashMap<Player, ClientInputSample> latestCIS, ArrayList<Player> playerList) {
     udpSocket = ds;
-    multiCastPort = port;
     multiCastIP = ip;
     this.entities = entities;
     this.latestCIS = latestCIS;
@@ -46,23 +44,35 @@ public class ServerMulticastSender extends Thread {
   }
 
   public void run() {
-    long lastTime = System.nanoTime();
+    long lastTime = getTime();
     long currentTime = 0;
     double tick = 0;
 
     while (run) {
-      currentTime = System.nanoTime();
+      currentTime = getTime();
       tick += 1.0 * (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
       while (tick >= 1) {
-        readInputSample();
-        updateGameStateByCIS();
-        sendGameState();
+        this.readInputSample();
+        this.updateGameStateByCIS();
+        this.sendGameState();
         tick--;
         // Update last time
-        lastTime = System.nanoTime();
+        lastTime = getTime();
       }
     }
+  }
 
+  /**
+   * Gets current time in nanoseconds from the JVM
+   * 
+   * @return current time in nanoseconds
+   */
+  private long getTime() {
+    return System.nanoTime();
+  }
+
+  public void end() {
+    run = false;
   }
 
   private void readInputSample() {
@@ -91,6 +101,8 @@ public class ServerMulticastSender extends Thread {
           else
             latestCIS.put(p, cis);
       }
+    } catch (SocketTimeoutException ste) {
+      // Do nothing, just proceed
     } catch (IOException ioe) {
       LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL,
           "Something wrong when deserializing input sample byte");
@@ -149,7 +161,7 @@ public class ServerMulticastSender extends Thread {
 
       // Create a packet for holding the entsLite byte data
       DatagramPacket entsLitePacket =
-          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, multiCastPort);
+          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, Parameters.MULTI_CAST_PORT);
 
       // Make the game event packet
       GameEvent event = Server.getInstance().getNextEvent();
@@ -160,7 +172,7 @@ public class ServerMulticastSender extends Thread {
 
       // Make packet
       DatagramPacket eventPacket =
-          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, multiCastPort);
+          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, Parameters.MULTI_CAST_PORT);
 
       // Send the entsLite packet and the event packet to client
       udpSocket.send(entsLitePacket);

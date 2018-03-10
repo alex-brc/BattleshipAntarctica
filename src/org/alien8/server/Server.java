@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
-import org.alien8.core.ClientRequest;
+import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
@@ -47,10 +47,8 @@ public class Server implements Runnable {
   private ArrayList<Player> playerList = new ArrayList<Player>();
   private ArrayList<ClientHandler> chList = new ArrayList<ClientHandler>();
   private LinkedList<GameEvent> events = new LinkedList<GameEvent>();
-  private int serverPort = 4446;
-  private int multiCastPort = 4445;
   private Long seed = (new Random()).nextLong();
-  private static volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
+  private volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
   private volatile boolean run = true;
 
   public static void main(String[] args) {
@@ -58,7 +56,7 @@ public class Server implements Runnable {
     instance = s;
     s.start();
   }
-  
+
   public static Server getInstance() {
     return instance;
   }
@@ -67,7 +65,7 @@ public class Server implements Runnable {
     thread = new Thread(this, "Battleship Antarctica Server");
     thread.start();
   }
-  
+
   public void stop() {
     run = false;
     try {
@@ -80,11 +78,12 @@ public class Server implements Runnable {
   @Override
   public void run() {
     model.makeMap(seed);
-    initializeGameState();
-    setHostIP();
+    this.initializeGameState();
+    this.setHostIP();
     try {
-      tcpSocket = new ServerSocket(serverPort, 50, hostIP);
-      udpSocket = new DatagramSocket(serverPort, hostIP);
+      tcpSocket = new ServerSocket(Parameters.SERVER_PORT, 50, hostIP);
+      udpSocket = new DatagramSocket(Parameters.SERVER_PORT, hostIP);
+      udpSocket.setSoTimeout(Parameters.SERVER_SOCKET_BLOCK_TIME);
       System.out.println("TCP socket Port: " + tcpSocket.getLocalPort());
       System.out.println("TCP socket IP: " + tcpSocket.getInetAddress());
       System.out.println("UDP socket Port: " + udpSocket.getLocalPort());
@@ -99,20 +98,20 @@ public class Server implements Runnable {
         InetAddress clientIP = client.getInetAddress();
         ObjectInputStream fromClient = new ObjectInputStream(client.getInputStream());
         ObjectOutputStream toClient = new ObjectOutputStream(client.getOutputStream());
-        ClientRequest cr = (ClientRequest) fromClient.readObject();
-        processClientRequest(clientIP, cr, toClient, fromClient);
+        ClientMessage cr = (ClientMessage) fromClient.readObject();
+        processClientMessage(clientIP, cr, toClient, fromClient);
       }
 
       tcpSocket.close();
       udpSocket.close();
-    } catch (SocketException e) {
+    } catch (SocketException se) {
       LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
           "Cannot bind the UDP socket");
-      e.printStackTrace();
-    } catch (IOException e) {
+      se.printStackTrace();
+    } catch (IOException ioe) {
       LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
           "Something wrong with the TCP connection");
-      e.printStackTrace();
+      ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
       LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
           "Cannot find the class of the received serialized object");
@@ -124,10 +123,9 @@ public class Server implements Runnable {
     try {
       hostIP = Inet4Address.getLocalHost();
       multiCastIP = InetAddress.getByName("224.0.0.5");
-    } catch (UnknownHostException e) {
-      LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
-          "Unknown Host");
-      e.printStackTrace();
+    } catch (UnknownHostException uhe) {
+      LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL, "Unknown Host");
+      uhe.printStackTrace();
     }
   }
 
@@ -168,7 +166,7 @@ public class Server implements Runnable {
     }
   }
 
-  private void processClientRequest(InetAddress clientIP, ClientRequest cr,
+  private void processClientMessage(InetAddress clientIP, ClientMessage cr,
       ObjectOutputStream toClient, ObjectInputStream fromClient) {
     if (cr.getType() == 0) { // Connect request
       ClientHandler ch = new ClientHandler(clientIP, cr.getUdpPort(), playerList, entities,
@@ -189,23 +187,16 @@ public class Server implements Runnable {
 
   public void disconnectPlayer(InetAddress clientIP, int clientPort) {
     if (isPlayerConnected(clientIP, clientPort)) {
-      Player pToBeRemoved = null;
-      for (Player p : playerList) {
-        if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
-          // Remove player from the PlayerList
-          // Do not do entities.remove(), just have the ship marked for deletion.
-          // model.getEntities().remove(p.getShip());
-          p.getShip().delete();
-          latestCIS.remove(p);
-          pToBeRemoved = p;
-          ClientHandler ch = getClientHandlerByIpAndPort(clientIP, clientPort);
-          ch.end();
-          chList.remove(ch);
-          // Remove player from scoreboard
-          ScoreBoard.getInstance().remove(p);
-        }
-      }
+      Player pToBeRemoved = this.getPlayerByIpAndPort(clientIP, clientPort);
+      Ship shipToBeRemoved = pToBeRemoved.getShip();
+      ClientHandler ch = this.getClientHandlerByIpAndPort(clientIP, clientPort);
       playerList.remove(pToBeRemoved);
+      shipToBeRemoved.delete();
+      playerMap.remove(shipToBeRemoved);
+      latestCIS.remove(pToBeRemoved);
+      ScoreBoard.getInstance().remove(pToBeRemoved);
+      chList.remove(ch);
+      ch.end();
     }
   }
 
@@ -232,10 +223,10 @@ public class Server implements Runnable {
     return events.removeFirst();
   }
 
-  public void startSMCS() {
-    ServerMulticastSender smcs = new ServerMulticastSender(udpSocket, multiCastPort, multiCastIP,
-        entities, latestCIS, playerList);
-    smcs.start();
+  public void startSGH() {
+    ServerGameHandler sgh =
+        new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
+    sgh.start();
   }
 
   public Player getPlayerByIpAndPort(InetAddress clientIP, int clientPort) {
@@ -255,6 +246,10 @@ public class Server implements Runnable {
     return playerMap.get(ship);
   }
 
+  public ArrayList<ClientHandler> getCHList() {
+    return chList;
+  }
+
   public ClientHandler getClientHandlerByIpAndPort(InetAddress clientIP, int clientUdpPort) {
     for (ClientHandler ch : chList) {
       if (ch.getClientIP().equals(clientIP) && ch.getClientUdpPort() == clientUdpPort) {
@@ -265,26 +260,25 @@ public class Server implements Runnable {
   }
 
   public Position getRandomPosition() {
-	  boolean[][] iceGrid = model.getMap().getIceGrid();
-	  Random r = new Random();
-	  double randomX = 0;
-	  double randomY = 0;
-	  boolean isIcePosition = true;
+    boolean[][] iceGrid = model.getMap().getIceGrid();
+    Random r = new Random();
+    double randomX = 0;
+    double randomY = 0;
+    boolean isIcePosition = true;
 
-	  // Choose a random position without ice for ship spawning
-	  while (isIcePosition) {
-		  randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
-		  randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
+    // Choose a random position without ice for ship spawning
+    while (isIcePosition) {
+      randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
+      randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
 
-		  if (!iceGrid[(int) randomX][(int) randomY]) {
-			  isIcePosition = false;
-		  }
-	  }
-	  return new Position(randomX,randomY);
+      if (!iceGrid[(int) randomX][(int) randomY]) {
+        isIcePosition = false;
+      }
+    }
+    return new Position(randomX, randomY);
   }
 
-  public static Bullet getBullet(Position position, double direction, double distance,
-      long serial) {
+  public Bullet getBullet(Position position, double direction, double distance, long serial) {
 
     // Take one from the top
     Bullet b = bullets.pollFirst();

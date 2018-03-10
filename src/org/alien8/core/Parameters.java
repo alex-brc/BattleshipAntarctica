@@ -15,6 +15,11 @@ import net.jafama.FastMath;
  * 
  */
 public class Parameters {
+
+  public static final int SERVER_PORT = 4446;
+  public static final int MULTI_CAST_PORT = 4445;
+  public static final int SERVER_SOCKET_BLOCK_TIME = 100;
+      
   public static final boolean RENDER_BOX = true;
   /**
    * How many times to attempt connection to server before giving up. Keep in mind the timeout is
