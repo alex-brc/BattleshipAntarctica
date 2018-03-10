@@ -45,7 +45,6 @@ public class PlaneDropper extends Entity {
 		if(position.approximately(packetPosition, 5))
 			dropPacket();
 		super.setPosition(position);
-		System.out.println(position);
 	}
 	
 	private void dropPacket() {
@@ -57,6 +56,7 @@ public class PlaneDropper extends Entity {
 				pickup = new HealthPickup(packetPosition);
 				break;
 		}
+		System.out.println(pickup);
 		ModelManager.getInstance().addEntity(pickup);
 	}
 	

@@ -130,9 +130,11 @@ public class ServerMulticastSender extends Thread {
             b.getDirection(), b.getSpeed(), b.getDistance(), b.getTravelled(), b.getSource()));
       } else if (e instanceof Pickup) {
     	Pickup p = (Pickup) e;
+  	  System.out.println("Sending pickup " + p.toString());
     	EntitiesLite.add(new EntityLite(3, p.getPosition(), p.getPickupType(), p.isToBeDeleted()));
       } else if (e instanceof PlaneDropper) {
     	  PlaneDropper pd = (PlaneDropper) e;
+    	  System.out.println("Sending plane");
     	  EntitiesLite.add(new EntityLite(4, pd.getPosition(), pd.isToBeDeleted(), pd.getDirection()));
       }
     }
