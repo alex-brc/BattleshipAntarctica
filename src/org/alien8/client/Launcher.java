@@ -28,13 +28,13 @@ public class Launcher {
     launcher.loadStatus = "Loading sounds...";
     launcher.loadAudioManager();
 
-    // Connect to server
-    launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr + "...";
-    launcher.connect();
-
     // Make the scoreboard
     launcher.loadStatus = "Constructing a scoreboard...";
     launcher.loadScoreBoard();
+    
+    // Connect to server
+    launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr + "...";
+    launcher.connect();
 
     // Start the game
     launcher.game.start();

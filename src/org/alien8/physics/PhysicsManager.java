@@ -2,7 +2,6 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-
 import net.jafama.FastMath;
 
 public class PhysicsManager {
@@ -63,7 +62,6 @@ public class PhysicsManager {
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
 
     // Update the Oriented Bounding Box
-    // TODO: This causes an error.
     e.translateObb(xdiff, ydiff);
     // Deal with terrain collision
     e.dealWithInIce(iceGrid);
@@ -80,8 +78,8 @@ public class PhysicsManager {
    */
   public static void rotateEntity(Entity e, double angle) {
     /**
-     * First, squeeze the speed into the [0,4pi/5] interval
-     * 								4pi/5 since we want the ship at top speed to be able to turn slowly
+     * First, squeeze the speed into the [0,4pi/5] interval 4pi/5 since we want the ship at top
+     * speed to be able to turn slowly
      *
      * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,4pi/5]
      */

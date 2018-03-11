@@ -106,12 +106,12 @@ public class Turret implements Serializable {
   }
 
   public Position getTargetPosition() {
-      Position result = new Position(0,0);
-      
-      result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
-      result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
-      
-      return result;
+    Position result = new Position(0, 0);
+
+    result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
+    result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
+
+    return result;
   }
 
   /**
@@ -139,10 +139,12 @@ public class Turret implements Serializable {
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
 
-    // if (this.isOnCooldown())
-    // r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
-    // else
-    // r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
+    if (Parameters.DEBUG_MODE) {
+      if (this.isOnCooldown())
+        r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
+      else
+        r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
+    }
 
     if (distance != minDistance) {
       Position pos = getTargetPosition();

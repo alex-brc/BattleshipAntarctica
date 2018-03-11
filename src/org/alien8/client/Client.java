@@ -303,8 +303,14 @@ public class Client implements Runnable {
       // Deserialize the entsLite byte data into object
       ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      ArrayList<EntityLite> entsLite = (ArrayList<EntityLite>) objIn.readObject();
-
+      ArrayList<EntityLite> entsLite = null;
+      try {
+    	  entsLite = (ArrayList<EntityLite>) objIn.readObject();
+      } catch (ClassCastException e) {
+          // Desync'd. Drop packet, move on
+          LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
+              "Desync'd socket receive. Tried to cast GameEvent to ArrayList");
+        }
       if (entsLite != null)
         // Sync the game state with server
         ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
