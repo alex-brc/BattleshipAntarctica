@@ -21,6 +21,7 @@ public class Parameters {
   public static final boolean ICE_IS_SOLID = false;
   public static final int MAX_PLAYERS = 16;
   public static final boolean AI_ON = true;
+  public static final boolean DEBUG_MODE = true;
 
 
   /// SERVER PARAMETERS
@@ -37,7 +38,7 @@ public class Parameters {
 public static final int SERVER_PORT = 4446;
   public static final int MULTI_CAST_PORT = 4445;
   public static final int SERVER_SOCKET_BLOCK_TIME = 100;
-  /**
+
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */
@@ -83,34 +84,13 @@ public static final int SERVER_PORT = 4446;
   //////////////////////////////////////////////////////////
 
 
-  /// PHYSICS PARAMETERS
-  /**
-   * Affects how much damage ships take in collisions.
-   */
-  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
-  /**
-   * Affects how much the speed impacts the turning rate.
-   */
-  public static final double ROTATION_MODIFIER = 1;
-  public static final double FRICTION = 0.997;
-  /**
-   * Affects how much speed is lost when Entities collide
-   */
-  public static final double RESTITUTION_COEFFICIENT = 1;
-  /**
-   * Affects how 'bouncy' ice is when collided with.
-   */
-  public static final double ICE_BOUNCINESS = 0.02;
-  //////////////////////////////////////////////////////////
-
-
   /// BULLET PARAMETERS
   /**
    * Bullet parameters. Cooldowns in milliseconds.
    */
   public static final double BULLET_MASS = 10;
-  public static final double BULLET_WIDTH = 2;
-  public static final double BULLET_LENGTH = 4;
+  public static final double BULLET_WIDTH = 4;
+  public static final double BULLET_LENGTH = 8;
   public static final double BULLET_SPEED = 4;
   public static final double BULLET_DAMAGE = 10;
   public static final int BULLET_POOL_SIZE = 50;
@@ -122,6 +102,30 @@ public static final int SERVER_PORT = 4446;
    * tick
    */
   public static final double CHARGE_INCREMENT = 4;
+  //////////////////////////////////////////////////////////
+
+
+  /// PHYSICS PARAMETERS
+  /**
+   * Affects how much damage ships take in collisions.
+   */
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
+  public static final double COLLISION_ROTATION_MODIFIER = 0.2;
+  /**
+   * Affects how much the speed impacts the turning rate.
+   */
+  public static final double ROTATION_MODIFIER = 1;
+  public static final double FRICTION = 0.997;
+  /**
+   * Affects how much speed is lost when Entities collide
+   */
+  public static final double RESTITUTION_COEFFICIENT = 0.5;
+  /**
+   * Affects how 'bouncy' ice is when collided with.
+   */
+  public static final double ICE_BOUNCINESS = 0.02;
+  public static final double OUT_OF_BOUNDS_PUSHBACK = 10;
+  public static final double OUT_OF_BOUNDS_BOUNCINESS = 0.02;
   //////////////////////////////////////////////////////////
 
 

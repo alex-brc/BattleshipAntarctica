@@ -119,21 +119,23 @@ public class Collision {
     // This means that we can just swap their speed and direction
     // We multiply speed by the coefficient of restitution to decrease it
     entity1.setSpeed(speed2 * Parameters.RESTITUTION_COEFFICIENT);
-    PhysicsManager.rotateEntity(entity1, (direction1 - direction2) % 5);
+    PhysicsManager.rotateEntity(entity1,
+        ((direction1 - direction2) % 5) * Parameters.COLLISION_ROTATION_MODIFIER);
     // entity1.setDirection(direction2);
     entity2.setSpeed(speed1 * Parameters.RESTITUTION_COEFFICIENT);
-    PhysicsManager.rotateEntity(entity2, (direction2 - direction1) % 5);
+    PhysicsManager.rotateEntity(entity2,
+        ((direction2 - direction1) % 5) * Parameters.COLLISION_ROTATION_MODIFIER);
     // entity2.setDirection(direction1);
 
     // Each ship takes damage proportional to the momentum of the other ship
     entity1.damage(speed2 * entity2.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
     entity2.damage(speed1 * entity1.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
     // Delete ships if dead
-    if (entity1.getHealth() <= 0) {
+    if (new Double(entity1.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
       entity1.delete();
     }
-    if (entity2.getHealth() <= 0) {
+    if (new Double(entity2.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
       entity2.delete();
     }
@@ -143,7 +145,7 @@ public class Collision {
     // This allows us to ignore cases where a ship shoots itself
     //System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
     if (bullet.getSource() != ship.getSerial()) {
-      System.out.println("bullet hit ship");
+      System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
       // Bullet damages ship
       ship.damage(bullet.getDamage());
       // Award score to the bullet owner
@@ -152,7 +154,7 @@ public class Collision {
       if (shooter != null)
         ScoreBoard.getInstance().giveHit(shooter, bullet);
       // See if ship has been destroyed
-      if (ship.getHealth() <= 0) {
+      if (new Double(ship.getHealth()).intValue() <= 0) {
         System.out.println("A ship died!");
         ship.delete();
         // Award score to the killer
