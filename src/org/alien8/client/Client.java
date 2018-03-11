@@ -15,7 +15,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import org.alien8.ai.AIController;
+import java.util.LinkedList;
+
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
@@ -116,6 +117,8 @@ public class Client implements Runnable {
         this.sendInputSample();
         this.receiveAndUpdate();
         this.receiveEvents();
+        Renderer.getInstance().render(model);
+        
         tickRate++;
         catchUp--;
         // Update last time
@@ -123,7 +126,6 @@ public class Client implements Runnable {
       }
 
       // Call the renderer
-      Renderer.getInstance().render(model);
       frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
@@ -131,12 +133,12 @@ public class Client implements Runnable {
         frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
         FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
         frameRate = 0;
-        // System.out.println("FPS: " + FPS);
+        System.out.println("FPS: " + FPS);
       }
       if (getTime() - tickTimer > Parameters.N_SECOND) {
         tickTimer += Parameters.N_SECOND;
         TICKS = (TICKS + tickRate) / 2;
-        // System.out.println("Ticks: " + TICKS);
+        System.out.println("Ticks: " + TICKS);
         tickRate = 0;
       }
     }
@@ -322,15 +324,20 @@ public class Client implements Runnable {
    */
   private ArrayList<EntityLite> receiveGameStateTCP(ObjectInputStream fromServer) {
     ArrayList<EntityLite> entsLite = null;
+    LinkedList<ScoreEvent> scores = null;
 
     try {
       entsLite = (ArrayList<EntityLite>) fromServer.readObject();
+      scores = (LinkedList<ScoreEvent>) fromServer.readObject();
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
       cnfe.printStackTrace();
     }
-
+    
+    for(ScoreEvent score : scores)
+    	ScoreBoard.getInstance().update(new Score(score));
+    
     return entsLite;
   }
 

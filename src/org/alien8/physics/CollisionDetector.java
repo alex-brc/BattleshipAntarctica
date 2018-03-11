@@ -26,7 +26,7 @@ public class CollisionDetector {
     // Rules out collisions between objects that are far away from each other
     ArrayList<IntervalValue> intervalValues = sort(aabbs);
     ArrayList<Collision> potentialCollisions = sweep(intervalValues);
-    System.out.println("Potential: " + potentialCollisions.size());
+    // System.out.println("Potential: " + potentialCollisions.size());
 
     /*
      * NARROW PHASE: In this phase, we inspect each of our potential collisions to determine which
@@ -40,7 +40,7 @@ public class CollisionDetector {
         verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2(), vector));
       }
     }
-    System.out.println("Verified: " + verifiedCollisions.size());
+    // System.out.println("Verified: " + verifiedCollisions.size());
 
     // Return the collisions that we have found
     return verifiedCollisions;

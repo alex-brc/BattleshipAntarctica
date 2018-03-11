@@ -3,7 +3,7 @@ package org.alien8.score;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.alien8.client.InputManager;
+
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -34,20 +34,18 @@ public class ScoreBoard implements Runnable {
   }
 
   public void update(Score sc) {
+	boolean updated = false;
     for (Score score : scores)
-      if (sc.getShipSerial() == score.getShipSerial())
-        score = sc;
-  }
-
-  public void fill(List<Player> players) {
-    LogManager.getInstance().log("ScoreBoard", LogManager.Scope.INFO,
-        "Filling scoreboard with players...");
-
-    for (Player p : players) {
-      Score score = new Score(p);
-      scores.add(score);
-      Server.getInstance().addEvent(score.exportToEvent());
-    }
+      if (sc.getShipSerial() == score.getShipSerial()) {
+        scores.remove(score);
+        scores.add(sc);
+        updated = true;
+        break;
+      }
+    if (!updated)
+    	this.scores.add(sc);
+    this.order();
+    System.out.println("added score");
   }
 
   public void add(Player player) {
@@ -130,26 +128,42 @@ public class ScoreBoard implements Runnable {
   }
 
   public void render() {
-    // TODO
-    Renderer.getInstance().drawRect(cornerX, cornerY, Parameters.SCOREBOARD_WIDTH,
-        Parameters.SCOREBOARD_HEIGHT, 0xFF4500, true);
-  }
-
-  public synchronized void notifyShift() {
-    notifyAll();
-  }
-
-  @Override
-  public synchronized void run() {
-    while (listenerRunning) {
-      while (!InputManager.getInstance().shiftPressed()) {
-        try {
-          this.wait();
-        } catch (InterruptedException e) {
-        }
-      }
-      this.order();
-      this.render();
+	
+    // Draw black background
+    renderer.drawFilledRect(cornerX, cornerY, Parameters.SCOREBOARD_HEIGHT, Parameters.SCOREBOARD_WIDTH, 0x000000, true);
+          
+    // Draw header text
+    renderer.drawText("Name", cornerX + 40, cornerY + this.renderVerticalBuffer, true, FontColor.WHITE);
+    renderer.drawText("Score", cornerX + 160, cornerY + this.renderVerticalBuffer, true, FontColor.WHITE);
+    renderer.drawText("Kills", cornerX + 280, cornerY + this.renderVerticalBuffer, true, FontColor.WHITE);
+    renderer.drawText("Status", cornerX + 410, cornerY + this.renderVerticalBuffer, true, FontColor.WHITE);
+    
+    // Draw separator
+    for(int x = cornerX; x < cornerX + Parameters.SCOREBOARD_WIDTH; x++)
+    	renderer.drawPixel(x, cornerY + this.renderFontHeight + this.renderVerticalBuffer, 0xFFFFFF, true);
+    
+    // Draw scores
+    int offset = this.renderFontHeight + 2 * this.renderVerticalBuffer;
+    for(Score score : scores) {
+    	// Draw the color
+    	renderer.drawFilledRect(cornerX + 15, cornerY + offset, 15, 15, score.getColour(), true);
+    	// Draw the name
+    	renderer.drawText(score.getName(), cornerX + 40, cornerY + offset, true, FontColor.WHITE);
+    	// Draw the score
+    	renderer.drawText(Integer.toString(score.getScore()), cornerX + 160, cornerY + offset, true, FontColor.WHITE);
+    	// Draw the kills
+    	renderer.drawText(Integer.toString(score.getKills()), cornerX + 310, cornerY + offset, true, FontColor.WHITE);
+    	// Draw the status
+    	if(score.getAlive())
+    		renderer.drawText("ALIVE", cornerX + 420, cornerY + offset, true, FontColor.WHITE);
+    	else
+    		renderer.drawText("DEAD", cornerX + 420, cornerY + offset, true, FontColor.WHITE);
+    	// Draw a separator
+    	for(int x = cornerX; x < cornerX + Parameters.SCOREBOARD_WIDTH; x++)
+        	renderer.drawPixel(x, cornerY + offset + this.renderFontHeight, 0xFFFFFF, true);
+    	
+    	// Increment offset
+    	offset += this.renderFontHeight + this.renderVerticalBuffer;
     }
   }
 
