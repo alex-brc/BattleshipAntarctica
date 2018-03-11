@@ -476,7 +476,8 @@ public class Renderer extends Canvas {
    * 
    * @return the Position of the center in
    */
-  public static Position getScreenPosition(Position position) {
-    return new Position(400, 300);
+  public Position getScreenPosition(Position position) {
+	Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
+	return new Position(400,300);
   }
 }
