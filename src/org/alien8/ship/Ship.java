@@ -114,22 +114,66 @@ public class Ship extends Entity implements Serializable {
   public void render() {
     Renderer r = Renderer.getInstance();
 
-    // // Render four corners of bounding box
-    // for (int i = 0; i < 4; i++) {
-    // // Color front two points blue
-    // if (i == 1 || i == 2) {
-    // r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0x0000FF,
-    // false);
-    // }
-    // // Color back two points red
-    // else {
-    // r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0xFF0000,
-    // false);
-    // }
-    // }
-    //
-    // r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
-    // false);
+    if (Parameters.DEBUG_MODE) {
+      // Render four corners of bounding box
+      for (int i = 0; i < 4; i++) {
+        // Color front two points blue
+        if (i == 1 || i == 2) {
+          r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0x0000FF,
+              false);
+        }
+        // Color back two points red
+        else {
+          r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0xFF0000,
+              false);
+        }
+      }
+      r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
+          false);
+
+      /// Display AABB
+      Position pos = getPosition();
+      double length = getLength();
+      double x = pos.getX();
+      double y = pos.getY();
+
+      double dir = PhysicsManager.shiftAngle(getDirection());
+      double hypotenuse = length / 2;
+      Position max;
+      Position min;
+
+      if (dir >= 0 && dir < Math.PI / 2) {
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI / 2 && dir < Math.PI) {
+        dir = Math.PI - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI && dir < 3 * Math.PI / 2) {
+        dir = (3 * Math.PI / 2) - dir;
+        max = new Position(x + hypotenuse * FastMath.sin(dir), y - hypotenuse * FastMath.cos(dir));
+        min = new Position(x - hypotenuse * FastMath.sin(dir), y + hypotenuse * FastMath.cos(dir));
+      } else {
+        dir = (2 * Math.PI) - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      }
+
+      // // Calculate max and min points
+      // Position max = new Position((pos.getX() + 0.5 * length * FastMath.cos(getDirection())),
+      // (pos.getY() + 0.5 * length * FastMath.sin(getDirection())));
+      // Position min = new Position((pos.getX() - 0.5 * length * FastMath.cos(getDirection())),
+      // (pos.getY() - 0.5 * length * FastMath.sin(getDirection())));
+      r.drawText("MAX", new Double(max.getX()).intValue(), new Double(max.getY()).intValue(), false,
+          FontColor.BLACK);
+      r.drawText("MIN", new Double(min.getX()).intValue(), new Double(min.getY()).intValue(), false,
+          FontColor.WHITE);
+
+      r.drawRect(new Double(min.getX()).intValue(), new Double(max.getY()).intValue(),
+          new Double(max.getX() - min.getX()).intValue(),
+          new Double(min.getY() - max.getY()).intValue(), 0x00FF00, false);
+    }
+
 
     // Render ship sprite
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
@@ -179,6 +223,15 @@ public class Ship extends Entity implements Serializable {
     this.setPosition(
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
+
+    // // Handle rotation of the ship
+    // if (xdiff != 0) {
+    // if (getDirection())
+    // }
+    //
+    //
+    // PhysicsManager.rotateEntity(this, xdiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
+    // PhysicsManager.rotateEntity(this, ydiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
   }
 
   /**

@@ -26,6 +26,7 @@ public class CollisionDetector {
     // Rules out collisions between objects that are far away from each other
     ArrayList<IntervalValue> intervalValues = sort(aabbs);
     ArrayList<Collision> potentialCollisions = sweep(intervalValues);
+    System.out.println("Potential: " + potentialCollisions.size());
 
     /*
      * NARROW PHASE: In this phase, we inspect each of our potential collisions to determine which
@@ -39,6 +40,7 @@ public class CollisionDetector {
         verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2(), vector));
       }
     }
+    System.out.println("Verified: " + verifiedCollisions.size());
 
     // Return the collisions that we have found
     return verifiedCollisions;
@@ -55,18 +57,39 @@ public class CollisionDetector {
     for (Entity e : entities) {
       // Get position and length from the Entity
       Position pos = e.getPosition();
+      double x = pos.getX();
+      double y = pos.getY();
       double length = e.getLength();
-      // Calculate max and min points
-      Position max = new Position((pos.getX() + 0.5 * length * FastMath.cos(e.getDirection())),
-          (pos.getY() + 0.5 * length * FastMath.sin(e.getDirection())));
-      Position min = new Position((pos.getX() - 0.5 * length * FastMath.cos(e.getDirection())),
-          (pos.getY() - 0.5 * length * FastMath.sin(e.getDirection())));
+
+      double dir = PhysicsManager.shiftAngle(e.getDirection());
+      double hypotenuse = length / 2;
+      Position max;
+      Position min;
+
+      if (dir >= 0 && dir < Math.PI / 2) {
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI / 2 && dir < Math.PI) {
+        dir = Math.PI - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI && dir < 3 * Math.PI / 2) {
+        dir = (3 * Math.PI / 2) - dir;
+        max = new Position(x + hypotenuse * FastMath.sin(dir), y - hypotenuse * FastMath.cos(dir));
+        min = new Position(x - hypotenuse * FastMath.sin(dir), y + hypotenuse * FastMath.cos(dir));
+      } else {
+        dir = (2 * Math.PI) - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      }
+
       // Create new AABB
       AABB box = new AABB(max, min, e);
       aabbs.add(box);
     }
     return aabbs;
   }
+
 
   /**
    * The 'sort' part of the sort-and-sweep algorithm. Given a set of Axis-Aligned Bounding Boxes
@@ -124,7 +147,7 @@ public class CollisionDetector {
   private ArrayList<Collision> sweep(ArrayList<IntervalValue> intervalValues) {
     ArrayList<Collision> potentialCollisions = new ArrayList<>();
     // Creates a list to store active intervals
-    // As each interval has a beginnning and end point, an active interval is one which has begun
+    // As each interval has a beginning and end point, an active interval is one which has begun
     // but not yet ended
     ArrayList<IntervalValue> activeIntervals = new ArrayList<>();
     for (IntervalValue i : intervalValues) {

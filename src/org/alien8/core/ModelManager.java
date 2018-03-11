@@ -88,12 +88,15 @@ public class ModelManager {
 
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
+      ent.initObb();
     }
+
     ArrayList<Collision> collisions = collisionDetector.checkForCollisions(entities);
     for (Collision c : collisions) {
-      // System.out.println("Collision");
+      // System.out.println("Resolving collision");
       c.resolveCollision();
     }
+
   }
 
 

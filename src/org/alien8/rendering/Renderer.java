@@ -208,6 +208,12 @@ public class Renderer extends Canvas {
     // drawMinimap(720, 16, true);
 
 
+    // Display player death message
+    // if (player.getHealth() <= 0) {
+    // drawText("YOUDIED!", Parameters.RENDERER_SIZE.width / 2, Parameters.RENDERER_SIZE.height / 2,
+    // true, FontColor.BLACK);
+    // }
+
     // Graphics object from buffer strategy
     Graphics g = bs.getDrawGraphics();
     g.setColor(Color.BLACK);

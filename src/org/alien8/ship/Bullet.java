@@ -3,6 +3,7 @@ package org.alien8.ship;
 import java.io.Serializable;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
@@ -105,6 +106,52 @@ public class Bullet extends Entity implements Serializable {
 
   @Override
   public void render() {
+
+    if (Parameters.DEBUG_MODE) {
+      Renderer r = Renderer.getInstance();
+      // Render four corners of bounding box
+      for (int i = 0; i < 4; i++) {
+        // Color front two points blue
+        if (i == 1 || i == 2) {
+          r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0x0000FF,
+              false);
+        }
+        // Color back two points red
+        else {
+          r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0xFF0000,
+              false);
+        }
+      }
+
+      /// Display AABB
+      Position pos = getPosition();
+      double length = getLength();
+      double x = pos.getX();
+      double y = pos.getY();
+
+      double dir = PhysicsManager.shiftAngle(getDirection());
+      double hypotenuse = length / 2;
+      Position max;
+      Position min;
+
+      if (dir >= 0 && dir < Math.PI / 2) {
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI / 2 && dir < Math.PI) {
+        dir = Math.PI - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI && dir < 3 * Math.PI / 2) {
+        dir = (3 * Math.PI / 2) - dir;
+        max = new Position(x + hypotenuse * FastMath.sin(dir), y - hypotenuse * FastMath.cos(dir));
+        min = new Position(x - hypotenuse * FastMath.sin(dir), y + hypotenuse * FastMath.cos(dir));
+      } else {
+        dir = (2 * Math.PI) - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      }
+    }
+
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);

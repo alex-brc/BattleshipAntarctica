@@ -21,6 +21,7 @@ public class Parameters {
   public static final boolean ICE_IS_SOLID = false;
   public static final int MAX_PLAYERS = 16;
   public static final boolean AI_ON = true;
+  public static final boolean DEBUG_MODE = true;
 
 
   /// SERVER PARAMETERS
@@ -80,27 +81,6 @@ public class Parameters {
   //////////////////////////////////////////////////////////
 
 
-  /// PHYSICS PARAMETERS
-  /**
-   * Affects how much damage ships take in collisions.
-   */
-  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
-  /**
-   * Affects how much the speed impacts the turning rate.
-   */
-  public static final double ROTATION_MODIFIER = 1;
-  public static final double FRICTION = 0.997;
-  /**
-   * Affects how much speed is lost when Entities collide
-   */
-  public static final double RESTITUTION_COEFFICIENT = 1;
-  /**
-   * Affects how 'bouncy' ice is when collided with.
-   */
-  public static final double ICE_BOUNCINESS = 0.02;
-  //////////////////////////////////////////////////////////
-
-
   /// BULLET PARAMETERS
   /**
    * Bullet parameters. Cooldowns in milliseconds.
@@ -119,6 +99,30 @@ public class Parameters {
    * tick
    */
   public static final double CHARGE_INCREMENT = 4;
+  //////////////////////////////////////////////////////////
+
+
+  /// PHYSICS PARAMETERS
+  /**
+   * Affects how much damage ships take in collisions.
+   */
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
+  public static final double COLLISION_ROTATION_MODIFIER = 0.2;
+  /**
+   * Affects how much the speed impacts the turning rate.
+   */
+  public static final double ROTATION_MODIFIER = 1;
+  public static final double FRICTION = 0.997;
+  /**
+   * Affects how much speed is lost when Entities collide
+   */
+  public static final double RESTITUTION_COEFFICIENT = 0.5;
+  /**
+   * Affects how 'bouncy' ice is when collided with.
+   */
+  public static final double ICE_BOUNCINESS = 0.02;
+  public static final double OUT_OF_BOUNDS_PUSHBACK = 10;
+  public static final double OUT_OF_BOUNDS_BOUNCINESS = 0.02;
   //////////////////////////////////////////////////////////
 
 
@@ -155,4 +159,6 @@ public class Parameters {
    */
   public static final double ICE_BOX_DENSITY = 0.7;
   //////////////////////////////////////////////////////////
+
+
 }
