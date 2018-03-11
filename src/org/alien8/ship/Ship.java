@@ -85,6 +85,29 @@ public class Ship extends Entity implements Serializable {
     if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
       rearTurret.setDirection(angle);
   }
+  
+  public void setTurretsDirectionAI(Position mousePosition) {
+    //Had to make this to allow the AI ships to aim at positions
+    double ra = 0;
+    
+    // Front
+    double angle = Renderer.getInstance().getScreenPositionAI(frontTurret.getPosition()).getAngleTo(mousePosition);
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
+    ra = PhysicsManager.shiftAngle(ra);
+    // Range of motion: [pi/4,7*pi/4]
+    if (ra > 1.0 * FastMath.PI / 4 && ra < 7.0 * FastMath.PI / 4)
+      frontTurret.setDirection(angle);
+
+    // Rear
+    angle = Renderer.getInstance().getScreenPositionAI(rearTurret.getPosition()).getAngleTo(mousePosition);
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
+    ra = PhysicsManager.shiftAngle(ra);
+    // Range of motion: [5*pi/4, 3*pi/4]
+    if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
+      rearTurret.setDirection(angle);
+  }
 
   /**
    * Sets the position for all turrets considering the ship's position and direction

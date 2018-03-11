@@ -19,22 +19,27 @@ public class AIController{
 	protected Ship myShip;
 	protected Entity target;
 	protected boolean[][] iceGrid;
+	protected boolean rightTurnDefault = true;
+	protected int changeDefaultTurn = 0;
 	
 	public AIController(Ship ship){
-		// Note: changed this to a Ship constructor, easier to handle in server and more practical
 		model = ModelManager.getInstance();
 		iceGrid = model.getMap().getIceGrid();
-		myShip = ship; //All ai ships start facing East - temporary
+		myShip = ship;
 	}
 	
 	public void update(){
 		target = findClosestTarget();
-		myShip.setTurretsDirection(target.getPosition());
-		//At the moment it just fires all turrets at the closest ship
-		//myShip.frontTurretCharge();
-		//myShip.midTurretCharge();
-		//myShip.rearTurretCharge();
-		wander(); //Moves mostly aimlessly around the map
+		myShip.setTurretsDirectionAI(target.getPosition());
+		//Fires both turrets at the closest ship
+		myShip.frontTurretCharge();
+		myShip.rearTurretCharge();
+		changeDefaultTurn++;
+		if (changeDefaultTurn > 1200){
+			rightTurnDefault = !rightTurnDefault;
+			changeDefaultTurn = 0;
+		}
+		wander(); //Moves around the map, avoiding ice
 	}
 	
 	public Entity findClosestTarget(){
@@ -93,23 +98,28 @@ public class AIController{
 	public void wander(){
 		if (rayDetect((int)Parameters.SHIP_LENGTH)){
 			PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
-
+			
 			double locEastDir = myShip.getDirection();
 			locEastDir = PhysicsManager.shiftAngle(locEastDir - (Math.PI/2d));
 			double locWestDir = PhysicsManager.shiftAngle(locEastDir + Math.PI);
 			boolean obstToEast = drawRay(myShip.getPosition(), locEastDir, (int)Parameters.SHIP_LENGTH);
 			boolean obstToWest = drawRay(myShip.getPosition(), locWestDir, (int)Parameters.SHIP_LENGTH);
-			
-			if (obstToEast && obstToWest){ //Obsticles to both sides
-				myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
-			}
-			else if (obstToWest){
-				PhysicsManager.rotateEntity(myShip,Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+			if (rightTurnDefault){
+				if (obstToWest){
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()-Math.PI/64d));
+				}
+				else{
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()+Math.PI/64d));
+				}
 			}
 			else{
-				PhysicsManager.rotateEntity(myShip,(-1)*Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+				if (obstToEast){
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()+Math.PI/64d));
+				}
+				else{
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()-Math.PI/64d));
+				}
 			}
-			System.out.println(myShip.getSpeed());
 		}
 		else{
 			PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
