@@ -37,7 +37,6 @@ public class Client implements Runnable {
   private volatile boolean running = false;
   private Thread thread;
   private ModelManager model;
-  private AIController aiPlayer;
   private int FPS = 0;
   private int TICKS = 0;
   private InetAddress clientIP = null;
@@ -276,6 +275,7 @@ public class Client implements Runnable {
         if (event instanceof AudioEvent)
           AudioManager.getInstance().addEvent((AudioEvent) event);
         else if (event instanceof ScoreEvent) {
+          System.out.println("Got score event");
           ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
         }
       }

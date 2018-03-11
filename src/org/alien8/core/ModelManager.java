@@ -70,7 +70,6 @@ public class ModelManager {
     ClientInputSample cis = null;
 
     for (Entity ent : entities) {
-      // System.out.println(ent.getSerial());
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
@@ -172,7 +171,6 @@ public class ModelManager {
     	  this.addEntity(p);
       } else if(el.entityType == 4) { // Plane
     	  PlaneDropper pd = new PlaneDropper(el.position, el.direction);
-    	  System.out.println("got plane at " + pd.getPosition());
     	  if(el.toBeDeleted) {
     		  pd.delete();
     	  }

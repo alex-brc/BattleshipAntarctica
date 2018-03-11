@@ -354,5 +354,11 @@ public class Ship extends Entity implements Serializable {
 	  if(item != null)
 		  this.item.use();
   }
+  
+  public boolean hasItem() {
+	  if(item == null)
+		  return true;
+	  return false;
+  }
 
 }

@@ -41,7 +41,7 @@ public class PhysicsManager {
    */
   public static void applyFriction(Entity e) {
     e.setSpeed(e.getSpeed() * Parameters.FRICTION);
-    // Makes friction less CPU-intensive sometimes
+    // Remove redundant calculation, also improves look and feel
     if (e.getSpeed() < 0.001d) {
       e.setSpeed(0);
     }
@@ -89,10 +89,10 @@ public class PhysicsManager {
     /**
      * Then put this speed through the function:
      *
-     * f : (0,PI) -> [0,1] f(x) = sin^2(x),
+     * f : (0,PI) -> [0,1.3] f(x) = sin^2(x) + 0.3,
      *
      */
-    double rotModifier = FastMath.pow(FastMath.sin(squeezedSpeed), 2);
+    double rotModifier = FastMath.pow(FastMath.sin(squeezedSpeed), 2) + 0.3;
     // Then apply this modifier to the angle, with a parametrised weight
     angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 

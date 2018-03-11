@@ -11,7 +11,6 @@ import org.alien8.audio.AudioManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
-import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
 
 import net.jafama.FastMath;
@@ -232,7 +231,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
         return;
       case KeyEvent.VK_SHIFT:
         shiftPressed = true;
-        ScoreBoard.getInstance().notifyShift();
         return;
       default:
         // Not a game control

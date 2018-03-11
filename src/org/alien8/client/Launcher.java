@@ -1,7 +1,6 @@
 package org.alien8.client;
 
 import org.alien8.audio.AudioManager;
-import org.alien8.rendering.Renderer;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
@@ -53,16 +52,12 @@ public class Launcher {
     LogManager.getInstance();
   }
 
-  private void loadRenderer() {
-    Renderer.getInstance();
-  }
-
   private void loadAudioManager() {
     AudioManager.getInstance();
   }
 
   private void loadScoreBoard() {
-    ScoreBoard.getInstance().startListener();
+    ScoreBoard.getInstance();
   }
 
   private void connect() {

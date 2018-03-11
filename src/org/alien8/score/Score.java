@@ -21,7 +21,7 @@ public class Score implements Comparable<Score> {
     this.kills = 0;
     this.alive = true;
   }
-  
+
   public Score(ScoreEvent event) {
 	 this.name = event.getName();
 	 this.shipSerial = event.getShipSerial();

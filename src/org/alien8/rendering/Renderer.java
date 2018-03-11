@@ -206,7 +206,10 @@ public class Renderer extends Canvas {
     // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
     // System.out.println(minimapTerrain);
     // drawMinimap(720, 16, true);
-
+    
+    // If pressing shift display scoreboard
+    if(InputManager.getInstance().shiftPressed())
+    	ScoreBoard.getInstance().render();
 
     // Graphics object from buffer strategy
     Graphics g = bs.getDrawGraphics();
@@ -234,7 +237,7 @@ public class Renderer extends Canvas {
     drawFilledRect(xp + 7, yp + 7, barHeight, barLength, color, fixed);
   }
 
-  private void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
+  public void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
     for (int y = yp; y < yp + height; y++) {
       for (int x = xp; x < xp + length; x++) {
         drawPixel(x, y, color, fixed);

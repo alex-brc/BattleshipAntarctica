@@ -2,8 +2,8 @@ package org.alien8.client;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
 import org.alien8.audio.AudioManager;
-import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
 /**
@@ -18,8 +18,6 @@ public class ClientWindowListener implements WindowListener {
 	  Launcher.getInstance().getRunningClient().disconnect();
 	  // Shutdown audio clips
 	  AudioManager.getInstance().shutDown();
-	  // Kill scoreboard listener
-	  ScoreBoard.getInstance().killListener();
 	  // Log status
 	  System.out.println("System exitted cleanly. Check log for crash information");
 	  LogManager.getInstance().log("Shutdown", LogManager.Scope.INFO,

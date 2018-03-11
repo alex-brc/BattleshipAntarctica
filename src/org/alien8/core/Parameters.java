@@ -132,8 +132,8 @@ public class Parameters {
   public static final int SCORE_PER_KILL = 1000;
   public static final float KILL_STREAK_MULTIPLIER = 0.1f;
   public static final float DISTANCE_MULTIPLIER = 0.1f;
-  public static final int SCOREBOARD_HEIGHT = 500;
-  public static final int SCOREBOARD_WIDTH = 500;
+  public static final int SCOREBOARD_HEIGHT = 450;
+  public static final int SCOREBOARD_WIDTH = 550;
   /**
    * Items
    */

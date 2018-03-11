@@ -24,7 +24,7 @@ public class ScoreEvent extends GameEvent {
 		this.kills = kills;
 		this.alive = alive;
 	}
-	
+			
 	public ScoreEvent(Score score) {
 		super();
 		this.shipSerial = score.getShipSerial();

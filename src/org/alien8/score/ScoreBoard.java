@@ -3,7 +3,7 @@ package org.alien8.score;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.alien8.client.InputManager;
+
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -12,19 +12,23 @@ import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.util.LogManager;
 
-public class ScoreBoard implements Runnable {
+public class ScoreBoard {
   public static ScoreBoard instance;
   private List<Score> scores = new LinkedList<Score>();
-  private Thread thread;
-  private volatile boolean listenerRunning = false;
   private int cornerX;
   private int cornerY;
+  private int renderVerticalBuffer;
+  private int renderFontHeight;
+  private Renderer renderer;
 
   private ScoreBoard() {
-    Position screenCenter =
-        new Position(Parameters.RENDERER_SIZE.width / 2, Parameters.RENDERER_SIZE.height / 2);
-    cornerX = (int) screenCenter.getX() - Parameters.SCOREBOARD_WIDTH / 2;
-    cornerY = (int) screenCenter.getY() - Parameters.SCOREBOARD_HEIGHT / 2;
+	  renderVerticalBuffer = 10;
+	  renderFontHeight = 25;
+	  renderer = Renderer.getInstance();
+	  Position screenCenter =
+			  new Position(Parameters.RENDERER_SIZE.width / 2, Parameters.RENDERER_SIZE.height / 2);
+	  cornerX = (int) screenCenter.getX() - Parameters.SCOREBOARD_WIDTH / 2;
+	  cornerY = (int) screenCenter.getY() - Parameters.SCOREBOARD_HEIGHT / 2 + 50;
   }
 
   public static ScoreBoard getInstance() {
@@ -35,8 +39,10 @@ public class ScoreBoard implements Runnable {
 
   public void update(Score sc) {
     for (Score score : scores)
-      if (sc.getShipSerial() == score.getShipSerial())
+      if (sc.getShipSerial() == score.getShipSerial()) {
         score = sc;
+      }
+    this.order();
   }
 
   public void fill(List<Player> players) {
@@ -113,7 +119,6 @@ public class ScoreBoard implements Runnable {
 
   public Score getScore(Player player) {
     for (Score score : scores) {
-      //System.out.println("SCORE: " + score.toString());
       if (player.getShip().getSerial() == score.getShipSerial())
         return score;
     }
@@ -122,7 +127,6 @@ public class ScoreBoard implements Runnable {
 
   public Score getScore(long shipSerial) {
     for (Score score : scores) {
-      //System.out.println("SCORE: " + score.toString());
       if (score.getShipSerial() == shipSerial)
         return score;
     }
@@ -130,44 +134,42 @@ public class ScoreBoard implements Runnable {
   }
 
   public void render() {
-    // TODO
-    Renderer.getInstance().drawRect(cornerX, cornerY, Parameters.SCOREBOARD_WIDTH,
-        Parameters.SCOREBOARD_HEIGHT, 0xFF4500, true);
-  }
-
-  public synchronized void notifyShift() {
-    notifyAll();
-  }
-
-  @Override
-  public synchronized void run() {
-    while (listenerRunning) {
-      while (!InputManager.getInstance().shiftPressed()) {
-        try {
-          this.wait();
-        } catch (InterruptedException e) {
-        }
-      }
-      this.order();
-      this.render();
+	
+    // Draw black background
+    renderer.drawFilledRect(cornerX, cornerY, Parameters.SCOREBOARD_HEIGHT, Parameters.SCOREBOARD_WIDTH, 0x000000, true);
+          
+    // Draw header text
+    renderer.drawText("Name", cornerX + 40, cornerY + this.renderVerticalBuffer, true);
+    renderer.drawText("Score", cornerX + 160, cornerY + this.renderVerticalBuffer, true);
+    renderer.drawText("Kills", cornerX + 280, cornerY + this.renderVerticalBuffer, true);
+    renderer.drawText("Status", cornerX + 410, cornerY + this.renderVerticalBuffer, true);
+    
+    // Draw separator
+    for(int x = cornerX; x < cornerX + Parameters.SCOREBOARD_WIDTH; x++)
+    	renderer.drawPixel(x, cornerY + this.renderFontHeight + this.renderVerticalBuffer, 0xFFFFFF, true);
+    
+    // Draw scores
+    int offset = this.renderFontHeight + 2 * this.renderVerticalBuffer;
+    for(Score score : scores) {
+    	// Draw the color
+    	renderer.drawFilledRect(cornerX + 15, cornerY + offset, 15, 15, score.getColour(), true);
+    	// Draw the name
+    	renderer.drawText(score.getName(), cornerX + 40, cornerY + offset, true);
+    	// Draw the score
+    	renderer.drawText(Integer.toString(score.getScore()), cornerX + 160, cornerY + offset, true);
+    	// Draw the kills
+    	renderer.drawText(Integer.toString(score.getKills()), cornerX + 280, cornerY + offset, true);
+    	// Draw the status
+    	if(score.getAlive())
+    		renderer.drawText("ALIVE", cornerX + 390, cornerY + offset, true);
+    	else
+    		renderer.drawText("DEAD", cornerX + 390, cornerY + offset, true);
+    	// Draw a separator
+    	for(int x = cornerX; x < cornerX + Parameters.SCOREBOARD_WIDTH; x++)
+        	renderer.drawPixel(x, cornerY + offset + this.renderVerticalBuffer, 0xFFFFFF, true);
+    	
+    	// Increment offset
+    	offset += this.renderFontHeight + 2 * this.renderVerticalBuffer;
     }
-  }
-
-  public void startListener() {
-    listenerRunning = true;
-    thread = new Thread(ScoreBoard.getInstance(), "ScoreBoard");
-    thread.start();
-  }
-
-  public void killListener() {
-    try {
-      listenerRunning = false;
-      thread.join();
-    } catch (InterruptedException e) {
-      LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
-          "Failed to kill listener thread. " + e.toString());
-    }
-    LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
-        "Score listener killed cleanly.");
   }
 }
