@@ -2,6 +2,7 @@ package org.alien8.core;
 
 import java.io.Serializable;
 import org.alien8.physics.Position;
+import net.jafama.FastMath;
 
 /**
  * This abstract class implements the generic Entity. All things that are part of the game map are
@@ -35,11 +36,6 @@ public abstract class Entity implements Serializable, Cloneable {
   public Entity(Position position, double direction, double speed, double mass, double length,
       double width) {
     this.position = position;
-    // this.properties.setDirection(direction);
-    // this.properties.setSpeed(speed);
-    // this.properties.setMass(mass);
-    // this.properties.setLength(length);
-    // this.properties.setWidth(width);
     this.direction = direction;
     this.speed = speed;
     this.mass = mass;
@@ -52,12 +48,6 @@ public abstract class Entity implements Serializable, Cloneable {
   public Entity(Position position, double direction, double speed, double mass, double length,
       double width, double health) {
     this.position = position;
-    // this.properties.setDirection(direction);
-    // this.properties.setSpeed(speed);
-    // this.properties.setMass(mass);
-    // this.properties.setLength(length);
-    // this.properties.setWidth(width);
-    // this.properties.setHealth(health);
     this.direction = direction;
     this.speed = speed;
     this.mass = mass;
@@ -66,40 +56,6 @@ public abstract class Entity implements Serializable, Cloneable {
     this.health = health;
 
     initObb();
-  }
-
-  /**
-   * @return the position in XY coordinates
-   */
-  public Position getPosition() {
-    return position;
-  }
-
-  /**
-   * @param position the position to set, in XY coordinates
-   */
-  public void setPosition(Position position) {
-    this.position = position;
-  }
-
-  public long getSerial() {
-    return serial;
-  }
-
-  public void setSerial(long serial) {
-    if (this.serial == -1) {
-      this.serial = serial;
-    }
-    // Only works once.
-
-  }
-
-  public void delete() {
-    this.toBeDeleted = true;
-  }
-
-  public boolean isToBeDeleted() {
-    return toBeDeleted;
   }
 
   /**
@@ -156,8 +112,8 @@ public abstract class Entity implements Serializable, Cloneable {
       double tempX = cornerX - centerX;
       double tempY = cornerY - centerY;
       // Perform rotation
-      double rotatedX = tempX * Math.cos(angle) - tempY * Math.sin(angle);
-      double rotatedY = tempX * Math.sin(angle) + tempY * Math.cos(angle);
+      double rotatedX = tempX * FastMath.cos(angle) - tempY * FastMath.sin(angle);
+      double rotatedY = tempX * FastMath.sin(angle) + tempY * FastMath.cos(angle);
       // Translate corner back to find true position
       cornerX = rotatedX + centerX;
       cornerY = rotatedY + centerY;
@@ -172,12 +128,7 @@ public abstract class Entity implements Serializable, Cloneable {
   public abstract void render();
 
   public void damage(double damage) {
-    // System.out.println("Damage: " + damage);
-    // properties.setHealth(attributes.getHealth() - damage);
-    // // Destroy if health less than 0
-    // if (properties.getHealth() <= 0) {
-    // delete();
-    // }
+    // Dying handled externally
     health -= damage;
   }
 
@@ -190,7 +141,7 @@ public abstract class Entity implements Serializable, Cloneable {
   public boolean isOutOfBounds() {
     double x = this.getPosition().getX();
     double y = this.getPosition().getY();
-    if (x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
+    if (x < 0 || x > Parameters.MAP_WIDTH || y < 0 || y > Parameters.MAP_HEIGHT)
       return true;
     return false;
   }
@@ -262,6 +213,41 @@ public abstract class Entity implements Serializable, Cloneable {
   public Position[] getObb() {
     return obb;
   }
+
+  /**
+   * @return the position in XY coordinates
+   */
+  public Position getPosition() {
+    return position;
+  }
+
+  /**
+   * @param position the position to set, in XY coordinates
+   */
+  public void setPosition(Position position) {
+    this.position = position;
+  }
+
+  public long getSerial() {
+    return serial;
+  }
+
+  public void setSerial(long serial) {
+    this.serial = serial;
+  }
+
+  public void save() {
+    this.toBeDeleted = false;
+  }
+
+  public void delete() {
+    this.toBeDeleted = true;
+  }
+
+  public boolean isToBeDeleted() {
+    return toBeDeleted;
+  }
+
 
   @Override
   public Object clone() throws CloneNotSupportedException {

@@ -1,6 +1,7 @@
 package org.alien8.core;
 
 import java.awt.Dimension;
+import net.jafama.FastMath;
 
 /**
  * This class is meant to hold all the important <code> final </code> parameters for all classes to
@@ -14,7 +15,16 @@ import java.awt.Dimension;
  * 
  */
 public class Parameters {
+
+  /// GENERIC GAME PARAMETERS
   public static final boolean RENDER_BOX = true;
+  public static final boolean ICE_IS_SOLID = false;
+  public static final int MAX_PLAYERS = 16;
+  public static final boolean AI_ON = true;
+  public static final boolean DEBUG_MODE = true;
+
+
+  /// SERVER PARAMETERS
   /**
    * How many times to attempt connection to server before giving up. Keep in mind the timeout is
    * pretty long itself.
@@ -24,20 +34,10 @@ public class Parameters {
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
    * than that. A value of 63 gives 58-60 ticks/second, hovering around 59
    */
-  public static final int TICKS_PER_SECOND = 63;
-  /**
-   * Size of map hitboxes
-   */
-  public static final int MAP_BOX_SIZE = 1;
-  /**
-   * Dimension object for the renderer dimensions
-   */
-  public static final Dimension RENDERER_SIZE = new Dimension(800, 600);
-  public static final int MAX_PLAYERS = 16;
-  /**
-   * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
-   */
-  public static final double ICE_BOX_DENSITY = 0.7;
+  public static final int TICKS_PER_SECOND = 103;
+  public static final int SERVER_PORT = 4446;
+  public static final int MULTI_CAST_PORT = 4445;
+  public static final int SERVER_SOCKET_BLOCK_TIME = 100;
   /**
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
@@ -45,33 +45,72 @@ public class Parameters {
   public static final int LIST_LENGTH_PER_PACKET = 5000;
   public static final int FPS_FREQ = 1;
   public static final int N_SECOND = 1000000000;
+  //////////////////////////////////////////////////////////
+
+
+  /// RENDERER PARAMETERS
+  /**
+   * Dimension object for the renderer dimensions
+   */
+  public static final Dimension RENDERER_SIZE = new Dimension(800, 600);
+  // public static final Dimension VIEWPORT_SIZE = new Dimension(600, 400);
+  public static final int SMALL_BORDER = 16;
+  public static final int BIG_BORDER = 96;
+  public static final int MINIMAP_WIDTH = 64;
+  public static final int MINIMAP_HEIGHT = 64;
+  //////////////////////////////////////////////////////////
+
+
+  /// MAP PARAMETERS
   public static final int MAP_HEIGHT = 2048;
   public static final int MAP_WIDTH = 2048;
-  /**
-   * Length of the ship in units (the same units we use for the coordinate system).
-   */
+  public static final double WATER_LEVEL = 0.4d;
+  //////////////////////////////////////////////////////////
+
+
+  /// SHIP PARAMETERS
   public static final double SHIP_LENGTH = 100;
-  /**
-   * Width of the ship in units (the same units we use for the coordinate system).
-   */
   public static final double SHIP_WIDTH = 25;
-  /**
-   * Amount of health a ship has.
-   */
   public static final double SHIP_HEALTH = 100;
-  /**
-   * Interdependent stuff. Force required is computed according to how long it would take to reach
-   * top speed
-   */
   public static final double SHIP_TOP_SPEED_REACH_TIME = 200;
   public static final double SHIP_TOP_SPEED_FORWARD = 2;
   public static final double SHIP_TOP_SPEED_BACKWARD = 2;
-  public static final double SHIP_MASS = 1000; // kg. This is kinda random
+  public static final double SHIP_MASS = 1000;
   public static final double SHIP_FORWARD_FORCE =
-      SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME; // N
+      SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME;
   public static final double SHIP_BACKWARD_FORCE =
-      SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME; // N
-  public static final double SHIP_ROTATION_PER_SEC = Math.PI / 3;
+      SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME;
+  public static final double SHIP_ROTATION_PER_SEC = FastMath.PI / 3;
+  //////////////////////////////////////////////////////////
+
+
+  /// BULLET PARAMETERS
+  /**
+   * Bullet parameters. Cooldowns in milliseconds.
+   */
+  public static final double BULLET_MASS = 10;
+  public static final double BULLET_WIDTH = 4;
+  public static final double BULLET_LENGTH = 8;
+  public static final double BULLET_SPEED = 4;
+  public static final double BULLET_DAMAGE = 10;
+  public static final int BULLET_POOL_SIZE = 50;
+  public static final int TURRET_CD = 1000;
+  public static final int TURRET_MIN_DIST = 0;
+  public static final int TURRET_MAX_DIST = 400;
+  /**
+   * This modifier affects how much distance holding down a button gives to the turret shot every
+   * tick
+   */
+  public static final double CHARGE_INCREMENT = 4;
+  //////////////////////////////////////////////////////////
+
+
+  /// PHYSICS PARAMETERS
+  /**
+   * Affects how much damage ships take in collisions.
+   */
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
+  public static final double COLLISION_ROTATION_MODIFIER = 0.2;
   /**
    * Affects how much the speed impacts the turning rate.
    */
@@ -80,59 +119,48 @@ public class Parameters {
   /**
    * Affects how much speed is lost when Entities collide
    */
-  public static final double RESTITUTION_COEFFICIENT = 1;
+  public static final double RESTITUTION_COEFFICIENT = 0.5;
   /**
    * Affects how 'bouncy' ice is when collided with.
    */
   public static final double ICE_BOUNCINESS = 0.02;
-  /**
-   * Bullet parameters
-   */
-  public static final double SMALL_BULLET_MASS = 10;
-  public static final double SMALL_BULLET_WIDTH = 2;
-  public static final double SMALL_BULLET_LENGTH = 4;
-  public static final double SMALL_BULLET_SPEED = 4;
-  public static final double SMALL_BULLET_DAMAGE = 10;
-  // Bullet cooldown in milliseconds
-  public static final int SMALL_BULLET_CD = 500;
-  public static final int SMALL_BULLET_MIN_DIST = 50;
-  public static final int SMALL_BULLET_MAX_DIST = 400;
+  public static final double OUT_OF_BOUNDS_PUSHBACK = 10;
+  public static final double OUT_OF_BOUNDS_BOUNCINESS = 0.02;
+  //////////////////////////////////////////////////////////
 
-  public static final double BIG_BULLET_MASS = 30;
-  public static final double BIG_BULLET_WIDTH = 4;
-  public static final double BIG_BULLET_LENGTH = 6;
-  public static final double BIG_BULLET_SPEED = 2;
-  public static final double BIG_BULLET_DAMAGE = 10;
-  public static final int BIG_BULLET_CD = 2000;
-  public static final int BIG_BULLET_MIN_DIST = 50;
-  public static final int BIG_BULLET_MAX_DIST = 400;
 
-  /**
-   * This modifier affects how much distance holding down a button gives to the turret shot every
-   * tick
-   */
-  public static final double CHARGE_INCREMENT = 4;
-  /**
-   * Affects how much damage ships take in collisions.
-   */
-  public static final double COLLISION_DAMAGE_MODIFIER = 0.1;
-  public static final double WATER_LEVEL = 0.4d;
+  /// AUDIO PARAMETERS
   /**
    * Maximum number of "shoot" audio clips running at the same time
    */
   public static final int SFX_POOL_SIZE = 5;
-  public static final float INITIAL_VOLUME_SFX = 0.4f;
-  public static final float INITIAL_VOLUME_AMBIENT = 0.4f;
+  public static final float INITIAL_VOLUME_SFX = 0.8f;
+  public static final float INITIAL_VOLUME_AMBIENT = 0.8f;
   public static final int MAX_HEARING_DISTANCE = 1500;
-  /**
-   * See Score for details
-   */
-  public static final int SCORE_PER_KILL = 100;
+  //////////////////////////////////////////////////////////
+
+
+  /// SCORE PARAMETERS
+  public static final int SCORE_PER_KILL = 1000;
   public static final float KILL_STREAK_MULTIPLIER = 0.1f;
-  public static final float DISTANCE_MULTIPLIER = 1;
+  public static final float DISTANCE_MULTIPLIER = 0.1f;
   public static final int SCOREBOARD_HEIGHT = 500;
   public static final int SCOREBOARD_WIDTH = 500;
+  //////////////////////////////////////////////////////////
 
 
+  /// ITEMS PARAMETERS
+  public static final double PLANE_SPEED = 3;
+  public static final double ITEM_WIDTH = 16;
+  public static final double ITEM_LENGTH = 16;
+  public static final double ITEM_HEALTH_ITEM_VALUE = 25;
+  //////////////////////////////////////////////////////////
 
+
+  /// UNUSED PARAMETERS
+  /**
+   * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
+   */
+  public static final double ICE_BOX_DENSITY = 0.7;
+  //////////////////////////////////////////////////////////
 }

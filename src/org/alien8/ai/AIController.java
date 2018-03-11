@@ -6,6 +6,9 @@ import java.util.Random;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.ship.Ship;
+
+import net.jafama.FastMath;
+
 import org.alien8.physics.Position;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
@@ -72,7 +75,6 @@ public class AIController{
 		double yNose = (corners[0].getY() + corners[1].getY())/2.0;
 		Position nose = new Position(xNose,yNose);
 		return drawRay(corners[0], direction, rayLength) || drawRay(corners[1], direction, rayLength) || drawRay(nose, direction, rayLength); 
-		
 	}
 	
 	public boolean drawRay(Position start, double dir, int maxR){

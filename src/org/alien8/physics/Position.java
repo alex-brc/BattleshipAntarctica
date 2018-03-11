@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.alien8.core.Parameters;
 
+import net.jafama.FastMath;
+
 /**
  * Basic position class to pack together the X and Y coordinates for an entity.
  *
@@ -32,7 +34,7 @@ public class Position implements Serializable{
 	 * @return the angle in radians in [0,2pi) 
 	 */
 	public double getAngleTo(Position position) {
-		return Math.atan2(						// Intentionally left out intermediary variables for speed
+		return FastMath.atan2(						// Intentionally left out intermediary variables for speed
 				position.getX() - this.getX(),  // B(x) - A(x)  
 				position.getY() - this.getY()); // B(y) - A(y) 
 	}
@@ -53,7 +55,7 @@ public class Position implements Serializable{
 	 * @return distance in units between the points
 	 */
 	public double distanceTo(Position position) {
-		return (Math.hypot(
+		return (FastMath.hypot(
 					position.getX()-this.getX(),
 					position.getY()-this.getY()
 					)
@@ -115,5 +117,22 @@ public class Position implements Serializable{
 		if((int) this.getX() == (int) position.getX() && (int) this.getY() == (int) position.getY())
 			return true;
 		return false;
+	}
+	
+	/**
+	 * Verifies if two positions are approximately equal
+	 * @param position to check against 
+	 * @param margin the margin that would be acceptable to call the position approximate
+	 * @return true if they are approximately equal, false otherwise
+	 */
+	public boolean approximately(Position position, int margin) {
+		if(FastMath.abs(this.getX() 
+				- position.getX()) > margin)
+			return false;
+		
+		if(FastMath.abs(this.getY() - position.getY()) > margin)
+			return false;
+		
+		return true;
 	}
 }

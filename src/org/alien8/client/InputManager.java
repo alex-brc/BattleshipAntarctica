@@ -1,3 +1,4 @@
+
 package org.alien8.client;
 
 import java.awt.event.KeyEvent;
@@ -5,11 +6,15 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
+import org.alien8.audio.AudioManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
+
+import net.jafama.FastMath;
 
 /**
  * This singleton class is a listener to be added to the main window. It adds all relevant input
@@ -27,7 +32,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   private boolean aPressed = false; // Turn left
   private boolean sPressed = false; // Slow down
   private boolean dPressed = false; // Turn right
-  private boolean spacePressed = false; // Shoot 3
+  private boolean spacePressed = false; // Use item
 
   // Not synced - local controls
   private boolean escPressed = false; // Pull up menu
@@ -53,7 +58,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
       PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
     else if (cis.sPressed)
       PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
-          PhysicsManager.shiftAngle(player.getDirection() + Math.PI));
+          PhysicsManager.shiftAngle(player.getDirection() + FastMath.PI));
 
     // Apply rotation
     if (cis.aPressed)
@@ -62,10 +67,14 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
     if (cis.dPressed)
       PhysicsManager.rotateEntity(player,
           Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-
+    
     // Apply "friction"
     PhysicsManager.applyFriction(player);
-
+    
+    // Use item
+    if(cis.spacePressed)
+    	player.useItem();
+    
     // Prepare for shooting
     // Orientation
     player.setTurretsDirection(cis.mousePosition);
@@ -81,9 +90,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
       player.rearTurretShoot();
 
     if (cis.spacePressed)
-      player.midTurretCharge();
-    else
-      player.midTurretShoot();
+      ; // TODO use item
 
   }
 
@@ -283,6 +290,10 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
   @Override
   public void keyTyped(KeyEvent e) {
-    // Not interesting
+	// Mute all sounds with M
+    if(e.getKeyCode() == KeyEvent.VK_M) {
+    	AudioManager.getInstance().ambientMuteToggle();
+    	AudioManager.getInstance().sfxMuteToggle();
+    }
   }
 }

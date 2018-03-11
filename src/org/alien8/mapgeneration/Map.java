@@ -7,6 +7,8 @@ import org.alien8.physics.AABB;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 
+import net.jafama.FastMath;
+
 public class Map {
   protected int length;
   protected int width;
@@ -64,8 +66,8 @@ public class Map {
         if (1.0 * countIce / (boxSize * boxSize) > Parameters.ICE_BOX_DENSITY) {
           // Just need to generate a bunch of values for initialising an entity/hitbox
 
-          double centerX = x + (Math.ceil(boxSize / 2.0d) - 1);
-          double centerY = y + (Math.ceil(boxSize / 2.0d) - 1);
+          double centerX = x + (FastMath.ceil(boxSize / 2.0d) - 1);
+          double centerY = y + (FastMath.ceil(boxSize / 2.0d) - 1);
           Position center = new Position(centerX, centerY);
           Ice newIce = new Ice(center);
 
@@ -87,6 +89,7 @@ public class Map {
   }
 
   public void render(Renderer r) {
-    r.drawMap(iceGrid);
+    // r.drawMap(iceGrid);
+    r.drawViewport(iceGrid);
   }
 }

@@ -8,6 +8,7 @@ import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
+import net.jafama.FastMath;
 
 public class Collision {
   private Entity entity1;
@@ -70,7 +71,6 @@ public class Collision {
     double direction2 = entity2.getDirection();
 
     // Move ships apart according to the Minimum Translation Vector
-    // System.out.println("Cur" + entity1.getPosition());
     // mod 10 allows distance to be scaled down so that objects don't fly away from each other as
     // much
     double mtvX = mtv.getDistance() * mtv.getAxis().getX() % 10;
@@ -119,31 +119,48 @@ public class Collision {
     // This means that we can just swap their speed and direction
     // We multiply speed by the coefficient of restitution to decrease it
     entity1.setSpeed(speed2 * Parameters.RESTITUTION_COEFFICIENT);
-    PhysicsManager.rotateEntity(entity1, (direction1 - direction2) % 5);
+    PhysicsManager.rotateEntity(entity1,
+        ((direction1 - direction2) % 5) * Parameters.COLLISION_ROTATION_MODIFIER);
     // entity1.setDirection(direction2);
     entity2.setSpeed(speed1 * Parameters.RESTITUTION_COEFFICIENT);
-    PhysicsManager.rotateEntity(entity2, (direction2 - direction1) % 5);
+    PhysicsManager.rotateEntity(entity2,
+        ((direction2 - direction1) % 5) * Parameters.COLLISION_ROTATION_MODIFIER);
     // entity2.setDirection(direction1);
 
     // Each ship takes damage proportional to the momentum of the other ship
     entity1.damage(speed2 * entity2.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
     entity2.damage(speed1 * entity1.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
+    // Delete ships if dead
+    if (new Double(entity1.getHealth()).intValue() <= 0) {
+      System.out.println("A ship died!");
+      entity1.delete();
+    }
+    if (new Double(entity2.getHealth()).intValue() <= 0) {
+      System.out.println("A ship died!");
+      entity2.delete();
+    }
   }
 
   private void resolveBulletShipCollision(Bullet bullet, Ship ship) {
     // This allows us to ignore cases where a ship shoots itself
+    //System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
     if (bullet.getSource() != ship.getSerial()) {
-      System.out.println("bullet hit ship");
+      System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
       // Bullet damages ship
       ship.damage(bullet.getDamage());
       // Award score to the bullet owner
-      Player shooter = Server.getPlayer(bullet);
-      ScoreBoard.getInstance().giveHit(shooter, bullet);
+      Player shooter = Server.getInstance().getPlayer(bullet);
+      // If it's AI, no points
+      if (shooter != null)
+        ScoreBoard.getInstance().giveHit(shooter, bullet);
       // See if ship has been destroyed
-      if (ship.getHealth() <= 0) {
+      if (new Double(ship.getHealth()).intValue() <= 0) {
+        System.out.println("A ship died!");
         ship.delete();
         // Award score to the killer
-        ScoreBoard.getInstance().giveKill(shooter);
+        // If it's AI, no points
+        if (shooter != null)
+          ScoreBoard.getInstance().giveKill(shooter);
       }
       // Destroy bullet
       bullet.delete();
@@ -152,7 +169,7 @@ public class Collision {
 
   private void resolveShipIceCollision(Ship ship, Ice ice) {
     System.out.println("ship hit ice");
-    ship.setDirection(Math.PI + ship.getDirection());
+    ship.setDirection(FastMath.PI + ship.getDirection());
   }
 
   private void resolveBulletIceCollision(Bullet bullet, Ice ice) {

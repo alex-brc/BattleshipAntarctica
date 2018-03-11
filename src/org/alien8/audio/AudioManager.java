@@ -3,13 +3,17 @@ package org.alien8.audio;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.FloatControl.Type;
+
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
-import org.alien8.server.AudioEvent;
 import org.alien8.util.LogManager;
+
+import net.jafama.FastMath;
 
 /**
  * This audio manager is responsible for all game audio, handles sound FX and also volume.
@@ -24,6 +28,9 @@ public class AudioManager implements Runnable {
   public static final int SFX_ICE_CRASH = 2;
   public static final int SFX_SHIP_CRASH = 3;
   public static final int SFX_PLANE_PASS = 4;
+  public double RANGE;
+  public double RANGE_MIN;
+  public double RANGE_MAX;
 
   private static AudioManager instance = null;
   private volatile boolean running;
@@ -67,7 +74,13 @@ public class AudioManager implements Runnable {
 
       // Initialise event queue
       audioEvents = new ConcurrentLinkedQueue<AudioEvent>();
-
+      
+      // Get gain control range
+      FloatControl gainControl = (FloatControl) shoot1Pool.get(1).getControl(FloatControl.Type.MASTER_GAIN);
+      RANGE = gainControl.getMaximum() - gainControl.getMinimum();
+      RANGE_MIN = gainControl.getMinimum();
+      RANGE_MAX = gainControl.getMaximum();
+      
       // Start event listener thread
       running = true;
       (new Thread(this, "AudioManager")).start();
@@ -259,17 +272,6 @@ public class AudioManager implements Runnable {
   }
 
   /**
-   * Computes a linear volume scale from the gain in decibels and returns the equivalent value
-   * 
-   * @param clip the clip to get the volume from
-   * @return a linear scale value for the volume (0 to 1)
-   */
-  private float getVolume(Clip clip) {
-    FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    return (float) Math.pow(10f, gainControl.getValue() / 20f);
-  }
-
-  /**
    * Assigns a value for the gain in decibels from a linear scale input
    * 
    * @param clip the clip to set the volume for
@@ -278,9 +280,10 @@ public class AudioManager implements Runnable {
   private void setVolume(Clip clip, double volume) {
     if (volume < 0.0f || volume > 1.0f)
       return;
-
-    FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-    gainControl.setValue(20f * (float) Math.log10(volume));
+    
+    float gain = (float) (RANGE * volume + RANGE_MIN);
+    ((FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(gain);
+    
   }
 
   public void addEvent(AudioEvent event) {
