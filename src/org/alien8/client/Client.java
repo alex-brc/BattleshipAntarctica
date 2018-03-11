@@ -12,12 +12,13 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import org.alien8.ai.AIController;
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
-import org.alien8.core.ClientRequest;
+import org.alien8.core.ClientMessage;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
@@ -43,19 +44,15 @@ public class Client implements Runnable {
   private InetAddress serverIP = null;
   private InetAddress multiCastIP = null;
   private Integer clientUdpPort = null;
-  private Integer serverPort = 4446;
-  private int multiCastPort = 4445;
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
-  private ScoreBoard scoreBoard;
 
   public Client() {
     model = ModelManager.getInstance();
-    scoreBoard = ScoreBoard.getInstance();
   }
 
   /**
@@ -181,28 +178,31 @@ public class Client implements Runnable {
       try {
         clientIP = InetAddress.getLocalHost();
         serverIP = InetAddress.getByName(serverIPStr);
-        tcpSocket = new Socket(serverIP, serverPort);
+        tcpSocket = new Socket(serverIP, Parameters.SERVER_PORT);
         udpSocket = new DatagramSocket();
         clientUdpPort = udpSocket.getLocalPort();
-        // eventSocket = new DatagramSocket();
 
-        // Serialize a ClientRequest Object into byte array
-        ClientRequest connectRequest = new ClientRequest(0, udpSocket.getLocalPort());
+        // Serialize a ClientMessage (connect) Object into byte array
+        ClientMessage connectRequest = new ClientMessage(0, udpSocket.getLocalPort());
         ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
         ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
         toServer.writeObject(connectRequest);
 
         // Receive map seed from server
-        Long seed = getMapSeed(fromServer);
+        Long seed = this.getMapSeed(fromServer);
         model.makeMap(seed);
 
         // Receive the initial game state from server
-        ArrayList<EntityLite> entsLite = receiveGameStateTCP(fromServer);
+        ArrayList<EntityLite> entsLite = this.receiveGameStateTCP(fromServer);
         model.sync(entsLite, clientIP, clientUdpPort);
+
+        // Serialize a ClientMessage (ready) Object into byte array
+        ClientMessage ready = new ClientMessage(2, udpSocket.getLocalPort());
+        toServer.writeObject(ready);
 
         // Set up multicast socket for receiving game states from server
         multiCastIP = InetAddress.getByName("224.0.0.5");
-        multiCastSocket = new MulticastSocket(multiCastPort);
+        multiCastSocket = new MulticastSocket(Parameters.MULTI_CAST_PORT);
         multiCastSocket.joinGroup(multiCastIP);
 
       } catch (BindException e) {
@@ -242,8 +242,7 @@ public class Client implements Runnable {
       sendingByte = byteOut.toByteArray();
 
       // Create a packet for holding the input sample byte data
-      DatagramPacket packet =
-          new DatagramPacket(sendingByte, sendingByte.length, serverIP, 4446);
+      DatagramPacket packet = new DatagramPacket(sendingByte, sendingByte.length, serverIP, Parameters.SERVER_PORT);
 
       // Send the client input sample packet to the server
       udpSocket.send(packet);
@@ -280,6 +279,8 @@ public class Client implements Runnable {
           ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
         }
       }
+    } catch (SocketTimeoutException ste) {
+      // Do nothing, just proceed
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
@@ -304,9 +305,12 @@ public class Client implements Runnable {
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
       ArrayList<EntityLite> entsLite = (ArrayList<EntityLite>) objIn.readObject();
 
-      // Sync the game state with server
-      ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
+      if (entsLite != null)
+        // Sync the game state with server
+        ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
 
+    } catch (SocketTimeoutException ste) {
+      // Do nothing, just proceed
     } catch (IOException ioe) {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
@@ -345,14 +349,14 @@ public class Client implements Runnable {
   }
 
   /**
-   * Should be called when the client clicks the 'Exit' button from the in-game menu.
+   * Should be called when the client clicks the 'Exit' button from the in-game menu or closes the game window
    */
   public void disconnect() {
     if (clientIP != null && serverIP != null && multiCastIP != null && clientUdpPort != null
         && tcpSocket != null && udpSocket != null && multiCastSocket != null) {
       try {
         // Serialize a ClientRequest Object into byte array
-        ClientRequest disconnectRequest = new ClientRequest(1, udpSocket.getLocalPort());
+        ClientMessage disconnectRequest = new ClientMessage(1, udpSocket.getLocalPort());
         ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
 
         // Send the disconnect request

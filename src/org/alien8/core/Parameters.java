@@ -35,7 +35,27 @@ public class Parameters {
    * than that. A value of 63 gives 58-60 ticks/second, hovering around 59
    */
   public static final int TICKS_PER_SECOND = 103;
+public static final int SERVER_PORT = 4446;
+  public static final int MULTI_CAST_PORT = 4445;
+  public static final int SERVER_SOCKET_BLOCK_TIME = 100;
+  
+
   /**
+<<<<<<< HEAD
+=======
+   * Dimension object for the renderer dimensions
+   */
+  public static final Dimension RENDERER_SIZE = new Dimension(800, 600);
+  // public static final Dimension VIEWPORT_SIZE = new Dimension(600, 400);
+  public static final int SMALL_BORDER = 16;
+  public static final int BIG_BORDER = 96;
+  public static final int MAX_PLAYERS = 16;
+  /**
+   * How many ice pixels must be in a box to be considered an ice entity (%). This is in [0,1]
+   */
+  public static final double ICE_BOX_DENSITY = 0.7;
+  /**
+>>>>>>> 6f7522becb7730205f5e9ff7a66b12592f929b58
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */

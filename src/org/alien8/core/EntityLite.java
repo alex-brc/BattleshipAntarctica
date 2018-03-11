@@ -17,8 +17,11 @@ public class EntityLite implements Serializable {
   /*
    * 0 - Player Ship
    * 1 - AI Ship
-   * 2 - Small Bullet
-   * 3 - Big Bullet
+   * 2 - Bullet
+<<<<<<< HEAD
+=======
+   * 3 - Pickup
+>>>>>>> alexb
    */
   public int entityType;
   public Position position;
@@ -42,6 +45,9 @@ public class EntityLite implements Serializable {
   public double distance;
   public double travelled;
   public long source;
+  
+  // For pickups
+  public int pickupType;
 
   // For Player Ship
   public EntityLite(long serial, int entityType, Position position,
@@ -96,6 +102,22 @@ public class EntityLite implements Serializable {
     this.travelled = travelled;
     this.source = source;
   }
+  
+  // For pickup
+  public EntityLite(int entityType, Position position, int pickupType, boolean toBeDeleted) {
+	  this.entityType = entityType;
+	  this.position = position;
+	  this.pickupType = pickupType;
+	  this.toBeDeleted = toBeDeleted;
+  }
+  
+  // For PlaneDropper
+  public EntityLite(int entityType, Position position, boolean toBeDeleted, double direction) {
+	    this.entityType = entityType;
+	    this.position = position;
+	    this.toBeDeleted = toBeDeleted;
+	    this.direction = direction;
+	  }
 
   public String toString() {
     return "Serial: " + serial + ", " + "EntityType: " + entityType;

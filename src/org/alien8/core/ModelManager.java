@@ -7,6 +7,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
+import org.alien8.items.HealthPickup;
+import org.alien8.items.Pickup;
+import org.alien8.items.PlaneDropper;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
@@ -67,6 +70,7 @@ public class ModelManager {
     ClientInputSample cis = null;
 
     for (Entity ent : entities) {
+      // System.out.println(ent.getSerial());
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
@@ -99,7 +103,6 @@ public class ModelManager {
 
   }
 
-
   /**
    * Sync the client with the server
    */
@@ -115,26 +118,28 @@ public class ModelManager {
     for (EntityLite el : entitiesLite) {
       if (el.entityType == 0) { // Player Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
-        s.setSerial(el.serial);
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
         s.getFrontTurret().setDistance(el.frontTurretCharge);
         s.getRearTurret().setDistance(el.rearTurretCharge);
-
+        
         if (el.toBeDeleted) {
           s.delete();
         }
 
-        if (el.clientIP.equals(clientIP) && el.clientUdpPort == clientUdpPort) { // Client's ship
+        if (el.clientIP.equals(
+        		clientIP) && 
+        		el.clientUdpPort == 
+        		clientUdpPort) { // Client's ship
           this.setPlayer(s);
         }
 
         this.addEntity(s);
+        s.setSerial(el.serial);
       } else if (el.entityType == 1) { // AI Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
-        s.setSerial(el.serial);
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
@@ -145,18 +150,39 @@ public class ModelManager {
         }
 
         this.addEntity(s);
-      } else if (el.entityType == 2) { // SmallBullet
+      } else if (el.entityType == 2) { // Bullet
         Bullet b = new Bullet(el.position, el.direction, el.distance, el.source);
-        b.setSerial(el.serial);
         b.setSpeed(el.speed);
         b.setTravelled(el.travelled);
 
         if (el.toBeDeleted) {
-          b.delete();
+        	b.delete();
         }
 
         this.addEntity(b);
+      } else if(el.entityType == 3) { // Pickup
+    	  Pickup p = null;
+    	  switch(el.pickupType) {
+    	  case Pickup.HEALTH_PICKUP:
+    		  p = new HealthPickup(el.position);
+    		  break;
+    	  }
+
+    	  if(el.toBeDeleted) {
+    		  p.delete();
+    	  }
+    	  
+    	  this.addEntity(p);
+      } else if(el.entityType == 4) { // Plane
+    	  PlaneDropper pd = new PlaneDropper(el.position, el.direction);
+    	  System.out.println("got plane at " + pd.getPosition());
+    	  if(el.toBeDeleted) {
+    		  pd.delete();
+    	  }
+    	  
+    	  this.addEntity(pd);
       }
+      
     }
   }
 

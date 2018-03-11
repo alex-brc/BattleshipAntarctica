@@ -17,15 +17,13 @@ public class Launcher {
 
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
+    
+    // Loading client window
     launcher.game = new Client();
     Launcher.instance = launcher;
     // Load log manager
     launcher.loadStatus = "Preparing logger...";
     launcher.loadLogManager();
-
-    // Load renderer
-    launcher.loadStatus = "Building renderer...";
-    launcher.loadRenderer();
 
     // Load audio manager
     launcher.loadStatus = "Loading sounds...";

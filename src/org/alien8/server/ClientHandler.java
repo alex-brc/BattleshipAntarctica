@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import org.alien8.core.ClientRequest;
+import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
@@ -45,8 +45,13 @@ public class ClientHandler extends Thread {
   }
 
   public void run() {
+    // Start the server game loop if it is the first client connecting
+    if (playerList.size() == 0) {
+      Server.getInstance().startSGH();
+    }
+
     Position randPos = Server.getInstance().getRandomPosition();
-    
+
     // TODO: ADD NAMES TO PLAYERS
     int k = (new Random()).nextInt(1000);
     String name = "RAND_NAME_" + k;
@@ -61,46 +66,41 @@ public class ClientHandler extends Thread {
     playerMap.put(s, p);
     ScoreBoard.getInstance().add(p);
     System.out.println("FIRST SCORE: " + ScoreBoard.getInstance().getScores().get(0).toString());
-    // Update the client's scoreBoard asap
-    playerList.add(p);
 
-    // Start the server game loop if it is the first client connecting
-    if (playerList.size() == 1) {
-      Server.getInstance().startSMCS();
-    }
+    this.sendMapSeed(p, s);
+    this.sendGameState(p, s);
+    this.waitForReadyMessage(p, s);
 
-    sendMapSeed(clientIP, toClient, mapSeed);
-    sendGameState(toClient);
-    
     // Keep reading for various client's request (only disconnect request at this moment)
     while (run) {
       try {
-        ClientRequest cr = (ClientRequest) fromClient.readObject();
-        if (cr.getType() == 1) { // Disconnect request
+        ClientMessage msg = (ClientMessage) fromClient.readObject();
+        if (msg.getType() == 1) { // Disconnect request
           Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
         }
-      } catch(ClassNotFoundException cnfe) {
+      } catch (ClassNotFoundException cnfe) {
         LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
             "Class of serialized object cannot be found." + cnfe.toString());
         cnfe.printStackTrace();
+        Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
       } catch (IOException ioe) {
         LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-            "Something is wrong when reading client's request" + ioe.toString());
+            "Something is wrong when reading client's message" + ioe.toString());
         Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
       }
     }
   }
 
-  private void sendMapSeed(InetAddress clientIP, ObjectOutputStream toClient, Long seed) {
+  private void sendMapSeed(Player p, Ship s) {
     try {
-      toClient.writeObject(seed);
+      toClient.writeObject(mapSeed);
     } catch (IOException ioe) {
       LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
           "Could not send map seed to client. " + ioe.toString());
       ioe.printStackTrace();
+      this.disconnectClient(p, s);
     }
-    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
-            "Sent seed to client. ");
+    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO, "Sent seed to client. ");
   }
 
   /*
@@ -134,7 +134,7 @@ public class ClientHandler extends Thread {
     return EntitiesLite;
   }
 
-  private void sendGameState(ObjectOutputStream toClient) {
+  private void sendGameState(Player p, Ship s) {
     ArrayList<EntityLite> entsLite = this.calculateEntitiesLite(entities);
     try {
       toClient.writeObject(entsLite);
@@ -142,9 +142,42 @@ public class ClientHandler extends Thread {
       LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
           "Could not send entsLite to client. " + ioe.toString());
       ioe.printStackTrace();
+      this.disconnectClient(p, s);
     }
     LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
         "Sent entLites to client. ");
+  }
+
+  private void waitForReadyMessage(Player p, Ship s) {
+    // Add the player to the playerList when the player is ready
+    try {
+      ClientMessage msg = (ClientMessage) fromClient.readObject();
+      if (msg.getType() == 2) // Ready message
+        playerList.add(p);
+      else
+        this.disconnectClient(p, s);
+    } catch (ClassNotFoundException cnfe) {
+      LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
+          "Class of serialized object cannot be found." + cnfe.toString());
+      cnfe.printStackTrace();
+      this.disconnectClient(p, s);
+    } catch (IOException ioe) {
+      LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
+          "Something is wrong when reading client's ready message" + ioe.toString());
+      ioe.printStackTrace();
+      this.disconnectClient(p, s);
+    }
+  }
+
+  /*
+   * Use this only if things goes wrong before the client is added to the playerList
+   */
+  private void disconnectClient(Player p, Ship s) {
+    s.delete();
+    playerMap.remove(s);
+    ScoreBoard.getInstance().remove(p);
+    Server.getInstance().getCHList().remove(this);
+    this.end();
   }
 
   public InetAddress getClientIP() {
@@ -154,7 +187,7 @@ public class ClientHandler extends Thread {
   public int getClientUdpPort() {
     return this.clientUdpPort;
   }
-  
+
   public void end() {
     run = false;
   }
