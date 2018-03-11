@@ -80,7 +80,7 @@ public class AIController{
 		double y0 = start.getY();
 		for (int r = 1;r <=maxR; r++){
 			int x = (int)Math.round(x0 + r*Math.cos(dir));
-			int y = (int)Math.round(y0 + r*Math.sin(dir)); //This is minus due to our weird coordinate system..
+			int y = (int)Math.round(y0 + r*Math.sin(dir));
 			if (y >= Parameters.MAP_HEIGHT || x <= 0 || y <= 0 || x >= Parameters.MAP_WIDTH || iceGrid[x][y] ){
 				return true;
 			}
@@ -90,36 +90,26 @@ public class AIController{
 	
 	public void wander(){
 		if (rayDetect((int)Parameters.SHIP_LENGTH)){
-			if (myShip.getSpeed() < 1){
-				System.out.println("Case 1");
-				PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
-			}
-			else{
-				System.out.println("Case 2");
-				PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
-			}
+			PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
+
 			double locEastDir = myShip.getDirection();
-			if (locEastDir < (Math.PI/2d)){
-				locEastDir = (2d*Math.PI) + locEastDir - (Math.PI/2d);
+			locEastDir = PhysicsManager.shiftAngle(locEastDir - (Math.PI/2d));
+			double locWestDir = PhysicsManager.shiftAngle(locEastDir + Math.PI);
+			boolean obstToEast = drawRay(myShip.getPosition(), locEastDir, (int)Parameters.SHIP_LENGTH);
+			boolean obstToWest = drawRay(myShip.getPosition(), locWestDir, (int)Parameters.SHIP_LENGTH);
+			
+			if (obstToEast && obstToWest){ //Obsticles to both sides
+				myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
 			}
-			else{
-				locEastDir = locEastDir - (Math.PI/2d);
-			}
-			double locWestDir = locEastDir + Math.PI;
-			if (locWestDir >= Math.PI){
-				locWestDir = locWestDir - 2d*Math.PI;
-			}
-			if (drawRay(myShip.getPosition(), locEastDir, (int)Parameters.SHIP_LENGTH)){
-				System.out.println("Case L");
-				PhysicsManager.rotateEntity(myShip,(-1)*Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-			}
-			else{
-				System.out.println("Case R");
+			else if (obstToWest){
 				PhysicsManager.rotateEntity(myShip,Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
 			}
+			else{
+				PhysicsManager.rotateEntity(myShip,(-1)*Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
+			}
+			System.out.println(myShip.getSpeed());
 		}
 		else{
-			System.out.println("Case 0");
 			PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
 		}
 	}

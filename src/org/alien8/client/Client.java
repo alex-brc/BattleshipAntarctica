@@ -48,7 +48,7 @@ public class Client implements Runnable {
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiReceiver = null;
   private String groupIPStr = "224.0.0.5";
-  private String serverIPstr = "172.22.94.28"; // <- change to the ip of the server to test
+  private String serverIPstr = "192.168.0.13"; // <- change to the ip of the server to test
   private ScoreBoard scoreBoard;
 
   public Client() {
@@ -134,11 +134,11 @@ public class Client implements Runnable {
         frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
         FPS = frameRate * Parameters.FPS_FREQ;
         frameRate = 0;
-        System.out.println(FPS);
+        //System.out.println(FPS);
       }
       if (getTime() - tickTimer > Parameters.N_SECOND) {
         tickTimer += Parameters.N_SECOND;
-        System.out.println(tickRate);
+        //System.out.println(tickRate);
         tickRate = 0;
       }
     }
