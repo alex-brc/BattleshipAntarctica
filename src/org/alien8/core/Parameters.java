@@ -35,10 +35,10 @@ public class Parameters {
    * than that. A value of 63 gives 58-60 ticks/second, hovering around 59
    */
   public static final int TICKS_PER_SECOND = 103;
-public static final int SERVER_PORT = 4446;
+  public static final int SERVER_PORT = 4446;
   public static final int MULTI_CAST_PORT = 4445;
   public static final int SERVER_SOCKET_BLOCK_TIME = 100;
-
+  /**
    * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
    * simplicity.
    */
