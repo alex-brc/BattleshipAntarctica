@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
@@ -40,23 +39,18 @@ public class ScoreBoard {
   }
 
   public void update(Score sc) {
-    for (Score score : scores) {
+	boolean updated = false;
+    for (Score score : scores)
       if (sc.getShipSerial() == score.getShipSerial()) {
-        score = sc;
+        scores.remove(score);
+        scores.add(sc);
+        updated = true;
+        break;
       }
-    }
+    if (!updated)
+    	this.scores.add(sc);
     this.order();
-  }
-
-  public void fill(List<Player> players) {
-    LogManager.getInstance().log("ScoreBoard", LogManager.Scope.INFO,
-        "Filling scoreboard with players...");
-
-    for (Player p : players) {
-      Score score = new Score(p);
-      scores.add(score);
-      Server.getInstance().addEvent(score.exportToEvent());
-    }
+    System.out.println("added score");
   }
 
   public void add(Player player) {
@@ -153,7 +147,6 @@ public class ScoreBoard {
     // Draw scores
     int offset = this.renderFontHeight + 2 * this.renderVerticalBuffer;
     for(Score score : scores) {
-    	System.out.println("rendering score");
     	// Draw the color
     	renderer.drawFilledRect(cornerX + 15, cornerY + offset, 15, 15, score.getColour(), true);
     	// Draw the name
@@ -161,18 +154,18 @@ public class ScoreBoard {
     	// Draw the score
     	renderer.drawText(Integer.toString(score.getScore()), cornerX + 160, cornerY + offset, true, FontColor.WHITE);
     	// Draw the kills
-    	renderer.drawText(Integer.toString(score.getKills()), cornerX + 280, cornerY + offset, true, FontColor.WHITE);
+    	renderer.drawText(Integer.toString(score.getKills()), cornerX + 310, cornerY + offset, true, FontColor.WHITE);
     	// Draw the status
     	if(score.getAlive())
-    		renderer.drawText("ALIVE", cornerX + 390, cornerY + offset, true, FontColor.WHITE);
+    		renderer.drawText("ALIVE", cornerX + 420, cornerY + offset, true, FontColor.WHITE);
     	else
-    		renderer.drawText("DEAD", cornerX + 390, cornerY + offset, true, FontColor.WHITE);
+    		renderer.drawText("DEAD", cornerX + 420, cornerY + offset, true, FontColor.WHITE);
     	// Draw a separator
     	for(int x = cornerX; x < cornerX + Parameters.SCOREBOARD_WIDTH; x++)
-        	renderer.drawPixel(x, cornerY + offset + this.renderVerticalBuffer, 0xFFFFFF, true);
+        	renderer.drawPixel(x, cornerY + offset + this.renderFontHeight, 0xFFFFFF, true);
     	
     	// Increment offset
-    	offset += this.renderFontHeight + 2 * this.renderVerticalBuffer;
+    	offset += this.renderFontHeight + this.renderVerticalBuffer;
     }
   }
 }

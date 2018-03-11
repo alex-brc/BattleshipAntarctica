@@ -5,15 +5,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.physics.Position;
+import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
+import org.alien8.score.ScoreEvent;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
@@ -54,7 +58,7 @@ public class ClientHandler extends Thread {
 
     // TODO: ADD NAMES TO PLAYERS
     int k = (new Random()).nextInt(1000);
-    String name = "RAND_NAME_" + k;
+    String name = "" + k;
 
     // Setup client's ship
     int randColour = (new Random()).nextInt(0xFFFFFF);
@@ -135,8 +139,12 @@ public class ClientHandler extends Thread {
 
   private void sendGameState(Player p, Ship s) {
     ArrayList<EntityLite> entsLite = this.calculateEntitiesLite(entities);
+    LinkedList<ScoreEvent> initialScores = new LinkedList<ScoreEvent>();
+    for(Score score : ScoreBoard.getInstance().getScores())
+    	initialScores.add(score.exportToEvent());
     try {
       toClient.writeObject(entsLite);
+      toClient.writeObject(initialScores);
     } catch (IOException ioe) {
       LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
           "Could not send entsLite to client. " + ioe.toString());
