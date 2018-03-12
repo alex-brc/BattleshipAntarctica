@@ -29,7 +29,6 @@ public abstract class Pickup extends Entity {
 	public void onPickup(Ship ship) {
 		item.setShip(ship);
 		ship.giveItem(item);
-		this.delete();
 	}
 	
 	@Override

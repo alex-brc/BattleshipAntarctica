@@ -2,6 +2,7 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.items.Pickup;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
@@ -47,18 +48,20 @@ public class Collision {
     } else if ((entity1 instanceof Bullet) & (entity2 instanceof Ship)) {
       resolveBulletShipCollision((Bullet) entity1, (Ship) entity2);
     }
-    // // Collision between a Ship and Ice
-    // else if ((entity1 instanceof Ship) & (entity2 instanceof Ice)) {
-    // resolveShipIceCollision((Ship) entity1, (Ice) entity2);
-    // } else if ((entity1 instanceof Ice) & (entity2 instanceof Ship)) {
-    // resolveShipIceCollision((Ship) entity2, (Ice) entity1);
-    // }
-    // // Collision between a Bullet and Ice
-    // else if ((entity1 instanceof Bullet) & (entity2 instanceof Ice)) {
-    // resolveBulletIceCollision((Bullet) entity1, (Ice) entity2);
-    // } else if ((entity1 instanceof Ice) & (entity2 instanceof Bullet)) {
-    // resolveBulletIceCollision((Bullet) entity2, (Ice) entity1);
-    // }
+    // Collision between a Ship and a Pickup
+    else if((entity1 instanceof Ship) & (entity2 instanceof Pickup)) {
+    	resolveShipPickupCollision((Ship) entity1, (Pickup) entity2);
+    } else if((entity1 instanceof Pickup) & (entity2 instanceof Ship)) {
+    	resolveShipPickupCollision((Ship) entity2, (Pickup) entity1);
+    }
+  }
+
+  private void resolveShipPickupCollision(Ship ship, Pickup pickup) {
+	 System.out.println("pickup collision (60:Collision)");
+	 if(!ship.hasItem()) {
+		 pickup.onPickup(ship);
+	 }
+	 pickup.delete();
   }
 
   private void resolveShipShipCollision(Ship ship1, Ship ship2) {
@@ -141,8 +144,8 @@ public class Collision {
 
   private void resolveBulletShipCollision(Bullet bullet, Ship ship) {
     // This allows us to ignore cases where a ship shoots itself
-    //System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
-    if (bullet.getSource() != ship.getSerial()) {
+	//System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
+    if (bullet.getSource() != ship.getSerial()) { 
       System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
       // Bullet damages ship
       ship.damage(bullet.getDamage());

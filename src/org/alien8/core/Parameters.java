@@ -20,7 +20,7 @@ public class Parameters {
   public static final boolean RENDER_BOX = true;
   public static final boolean ICE_IS_SOLID = true;
   public static final int MAX_PLAYERS = 16;
-  public static final boolean AI_ON = true;
+  public static final boolean AI_ON = false;
   public static final boolean DEBUG_MODE = true;
 
 
@@ -151,8 +151,8 @@ public class Parameters {
 
   /// ITEMS PARAMETERS
   public static final double PLANE_SPEED = 3;
-  public static final double ITEM_WIDTH = 16;
-  public static final double ITEM_LENGTH = 16;
+  public static final double ITEM_WIDTH = 32;
+  public static final double ITEM_LENGTH = 32;
   public static final double ITEM_HEALTH_ITEM_VALUE = 25;
   //////////////////////////////////////////////////////////
 

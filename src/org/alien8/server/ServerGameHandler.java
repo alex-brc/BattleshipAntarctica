@@ -150,7 +150,6 @@ public class ServerGameHandler extends Thread {
     	EntitiesLite.add(new EntityLite(3, p.getPosition(), p.getPickupType(), p.isToBeDeleted()));
       } else if (e instanceof PlaneDropper) {
     	  PlaneDropper pd = (PlaneDropper) e;
-    	  System.out.println("Sending plane at " + pd.getPosition() );
     	  EntitiesLite.add(new EntityLite(4, pd.getPosition(), pd.isToBeDeleted(), pd.getDirection()));
       }
     }
