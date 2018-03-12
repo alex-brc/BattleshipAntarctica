@@ -38,7 +38,6 @@ public class Client implements Runnable {
   private volatile boolean running = false;
   private Thread thread;
   private ModelManager model;
-  private AIController aiPlayer;
   private int FPS = 0;
   private int TICKS = 0;
   private InetAddress clientIP = null;
@@ -113,6 +112,7 @@ public class Client implements Runnable {
       catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
       // Call update() as many times as needed to compensate before rendering
+      // Call the renderer
       while (catchUp >= 1) {
         this.sendInputSample();
         this.receiveAndUpdate();
@@ -124,9 +124,6 @@ public class Client implements Runnable {
         // Update last time
         lastTime = getTime();
       }
-
-      // Call the renderer
-      frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
       if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {

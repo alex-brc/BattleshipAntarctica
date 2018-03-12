@@ -8,8 +8,7 @@ import org.alien8.util.LogManager;
 public class Launcher {
   public static Launcher instance;
   private String loadStatus;
-  private Renderer renderer;
-  private String serverIPstr = "192.168.0.13";
+  private String serverIPstr = "172.22.35.217";
   private Client game;
 
   private Launcher() {
@@ -24,18 +23,22 @@ public class Launcher {
     Launcher.instance = launcher;
     // Load log manager
     launcher.loadStatus = "Preparing logger...";
+    System.out.println(launcher.loadStatus);
     launcher.loadLogManager();
 
     // Load audio manager
     launcher.loadStatus = "Loading sounds...";
+    System.out.println(launcher.loadStatus);
     launcher.loadAudioManager();
 
     // Connect to server
     launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr + "...";
+    System.out.println(launcher.loadStatus);
     launcher.connect();
 
     // Make the scoreboard
     launcher.loadStatus = "Constructing a scoreboard...";
+    System.out.println(launcher.loadStatus);
     launcher.loadScoreBoard();
 
     // Start the game
@@ -54,16 +57,12 @@ public class Launcher {
     LogManager.getInstance();
   }
 
-  private void loadRenderer() {
-    Renderer.getInstance();
-  }
-
   private void loadAudioManager() {
     AudioManager.getInstance();
   }
 
   private void loadScoreBoard() {
-    ScoreBoard.getInstance().startListener();
+    ScoreBoard.getInstance();
   }
 
   private void connect() {

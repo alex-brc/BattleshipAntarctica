@@ -232,7 +232,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
         return;
       case KeyEvent.VK_SHIFT:
         shiftPressed = true;
-        ScoreBoard.getInstance().notifyShift();
         return;
       default:
         // Not a game control

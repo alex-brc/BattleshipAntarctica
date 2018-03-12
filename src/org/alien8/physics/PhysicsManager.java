@@ -87,10 +87,10 @@ public class PhysicsManager {
     /**
      * Then put this speed through the function:
      *
-     * f : (0,PI) -> [0,1] f(x) = sin^2(x),
+     * f : (0,PI) -> [0,1.5] f(x) = sin^2(x) + 0.5,
      *
      */
-    double rotModifier = FastMath.pow(FastMath.sin(squeezedSpeed), 2);
+    double rotModifier = FastMath.pow(FastMath.sin(squeezedSpeed), 2) + 0.5;
     // Then apply this modifier to the angle, with a parametrised weight
     angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 

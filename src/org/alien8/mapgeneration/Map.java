@@ -2,12 +2,10 @@ package org.alien8.mapgeneration;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.alien8.core.Parameters;
 import org.alien8.physics.AABB;
-import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
-
-import net.jafama.FastMath;
 
 public class Map {
   protected int length;
@@ -44,42 +42,7 @@ public class Map {
       }
     }
   }
-
-  protected void makeRoughAABBs(int boxSize) {
-    /*
-     * Function that gives all the ice basic hitboxes Works by checking every square of a given size
-     * if the majority of the pixels are ice or not If the majority is ice it makes the whole box a
-     * hitbox/entity
-     */
-    for (int y = 0; y < width; y += boxSize) {
-      for (int x = 0; x < length; x += boxSize) {
-
-        int countIce = 0;
-        for (int locY = y; locY < (y + boxSize); locY++) {
-          for (int locX = x; locX < (x + boxSize); locX++) {
-            if (iceGrid[locX][locY]) {
-              countIce++;
-            }
-          }
-        }
-
-        if (1.0 * countIce / (boxSize * boxSize) > Parameters.ICE_BOX_DENSITY) {
-          // Just need to generate a bunch of values for initialising an entity/hitbox
-
-          double centerX = x + (FastMath.ceil(boxSize / 2.0d) - 1);
-          double centerY = y + (FastMath.ceil(boxSize / 2.0d) - 1);
-          Position center = new Position(centerX, centerY);
-          Ice newIce = new Ice(center);
-
-          Position newMin = new Position((double) x, (double) y);
-          Position newMax = new Position((double) (x + boxSize - 1), (double) (y + boxSize - 1));
-          AABB newAABB = new AABB(newMin, newMax, newIce);
-          roughAABBs.add(newAABB);
-        }
-      }
-    }
-  }
-
+  
   public List<AABB> getAABBs() {
     return roughAABBs;
   }

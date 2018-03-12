@@ -6,25 +6,30 @@ import java.util.List;
 
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
+import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.util.LogManager;
 
-public class ScoreBoard implements Runnable {
+public class ScoreBoard {
   public static ScoreBoard instance;
   private List<Score> scores = new LinkedList<Score>();
-  private Thread thread;
-  private volatile boolean listenerRunning = false;
   private int cornerX;
   private int cornerY;
+  private int renderVerticalBuffer;
+  private int renderFontHeight;
+  private Renderer renderer;
 
   private ScoreBoard() {
     Position screenCenter =
         new Position(Parameters.RENDERER_SIZE.width / 2, Parameters.RENDERER_SIZE.height / 2);
     cornerX = (int) screenCenter.getX() - Parameters.SCOREBOARD_WIDTH / 2;
     cornerY = (int) screenCenter.getY() - Parameters.SCOREBOARD_HEIGHT / 2;
+    renderVerticalBuffer = 10;
+    renderFontHeight = 25;
+    renderer = Renderer.getInstance();
   }
 
   public static ScoreBoard getInstance() {
@@ -165,23 +170,5 @@ public class ScoreBoard implements Runnable {
     	// Increment offset
     	offset += this.renderFontHeight + this.renderVerticalBuffer;
     }
-  }
-
-  public void startListener() {
-    listenerRunning = true;
-    thread = new Thread(ScoreBoard.getInstance(), "ScoreBoard");
-    thread.start();
-  }
-
-  public void killListener() {
-    try {
-      listenerRunning = false;
-      thread.join();
-    } catch (InterruptedException e) {
-      LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
-          "Failed to kill listener thread. " + e.toString());
-    }
-    LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
-        "Score listener killed cleanly.");
   }
 }

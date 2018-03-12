@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Enumeration;
 
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
@@ -29,8 +28,6 @@ import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
-import org.alien8.util.ServerShutdownHook;
-import org.alien8.ai.AIController;
 
 /*
  * A singleton game server

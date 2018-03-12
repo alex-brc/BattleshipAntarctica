@@ -2,13 +2,11 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.mapgeneration.Ice;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
-import net.jafama.FastMath;
 
 public class Collision {
   private Entity entity1;
@@ -165,15 +163,5 @@ public class Collision {
       // Destroy bullet
       bullet.delete();
     }
-  }
-
-  private void resolveShipIceCollision(Ship ship, Ice ice) {
-    System.out.println("ship hit ice");
-    ship.setDirection(FastMath.PI + ship.getDirection());
-  }
-
-  private void resolveBulletIceCollision(Bullet bullet, Ice ice) {
-    System.out.println("bullet hit ice");
-    bullet.delete();
   }
 }

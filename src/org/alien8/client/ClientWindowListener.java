@@ -18,8 +18,6 @@ public class ClientWindowListener implements WindowListener {
 	  Launcher.getInstance().getRunningClient().disconnect();
 	  // Shutdown audio clips
 	  AudioManager.getInstance().shutDown();
-	  // Kill scoreboard listener
-	  ScoreBoard.getInstance().killListener();
 	  // Log status
 	  System.out.println("System exitted cleanly. Check log for crash information");
 	  LogManager.getInstance().log("Shutdown", LogManager.Scope.INFO,
