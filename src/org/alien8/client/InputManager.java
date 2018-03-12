@@ -88,10 +88,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
       player.rearTurretCharge();
     else
       player.rearTurretShoot();
-
-    if (cis.spacePressed)
-      ; // TODO use item
-
   }
 
 

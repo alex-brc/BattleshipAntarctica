@@ -76,16 +76,16 @@ public class Turret implements Serializable {
     return direction;
   }
 
-  /**
-   * @return the time of the last shot
-   */
-
+  public void resetCooldown() {
+	  this.lastShot = System.currentTimeMillis() - cooldown;
+  }
+  
   public boolean isOnCooldown() {
     if (System.currentTimeMillis() - this.lastShot < this.cooldown)
       return true;
     return false;
   }
-
+  
   /**
    * Puts the turret on cooldown.
    */

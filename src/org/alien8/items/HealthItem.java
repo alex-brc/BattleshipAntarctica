@@ -2,7 +2,6 @@ package org.alien8.items;
 
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Sprite;
-import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
 public class HealthItem extends Item {
@@ -24,6 +23,5 @@ public class HealthItem extends Item {
 			ship.setHealth(Parameters.SHIP_HEALTH);
 		else
 			ship.setHealth(ship.getHealth() + Parameters.ITEM_HEALTH_ITEM_VALUE);
-		System.out.println("SUCCESS (27:HealthItem)");
 	}
 }

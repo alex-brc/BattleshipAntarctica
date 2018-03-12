@@ -49,10 +49,23 @@ public class PlaneDropper extends Entity {
 		Pickup pickup = null;
 		Random rand = new Random();
 		switch(rand.nextInt(Pickup.NUMBER_OF_PICKUPS)) {
-			case Pickup.HEALTH_PICKUP: 
-				pickup = new HealthPickup(packetPosition);
-				break;
+		case Pickup.HEALTH_PICKUP: 
+			pickup = new HealthPickup(packetPosition);
+			break;
+		case Pickup.MINE_PICKUP: 
+			pickup = new MinePickup(packetPosition);
+			break;
+		case Pickup.INVULNERABLE_PICKUP: 
+			pickup = new InvulnerablePickup(packetPosition);
+			break;
+		case Pickup.SPEED_PICKUP: 
+			pickup = new SpeedPickup(packetPosition);
+			break;
+		case Pickup.NO_COOLDOWN_PICKUP: 
+			pickup = new NoCooldownPickup(packetPosition);
+			break;
 		}
+		pickup = new NoCooldownPickup(packetPosition);
 		ModelManager.getInstance().addEntity(pickup);
 	}
 	

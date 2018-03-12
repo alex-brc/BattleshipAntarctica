@@ -45,6 +45,7 @@ public class Parameters {
   public static final int LIST_LENGTH_PER_PACKET = 5000;
   public static final int FPS_FREQ = 1;
   public static final int N_SECOND = 1000000000;
+  public static final int M_SECOND = 1000;
   //////////////////////////////////////////////////////////
 
 
@@ -144,8 +145,8 @@ public class Parameters {
   public static final int SCORE_PER_KILL = 1000;
   public static final float KILL_STREAK_MULTIPLIER = 0.1f;
   public static final float DISTANCE_MULTIPLIER = 0.1f;
-  public static final int SCOREBOARD_HEIGHT = 500;
-  public static final int SCOREBOARD_WIDTH = 500;
+  public static final int SCOREBOARD_HEIGHT = 450;
+  public static final int SCOREBOARD_WIDTH = 550;
   //////////////////////////////////////////////////////////
 
 
@@ -154,6 +155,10 @@ public class Parameters {
   public static final double ITEM_WIDTH = 32;
   public static final double ITEM_LENGTH = 32;
   public static final double ITEM_HEALTH_ITEM_VALUE = 25;
+  public static final int ITEM_SPEED_ITEM_DURATION = 2; // in seconds
+  public static final int ITEM_SPEED_ITEM_MULTIPLIER = 2; // ship top speed multiplied by this
+  public static final int ITEM_NO_COOLDOWN_ITEM_DURATION = 5; // in seconds
+  public static final int ITEM_INVULNERABLE_ITEM_DURATION = 5; // in seconds
   //////////////////////////////////////////////////////////
 
 

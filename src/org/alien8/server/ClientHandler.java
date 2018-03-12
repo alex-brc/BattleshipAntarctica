@@ -69,7 +69,6 @@ public class ClientHandler extends Thread {
     Player p = new Player(name, clientIP, clientUdpPort, s);
     playerMap.put(s, p);
     ScoreBoard.getInstance().add(p);
-    System.out.println("FIRST SCORE: " + ScoreBoard.getInstance().getScores().get(0).toString());
 
     this.sendMapSeed(p, s);
     this.sendGameState(p, s);

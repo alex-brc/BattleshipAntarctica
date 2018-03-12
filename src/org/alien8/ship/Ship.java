@@ -3,14 +3,17 @@ package org.alien8.ship;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.items.Effect;
 import org.alien8.items.Item;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
+
 import net.jafama.FastMath;
 
 /**
@@ -26,21 +29,45 @@ public class Ship extends Entity implements Serializable {
   private Turret frontTurret;
   private Turret rearTurret;
   private Item item;
+  private Effect effect;
   private int colour;
   private Sprite sprite;
+  
 
   public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
         Parameters.SHIP_WIDTH, Parameters.SHIP_HEALTH);
     this.colour = colour;
     sprite = Sprite.makeShipSprite(colour);
-    this.item = null;
 
     frontTurret = new Turret(position, this.getSerial());
     rearTurret = new Turret(position, this.getSerial());
 
     setTurretsPosition();
     setTurretsDirection(new Position(0, 0));
+  }
+  /**
+   * Called every tick to see if we need to alter
+   * any active effect
+   */
+  public void updateEffect() {
+	  if(effect != null) {
+		if(effect.getEndTime() < System.currentTimeMillis())
+			  effect = null;
+		else if(effect.getEffectType() == Effect.NO_COOLDOWN) {
+			this.getFrontTurret().resetCooldown();
+			this.getRearTurret().resetCooldown();
+	    }
+	  }
+  }
+  
+  @Override
+  public void setSpeed(double speed) {
+	  if(effect != null && effect.getEffectType() == Effect.SPEED) {
+		  super.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD * Parameters.ITEM_SPEED_ITEM_MULTIPLIER);
+	  }
+	  else
+		  super.setSpeed(speed);
   }
 
   @Override
@@ -445,4 +472,18 @@ public class Ship extends Entity implements Serializable {
 	  return true;
   }
 
+  public void applyEffect(Effect effect) {
+	  this.effect = effect;
+  }
+  
+  public int getEffectType() {
+	  return this.effect.getEffectType();
+  }
+  
+  public boolean underEffect() {
+	  if(effect == null)
+		  return false;
+	  return true;
+  }
 }
+

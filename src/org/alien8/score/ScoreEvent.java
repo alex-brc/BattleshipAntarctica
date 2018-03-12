@@ -58,5 +58,4 @@ public class ScoreEvent extends GameEvent {
 	public boolean getAlive() {
 		return alive;
 	}
-
 }
