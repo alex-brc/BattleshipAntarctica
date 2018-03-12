@@ -112,18 +112,19 @@ public class Client implements Runnable {
       catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
       // Call update() as many times as needed to compensate before rendering
-      // Call the renderer
       while (catchUp >= 1) {
         this.sendInputSample();
         this.receiveAndUpdate();
         this.receiveEvents();
-        Renderer.getInstance().render(model);
         
         tickRate++;
         catchUp--;
         // Update last time
         lastTime = getTime();
       }
+      // Call the renderer
+      Renderer.getInstance().render(model);
+      frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
       if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
@@ -301,7 +302,14 @@ public class Client implements Runnable {
       // Deserialize the entsLite byte data into object
       ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      ArrayList<EntityLite> entsLite = (ArrayList<EntityLite>) objIn.readObject();
+      ArrayList<EntityLite> entsLite = null;
+      try {
+          entsLite = (ArrayList<EntityLite>) objIn.readObject();
+        } catch (ClassCastException e) {
+          // Desync'd. Drop packet, move on
+          LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
+              "Desync'd socket receive. Tried to cast GameEvent to ArrayList");
+        }
 
       if (entsLite != null)
         // Sync the game state with server

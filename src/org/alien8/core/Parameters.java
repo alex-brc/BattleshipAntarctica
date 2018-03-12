@@ -34,7 +34,7 @@ public class Parameters {
    * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
    * than that. A value of 63 gives 58-60 ticks/second, hovering around 59
    */
-  public static final int TICKS_PER_SECOND = 200;
+  public static final int TICKS_PER_SECOND = 80;
   public static final int SERVER_PORT = 4446;
   public static final int MULTI_CAST_PORT = 4445;
   public static final int SERVER_SOCKET_BLOCK_TIME = 100;
