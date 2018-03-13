@@ -159,6 +159,8 @@ public class Parameters {
   public static final int ITEM_SPEED_ITEM_MULTIPLIER = 2; // ship top speed multiplied by this
   public static final int ITEM_NO_COOLDOWN_ITEM_DURATION = 5; // in seconds
   public static final int ITEM_INVULNERABLE_ITEM_DURATION = 5; // in seconds
+  public static final int MINE_WIDTH = 32;
+  public static final int MINE_LENGTH = 32;
   //////////////////////////////////////////////////////////
 
 
