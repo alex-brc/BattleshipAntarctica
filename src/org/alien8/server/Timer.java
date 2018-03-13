@@ -26,8 +26,8 @@ public class Timer {
 	}
 	
 	public void render() {
-		// Renderer.getInstance().drawText("" + minutes + ":" + seconds, 50, 20, true, FontColor.WHITE);
-		System.out.println("" + minutes + ":" + seconds);
+		Renderer.getInstance().drawText("TIMER", 110, 16, true, FontColor.WHITE);
+		Renderer.getInstance().drawText("" + minutes + "-" + seconds, 110, 40, true, FontColor.WHITE);
 	}
 	
 }

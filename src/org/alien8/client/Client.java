@@ -130,7 +130,6 @@ public class Client implements Runnable {
       }
       // Call the renderer
       Renderer.getInstance().render(model);
-      timer.render();
       frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
@@ -176,6 +175,10 @@ public class Client implements Runnable {
 		this.receiveEvents((GameEvent) receivedObject);
 }
 
+  public Timer getTimer() {
+	  return this.timer;
+  }
+  
 /**
    * Getter for the latest FPS estimation.
    * 

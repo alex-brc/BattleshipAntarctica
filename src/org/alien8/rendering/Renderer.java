@@ -9,6 +9,7 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
+import org.alien8.client.Launcher;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
@@ -183,8 +184,8 @@ public class Renderer extends Canvas {
      * drawText("00000", 128, 40, true);
      */
     // Render health bar
-    drawText("HEALTH", 154, 16, true, FontColor.WHITE);
-    drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 154, 40, true);
+    drawText("HEALTH", 203, 16, true, FontColor.WHITE);
+    drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 203, 40, true);
     // TODO: Render turret charge
     drawText("TURRET1", 324, 16, true, FontColor.WHITE);
     drawBar(Sprite.turret_bar, player.getFrontTurretCharge(), Parameters.TURRET_MAX_DIST, 326, 40,
@@ -192,7 +193,10 @@ public class Renderer extends Canvas {
     drawText("TURRET2", 462, 16, true, FontColor.WHITE);
     drawBar(Sprite.turret_bar, player.getRearTurretCharge(), Parameters.TURRET_MAX_DIST, 464, 40,
         true);
-
+    
+    // Draw timer
+    Launcher.getInstance().getRunningClient().getTimer().render();
+    
     // TODO: Render use item
     drawText("ITEM", 612, 18, true, FontColor.WHITE);
     drawSprite(624, 40, new Sprite("/org/alien8/assets/item_frame.png"), true);

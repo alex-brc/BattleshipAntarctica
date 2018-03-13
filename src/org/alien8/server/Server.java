@@ -150,9 +150,6 @@ public class Server implements Runnable {
       initializeAIs();
 
     model.addEntity(new PlaneDropper());
-    model.addEntity(new PlaneDropper());
-    model.addEntity(new PlaneDropper());
-    model.addEntity(new PlaneDropper());
     
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
