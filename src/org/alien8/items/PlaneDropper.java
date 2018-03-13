@@ -23,7 +23,7 @@ public class PlaneDropper extends Entity {
         packetPosition = Server.getInstance().getRandomPosition();
         
         // Check if it's good looking
-        while(!packetPosition.approximately(getMiddleOfMap(), Parameters.MAP_HEIGHT / 5))
+        while(!packetPosition.approximately(getMiddleOfMap(), Parameters.MAP_HEIGHT / 3))
         	packetPosition = Server.getInstance().getRandomPosition();
 		// Find a point on left side of map to spawn
 		Random rand = new Random();
@@ -40,7 +40,7 @@ public class PlaneDropper extends Entity {
 
 	@Override
 	public void setPosition(Position position) {
-		if(position.approximately(packetPosition, 5))
+		if(position.approximately(packetPosition, 0.5))
 			dropPacket();
 		super.setPosition(position);
 	}
@@ -64,8 +64,10 @@ public class PlaneDropper extends Entity {
 		case Pickup.NO_COOLDOWN_PICKUP: 
 			pickup = new NoCooldownPickup(packetPosition);
 			break;
+		case Pickup.TORPEDO_PICKUP:
+			pickup = new TorpedoPickup(packetPosition);
+			break;
 		}
-		pickup = new NoCooldownPickup(packetPosition);
 		ModelManager.getInstance().addEntity(pickup);
 	}
 	
@@ -76,7 +78,7 @@ public class PlaneDropper extends Entity {
 	@Override
 	public void render() {
 		// TODO 
-		Renderer.getInstance().drawSprite((int) this.getPosition().getX(),(int) this.getPosition().getY(), Sprite.ship_red.rotateSprite(-(this.getDirection() - FastMath.PI / 2)), false);
+		Renderer.getInstance().drawSprite((int) this.getPosition().getX(),(int) this.getPosition().getY(), Sprite.plane.rotateSprite(-(this.getDirection() - FastMath.PI / 2)), false);
 	}
 
 	@Override

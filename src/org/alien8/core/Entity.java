@@ -1,6 +1,8 @@
 package org.alien8.core;
 
 import java.io.Serializable;
+
+import org.alien8.items.Effect;
 import org.alien8.physics.Position;
 import net.jafama.FastMath;
 
@@ -127,8 +129,8 @@ public abstract class Entity implements Serializable, Cloneable {
 
   public abstract void render();
 
-  public void damage(double damage) {
-    // Dying handled externally
+  public void damage(double damage) {  
+	// Dying handled externally
     health -= damage;
   }
 

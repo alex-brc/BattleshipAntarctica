@@ -7,11 +7,19 @@ import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 
 public class Mine extends Entity {
-
-	public Mine(Position position) {
+	private static final long serialVersionUID = -799176400440902424L;
+	
+	private long shipSerial;
+	
+	public Mine(Position position, long shipSerial) {
 		super(position, 0, 0, 0, Parameters.MINE_LENGTH, Parameters.MINE_WIDTH);
+		this.shipSerial = shipSerial;
 	}
-
+	
+	public long getSource() {
+		return this.shipSerial;
+	}
+	
 	@Override
 	public void render() {
 		//TODO give this a sprite
@@ -22,14 +30,12 @@ public class Mine extends Entity {
 
 	@Override
 	public void dealWithOutOfBounds() {
-		// TODO Auto-generated method stub
-
+		// Will never be
 	}
 
 	@Override
 	public void dealWithInIce(boolean[][] iceGrid) {
-		// TODO Auto-generated method stub
-
+		// Will never be
 	}
 
 }

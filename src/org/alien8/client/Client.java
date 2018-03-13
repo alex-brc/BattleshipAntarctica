@@ -28,6 +28,8 @@ import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
 import org.alien8.score.ScoreEvent;
 import org.alien8.server.GameEvent;
+import org.alien8.server.Timer;
+import org.alien8.server.TimerEvent;
 import org.alien8.util.LogManager;
 
 public class Client implements Runnable {
@@ -38,6 +40,7 @@ public class Client implements Runnable {
   private volatile boolean running = false;
   private Thread thread;
   private ModelManager model;
+  private Timer timer;
   private int FPS = 0;
   private int TICKS = 0;
   private InetAddress clientIP = null;
@@ -62,6 +65,9 @@ public class Client implements Runnable {
     if (running)
       return;
     running = true;
+    
+    // Make a timer
+    timer = new Timer(0);
 
     // Play the ambient music
     AudioManager.getInstance().startAmbient();
@@ -116,6 +122,7 @@ public class Client implements Runnable {
         this.sendInputSample();
         this.receivePacket();
         this.receivePacket();
+        
         tickRate++;
         catchUp--;
         // Update last time
@@ -123,6 +130,7 @@ public class Client implements Runnable {
       }
       // Call the renderer
       Renderer.getInstance().render(model);
+      timer.render();
       frameRate++;
 
       // Update the FPS timer every FPS_FREQ^-1 seconds
@@ -282,6 +290,8 @@ public class Client implements Runnable {
 			  AudioManager.getInstance().addEvent((AudioEvent) event);
 		  else if (event instanceof ScoreEvent) {
 			  ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
+		  } else if (event instanceof TimerEvent) {
+			  timer = new Timer((TimerEvent) event);
 		  }
 	  }
   }

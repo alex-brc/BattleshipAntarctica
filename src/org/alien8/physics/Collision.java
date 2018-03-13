@@ -3,7 +3,9 @@ package org.alien8.physics;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.items.Effect;
+import org.alien8.items.Mine;
 import org.alien8.items.Pickup;
+import org.alien8.items.Torpedo;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
@@ -55,17 +57,82 @@ public class Collision {
     } else if((entity1 instanceof Pickup) & (entity2 instanceof Ship)) {
     	resolveShipPickupCollision((Ship) entity2, (Pickup) entity1);
     }
+    // Collision between a Ship and a Mine
+    else if((entity1 instanceof Ship) & (entity2 instanceof Mine)) {
+    	resolveShipMineCollision((Ship) entity1, (Mine) entity2);
+    } else if((entity1 instanceof Mine) & (entity2 instanceof Ship)) {
+    	resolveShipMineCollision((Ship) entity2, (Mine) entity1);
+    }
+    // Collision between a Ship and a Torpedo
+    else if((entity1 instanceof Ship) & (entity2 instanceof Torpedo)) {
+    	resolveShipTorpedoCollision((Ship) entity1, (Torpedo) entity2);
+    } else if((entity1 instanceof Torpedo) & (entity2 instanceof Ship)) {
+    	resolveShipTorpedoCollision((Ship) entity2, (Torpedo) entity1);
+    }
+  }
+
+  private void resolveShipTorpedoCollision(Ship ship, Torpedo torpedo) {
+	  if (ship.getSerial() == torpedo.getSource())
+		  return;
+	  if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
+		  return;
+
+	  // Mine damages ship
+	  ship.damage(Parameters.TORPEDO_DAMAGE);
+	  // Award score to the mine owner
+	  Player deployer = Server.getInstance().getPlayer(torpedo.getSource());
+	  // If it's AI, no points
+	  if (deployer != null)
+		  ScoreBoard.getInstance().giveScore(deployer, Parameters.TORPEDO_SCORE);
+	  // See if ship has been destroyed
+	  if (new Double(ship.getHealth()).intValue() <= 0) {
+		  System.out.println("A ship died!");
+		  ship.delete();
+		  // Award score to the killer
+		  // If it's AI, no points
+		  if (deployer != null)
+			  ScoreBoard.getInstance().giveKill(deployer);
+	  }
+	  // Destroy mine
+	  torpedo.delete();
+  }
+
+  private void resolveShipMineCollision(Ship ship, Mine mine) {
+	  if (ship.getSerial() == mine.getSource())
+		  return;
+	  if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
+		  return;
+
+	  // Mine damages ship
+	  ship.damage(Parameters.MINE_DAMAGE);
+	  // Award score to the mine owner
+	  Player deployer = Server.getInstance().getPlayer(mine.getSource());
+	  // If it's AI, no points
+	  if (deployer != null)
+		  ScoreBoard.getInstance().giveScore(deployer, Parameters.MINE_SCORE);
+	  // See if ship has been destroyed
+	  if (new Double(ship.getHealth()).intValue() <= 0) {
+		  System.out.println("A ship died!");
+		  ship.delete();
+		  // Award score to the killer
+		  // If it's AI, no points
+		  if (deployer != null)
+			  ScoreBoard.getInstance().giveKill(deployer);
+	  }
+	  // Destroy mine
+	  mine.delete();
+
   }
 
   private void resolveShipPickupCollision(Ship ship, Pickup pickup) {
-	 System.out.println("pickup");
-	  if(!ship.hasItem()) {
+	 if(!ship.hasItem()) {
 		 pickup.onPickup(ship);
 	 }
 	 pickup.delete();
   }
 
   private void resolveShipShipCollision(Ship ship1, Ship ship2) {
+
     System.out.println("ship hit ship!");
     double speed1 = entity1.getSpeed();
     double speed2 = entity2.getSpeed();
@@ -155,7 +222,7 @@ public class Collision {
     // Bullet damages ship
     ship.damage(bullet.getDamage());
     // Award score to the bullet owner
-    Player shooter = Server.getInstance().getPlayer(bullet);
+    Player shooter = Server.getInstance().getPlayer(bullet.getSource());
     // If it's AI, no points
     if (shooter != null)
     	ScoreBoard.getInstance().giveHit(shooter, bullet);

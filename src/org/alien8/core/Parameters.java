@@ -20,6 +20,7 @@ public class Parameters {
   public static final boolean RENDER_BOX = true;
   public static final boolean ICE_IS_SOLID = true;
   public static final int MAX_PLAYERS = 16;
+  public static final int MATCH_LENGTH = 300; // in seconds
   public static final boolean AI_ON = false;
   public static final boolean DEBUG_MODE = true;
 
@@ -31,17 +32,13 @@ public class Parameters {
    */
   public static final int NUMBER_CONNECT_ATTEMPTS = 3;
   /**
-   * How often the model calls update() on the entities. Because of some divisions, it's a bit lower
-   * than that. A value of 63 gives 58-60 ticks/second, hovering around 59
+   * How often the model calls update() on the entities. It's actually a bit lower
+   * than that.
    */
   public static final int TICKS_PER_SECOND = 80;
   public static final int SERVER_PORT = 4446;
   public static final int MULTI_CAST_PORT = 4445;
   public static final int SERVER_SOCKET_BLOCK_TIME = 100;
-  /**
-   * How many times a second to update the FPS tracker. Ideally, set to a divisor of e+9, for
-   * simplicity.
-   */
   public static final int LIST_LENGTH_PER_PACKET = 5000;
   public static final int FPS_FREQ = 1;
   public static final int N_SECOND = 1000000000;
@@ -161,6 +158,13 @@ public class Parameters {
   public static final int ITEM_INVULNERABLE_ITEM_DURATION = 5; // in seconds
   public static final int MINE_WIDTH = 32;
   public static final int MINE_LENGTH = 32;
+  public static final int MINE_DAMAGE = 50;
+  public static final int MINE_SCORE = 100;
+  public static final int TORPEDO_LENGTH = 32;
+  public static final int TORPEDO_WIDTH = 16;
+  public static final int TORPEDO_DAMAGE = 30;
+  public static final int TORPEDO_SPEED = 5;
+  public static final int TORPEDO_SCORE = 100; 
   //////////////////////////////////////////////////////////
 
 

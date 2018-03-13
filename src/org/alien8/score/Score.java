@@ -1,6 +1,7 @@
 package org.alien8.score;
 
 import org.alien8.core.Parameters;
+import org.alien8.items.Mine;
 import org.alien8.server.Player;
 import org.alien8.ship.Bullet;
 
@@ -41,7 +42,14 @@ public class Score implements Comparable<Score> {
   public void giveHit(Bullet bullet) {
     this.score += (int) bullet.getDistance() * Parameters.DISTANCE_MULTIPLIER + 15;
   }
-
+  
+  /**
+   * Awards a static score for exploding someone with a minte
+   */
+  public void giveScore(int score) {
+    this.score += score;
+  }
+  
   /**
    * Awards the score earned for killing someone
    * 

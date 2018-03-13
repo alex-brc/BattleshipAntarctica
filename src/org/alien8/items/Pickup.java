@@ -14,7 +14,8 @@ public abstract class Pickup extends Entity {
 	public static final int NO_COOLDOWN_PICKUP = 2;
 	public static final int INVULNERABLE_PICKUP = 3;
 	public static final int MINE_PICKUP = 4;
-	public static final int NUMBER_OF_PICKUPS = 5;
+	public static final int TORPEDO_PICKUP = 5;
+	public static final int NUMBER_OF_PICKUPS = 6;
 	
 	
 	protected Item item;

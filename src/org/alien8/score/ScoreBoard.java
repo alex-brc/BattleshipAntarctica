@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.alien8.core.Parameters;
+import org.alien8.items.Mine;
 import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
@@ -93,7 +94,25 @@ public class ScoreBoard {
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
         "In giveHit(): given player not found on the scoreboard.");
   }
-
+  
+  public void giveScore(Player player, int score) {
+	  try {
+	      for (Score sc : scores)
+	        if (player.getShip().getSerial() == sc.getShipSerial()) {
+	          sc.giveScore(Parameters.TORPEDO_SCORE);
+	          Server.getInstance().addEvent(sc.exportToEvent());
+	          return;
+	        }
+	    } catch (NullPointerException e) {
+	      LogManager.getInstance().log("ScoreBoard", LogManager.Scope.CRITICAL,
+	          "In giveHit(): the bullet or player given was null. Exiting...");
+	      e.printStackTrace();
+	      System.exit(-1);
+	    }
+	    LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
+	        "In giveHit(): given player not found on the scoreboard.");
+  }
+  
   public void kill(Player player) {
     for (Score score : scores)
       if (player.getShip().getSerial() == score.getShipSerial()) {

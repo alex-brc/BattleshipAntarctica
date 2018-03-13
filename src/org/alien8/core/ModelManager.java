@@ -10,11 +10,14 @@ import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
 import org.alien8.items.HealthPickup;
 import org.alien8.items.InvulnerablePickup;
+import org.alien8.items.Mine;
 import org.alien8.items.MinePickup;
 import org.alien8.items.NoCooldownPickup;
 import org.alien8.items.Pickup;
 import org.alien8.items.PlaneDropper;
 import org.alien8.items.SpeedPickup;
+import org.alien8.items.Torpedo;
+import org.alien8.items.TorpedoPickup;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
@@ -181,6 +184,9 @@ public class ModelManager {
     	  case Pickup.NO_COOLDOWN_PICKUP: 
     		  p = new NoCooldownPickup(el.position);
     		  break;
+    	  case Pickup.TORPEDO_PICKUP: 
+    		  p = new TorpedoPickup(el.position);
+    		  break;
     	  }
     	  
     	  if(el.toBeDeleted) {
@@ -190,14 +196,26 @@ public class ModelManager {
     	  this.addEntity(p);
       } else if(el.entityType == 4) { // Plane
     	  PlaneDropper pd = new PlaneDropper(el.position, el.direction);
-    	  System.out.println("got plane at " + pd.getPosition());
     	  if(el.toBeDeleted) {
     		  pd.delete();
     	  }
     	  
     	  this.addEntity(pd);
-      }
-      
+      } else if(el.entityType == 5) { // Mine
+    	  Mine m = new Mine(el.position, 0);
+    	  if(el.toBeDeleted) {
+    		  m.delete();
+    	  }
+    	  
+    	  this.addEntity(m);
+      } else if(el.entityType == 6) { // Torpedo
+    	  Torpedo t = new Torpedo(el.position, 0, el.direction);
+    	  if(el.toBeDeleted) {
+    		  t.delete();
+    	  }
+    	  
+    	  this.addEntity(t);
+      }  
     }
   }
 

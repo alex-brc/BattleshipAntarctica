@@ -150,6 +150,9 @@ public class Server implements Runnable {
       initializeAIs();
 
     model.addEntity(new PlaneDropper());
+    model.addEntity(new PlaneDropper());
+    model.addEntity(new PlaneDropper());
+    model.addEntity(new PlaneDropper());
     
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
@@ -208,12 +211,12 @@ public class Server implements Runnable {
   /**
    * Gets player by bullet. Used in awarding score.
    * 
-   * @param bullet the bullet belonging to the player
+   * @param l the bullet belonging to the player
    * @return the player who owns the bullet, null if it's AI
    */
-  public Player getPlayer(Bullet bullet) {
+  public Player getPlayer(long l) {
     for (Player p : playerList)
-      if (p.getShip().getSerial() == bullet.getSource())
+      if (p.getShip().getSerial() == l)
         return p;
     return null;
   }
