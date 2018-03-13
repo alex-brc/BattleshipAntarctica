@@ -8,7 +8,7 @@ import org.alien8.util.LogManager;
 public class Launcher {
   public static Launcher instance;
   private String loadStatus;
-  private String serverIPstr = "172.22.35.217";
+  private String serverIPstr = "147.188.195.67";
   private Client game;
 
   private Launcher() {

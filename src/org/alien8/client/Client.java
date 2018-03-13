@@ -114,8 +114,7 @@ public class Client implements Runnable {
       // Call update() as many times as needed to compensate before rendering
       while (catchUp >= 1) {
         this.sendInputSample();
-        this.receiveAndUpdate();
-        this.receiveEvents();
+        this.receivePacket();
         
         tickRate++;
         catchUp--;
@@ -143,7 +142,33 @@ public class Client implements Runnable {
     System.out.println("stopped");
   }
 
-  /**
+  private void receivePacket() {
+	Object receivedObject = null;
+	try{  
+	  // Create a packet for receiving entsLite packet
+      DatagramPacket packet = new DatagramPacket(buf, buf.length);
+
+      // Receive a entsLite packet and obtain the byte data
+      multiCastSocket.receive(packet);
+      receivedByte = packet.getData();
+
+      // Deserialize the entsLite byte data into object
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
+      ObjectInputStream objIn = new ObjectInputStream(byteIn);
+      receivedObject = objIn.readObject();
+	}
+	catch(Exception e){
+		e.printStackTrace();
+	}
+	if(receivedObject == null)
+		return;
+	if(receivedObject instanceof ArrayList<?>)
+		this.receiveAndUpdate((ArrayList<EntityLite>) receivedObject);
+	else if(receivedObject instanceof GameEvent)
+		this.receiveEvents((GameEvent) receivedObject);
+}
+
+/**
    * Getter for the latest FPS estimation.
    * 
    * @return
@@ -250,78 +275,24 @@ public class Client implements Runnable {
     }
   }
 
-  public void receiveEvents() {
-    try {
-      // Create a packet for receiving event packet
-      DatagramPacket eventPacket = new DatagramPacket(buf, buf.length);
-
-      multiCastSocket.receive(eventPacket);
-      receivedByte = eventPacket.getData();
-
-      // Deserialize the event data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
-      ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      GameEvent event = null;
-      try {
-        event = (GameEvent) objIn.readObject();
-      } catch (ClassCastException e) {
-        // Desync'd. Drop packet, move on
-        LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
-            "Desync'd socket receive. Tried to cast ArrayList to GameEvent");
-      }
-
-      // Send audio events to AudioManager
-      if (event != null) {
-        if (event instanceof AudioEvent)
-          AudioManager.getInstance().addEvent((AudioEvent) event);
-        else if (event instanceof ScoreEvent) {
-          ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
-        }
-      }
-    } catch (SocketTimeoutException ste) {
-      // Do nothing, just proceed
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    } catch (ClassNotFoundException cnfe) {
-      cnfe.printStackTrace();
-    }
+  public void receiveEvents(GameEvent event) {
+	  // Send audio events to AudioManager
+	  if (event != null) {
+		  if (event instanceof AudioEvent)
+			  AudioManager.getInstance().addEvent((AudioEvent) event);
+		  else if (event instanceof ScoreEvent) {
+			  ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
+		  }
+	  }
   }
 
   /*
    * Receive the game state from the server and sync the game state with the server (UDP)
    */
-  private void receiveAndUpdate() {
-    try {
-      // Create a packet for receiving entsLite packet
-      DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
-      // Receive a entsLite packet and obtain the byte data
-      multiCastSocket.receive(packet);
-      receivedByte = packet.getData();
-
-      // Deserialize the entsLite byte data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
-      ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      ArrayList<EntityLite> entsLite = null;
-      try {
-          entsLite = (ArrayList<EntityLite>) objIn.readObject();
-        } catch (ClassCastException e) {
-          // Desync'd. Drop packet, move on
-          LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
-              "Desync'd socket receive. Tried to cast GameEvent to ArrayList");
-        }
-
+  private void receiveAndUpdate(ArrayList<EntityLite> entsLite) {
       if (entsLite != null)
         // Sync the game state with server
         ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
-
-    } catch (SocketTimeoutException ste) {
-      // Do nothing, just proceed
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    } catch (ClassNotFoundException cnfe) {
-      cnfe.printStackTrace();
-    }
   }
 
   /*

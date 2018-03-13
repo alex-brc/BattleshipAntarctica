@@ -52,7 +52,7 @@ public class ServerGameHandler extends Thread {
 
     while (run) {
       currentTime = getTime();
-      tick += 1.0 * (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+      tick += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
       while (tick >= 1) {
         this.readInputSample();
         this.updateGameStateByCIS();
