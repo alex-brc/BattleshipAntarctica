@@ -115,7 +115,7 @@ public class Client implements Runnable {
       while (catchUp >= 1) {
         this.sendInputSample();
         this.receivePacket();
-        
+        this.receivePacket();
         tickRate++;
         catchUp--;
         // Update last time
