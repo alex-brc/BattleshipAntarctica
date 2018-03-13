@@ -125,9 +125,6 @@ public class Renderer extends Canvas {
     drawText("A", 704, 36, true, FontColor.WHITE);
     drawText("P", 704, 56, true, FontColor.WHITE);
     drawMinimap(720, 16, true);
-    // drawFilledRect(720, 16, 64, 64, 0x5555FF, true); // TEMPORARY BOX, DELETE LATER
-    // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
-    // System.out.println(minimapTerrain);
 
     if (InputManager.getInstance().shiftPressed())
       ScoreBoard.getInstance().render();
@@ -154,6 +151,20 @@ public class Renderer extends Canvas {
     bs.show();
   }
 
+  /**
+   * Draws a UI bar on the screen. Used for health bars and turret charge bars. Consists of a frame
+   * around the bar, and a bar inside which fills up according to the size of some variable compared
+   * to the maximum value of that variable. The bar is effectively a meter of how 'full' the
+   * variable is.
+   * 
+   * @param barSprite the sprite to use for the frame around the bar
+   * @param value the value of the variable that the bar represents
+   * @param maxValue the maximum value of the variable that the bar represents
+   * @param xp x position to display at
+   * @param yp y position to display at
+   * @param fixed fixed {@code true} if the rectangle is at a fixed screen position (for UI
+   *        elements), {@code false} if the text moves relative to the position of the player
+   */
   private void drawBar(Sprite barSprite, double value, double maxValue, int xp, int yp,
       boolean fixed) {
     drawSprite(xp, yp, barSprite, fixed);
@@ -172,6 +183,10 @@ public class Renderer extends Canvas {
     }
   }
 
+  /**
+   * Draws a black frame around the viewport. The top edge of this frame is where the HUD components
+   * are displayed.
+   */
   private void drawHudFrame() {
     // Top edge
     for (int y = 0; y < Parameters.BIG_BORDER; y++) {
@@ -203,6 +218,9 @@ public class Renderer extends Canvas {
 
   }
 
+  /**
+   * Clears the screen.
+   */
   public void clear() {
     for (int i = 0; i < pixels.length; i++) {
       pixels[i] = 0; // cycles through all pixels and sets them to 0, resetting the array
@@ -259,9 +277,9 @@ public class Renderer extends Canvas {
   /**
    * Draws a Sprite on the screen.
    * 
-   * @param xp
-   * @param yp
-   * @param sprite
+   * @param xp x position to display at
+   * @param yp y position to display at
+   * @param sprite the Sprite to draw
    * @param fixed {@code true} if the Sprite is at a fixed screen position (for UI elements),
    *        {@code false} if the text moves relative to the position of the player
    */
@@ -293,13 +311,20 @@ public class Renderer extends Canvas {
    * @param y y position to display at
    * @param fixed {@code true} if the text is at a fixed screen position (for UI elements),
    *        {@code false} if the text moves relative to the position of the player
-   * @param color
+   * @param color the color of the text to display. This is either black or white
    */
   public void drawText(String text, int x, int y, boolean fixed, FontColor color) {
     Font.defaultFont.render(text, this, x, y, fixed, color);
   }
 
-  // TODO:
+  /**
+   * Draws the minimap on the screen.
+   * 
+   * @param x x position to display at
+   * @param y y position to display at
+   * @param fixed {@code true} if the text is at a fixed screen position (for UI elements),
+   *        {@code false} if the text moves relative to the position of the player
+   */
   private void drawMinimap(int x, int y, boolean fixed) {
     // Render terrain
     int[][] minimap = ModelManager.getInstance().getMap().getMinimap();
@@ -309,15 +334,17 @@ public class Renderer extends Canvas {
       }
     }
 
-    // Render ships
     int widthScale = Parameters.MAP_WIDTH / Parameters.MINIMAP_WIDTH;
     int heightScale = Parameters.MAP_HEIGHT / Parameters.MINIMAP_HEIGHT;
+    // Render ships
     for (Entity ent : ModelManager.getInstance().getEntities()) {
       if (ent instanceof Ship) {
         double xPos = ent.getPosition().getX();
         double yPos = ent.getPosition().getY();
         int renderXPos = (int) FastMath.round(xPos / widthScale);
         int renderYPos = (int) FastMath.round(yPos / heightScale);
+        // Displays a dot for the ship on the minimap
+        // As 1 pixel is too small to see, actually display 3x3 pixels for the ship
         drawPixel(x + renderXPos, y + renderYPos, ((Ship) ent).getColour(), fixed);
         drawPixel(x + renderXPos + 1, y + renderYPos, ((Ship) ent).getColour(), fixed);
         drawPixel(x + renderXPos + 2, y + renderYPos, ((Ship) ent).getColour(), fixed);
@@ -360,7 +387,8 @@ public class Renderer extends Canvas {
    * Draws the viewport on the screen. This is the area of the screen that provides a 'window' that
    * the user sees through to the game world. Includes the map, and other ships that are present.
    * 
-   * @param grid
+   * @param grid a 2D boolean array where {@code true} represents ice, and {@code false} represents
+   *        water
    */
   public void drawViewport(boolean[][] grid) {
     int x0 = xScroll + Parameters.SMALL_BORDER;
