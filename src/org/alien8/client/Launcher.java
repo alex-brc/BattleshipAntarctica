@@ -1,14 +1,13 @@
 package org.alien8.client;
 
 import org.alien8.audio.AudioManager;
-import org.alien8.rendering.Renderer;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
 public class Launcher {
   public static Launcher instance;
   private String loadStatus;
-  private String serverIPstr = "172.22.35.217";
+  private String serverIPstr = "192.168.56.1";
   private Client game;
 
   private Launcher() {
@@ -17,7 +16,7 @@ public class Launcher {
 
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
-    
+
     // Loading client window
     launcher.game = new Client();
     Launcher.instance = launcher;

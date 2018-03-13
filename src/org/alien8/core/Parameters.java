@@ -21,8 +21,8 @@ public class Parameters {
   public static final boolean ICE_IS_SOLID = true;
   public static final int MAX_PLAYERS = 16;
   public static final int MATCH_LENGTH = 300; // in seconds
-  public static final boolean AI_ON = false;
-  public static final boolean DEBUG_MODE = true;
+  public static final boolean AI_ON = true;
+  public static final boolean DEBUG_MODE = false;
 
 
   /// SERVER PARAMETERS
@@ -32,8 +32,7 @@ public class Parameters {
    */
   public static final int NUMBER_CONNECT_ATTEMPTS = 3;
   /**
-   * How often the model calls update() on the entities. It's actually a bit lower
-   * than that.
+   * How often the model calls update() on the entities. It's actually a bit lower than that.
    */
   public static final int TICKS_PER_SECOND = 80;
   public static final int SERVER_PORT = 4446;
@@ -164,7 +163,7 @@ public class Parameters {
   public static final int TORPEDO_WIDTH = 16;
   public static final int TORPEDO_DAMAGE = 30;
   public static final int TORPEDO_SPEED = 5;
-  public static final int TORPEDO_SCORE = 100; 
+  public static final int TORPEDO_SCORE = 100;
   //////////////////////////////////////////////////////////
 
 

@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.ClientMessage;
@@ -150,11 +149,11 @@ public class Server implements Runnable {
       initializeAIs();
 
     model.addEntity(new PlaneDropper());
-    
+
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
   }
-  
+
   private void initializeAIs() {
     // Ai controllers should be put in the
     // ConcurrentHashMap<Ship, AIController> aiMap
@@ -163,7 +162,8 @@ public class Server implements Runnable {
 
     // test ai
     for (int i = 1; i <= 7; i++) {
-      Ship sh = new Ship(getRandomPosition(), 0, 0xFFFFFF);
+      int randColour = (new Random()).nextInt(0xFFFFFF);
+      Ship sh = new Ship(getRandomPosition(), 0, randColour);
       AIController ai = new AIController(sh);
       model.addEntity(sh);
       aiMap.put(sh, ai);
@@ -178,7 +178,7 @@ public class Server implements Runnable {
       chList.add(ch);
       ch.start();
     }
-    
+
   }
 
   private boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
