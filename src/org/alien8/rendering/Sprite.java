@@ -9,6 +9,7 @@ import net.jafama.FastMath;
 public class Sprite implements Serializable {
 
   private static final long serialVersionUID = -7826033026339264249L;
+
   private int width, height;
   private int[] pixels;
   private String path;
@@ -24,8 +25,13 @@ public class Sprite implements Serializable {
   public static Sprite health_bar = new Sprite("/org/alien8/assets/health_bar.png");
   public static Sprite item_frame = new Sprite("/org/alien8/assets/item_frame.png");
   public static Sprite plane = new Sprite("/org/alien8/assets/plane.png");
-
-  // public static Sprite health_item = new Sprite(""); //TODO
+  public static Sprite item_health = new Sprite("/org/alien8/assets/item_health.png");
+  public static Sprite item_invulnerable = new Sprite("/org/alien8/assets/item_invulnerable.png");
+  public static Sprite item_mine = new Sprite("/org/alien8/assets/item_mine.png");
+  public static Sprite item_no_cooldown = new Sprite("/org/alien8/assets/item_no_cooldown.png");
+  public static Sprite item_speed = new Sprite("/org/alien8/assets/item_speed.png");
+  public static Sprite item_torpedo = new Sprite("/org/alien8/assets/item_torpedo.png");
+  public static Sprite pickup = new Sprite("/org/alien8/assets/pickup.png");
 
   public Sprite(String path) {
     this.path = path;

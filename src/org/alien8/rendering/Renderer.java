@@ -7,6 +7,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
+import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
 import org.alien8.client.Launcher;
@@ -16,7 +17,9 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
+import org.alien8.server.Timer;
 import org.alien8.ship.Ship;
+import net.jafama.FastMath;
 
 public class Renderer extends Canvas {
 
@@ -31,8 +34,6 @@ public class Renderer extends Canvas {
 
   private BufferedImage image; // image which is rendered onto canvas
   private int[] pixels;
-
-  private int[][] minimapTerrain = new int[Parameters.MINIMAP_WIDTH][Parameters.MINIMAP_HEIGHT];
 
   private Renderer() {
     setPreferredSize(Parameters.RENDERER_SIZE);
@@ -56,86 +57,13 @@ public class Renderer extends Canvas {
     frame.addWindowListener(new ClientWindowListener());
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
-
-
-
-    // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
   }
-
-  // private Renderer(boolean[][] iceGrid) {
-  //
-  // setPreferredSize(Parameters.RENDERER_SIZE);
-  // width = Parameters.RENDERER_SIZE.width;
-  // height = Parameters.RENDERER_SIZE.height;
-  //
-  // image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-  // pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-  //
-  // frame = new JFrame();
-  //
-  // addMouseListener(InputManager.getInstance());
-  // addMouseMotionListener(InputManager.getInstance());
-  // addKeyListener(InputManager.getInstance());
-  //
-  // frame.setTitle("Battleship Antarctica");
-  // frame.setResizable(false);
-  // frame.add(this);
-  // frame.pack();
-  // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-  // frame.addWindowListener(new ClientWindowListener());
-  // frame.setLocationRelativeTo(null);
-  // frame.setVisible(true);
-  //
-  // // Create the minimap image of the terrain to save re-generating it each frame
-  // minimapTerrain = createMinimapTerrain(iceGrid);
-  // }
 
   public static Renderer getInstance() {
     if (instance == null)
       instance = new Renderer();
     return instance;
   }
-
-  public int[][] createMinimapTerrain(boolean[][] iceGrid) {
-    int bigWidth = Parameters.MAP_WIDTH;
-    int bigHeight = Parameters.MAP_HEIGHT;
-    int smallWidth = Parameters.MINIMAP_WIDTH;
-    int smallHeight = Parameters.MINIMAP_HEIGHT;
-
-    int widthScale = bigWidth / smallWidth;
-    int heightScale = bigHeight / smallHeight;
-
-    int[][] minimap = new int[smallWidth][smallHeight];
-
-    for (int j = 0; j < heightScale; j++) {
-      for (int i = 0; i < widthScale; i++) {
-        int ice = 0;
-        int water = 0;
-        for (int y = j * heightScale; y < (j + 1) * heightScale; y++) {
-          for (int x = i * widthScale; x < (i + 1) * widthScale; x++) {
-            if (iceGrid[x][y]) {
-              ice++;
-            } else {
-              water++;
-            }
-          }
-        }
-        if (ice > water) {
-          minimap[i][j] = 0xffffff;
-        } else {
-          minimap[i][j] = 0x5555ff;
-        }
-      }
-    }
-
-    return minimap;
-  }
-
-  // public static Renderer getInstance(boolean[][] iceGrid) {
-  // if (instance == null)
-  // instance = new Renderer(iceGrid);
-  // return instance;
-  // }
 
   /**
    * The render() method renders all entities to the screen in their current state
@@ -175,44 +103,46 @@ public class Renderer extends Canvas {
       drawText("0", 16, 40, true, FontColor.WHITE);
     else
       drawText(Long.toString(score.getScore()), 16, 40, true, FontColor.WHITE);
-
-    // TODO: Render current score
-    // drawText(ScoreBoard.getInstance().getScore(player).getScore(), 16, 40, true);
-    /*
-     * Commented this out as we are not having high scores for each player // TODO: Render high
-     * score header drawText("HI-SCORE", 128, 16, true); // TODO: Render high score
-     * drawText("00000", 128, 40, true);
-     */
     // Render health bar
     drawText("HEALTH", 203, 16, true, FontColor.WHITE);
     drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 203, 40, true);
-    // TODO: Render turret charge
+    // Render turret charge
     drawText("TURRET1", 324, 16, true, FontColor.WHITE);
     drawBar(Sprite.turret_bar, player.getFrontTurretCharge(), Parameters.TURRET_MAX_DIST, 326, 40,
         true);
     drawText("TURRET2", 462, 16, true, FontColor.WHITE);
     drawBar(Sprite.turret_bar, player.getRearTurretCharge(), Parameters.TURRET_MAX_DIST, 464, 40,
         true);
-    
+
     // Draw timer
-    Launcher.getInstance().getRunningClient().getTimer().render();
-    
+    Timer t = Launcher.getInstance().getRunningClient().getTimer();
+    if (t != null)
+      t.render();
+
     // TODO: Render use item
     drawText("ITEM", 612, 18, true, FontColor.WHITE);
     drawSprite(624, 40, new Sprite("/org/alien8/assets/item_frame.png"), true);
-    // drawSprite(/* USE ITEM IN HERE*/);
+    try {
+      drawSprite(631, 47, player.getItem().getSprite(), true);
+    } catch (NullPointerException e) {
 
-    // // TODO: Render minimap
+    }
+
+    // Render minimap
     drawText("M", 704, 16, true, FontColor.WHITE);
     drawText("A", 704, 36, true, FontColor.WHITE);
     drawText("P", 704, 56, true, FontColor.WHITE);
-    // drawFilledRect(720, 16, 64, 64, 0x5555FF, true); // TEMPORARY BOX, DELETE LATER
-    // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
-    // System.out.println(minimapTerrain);
-    // drawMinimap(720, 16, true);
+    drawMinimap(720, 16, true);
+
+    if (InputManager.getInstance().shiftPressed() || Client.getInstance().isWaitingToExit())
+      ScoreBoard.getInstance().render();
     
-    if(InputManager.getInstance().shiftPressed())
-    	ScoreBoard.getInstance().render();
+    if (Client.getInstance().isWaitingToExit()) {
+      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 550, true, FontColor.BLACK);
+      drawText("seconds", 230, 550, true, FontColor.BLACK);
+      drawText("before", 360, 550, true, FontColor.BLACK);
+      drawText("exiting", 480, 550, true, FontColor.BLACK);
+    }
 
     // Display player death message
     // if (player.getHealth() <= 0) {
@@ -236,6 +166,20 @@ public class Renderer extends Canvas {
     bs.show();
   }
 
+  /**
+   * Draws a UI bar on the screen. Used for health bars and turret charge bars. Consists of a frame
+   * around the bar, and a bar inside which fills up according to the size of some variable compared
+   * to the maximum value of that variable. The bar is effectively a meter of how 'full' the
+   * variable is.
+   * 
+   * @param barSprite the sprite to use for the frame around the bar
+   * @param value the value of the variable that the bar represents
+   * @param maxValue the maximum value of the variable that the bar represents
+   * @param xp x position to display at
+   * @param yp y position to display at
+   * @param fixed fixed {@code true} if the rectangle is at a fixed screen position (for UI
+   *        elements), {@code false} if the text moves relative to the position of the player
+   */
   private void drawBar(Sprite barSprite, double value, double maxValue, int xp, int yp,
       boolean fixed) {
     drawSprite(xp, yp, barSprite, fixed);
@@ -253,50 +197,11 @@ public class Renderer extends Canvas {
       }
     }
   }
- 
-  private void drawBar(double value, double maxValue, int x, int y, int width, int height,
-      int thickness, int borderColor, int barColor, boolean fixed) {
 
-    // Top line
-    for (int j = y; j < thickness + y + 2; j++) {
-      for (int i = x + 2; i < x + 4 + width; i++) {
-        drawPixel(i, j, borderColor, true);
-      }
-    }
-
-    // Bottom line
-    for (int j = y + 2 + height; j < y + 2 + height + thickness; j++) {
-      for (int i = x + 2; i < x + 4 + width; i++) {
-        drawPixel(i, j, borderColor, true);
-      }
-    }
-
-    // Left line
-    for (int j = y + 1; j < y + 1 + height; j++) {
-      for (int i = x; i < x + thickness; i++) {
-        drawPixel(i, j, borderColor, true);
-      }
-    }
-
-    // Right line
-    for (int j = y + 1; j < y + 1 + height; j++) {
-      for (int i = x + 1 + width; i < x + 1 + width + thickness; i++) {
-        drawPixel(i, j, borderColor, true);
-      }
-    }
-
-    // Bar in the middle
-    int barHeight = height - 4;
-    int maxBarLength = width - 4;
-    int barLength = (int) (value / maxValue) * maxBarLength;
-    for (int j = y + thickness + 1; j < y + thickness + 2 + barHeight; j++) {
-      for (int i = x + thickness + 1; i < x + thickness + 2 + barLength; i++) {
-        drawPixel(i, j, barColor, true);
-      }
-    }
-
-  }
-
+  /**
+   * Draws a black frame around the viewport. The top edge of this frame is where the HUD components
+   * are displayed.
+   */
   private void drawHudFrame() {
     // Top edge
     for (int y = 0; y < Parameters.BIG_BORDER; y++) {
@@ -328,6 +233,9 @@ public class Renderer extends Canvas {
 
   }
 
+  /**
+   * Clears the screen.
+   */
   public void clear() {
     for (int i = 0; i < pixels.length; i++) {
       pixels[i] = 0; // cycles through all pixels and sets them to 0, resetting the array
@@ -384,9 +292,9 @@ public class Renderer extends Canvas {
   /**
    * Draws a Sprite on the screen.
    * 
-   * @param xp
-   * @param yp
-   * @param sprite
+   * @param xp x position to display at
+   * @param yp y position to display at
+   * @param sprite the Sprite to draw
    * @param fixed {@code true} if the Sprite is at a fixed screen position (for UI elements),
    *        {@code false} if the text moves relative to the position of the player
    */
@@ -418,17 +326,49 @@ public class Renderer extends Canvas {
    * @param y y position to display at
    * @param fixed {@code true} if the text is at a fixed screen position (for UI elements),
    *        {@code false} if the text moves relative to the position of the player
-   * @param color
+   * @param color the color of the text to display. This is either black or white
    */
   public void drawText(String text, int x, int y, boolean fixed, FontColor color) {
     Font.defaultFont.render(text, this, x, y, fixed, color);
   }
 
+  /**
+   * Draws the minimap on the screen.
+   * 
+   * @param x x position to display at
+   * @param y y position to display at
+   * @param fixed {@code true} if the text is at a fixed screen position (for UI elements),
+   *        {@code false} if the text moves relative to the position of the player
+   */
   private void drawMinimap(int x, int y, boolean fixed) {
-    // System.out.println(minimapTerrain.length);
-    for (int j = y; j < minimapTerrain.length; j++) {
-      for (int i = x; i < minimapTerrain[0].length; i++) {
-        pixels[x + y * width] = minimapTerrain[x][y];
+    // Render terrain
+    int[][] minimap = ModelManager.getInstance().getMap().getMinimap();
+    for (int j = 0; j < minimap.length; j++) {
+      for (int i = 0; i < minimap[0].length; i++) {
+        drawPixel(x + i, y + j, minimap[i][j], fixed);
+      }
+    }
+
+    int widthScale = Parameters.MAP_WIDTH / Parameters.MINIMAP_WIDTH;
+    int heightScale = Parameters.MAP_HEIGHT / Parameters.MINIMAP_HEIGHT;
+    // Render ships
+    for (Entity ent : ModelManager.getInstance().getEntities()) {
+      if (ent instanceof Ship) {
+        double xPos = ent.getPosition().getX();
+        double yPos = ent.getPosition().getY();
+        int renderXPos = (int) FastMath.round(xPos / widthScale);
+        int renderYPos = (int) FastMath.round(yPos / heightScale);
+        // Displays a dot for the ship on the minimap
+        // As 1 pixel is too small to see, actually display 3x3 pixels for the ship
+        drawPixel(x + renderXPos, y + renderYPos, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos + 1, y + renderYPos, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos + 2, y + renderYPos, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos + 1, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos + 2, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos + 1, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
+        drawPixel(x + renderXPos + 2, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
       }
     }
   }
@@ -462,7 +402,8 @@ public class Renderer extends Canvas {
    * Draws the viewport on the screen. This is the area of the screen that provides a 'window' that
    * the user sees through to the game world. Includes the map, and other ships that are present.
    * 
-   * @param grid
+   * @param grid a 2D boolean array where {@code true} represents ice, and {@code false} represents
+   *        water
    */
   public void drawViewport(boolean[][] grid) {
     int x0 = xScroll + Parameters.SMALL_BORDER;
@@ -489,12 +430,12 @@ public class Renderer extends Canvas {
    * @return the Position of the center in
    */
   public Position getScreenPosition(Position position) {
-	Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
-	return new Position(400,300);
+    Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
+    return new Position(400, 300);
   }
-  
+
   public Position getScreenPositionAI(Position position) {
-	Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
-	return pos;
+    Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
+    return pos;
   }
 }

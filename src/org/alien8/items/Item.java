@@ -23,7 +23,10 @@ public abstract class Item {
 	}
 
 	public int getItemType() {
-		// TODO Auto-generated method stub
 		return itemType;
+	}
+
+	public Sprite getSprite() {
+		return sprite;
 	}
 }

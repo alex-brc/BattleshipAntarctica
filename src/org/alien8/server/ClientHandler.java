@@ -14,6 +14,7 @@ import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
+import org.alien8.core.ServerMessage;
 import org.alien8.physics.Position;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
@@ -47,6 +48,34 @@ public class ClientHandler extends Thread {
     this.toClient = toClient;
     this.fromClient = fromClient;
   }
+  
+  public void end() {
+    run = false;
+  }
+  
+  public void sendEndGameMessage() {
+    try {
+      toClient.writeObject(new ServerMessage(0));
+    } catch (IOException ioe) {
+      // Do nothing
+    }
+  }
+  
+  public void sendTimeBeforeExiting(int timeBeforeExiting) {
+    try {
+      toClient.writeObject(new ServerMessage(1, timeBeforeExiting));
+    } catch (IOException ioe) {
+      // Do nothing
+    }
+  }
+  
+  public void sendServerStoppedMessage() {
+    try {
+      toClient.writeObject(new ServerMessage(2));
+    } catch (IOException ioe) {
+      // Do nothing
+    }
+  }
 
   public void run() {
     // Start the server game loop if it is the first client connecting
@@ -74,24 +103,22 @@ public class ClientHandler extends Thread {
     this.sendGameState(p, s);
     this.waitForReadyMessage(p, s);
 
-    // Keep reading for various client's request (only disconnect request at this moment)
+    // Keep reading from client to track the connection status (Disconnection is catched by exception)
     while (run) {
       try {
-        ClientMessage msg = (ClientMessage) fromClient.readObject();
-        if (msg.getType() == 1) { // Disconnect request
-          Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
-        }
+        fromClient.readObject();
+        
       } catch (ClassNotFoundException cnfe) {
         LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
             "Class of serialized object cannot be found." + cnfe.toString());
         cnfe.printStackTrace();
         Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
-      } catch (IOException ioe) {
-        LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-            "Something is wrong when reading client's message" + ioe.toString());
+      } catch (IOException ioe) { // Client disconnected / Server closing the input stream when game ends
         Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
       }
     }
+    
+    System.out.println("Client Handler (" + clientIP + ", " + clientUdpPort + ") stopped");
   }
 
   private void sendMapSeed(Player p, Ship s) {
@@ -160,7 +187,7 @@ public class ClientHandler extends Thread {
     // Add the player to the playerList when the player is ready
     try {
       ClientMessage msg = (ClientMessage) fromClient.readObject();
-      if (msg.getType() == 2) // Ready message
+      if (msg.getType() == 1) // Ready message
         playerList.add(p);
       else
         this.disconnectClient(p, s);
@@ -195,8 +222,5 @@ public class ClientHandler extends Thread {
   public int getClientUdpPort() {
     return this.clientUdpPort;
   }
-
-  public void end() {
-    run = false;
-  }
+  
 }

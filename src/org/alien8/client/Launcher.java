@@ -1,10 +1,5 @@
 package org.alien8.client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.alien8.audio.AudioManager;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
@@ -21,9 +16,9 @@ public class Launcher {
   
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
-    
+
     // Loading client window
-    launcher.game = new Client();
+    launcher.game = Client.getInstance();
     Launcher.instance = launcher;
     // Load log manager
     launcher.loadStatus = "Preparing logger...";

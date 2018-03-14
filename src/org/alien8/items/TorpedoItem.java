@@ -6,7 +6,7 @@ import org.alien8.rendering.Sprite;
 public class TorpedoItem extends Item {
 	public TorpedoItem() {
 		// Doesn't have a ship at this point
-		super(Sprite.bullet, Pickup.SPEED_PICKUP); //TODO give it Sprite.health_item
+		super(Sprite.item_torpedo, Pickup.SPEED_PICKUP); //TODO give it Sprite.health_item
 	}
 	
 	/**
@@ -15,6 +15,5 @@ public class TorpedoItem extends Item {
 	@Override
 	public void use() {
 		ModelManager.getInstance().addEntity(new Torpedo(ship.getPosition(), ship.getSerial(), ship.getDirection()));
-		System.out.println("SUCCESS TORPEDO (19:TorpedoItem)");
 	}
 }
