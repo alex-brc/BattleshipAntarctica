@@ -57,7 +57,7 @@ public class ClientHandler extends Thread {
     try {
       toClient.writeObject(new ServerMessage(0));
     } catch (IOException ioe) {
-      System.out.println("Can't send end game message, client disconnected?");
+      // Do nothing
     }
   }
   
@@ -65,7 +65,7 @@ public class ClientHandler extends Thread {
     try {
       toClient.writeObject(new ServerMessage(1, timeBeforeExiting));
     } catch (IOException ioe) {
-      System.out.println("Can't send end game message, client disconnected?");
+      // Do nothing
     }
   }
   
@@ -73,7 +73,7 @@ public class ClientHandler extends Thread {
     try {
       toClient.writeObject(new ServerMessage(2));
     } catch (IOException ioe) {
-      System.out.println("Can't send end game message, client disconnected?");
+      // Do nothing
     }
   }
 

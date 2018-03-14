@@ -48,6 +48,7 @@ public class Server implements Runnable {
   private ArrayList<Player> playerList = new ArrayList<Player>();
   private ArrayList<ClientHandler> chList = new ArrayList<ClientHandler>();
   private LinkedList<GameEvent> events = new LinkedList<GameEvent>();
+  private ServerGameHandler sgh = null;
   private Long seed = (new Random()).nextLong();
   private volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
 
@@ -75,7 +76,8 @@ public class Server implements Runnable {
   public void stop() {
     udpSocket.close();
     try {
-      tcpSocket.close(); // Would make tcpSocket.accept() to throw SocketException + all ClientHandlers would throw IOException
+      tcpSocket.close(); // Would make tcpSocket.accept() to throw SocketException + all
+                         // ClientHandlers would throw IOException
     } catch (IOException ioe) {
       System.out.println("Can't close TCP socket!?");
     }
@@ -137,7 +139,7 @@ public class Server implements Runnable {
           "Cannot find the class of the received serialized object");
       cnfe.printStackTrace();
     }
-    
+
     System.out.println("Server stopped");
   }
 
@@ -212,7 +214,7 @@ public class Server implements Runnable {
   }
 
   public void disconnectPlayer(InetAddress clientIP, int clientPort) {
-    if (isPlayerConnected(clientIP, clientPort)) {
+    if (isPlayerConnected(clientIP, clientPort) && sgh.isGameRunning()) {
       Player pToBeRemoved = this.getPlayerByIpAndPort(clientIP, clientPort);
       Ship shipToBeRemoved = pToBeRemoved.getShip();
       ClientHandler ch = this.getClientHandlerByIpAndPort(clientIP, clientPort);
@@ -250,8 +252,7 @@ public class Server implements Runnable {
   }
 
   public void startSGH() {
-    ServerGameHandler sgh =
-        new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
+    sgh = new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
     sgh.start();
   }
 

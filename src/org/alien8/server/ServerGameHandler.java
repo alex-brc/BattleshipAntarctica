@@ -10,6 +10,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.client.ClientInputSample;
@@ -37,7 +38,7 @@ public class ServerGameHandler extends Thread {
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
-  private volatile boolean run = true;
+  private volatile boolean gameRunning = true;
   private int seconds;
 
   public ServerGameHandler(DatagramSocket ds, InetAddress ip,
@@ -57,7 +58,7 @@ public class ServerGameHandler extends Thread {
     long currentTime = 0;
     double tick = 0;
 
-    while (run) {
+    while (gameRunning) {
       currentTime = getNanoTime();
       tick += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
       while (tick >= 1) {
@@ -78,12 +79,13 @@ public class ServerGameHandler extends Thread {
       }
 
       if (seconds <= 0) {
-        // Notice all clients game has ended
-        for (ClientHandler ch : Server.getInstance().getCHList()) {
-          ch.sendEndGameMessage();
-        }
-        break;
+        gameRunning = false;
       }
+    }
+    
+    // Notice all clients game has ended
+    for (ClientHandler ch : Server.getInstance().getCHList()) {
+      ch.sendEndGameMessage();
     }
 
     long timeWhenGameEnds = getNanoTime();
@@ -91,9 +93,6 @@ public class ServerGameHandler extends Thread {
     // Wait 10 seconds before the server shut down (for players to read the leaderboard)
     while (getNanoTime() - timeWhenGameEnds < Parameters.TIME_BEFORE_SERVER_END * (long) Parameters.N_SECOND) {
       int timeBeforeExiting = Parameters.TIME_BEFORE_SERVER_END - (int) ((getNanoTime() - timeWhenGameEnds) / Parameters.N_SECOND);
-      
-      // Ensure client's game loop is not blocked so renderer can render the leaderboard and the time before exiting
-      this.sendGameState();
       
       // Send info about how much time before exiting for client's renderer to update the time
       for (ClientHandler ch : Server.getInstance().getCHList()) {
@@ -128,9 +127,13 @@ public class ServerGameHandler extends Thread {
   private long getNanoTime() {
     return System.nanoTime();
   }
+  
+  public boolean isGameRunning() {
+    return gameRunning;
+  }
 
   public void end() {
-    run = false;
+    gameRunning = false;
   }
 
   private void readInputSample() {

@@ -26,7 +26,7 @@ public class ClientTCP extends Thread {
           Client.getInstance().setTimeBeforeExiting(msg.getTimeBeforeExiting());
         }
         else if (msg.getType() == 2) { // Server stopped
-          Client.getInstance().disconnect();     
+          Client.getInstance().disconnect();
         }
       } catch (IOException ioe){ // Unexpected disconnection
         Client.getInstance().disconnect();

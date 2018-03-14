@@ -120,7 +120,7 @@ public class Client implements Runnable {
     long tickTimer = getTime();
 
     while (running) {
-      if (gameRunning || waitingToExit) {
+      if (gameRunning && !waitingToExit) {
         currentTime = getTime();
 
         // Get the amount of update()s the model needs to catch up
@@ -133,9 +133,13 @@ public class Client implements Runnable {
 
         // Call update() as many times as needed to compensate before rendering
         while (catchUp >= 1) {
-          this.sendInputSample();
-          this.receivePacket();
-          this.receivePacket();
+          try {
+            this.sendInputSample();
+            this.receivePacket();
+            this.receivePacket();
+          } catch (IOException e) {
+            // Do nothing, if reached here gameRunning && waitingToExit should be set false
+          }
 
           tickRate++;
           catchUp--;
@@ -159,6 +163,10 @@ public class Client implements Runnable {
           // System.out.println("Ticks: " + TICKS);
           tickRate = 0;
         }
+      }
+      if (waitingToExit && !gameRunning) {
+        // Call the renderer
+        Renderer.getInstance().render(model);
       }
     }
     System.out.println("stopped");
@@ -196,6 +204,8 @@ public class Client implements Runnable {
   public void waitToExit() {
     waitingToExit = true;
     gameRunning = false;
+    udpSocket.close();
+    multiCastSocket.close();
   }
   
   public boolean isWaitingToExit() {
@@ -269,7 +279,7 @@ public class Client implements Runnable {
     return false;
   }
 
-  private void sendInputSample() {
+  private void sendInputSample() throws IOException {
     try {
       // Serialize the input sample object into byte array
       ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -284,13 +294,12 @@ public class Client implements Runnable {
 
       // Send the client input sample packet to the server
       udpSocket.send(packet);
-    } catch (IOException ioe) {
-      // Disconnected with server, when reached this exception the gameRunning would be set false so
-      // the while loop in run() would keep looping and do nothing after this
+    } catch (IOException ioe) { // UdpSocket closed
+      throw ioe;
     }
   }
 
-  private void receivePacket() {
+  private void receivePacket() throws IOException {
     Object receivedObject = null;
     try {
       // Create a packet for receiving entsLite packet
@@ -304,9 +313,8 @@ public class Client implements Runnable {
       ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
       ObjectInputStream objIn = new ObjectInputStream(byteIn);
       receivedObject = objIn.readObject();
-    } catch (IOException ioe) {
-      // Disconnected with server, when reached this exception the gameRunning would be set false so
-      // the while loop in run() would keep looping and do nothing after this
+    } catch (IOException ioe) { // multiCastsocket closed
+      throw ioe;
     } catch (ClassNotFoundException cnfe) {
       cnfe.printStackTrace();
     }
@@ -390,14 +398,14 @@ public class Client implements Runnable {
   public void disconnect() {
     try {
       clientTCP.end();
-      waitingToExit = false;
+      gameRunning = false;
+      waitingToExit = false; 
       tcpSocket.close();
       udpSocket.close();
       multiCastSocket.close();
 
       // Reset relevant field
       // TODO: reset model instance
-      gameRunning = false;
       timer = null;
       FPS = 0;
       TICKS = 0;
@@ -413,9 +421,7 @@ public class Client implements Runnable {
       receivedByte = null;
       sendingByte = null;
     } catch (IOException e) {
-      System.out.println("Can't close TCP socket?");
-      LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
-          "Something went wrong disconnecting client. " + e.toString());
+      // Trying to close a closed socket, it's ok just proceed
     }
   }
 
