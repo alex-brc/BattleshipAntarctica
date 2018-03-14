@@ -7,6 +7,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
+import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
 import org.alien8.client.Launcher;
@@ -16,6 +17,7 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
+import org.alien8.server.Timer;
 import org.alien8.ship.Ship;
 import net.jafama.FastMath;
 
@@ -113,7 +115,9 @@ public class Renderer extends Canvas {
         true);
 
     // Draw timer
-    Launcher.getInstance().getRunningClient().getTimer().render();
+    Timer t = Launcher.getInstance().getRunningClient().getTimer();
+    if (t != null)
+      t.render();
 
     // TODO: Render use item
     drawText("ITEM", 612, 18, true, FontColor.WHITE);
@@ -130,8 +134,15 @@ public class Renderer extends Canvas {
     drawText("P", 704, 56, true, FontColor.WHITE);
     drawMinimap(720, 16, true);
 
-    if (InputManager.getInstance().shiftPressed())
+    if (InputManager.getInstance().shiftPressed() || Client.getInstance().isWaitingToExit())
       ScoreBoard.getInstance().render();
+    
+    if (Client.getInstance().isWaitingToExit()) {
+      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 550, true, FontColor.BLACK);
+      drawText("seconds", 230, 550, true, FontColor.BLACK);
+      drawText("before", 360, 550, true, FontColor.BLACK);
+      drawText("exiting", 480, 550, true, FontColor.BLACK);
+    }
 
     // Display player death message
     // if (player.getHealth() <= 0) {

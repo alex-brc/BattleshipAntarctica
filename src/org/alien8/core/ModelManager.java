@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
@@ -69,8 +68,8 @@ public class ModelManager {
 
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
-	//System.out.println(entities.size());
-	AIController ai = null;
+    // System.out.println(entities.size());
+    AIController ai = null;
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
@@ -80,24 +79,24 @@ public class ModelManager {
         // Skip the rest
         continue;
       }
-      if(ent instanceof Ship) {
-    	  // Handle player stuff
-    	  Ship ship = (Ship) ent;
-    	  ai = Server.getInstance().getAIByShip(ship);
-    	  if(ai != null) {
-    		  ai.update();
-    	  }
-    	  else for (Player p : latestCIS.keySet()) {
-    		  if (ent == p.getShip()) {
-    			  Ship s = (Ship) ent;
-    			  s.updateEffect();
-    			  ClientInputSample cis = latestCIS.get(p);
-    			  InputManager.processInputs(s, cis);
-    			  break;
-    		  }
-    	  }
+      if (ent instanceof Ship) {
+        // Handle player stuff
+        Ship ship = (Ship) ent;
+        ai = Server.getInstance().getAIByShip(ship);
+        if (ai != null) {
+          ai.update();
+        } else
+          for (Player p : latestCIS.keySet()) {
+            if (ent == p.getShip()) {
+              Ship s = (Ship) ent;
+              s.updateEffect();
+              ClientInputSample cis = latestCIS.get(p);
+              InputManager.processInputs(s, cis);
+              break;
+            }
+          }
       }
-      
+
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
     }
@@ -130,15 +129,12 @@ public class ModelManager {
         s.getRearTurret().setDirection(el.rearTurretDirection);
         s.getFrontTurret().setDistance(el.frontTurretCharge);
         s.getRearTurret().setDistance(el.rearTurretCharge);
-        
+
         if (el.toBeDeleted) {
           s.delete();
         }
 
-        if (el.clientIP.equals(
-        		clientIP) && 
-        		el.clientUdpPort == 
-        		clientUdpPort) { // Client's ship
+        if (el.clientIP.equals(clientIP) && el.clientUdpPort == clientUdpPort) { // Client's ship
           this.setPlayer(s);
         }
 
@@ -162,60 +158,60 @@ public class ModelManager {
         b.setTravelled(el.travelled);
 
         if (el.toBeDeleted) {
-        	b.delete();
+          b.delete();
         }
 
         this.addEntity(b);
-      } else if(el.entityType == 3) { // Pickup
-    	  Pickup p = null;
-    	  switch(el.pickupType) {
-    	  case Pickup.HEALTH_PICKUP: 
-    		  p = new HealthPickup(el.position);
-    		  break;
-    	  case Pickup.MINE_PICKUP: 
-    		  p = new MinePickup(el.position);
-    		  break;
-    	  case Pickup.INVULNERABLE_PICKUP: 
-    		  p = new InvulnerablePickup(el.position);
-    		  break;
-    	  case Pickup.SPEED_PICKUP: 
-    		  p = new SpeedPickup(el.position);
-    		  break;
-    	  case Pickup.NO_COOLDOWN_PICKUP: 
-    		  p = new NoCooldownPickup(el.position);
-    		  break;
-    	  case Pickup.TORPEDO_PICKUP: 
-    		  p = new TorpedoPickup(el.position);
-    		  break;
-    	  }
-    	  
-    	  if(el.toBeDeleted) {
-    		  p.delete();
-    	  }
-    	  
-    	  this.addEntity(p);
-      } else if(el.entityType == 4) { // Plane
-    	  PlaneDropper pd = new PlaneDropper(el.position, el.direction);
-    	  if(el.toBeDeleted) {
-    		  pd.delete();
-    	  }
-    	  
-    	  this.addEntity(pd);
-      } else if(el.entityType == 5) { // Mine
-    	  Mine m = new Mine(el.position, 0);
-    	  if(el.toBeDeleted) {
-    		  m.delete();
-    	  }
-    	  
-    	  this.addEntity(m);
-      } else if(el.entityType == 6) { // Torpedo
-    	  Torpedo t = new Torpedo(el.position, 0, el.direction);
-    	  if(el.toBeDeleted) {
-    		  t.delete();
-    	  }
-    	  
-    	  this.addEntity(t);
-      }  
+      } else if (el.entityType == 3) { // Pickup
+        Pickup p = null;
+        switch (el.pickupType) {
+          case Pickup.HEALTH_PICKUP:
+            p = new HealthPickup(el.position);
+            break;
+          case Pickup.MINE_PICKUP:
+            p = new MinePickup(el.position);
+            break;
+          case Pickup.INVULNERABLE_PICKUP:
+            p = new InvulnerablePickup(el.position);
+            break;
+          case Pickup.SPEED_PICKUP:
+            p = new SpeedPickup(el.position);
+            break;
+          case Pickup.NO_COOLDOWN_PICKUP:
+            p = new NoCooldownPickup(el.position);
+            break;
+          case Pickup.TORPEDO_PICKUP:
+            p = new TorpedoPickup(el.position);
+            break;
+        }
+
+        if (el.toBeDeleted) {
+          p.delete();
+        }
+
+        this.addEntity(p);
+      } else if (el.entityType == 4) { // Plane
+        PlaneDropper pd = new PlaneDropper(el.position, el.direction);
+        if (el.toBeDeleted) {
+          pd.delete();
+        }
+
+        this.addEntity(pd);
+      } else if (el.entityType == 5) { // Mine
+        Mine m = new Mine(el.position, 0);
+        if (el.toBeDeleted) {
+          m.delete();
+        }
+
+        this.addEntity(m);
+      } else if (el.entityType == 6) { // Torpedo
+        Torpedo t = new Torpedo(el.position, 0, el.direction);
+        if (el.toBeDeleted) {
+          t.delete();
+        }
+
+        this.addEntity(t);
+      }
     }
   }
 

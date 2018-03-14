@@ -29,7 +29,7 @@ import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
 /*
- * A singleton game server
+ * A singleton game server, call Server.getInstance().start() every time a client starts a server
  */
 public class Server implements Runnable {
 
@@ -48,32 +48,57 @@ public class Server implements Runnable {
   private ArrayList<Player> playerList = new ArrayList<Player>();
   private ArrayList<ClientHandler> chList = new ArrayList<ClientHandler>();
   private LinkedList<GameEvent> events = new LinkedList<GameEvent>();
+  private ServerGameHandler sgh = null;
   private Long seed = (new Random()).nextLong();
   private volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
-  private volatile boolean run = true;
 
   public static void main(String[] args) {
-    Server s = new Server();
-    instance = s;
+    Server s = Server.getInstance();
     s.start();
   }
 
+  private Server() {
+
+  }
+
   public static Server getInstance() {
+    if (instance == null)
+      instance = new Server();
     return instance;
   }
 
   public void start() {
+    this.reset();
     thread = new Thread(this, "Battleship Antarctica Server");
     thread.start();
   }
 
   public void stop() {
-    run = false;
+    udpSocket.close();
     try {
-      thread.join();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+      tcpSocket.close(); // Would make tcpSocket.accept() to throw SocketException + all
+                         // ClientHandlers would throw IOException
+    } catch (IOException ioe) {
+      System.out.println("Can't close TCP socket!?");
     }
+  }
+
+  public void reset() {
+    // TODO: reset ModelManager
+    thread = null;
+    hostIP = null;
+    multiCastIP = null;
+    tcpSocket = null;
+    udpSocket = null;
+    entities = model.getEntities();
+    latestCIS = new ConcurrentHashMap<Player, ClientInputSample>();
+    aiMap = new ConcurrentHashMap<Ship, AIController>();
+    playerMap = new ConcurrentHashMap<Ship, Player>();
+    playerList = new ArrayList<Player>();
+    chList = new ArrayList<ClientHandler>();
+    events = new LinkedList<GameEvent>();
+    seed = (new Random()).nextLong();
+    bullets = new LinkedList<Bullet>();
   }
 
   @Override
@@ -91,7 +116,7 @@ public class Server implements Runnable {
       System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
 
       // Process clients' connect/disconnect request
-      while (run) {
+      while (true) {
         // Receive and process client's packet
         LogManager.getInstance().log("Server", LogManager.Scope.INFO,
             "Waiting for client request...");
@@ -103,12 +128,8 @@ public class Server implements Runnable {
         processClientMessage(clientIP, cr, toClient, fromClient);
       }
 
-      tcpSocket.close();
-      udpSocket.close();
     } catch (SocketException se) {
-      LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
-          "Cannot bind the UDP socket");
-      se.printStackTrace();
+      // Do nothing, just let this thread stops
     } catch (IOException ioe) {
       LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
           "Something wrong with the TCP connection");
@@ -118,6 +139,8 @@ public class Server implements Runnable {
           "Cannot find the class of the received serialized object");
       cnfe.printStackTrace();
     }
+
+    System.out.println("Server stopped");
   }
 
   private void setHostIP() {
@@ -191,7 +214,7 @@ public class Server implements Runnable {
   }
 
   public void disconnectPlayer(InetAddress clientIP, int clientPort) {
-    if (isPlayerConnected(clientIP, clientPort)) {
+    if (isPlayerConnected(clientIP, clientPort) && sgh.isGameRunning()) {
       Player pToBeRemoved = this.getPlayerByIpAndPort(clientIP, clientPort);
       Ship shipToBeRemoved = pToBeRemoved.getShip();
       ClientHandler ch = this.getClientHandlerByIpAndPort(clientIP, clientPort);
@@ -229,8 +252,7 @@ public class Server implements Runnable {
   }
 
   public void startSGH() {
-    ServerGameHandler sgh =
-        new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
+    sgh = new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
     sgh.start();
   }
 
