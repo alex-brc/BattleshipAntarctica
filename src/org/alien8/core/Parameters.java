@@ -20,7 +20,8 @@ public class Parameters {
   public static final boolean RENDER_BOX = true;
   public static final boolean ICE_IS_SOLID = true;
   public static final int MAX_PLAYERS = 16;
-  public static final int MATCH_LENGTH = 300; // in seconds
+  public static final int MATCH_LENGTH = 10; // in seconds
+  public static final int TIME_BEFORE_SERVER_END = 10; // in seconds
   public static final boolean AI_ON = false;
   public static final boolean DEBUG_MODE = true;
 

@@ -287,8 +287,8 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   public void keyTyped(KeyEvent e) {
 	// Mute all sounds with M
     if(e.getKeyCode() == KeyEvent.VK_M) {
-    	AudioManager.getInstance().ambientMuteToggle();
-    	AudioManager.getInstance().sfxMuteToggle();
+      AudioManager.getInstance().ambientMuteToggle();
+      AudioManager.getInstance().sfxMuteToggle();
     }
   }
 }

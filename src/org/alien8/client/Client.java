@@ -12,11 +12,9 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
@@ -32,15 +30,22 @@ import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
 import org.alien8.util.LogManager;
 
+/*
+ * A singleton game client, loops and do nothing when not in game (gameRunning == false).
+ */
 public class Client implements Runnable {
   /**
    * Volatile "running" boolean to avoid internal caching. Thread should stop cleanly when set to
    * false.
    */
   private volatile boolean running = false;
+  private boolean gameRunning = false;
+  private boolean waitingToExit = false;
+  private static Client instance;
   private Thread thread;
   private ModelManager model;
   private Timer timer;
+  private int timeBeforeExiting = 10;
   private int FPS = 0;
   private int TICKS = 0;
   private InetAddress clientIP = null;
@@ -50,10 +55,18 @@ public class Client implements Runnable {
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
+  private ClientTCP clientTCP;
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
-  public Client() {
+
+  public static Client getInstance() {
+    if (instance == null)
+      instance = new Client();
+    return instance;
+  }
+
+  private Client() {
     model = ModelManager.getInstance();
   }
 
@@ -65,7 +78,7 @@ public class Client implements Runnable {
     if (running)
       return;
     running = true;
-    
+
     // Make a timer
     timer = new Timer(0);
 
@@ -107,79 +120,55 @@ public class Client implements Runnable {
     long tickTimer = getTime();
 
     while (running) {
-      currentTime = getTime();
+      if (gameRunning || waitingToExit) {
+        currentTime = getTime();
 
-      // Get the amount of update()s the model needs to catch up
-      //
-      // timeNow - timeLastUpdateWasDone -->
-      // timeToCatchUp = ----------------------------------
-      // deltaTPerTick --> how long a "tick" is
-      //
-      catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+        // Get the amount of update()s the model needs to catch up
+        //
+        // timeNow - timeLastUpdateWasDone -->
+        // timeToCatchUp = ----------------------------------
+        // deltaTPerTick --> how long a "tick" is
+        //
+        catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
-      // Call update() as many times as needed to compensate before rendering
-      while (catchUp >= 1) {
-        this.sendInputSample();
-        this.receivePacket();
-        this.receivePacket();
-        
-        tickRate++;
-        catchUp--;
-        // Update last time
-        lastTime = getTime();
-      }
-      // Call the renderer
-      Renderer.getInstance().render(model);
-      frameRate++;
+        // Call update() as many times as needed to compensate before rendering
+        while (catchUp >= 1) {
+          this.sendInputSample();
+          this.receivePacket();
+          this.receivePacket();
 
-      // Update the FPS timer every FPS_FREQ^-1 seconds
-      if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
-        frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-        FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
-        frameRate = 0;
-        System.out.println("FPS: " + FPS);
-      }
-      if (getTime() - tickTimer > Parameters.N_SECOND) {
-        tickTimer += Parameters.N_SECOND;
-        TICKS = (TICKS + tickRate) / 2;
-        System.out.println("Ticks: " + TICKS);
-        tickRate = 0;
+          tickRate++;
+          catchUp--;
+          // Update last time
+          lastTime = getTime();
+        }
+        // Call the renderer
+        Renderer.getInstance().render(model);
+        frameRate++;
+
+        // Update the FPS timer every FPS_FREQ^-1 seconds
+        if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
+          frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
+          FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
+          frameRate = 0;
+          // System.out.println("FPS: " + FPS);
+        }
+        if (getTime() - tickTimer > Parameters.N_SECOND) {
+          tickTimer += Parameters.N_SECOND;
+          TICKS = (TICKS + tickRate) / 2;
+          // System.out.println("Ticks: " + TICKS);
+          tickRate = 0;
+        }
       }
     }
     System.out.println("stopped");
   }
 
-  private void receivePacket() {
-	Object receivedObject = null;
-	try{  
-	  // Create a packet for receiving entsLite packet
-      DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
-      // Receive a entsLite packet and obtain the byte data
-      multiCastSocket.receive(packet);
-      receivedByte = packet.getData();
-
-      // Deserialize the entsLite byte data into object
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
-      ObjectInputStream objIn = new ObjectInputStream(byteIn);
-      receivedObject = objIn.readObject();
-	}
-	catch(Exception e){
-		e.printStackTrace();
-	}
-	if(receivedObject == null)
-		return;
-	if(receivedObject instanceof ArrayList<?>)
-		this.receiveAndUpdate((ArrayList<EntityLite>) receivedObject);
-	else if(receivedObject instanceof GameEvent)
-		this.receiveEvents((GameEvent) receivedObject);
-}
-
   public Timer getTimer() {
-	  return this.timer;
+    return this.timer;
   }
-  
-/**
+
+  /**
    * Getter for the latest FPS estimation.
    * 
    * @return
@@ -202,6 +191,15 @@ public class Client implements Runnable {
    */
   private long getTime() {
     return System.nanoTime();
+  }
+  
+  public void waitToExit() {
+    waitingToExit = true;
+    gameRunning = false;
+  }
+  
+  public boolean isWaitingToExit() {
+    return waitingToExit;
   }
 
   /**
@@ -232,13 +230,17 @@ public class Client implements Runnable {
         model.sync(entsLite, clientIP, clientUdpPort);
 
         // Serialize a ClientMessage (ready) Object into byte array
-        ClientMessage ready = new ClientMessage(2, udpSocket.getLocalPort());
+        ClientMessage ready = new ClientMessage(1, udpSocket.getLocalPort());
         toServer.writeObject(ready);
 
         // Set up multicast socket for receiving game states from server
         multiCastIP = InetAddress.getByName("224.0.0.5");
         multiCastSocket = new MulticastSocket(Parameters.MULTI_CAST_PORT);
         multiCastSocket.joinGroup(multiCastIP);
+
+        clientTCP = new ClientTCP(fromServer);
+        clientTCP.start();
+        gameRunning = true;
 
       } catch (BindException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
@@ -277,35 +279,65 @@ public class Client implements Runnable {
       sendingByte = byteOut.toByteArray();
 
       // Create a packet for holding the input sample byte data
-      DatagramPacket packet = new DatagramPacket(sendingByte, sendingByte.length, serverIP, Parameters.SERVER_PORT);
+      DatagramPacket packet =
+          new DatagramPacket(sendingByte, sendingByte.length, serverIP, Parameters.SERVER_PORT);
 
       // Send the client input sample packet to the server
       udpSocket.send(packet);
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      // Disconnected with server, when reached this exception the gameRunning would be set false so
+      // the while loop in run() would keep looping and do nothing after this
     }
   }
 
-  public void receiveEvents(GameEvent event) {
-	  // Send audio events to AudioManager
-	  if (event != null) {
-		  if (event instanceof AudioEvent)
-			  AudioManager.getInstance().addEvent((AudioEvent) event);
-		  else if (event instanceof ScoreEvent) {
-			  ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
-		  } else if (event instanceof TimerEvent) {
-			  timer = new Timer((TimerEvent) event);
-		  }
-	  }
+  private void receivePacket() {
+    Object receivedObject = null;
+    try {
+      // Create a packet for receiving entsLite packet
+      DatagramPacket packet = new DatagramPacket(buf, buf.length);
+
+      // Receive a entsLite packet and obtain the byte data
+      multiCastSocket.receive(packet);
+      receivedByte = packet.getData();
+
+      // Deserialize the entsLite byte data into object
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(receivedByte);
+      ObjectInputStream objIn = new ObjectInputStream(byteIn);
+      receivedObject = objIn.readObject();
+    } catch (IOException ioe) {
+      // Disconnected with server, when reached this exception the gameRunning would be set false so
+      // the while loop in run() would keep looping and do nothing after this
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
+    }
+    if (receivedObject == null)
+      return;
+    if (receivedObject instanceof ArrayList<?>)
+      this.updateGameState((ArrayList<EntityLite>) receivedObject);
+    else if (receivedObject instanceof GameEvent)
+      this.receiveEvents((GameEvent) receivedObject);
+  }
+
+  private void receiveEvents(GameEvent event) {
+    // Send audio events to AudioManager
+    if (event != null) {
+      if (event instanceof AudioEvent)
+        AudioManager.getInstance().addEvent((AudioEvent) event);
+      else if (event instanceof ScoreEvent) {
+        ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
+      } else if (event instanceof TimerEvent) {
+        timer = new Timer((TimerEvent) event);
+      }
+    }
   }
 
   /*
    * Receive the game state from the server and sync the game state with the server (UDP)
    */
-  private void receiveAndUpdate(ArrayList<EntityLite> entsLite) {
-      if (entsLite != null)
-        // Sync the game state with server
-        ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
+  private void updateGameState(ArrayList<EntityLite> entsLite) {
+    if (entsLite != null)
+      // Sync the game state with server
+      ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
   }
 
   /*
@@ -323,10 +355,10 @@ public class Client implements Runnable {
     } catch (ClassNotFoundException cnfe) {
       cnfe.printStackTrace();
     }
-    
-    for(ScoreEvent score : scores)
-    	ScoreBoard.getInstance().update(new Score(score));
-    
+
+    for (ScoreEvent score : scores)
+      ScoreBoard.getInstance().update(new Score(score));
+
     return entsLite;
   }
 
@@ -342,38 +374,49 @@ public class Client implements Runnable {
 
     return seed;
   }
-
-  /**
-   * Should be called when the client clicks the 'Exit' button from the in-game menu or closes the game window
-   */
-  public void disconnect() {
-    if (clientIP != null && serverIP != null && multiCastIP != null && clientUdpPort != null
-        && tcpSocket != null && udpSocket != null && multiCastSocket != null) {
-      try {
-        // Serialize a ClientRequest Object into byte array
-        ClientMessage disconnectRequest = new ClientMessage(1, udpSocket.getLocalPort());
-        ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
-
-        // Send the disconnect request
-        toServer.writeObject(disconnectRequest);
-
-        // Reset every networking related field
-        clientIP = null;
-        serverIP = null;
-        multiCastIP = null;
-        clientUdpPort = null;
-        tcpSocket = null;
-        udpSocket = null;
-        multiCastSocket = null;
-      } catch (IOException e) {
-        LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
-            "Something went wrong disconnecting client. " + e.toString());
-      }
-    }
+  
+  public void setTimeBeforeExiting(int t) {
+    this.timeBeforeExiting = t;
+  }
+  
+  public int getTimeBeforeExiting() {
+    return this.timeBeforeExiting;
   }
 
-  // public boolean[][] getMapIceGrid() {
-  // return model.getMap().getIceGrid();
-  // }
+  /**
+   * Should be called when the client clicks the 'Exit' button from the in-game menu or closes the
+   * game window
+   */
+  public void disconnect() {
+    try {
+      clientTCP.end();
+      waitingToExit = false;
+      tcpSocket.close();
+      udpSocket.close();
+      multiCastSocket.close();
+
+      // Reset relevant field
+      // TODO: reset model instance
+      gameRunning = false;
+      timer = null;
+      FPS = 0;
+      TICKS = 0;
+      clientIP = null;
+      serverIP = null;
+      multiCastIP = null;
+      clientUdpPort = null;
+      tcpSocket = null;
+      udpSocket = null;
+      multiCastSocket = null;
+      clientTCP = null;
+      buf = new byte[65536];
+      receivedByte = null;
+      sendingByte = null;
+    } catch (IOException e) {
+      System.out.println("Can't close TCP socket?");
+      LogManager.getInstance().log("Client", LogManager.Scope.ERROR,
+          "Something went wrong disconnecting client. " + e.toString());
+    }
+  }
 
 }

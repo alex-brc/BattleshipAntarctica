@@ -8,7 +8,7 @@ import org.alien8.util.LogManager;
 public class Launcher {
   public static Launcher instance;
   private String loadStatus;
-  private String serverIPstr = "172.22.35.217";
+  private String serverIPstr = "192.168.0.15";
   private Client game;
 
   private Launcher() {
@@ -19,7 +19,7 @@ public class Launcher {
     Launcher launcher = new Launcher();
     
     // Loading client window
-    launcher.game = new Client();
+    launcher.game = Client.getInstance();
     Launcher.instance = launcher;
     // Load log manager
     launcher.loadStatus = "Preparing logger...";

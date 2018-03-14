@@ -12,16 +12,17 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
+import org.alien8.core.ServerMessage;
 import org.alien8.items.Mine;
 import org.alien8.items.Pickup;
 import org.alien8.items.PlaneDropper;
 import org.alien8.items.Torpedo;
+import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
@@ -67,23 +68,56 @@ public class ServerGameHandler extends Thread {
         // Update last time
         lastTime = getNanoTime();
       }
-      
+
       if (getNanoTime() - timer > Parameters.N_SECOND) {
-          timer += Parameters.N_SECOND;
-          seconds--;
-          if(seconds % 10 == 0)
-        	  ModelManager.getInstance().addEntity(new PlaneDropper());
-          updateServerTimer();
+        timer += Parameters.N_SECOND;
+        seconds--;
+        if (seconds % 10 == 0)
+          ModelManager.getInstance().addEntity(new PlaneDropper());
+        updateServerTimer();
+      }
+
+      if (seconds <= 0) {
+        // Notice all clients game has ended
+        for (ClientHandler ch : Server.getInstance().getCHList()) {
+          ch.sendEndGameMessage();
         }
+        break;
+      }
     }
+
+    long timeWhenGameEnds = getNanoTime();
+    
+    // Wait 10 seconds before the server shut down (for players to read the leaderboard)
+    while (getNanoTime() - timeWhenGameEnds < Parameters.TIME_BEFORE_SERVER_END * (long) Parameters.N_SECOND) {
+      int timeBeforeExiting = Parameters.TIME_BEFORE_SERVER_END - (int) ((getNanoTime() - timeWhenGameEnds) / Parameters.N_SECOND);
+      
+      // Ensure client's game loop is not blocked so renderer can render the leaderboard and the time before exiting
+      this.sendGameState();
+      
+      // Send info about how much time before exiting for client's renderer to update the time
+      for (ClientHandler ch : Server.getInstance().getCHList()) {
+        ch.sendTimeBeforeExiting(timeBeforeExiting);
+      }
+    }
+
+    // Notice all clients that server has been shut down
+    for (ClientHandler ch : Server.getInstance().getCHList()) {
+      ch.sendServerStoppedMessage();
+      ch.end(); // Will not immediately stop the client handler, it stops when server's TCP socket is closed (which throw exception for ch)
+    }
+
+    // Stop the server
+    Server.getInstance().stop();
+    System.out.println("Server game handler stopped");
   }
-  
+
   public int getSeconds() {
-	  return seconds;
+    return seconds;
   }
-  
+
   public void updateServerTimer() {
-	  Server.getInstance().addEvent(new TimerEvent(seconds));
+    Server.getInstance().addEvent(new TimerEvent(seconds));
   }
 
   /**
@@ -168,17 +202,18 @@ public class ServerGameHandler extends Thread {
         EntitiesLite.add(new EntityLite(b.getSerial(), 2, b.getPosition(), b.isToBeDeleted(),
             b.getDirection(), b.getSpeed(), b.getDistance(), b.getTravelled(), b.getSource()));
       } else if (e instanceof Pickup) {
-    	Pickup p = (Pickup) e;
-    	EntitiesLite.add(new EntityLite(3, p.getPosition(), p.getPickupType(), p.isToBeDeleted()));
+        Pickup p = (Pickup) e;
+        EntitiesLite.add(new EntityLite(3, p.getPosition(), p.getPickupType(), p.isToBeDeleted()));
       } else if (e instanceof PlaneDropper) {
-    	  PlaneDropper pd = (PlaneDropper) e;
-    	  EntitiesLite.add(new EntityLite(4, pd.getPosition(), pd.isToBeDeleted(), pd.getDirection()));
+        PlaneDropper pd = (PlaneDropper) e;
+        EntitiesLite
+            .add(new EntityLite(4, pd.getPosition(), pd.isToBeDeleted(), pd.getDirection()));
       } else if (e instanceof Mine) {
-      	Mine m = (Mine) e;
-      	EntitiesLite.add(new EntityLite(5, m.getPosition(), m.isToBeDeleted(), m.getDirection()));
+        Mine m = (Mine) e;
+        EntitiesLite.add(new EntityLite(5, m.getPosition(), m.isToBeDeleted(), m.getDirection()));
       } else if (e instanceof Torpedo) {
-    	Torpedo t = (Torpedo) e;
-    	EntitiesLite.add(new EntityLite(6, t.getPosition(), t.isToBeDeleted(), t.getDirection()));
+        Torpedo t = (Torpedo) e;
+        EntitiesLite.add(new EntityLite(6, t.getPosition(), t.isToBeDeleted(), t.getDirection()));
       }
     }
 
@@ -196,8 +231,8 @@ public class ServerGameHandler extends Thread {
       sendingByte = byteOut.toByteArray();
 
       // Create a packet for holding the entsLite byte data
-      DatagramPacket entsLitePacket =
-          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, Parameters.MULTI_CAST_PORT);
+      DatagramPacket entsLitePacket = new DatagramPacket(sendingByte, sendingByte.length,
+          multiCastIP, Parameters.MULTI_CAST_PORT);
 
       // Make the game event packet
       GameEvent event = Server.getInstance().getNextEvent();
@@ -207,8 +242,8 @@ public class ServerGameHandler extends Thread {
       sendingByte = byteOut.toByteArray();
 
       // Make packet
-      DatagramPacket eventPacket =
-          new DatagramPacket(sendingByte, sendingByte.length, multiCastIP, Parameters.MULTI_CAST_PORT);
+      DatagramPacket eventPacket = new DatagramPacket(sendingByte, sendingByte.length, multiCastIP,
+          Parameters.MULTI_CAST_PORT);
 
       // Send the entsLite packet and the event packet to client
       udpSocket.send(entsLitePacket);

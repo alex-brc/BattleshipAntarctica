@@ -7,6 +7,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
+import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
 import org.alien8.client.Launcher;
@@ -16,6 +17,7 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
+import org.alien8.server.Timer;
 import org.alien8.ship.Ship;
 
 public class Renderer extends Canvas {
@@ -193,10 +195,12 @@ public class Renderer extends Canvas {
     drawText("TURRET2", 462, 16, true, FontColor.WHITE);
     drawBar(Sprite.turret_bar, player.getRearTurretCharge(), Parameters.TURRET_MAX_DIST, 464, 40,
         true);
-    
+
     // Draw timer
-    Launcher.getInstance().getRunningClient().getTimer().render();
-    
+    Timer t = Launcher.getInstance().getRunningClient().getTimer();
+    if (t != null)
+      t.render();
+
     // TODO: Render use item
     drawText("ITEM", 612, 18, true, FontColor.WHITE);
     drawSprite(624, 40, new Sprite("/org/alien8/assets/item_frame.png"), true);
@@ -210,9 +214,16 @@ public class Renderer extends Canvas {
     // minimapTerrain = createMinimapTerrain(ModelManager.getInstance().getMap().getIceGrid());
     // System.out.println(minimapTerrain);
     // drawMinimap(720, 16, true);
+
+    if (InputManager.getInstance().shiftPressed() || Client.getInstance().isWaitingToExit())
+      ScoreBoard.getInstance().render();
     
-    if(InputManager.getInstance().shiftPressed())
-    	ScoreBoard.getInstance().render();
+    if (Client.getInstance().isWaitingToExit()) {
+      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 550, true, FontColor.BLACK);
+      drawText("seconds", 230, 550, true, FontColor.BLACK);
+      drawText("before", 360, 550, true, FontColor.BLACK);
+      drawText("exiting", 480, 550, true, FontColor.BLACK);
+    }
 
     // Display player death message
     // if (player.getHealth() <= 0) {
@@ -253,7 +264,7 @@ public class Renderer extends Canvas {
       }
     }
   }
- 
+
   private void drawBar(double value, double maxValue, int x, int y, int width, int height,
       int thickness, int borderColor, int barColor, boolean fixed) {
 
@@ -489,12 +500,12 @@ public class Renderer extends Canvas {
    * @return the Position of the center in
    */
   public Position getScreenPosition(Position position) {
-	Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
-	return new Position(400,300);
+    Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
+    return new Position(400, 300);
   }
-  
+
   public Position getScreenPositionAI(Position position) {
-	Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
-	return pos;
+    Position pos = new Position(position.getX() - xScroll, position.getY() - yScroll);
+    return pos;
   }
 }
