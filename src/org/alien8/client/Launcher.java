@@ -1,7 +1,6 @@
 package org.alien8.client;
 
 import org.alien8.audio.AudioManager;
-import org.alien8.rendering.Renderer;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
@@ -17,7 +16,7 @@ public class Launcher {
 
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
-    
+
     // Loading client window
     launcher.game = Client.getInstance();
     Launcher.instance = launcher;

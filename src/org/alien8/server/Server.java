@@ -183,7 +183,8 @@ public class Server implements Runnable {
 
     // test ai
     for (int i = 1; i <= 7; i++) {
-      Ship sh = new Ship(getRandomPosition(), 0, 0xFFFFFF);
+      int randColour = (new Random()).nextInt(0xFFFFFF);
+      Ship sh = new Ship(getRandomPosition(), 0, randColour);
       AIController ai = new AIController(sh);
       model.addEntity(sh);
       aiMap.put(sh, ai);
