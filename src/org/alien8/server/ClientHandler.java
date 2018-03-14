@@ -103,13 +103,11 @@ public class ClientHandler extends Thread {
     this.sendGameState(p, s);
     this.waitForReadyMessage(p, s);
 
-    // Keep reading from client to track the connection status
+    // Keep reading from client to track the connection status (Disconnection is catched by exception)
     while (run) {
       try {
-        ClientMessage msg = (ClientMessage) fromClient.readObject();
-        if (msg.getType() == 1) { // Disconnect request
-          Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
-        }
+        fromClient.readObject();
+        
       } catch (ClassNotFoundException cnfe) {
         LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
             "Class of serialized object cannot be found." + cnfe.toString());
