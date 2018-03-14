@@ -9,13 +9,13 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
+import org.alien8.client.Launcher;
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
-import org.alien8.server.Launcher;
 import org.alien8.ship.Ship;
 
 public class Renderer extends Canvas {

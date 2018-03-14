@@ -1,4 +1,4 @@
-package org.alien8.server;
+package org.alien8.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.alien8.audio.AudioManager;
-import org.alien8.client.Client;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
