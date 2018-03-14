@@ -4,6 +4,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import org.alien8.audio.AudioManager;
 import org.alien8.score.ScoreBoard;
+import org.alien8.server.Launcher;
 import org.alien8.util.LogManager;
 
 /**

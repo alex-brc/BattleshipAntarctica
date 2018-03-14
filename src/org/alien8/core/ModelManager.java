@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
+import org.alien8.items.Effect;
+import org.alien8.items.HealthItem;
 import org.alien8.items.HealthPickup;
 import org.alien8.items.InvulnerablePickup;
 import org.alien8.items.Mine;
@@ -130,6 +132,47 @@ public class ModelManager {
         s.getRearTurret().setDirection(el.rearTurretDirection);
         s.getFrontTurret().setDistance(el.frontTurretCharge);
         s.getRearTurret().setDistance(el.rearTurretCharge);
+        
+        // Give item
+        switch(el.itemType) {
+        case Pickup.HEALTH_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.MINE_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.INVULNERABLE_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.SPEED_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.NO_COOLDOWN_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.TORPEDO_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        default:
+        	// Don't give an item
+        	break;
+        }
+        
+        // Apply effect
+        switch(el.effectType) {
+        case Pickup.INVULNERABLE_PICKUP: 
+        	s.applyEffect(new Effect(0, Effect.INVULNERABLE));
+        	break;
+        case Pickup.SPEED_PICKUP: 
+        	s.applyEffect(new Effect(0, Effect.SPEED));
+        	break;
+        case Pickup.NO_COOLDOWN_PICKUP: 
+        	s.applyEffect(new Effect(0, Effect.NO_COOLDOWN));
+        	break;
+        default:
+        	// No effect
+        	break;
+        }
         
         if (el.toBeDeleted) {
           s.delete();

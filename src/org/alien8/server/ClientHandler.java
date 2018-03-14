@@ -120,7 +120,8 @@ public class ClientHandler extends Thread {
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
               s.getRearTurretDirection(), s.getFrontTurretCharge(), s.getRearTurretCharge(),
-              s.getColour(), p.getIP(), p.getPort()));
+              s.getColour(), s.getItemType(), s.getEffectType(), 
+              p.getIP(), p.getPort()));
         } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),

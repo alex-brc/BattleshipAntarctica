@@ -18,10 +18,6 @@ public class EntityLite implements Serializable {
    * 0 - Player Ship
    * 1 - AI Ship
    * 2 - Bullet
-<<<<<<< HEAD
-=======
-   * 3 - Pickup
->>>>>>> alexb
    */
   public int entityType;
   public Position position;
@@ -40,6 +36,8 @@ public class EntityLite implements Serializable {
   public int clientUdpPort;
   public double frontTurretCharge;
   public double rearTurretCharge;
+  public int itemType;
+  public int effectType;
 
   // For bullet
   public double distance;
@@ -54,7 +52,8 @@ public class EntityLite implements Serializable {
       boolean toBeDeleted, double direction, double speed, double health,
       double frontTurretDirection, double rearTurretDirection,
       double frontTurretCharge, double rearTurretCharge,
-      int colour, InetAddress clientIP, int clientUdpPort) {
+      int colour, int itemType, int effectType, 
+      InetAddress clientIP, int clientUdpPort) {
     this.serial = serial;
     this.entityType = entityType;
     this.position = position;
@@ -67,6 +66,8 @@ public class EntityLite implements Serializable {
     this.frontTurretCharge = frontTurretCharge;
     this.rearTurretCharge = rearTurretCharge;
     this.colour = colour;
+    this.itemType = itemType;
+    this.effectType = effectType;
     this.clientIP = clientIP;
     this.clientUdpPort = clientUdpPort;
   }

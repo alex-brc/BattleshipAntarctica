@@ -7,7 +7,7 @@ public class SpeedItem extends Item {
 	
 	public SpeedItem() {
 		// Doesn't have a ship at this point
-	    super(Sprite.bullet); //TODO give it Sprite.health_item
+	    super(Sprite.bullet, Pickup.SPEED_PICKUP); //TODO give it Sprite.health_item
 	}
 	
 	@Override

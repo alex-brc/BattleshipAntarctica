@@ -1,20 +1,25 @@
-package org.alien8.client;
+package org.alien8.server;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.alien8.audio.AudioManager;
-import org.alien8.rendering.Renderer;
+import org.alien8.client.Client;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
 public class Launcher {
   public static Launcher instance;
   private String loadStatus;
-  private String serverIPstr = "172.22.35.217";
+  private String serverIPstr = "192.168.0.16";
   private Client game;
 
   private Launcher() {
     // Nothing
   }
-
+  
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
     

@@ -477,13 +477,20 @@ public class Ship extends Entity implements Serializable {
   }
   
   public int getEffectType() {
-	  return this.effect.getEffectType();
+	  if(effect != null)
+		  return this.effect.getEffectType();
+	  return -1;
   }
   
   public boolean underEffect() {
 	  if(effect == null)
 		  return false;
 	  return true;
+  }
+  public int getItemType() {
+	  if(item != null)
+		  return this.item.getItemType();
+	  return -1;
   }
 }
 

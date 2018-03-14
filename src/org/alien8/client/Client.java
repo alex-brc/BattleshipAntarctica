@@ -28,6 +28,7 @@ import org.alien8.score.Score;
 import org.alien8.score.ScoreBoard;
 import org.alien8.score.ScoreEvent;
 import org.alien8.server.GameEvent;
+import org.alien8.server.Server;
 import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
 import org.alien8.util.LogManager;

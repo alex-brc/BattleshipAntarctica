@@ -6,7 +6,7 @@ import org.alien8.rendering.Sprite;
 public class MineItem extends Item {
 	public MineItem() {
 		// Doesn't have a ship at this point
-		super(Sprite.bullet); //TODO give it Sprite.health_item
+		super(Sprite.bullet, Pickup.MINE_PICKUP); //TODO give it Sprite.health_item
 	}
 	
 	/**

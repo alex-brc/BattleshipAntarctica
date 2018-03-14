@@ -7,7 +7,7 @@ public class InvulnerableItem extends Item {
 
 	public InvulnerableItem() {
 		// Doesn't have a ship at this point
-		super(Sprite.bullet);// TODO give it a sprite
+		super(Sprite.bullet, Pickup.INVULNERABLE_PICKUP);// TODO give it a sprite
 	}
 
 	@Override

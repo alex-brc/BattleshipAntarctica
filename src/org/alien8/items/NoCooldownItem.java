@@ -7,7 +7,7 @@ public class NoCooldownItem extends Item {
 
 	public NoCooldownItem() {
 		// Doesn't have a ship at this point
-		super(Sprite.bullet);// TODO give it a sprite
+		super(Sprite.bullet, Pickup.NO_COOLDOWN_PICKUP);// TODO give it a sprite
 	}
 
 	@Override

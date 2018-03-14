@@ -7,7 +7,7 @@ import org.alien8.util.LogManager;
 public class HealthItem extends Item {
 	public HealthItem() {
 		// Doesn't have a ship at this point
-		super(Sprite.bullet); //TODO give it Sprite.health_item
+		super(Sprite.bullet, Pickup.HEALTH_PICKUP); //TODO give it Sprite.health_item
 	}
 	
 	/**

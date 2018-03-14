@@ -6,8 +6,9 @@ import org.alien8.ship.Ship;
 public abstract class Item {
 	protected Ship ship;
 	protected Sprite sprite;
+	protected int itemType;
 
-	public Item(Sprite sprite) {
+	public Item(Sprite sprite, int itemType) {
 		this.sprite = sprite;
 	}
 	
@@ -19,5 +20,10 @@ public abstract class Item {
 	
 	public void setShip(Ship ship) {
 		this.ship = ship;
+	}
+
+	public int getItemType() {
+		// TODO Auto-generated method stub
+		return itemType;
 	}
 }
