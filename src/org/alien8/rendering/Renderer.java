@@ -118,7 +118,11 @@ public class Renderer extends Canvas {
     // TODO: Render use item
     drawText("ITEM", 612, 18, true, FontColor.WHITE);
     drawSprite(624, 40, new Sprite("/org/alien8/assets/item_frame.png"), true);
-    // drawSprite(/* USE ITEM IN HERE*/);
+    try {
+      drawSprite(631, 47, player.getItem().getSprite(), true);
+    } catch (NullPointerException e) {
+
+    }
 
     // Render minimap
     drawText("M", 704, 16, true, FontColor.WHITE);

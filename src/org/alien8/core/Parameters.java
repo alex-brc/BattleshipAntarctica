@@ -21,7 +21,7 @@ public class Parameters {
   public static final boolean ICE_IS_SOLID = true;
   public static final int MAX_PLAYERS = 16;
   public static final int MATCH_LENGTH = 300; // in seconds
-  public static final boolean AI_ON = true;
+  public static final boolean AI_ON = false;
   public static final boolean DEBUG_MODE = false;
 
 

@@ -5,14 +5,17 @@ import org.alien8.rendering.Sprite;
 
 public class InvulnerableItem extends Item {
 
-	public InvulnerableItem() {
-		// Doesn't have a ship at this point
-		super(Sprite.bullet);// TODO give it a sprite
-	}
+  public InvulnerableItem() {
+    // Doesn't have a ship at this point
+    super(Sprite.item_invulnerable);// TODO give it a sprite
+  }
 
-	@Override
-	public void use() {
-		ship.applyEffect(new Effect(System.currentTimeMillis() + Parameters.ITEM_INVULNERABLE_ITEM_DURATION * Parameters.M_SECOND, Effect.INVULNERABLE));
-	}
+  @Override
+  public void use() {
+    ship.applyEffect(new Effect(
+        System.currentTimeMillis()
+            + Parameters.ITEM_INVULNERABLE_ITEM_DURATION * Parameters.M_SECOND,
+        Effect.INVULNERABLE));
+  }
 
 }

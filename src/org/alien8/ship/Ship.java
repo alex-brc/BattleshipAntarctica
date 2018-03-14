@@ -3,7 +3,6 @@ package org.alien8.ship;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.items.Effect;
@@ -13,7 +12,6 @@ import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-
 import net.jafama.FastMath;
 
 /**
@@ -32,7 +30,7 @@ public class Ship extends Entity implements Serializable {
   private Effect effect;
   private int colour;
   private Sprite sprite;
-  
+
 
   public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
@@ -46,28 +44,27 @@ public class Ship extends Entity implements Serializable {
     setTurretsPosition();
     setTurretsDirection(new Position(0, 0));
   }
+
   /**
-   * Called every tick to see if we need to alter
-   * any active effect
+   * Called every tick to see if we need to alter any active effect
    */
   public void updateEffect() {
-	  if(effect != null) {
-		if(effect.getEndTime() < System.currentTimeMillis())
-			  effect = null;
-		else if(effect.getEffectType() == Effect.NO_COOLDOWN) {
-			this.getFrontTurret().resetCooldown();
-			this.getRearTurret().resetCooldown();
-	    }
-	  }
+    if (effect != null) {
+      if (effect.getEndTime() < System.currentTimeMillis())
+        effect = null;
+      else if (effect.getEffectType() == Effect.NO_COOLDOWN) {
+        this.getFrontTurret().resetCooldown();
+        this.getRearTurret().resetCooldown();
+      }
+    }
   }
-  
+
   @Override
   public void setSpeed(double speed) {
-	  if(effect != null && effect.getEffectType() == Effect.SPEED) {
-		  super.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD * Parameters.ITEM_SPEED_ITEM_MULTIPLIER);
-	  }
-	  else
-		  super.setSpeed(speed);
+    if (effect != null && effect.getEffectType() == Effect.SPEED) {
+      super.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD * Parameters.ITEM_SPEED_ITEM_MULTIPLIER);
+    } else
+      super.setSpeed(speed);
   }
 
   @Override
@@ -93,9 +90,10 @@ public class Ship extends Entity implements Serializable {
     // ra = angle of the turret relative to the ship, ra is
     // ra = a + (pi - s);
     double ra = 0;
-    
+
     // Front
-    double angle = Renderer.getInstance().getScreenPosition(frontTurret.getPosition()).getAngleTo(mousePosition);
+    double angle = Renderer.getInstance().getScreenPosition(frontTurret.getPosition())
+        .getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -104,7 +102,8 @@ public class Ship extends Entity implements Serializable {
       frontTurret.setDirection(angle);
 
     // Rear
-    angle = Renderer.getInstance().getScreenPosition(rearTurret.getPosition()).getAngleTo(mousePosition);
+    angle = Renderer.getInstance().getScreenPosition(rearTurret.getPosition())
+        .getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -112,13 +111,14 @@ public class Ship extends Entity implements Serializable {
     if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
       rearTurret.setDirection(angle);
   }
-  
+
   public void setTurretsDirectionAI(Position mousePosition) {
-    //Had to make this to allow the AI ships to aim at positions
+    // Had to make this to allow the AI ships to aim at positions
     double ra = 0;
-    
+
     // Front
-    double angle = Renderer.getInstance().getScreenPositionAI(frontTurret.getPosition()).getAngleTo(mousePosition);
+    double angle = Renderer.getInstance().getScreenPositionAI(frontTurret.getPosition())
+        .getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -127,7 +127,8 @@ public class Ship extends Entity implements Serializable {
       frontTurret.setDirection(angle);
 
     // Rear
-    angle = Renderer.getInstance().getScreenPositionAI(rearTurret.getPosition()).getAngleTo(mousePosition);
+    angle = Renderer.getInstance().getScreenPositionAI(rearTurret.getPosition())
+        .getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -352,9 +353,9 @@ public class Ship extends Entity implements Serializable {
             }
 
             if (getDirection() >= 0 && getDirection() < FastMath.PI) {
-            PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+              PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
             } else {
-            PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+              PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
             }
 
             // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
@@ -451,39 +452,45 @@ public class Ship extends Entity implements Serializable {
   }
 
   public String toString() {
-	  return "Ship " + this.getSerial() + "," + this.getPosition();
+    return "Ship " + this.getSerial() + "," + this.getPosition();
   }
 
   public void giveItem(Item item) {
-	  if(this.item == null)
-		  this.item = item;
+    if (this.item == null) {
+      this.item = item;
+      System.out.println("Picked up a " + item.getClass());
+    }
   }
-  
+
   public void useItem() {
-	  if(item != null) {
-		  this.item.use();
-		  item = null;
-	  }
+    if (item != null) {
+      this.item.use();
+      item = null;
+    }
   }
-  
+
   public boolean hasItem() {
-	  if(item == null)
-		  return false;
-	  return true;
+    if (item == null)
+      return false;
+    return true;
   }
 
   public void applyEffect(Effect effect) {
-	  this.effect = effect;
+    this.effect = effect;
   }
-  
+
   public int getEffectType() {
-	  return this.effect.getEffectType();
+    return this.effect.getEffectType();
   }
-  
+
   public boolean underEffect() {
-	  if(effect == null)
-		  return false;
-	  return true;
+    if (effect == null)
+      return false;
+    return true;
+  }
+
+  public Item getItem() {
+    return item;
   }
 }
 
