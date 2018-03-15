@@ -277,7 +277,7 @@ public class Renderer extends Canvas {
     int maxBarLength = 76;
     int barLength = new Double(value / maxValue * maxBarLength).intValue();
     int color = 0x00B800;
-    drawFilledRect(xp + 7, yp + 7, barHeight, barLength, color, fixed);
+    drawFilledRect(xp + 7, yp + 7, barLength, barHeight, color, fixed);
   }
 
   /*private void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {

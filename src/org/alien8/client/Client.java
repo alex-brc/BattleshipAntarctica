@@ -15,7 +15,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
@@ -62,23 +61,24 @@ public class Client implements Runnable {
   private ScoreBoard scoreBoard;
   private SplashScreen splash = null;
   private MainMenu menu = null;
-  
+
   public enum State {
-	  MAIN_MENU, SPLASH_SCREEN, IN_GAME
+    MAIN_MENU, SPLASH_SCREEN, IN_GAME
   }
+
   private State state = State.SPLASH_SCREEN;
-  
+
   private ClientTCP clientTCP;
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
 
   private Client() {
-	model = ModelManager.getInstance();
-	splash = new SplashScreen();
-	menu = new MainMenu();
+    model = ModelManager.getInstance();
+    splash = new SplashScreen();
+    menu = new MainMenu();
   }
-  
+
   public static Client getInstance() {
     if (instance == null)
       instance = new Client();
@@ -126,9 +126,7 @@ public class Client implements Runnable {
     // Game loop goes here
 
     while (running) {
-      // Call the renderer
-      // aiPlayer.update();
-      switch(state){
+      switch (state) {
         case SPLASH_SCREEN:
           Renderer.getInstance().render(splash);
           break;
@@ -144,7 +142,7 @@ public class Client implements Runnable {
           long frameTimer = getTime();
           int tickRate = 0;
           long tickTimer = getTime();
-          
+
           while (gameRunning) {
             if (playersCompeting && !waitingToExit) {
               currentTime = getTime();
@@ -155,7 +153,8 @@ public class Client implements Runnable {
               // timeToCatchUp = ----------------------------------
               // deltaTPerTick --> how long a "tick" is
               //
-              catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+              catchUp +=
+                  (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
               // Call update() as many times as needed to compensate before rendering
               while (catchUp >= 1) {
@@ -164,7 +163,8 @@ public class Client implements Runnable {
                   this.receivePacket();
                   this.receivePacket();
                 } catch (IOException e) {
-                  // Do nothing, if reached here playersCompeting && waitingToExit should be set false
+                  // Do nothing, if reached here playersCompeting && waitingToExit should be set
+                  // false
                 }
 
                 tickRate++;
@@ -179,20 +179,18 @@ public class Client implements Runnable {
             // Update the FPS timer every FPS_FREQ^-1 seconds
             if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
               frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-              FPS = ( frameRate * Parameters.FPS_FREQ + FPS ) / 2;
+              FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
               frameRate = 0;
-              //System.out.println(FPS);
+              // System.out.println(FPS);
             }
             if (waitingToExit && !playersCompeting) {
-              // Call the renderer
               Renderer.getInstance().render(model);
-            }            
+            }
           }
           break;
       }
-
     }
-    System.out.println("stopped");
+    System.out.println("Client stopped");
   }
 
   public Timer getTimer() {
@@ -223,14 +221,14 @@ public class Client implements Runnable {
   private long getTime() {
     return System.nanoTime();
   }
-  
+
   public void waitToExit() {
     waitingToExit = true;
     playersCompeting = false;
     udpSocket.close();
     multiCastSocket.close();
   }
-  
+
   public boolean isWaitingToExit() {
     return waitingToExit;
   }
@@ -281,8 +279,8 @@ public class Client implements Runnable {
             "Could not bind to any port. Firewalls?\n" + e.toString());
         return false;
       } catch (SocketException e) {
-        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
-            "A socket exception occured.\n" + e.toString());
+        System.out.println("Server " + serverIPStr + " didn't response");
+        this.disconnect();
         return false;
       } catch (UnknownHostException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
@@ -406,11 +404,11 @@ public class Client implements Runnable {
 
     return seed;
   }
-  
+
   public void setTimeBeforeExiting(int t) {
     this.timeBeforeExiting = t;
   }
-  
+
   public int getTimeBeforeExiting() {
     return this.timeBeforeExiting;
   }
@@ -421,14 +419,18 @@ public class Client implements Runnable {
    */
   public void disconnect() {
     try {
-      clientTCP.end();
+      if (clientTCP != null)
+        clientTCP.end();
       gameRunning = false;
       playersCompeting = false;
-      waitingToExit = false; 
+      waitingToExit = false;
       this.setState(State.MAIN_MENU);
-      tcpSocket.close();
-      udpSocket.close();
-      multiCastSocket.close();
+      if (tcpSocket != null)
+        tcpSocket.close();
+      if (udpSocket != null)
+        udpSocket.close();
+      if (multiCastSocket != null)
+        multiCastSocket.close();
 
       // Reset relevant field
       // TODO: reset model instance
@@ -450,12 +452,12 @@ public class Client implements Runnable {
       // Trying to close a closed socket, it's ok just proceed
     }
   }
-  
-  public void setState(State s){
-	  if (s == State.IN_GAME && state != State.IN_GAME){
-		  connect(menu.getIP());
-	  }
-	  state = s;
+
+  public void setState(State s) {
+    state = s;
+    if (s == State.IN_GAME) {
+      connect(menu.getIP());
+    }
   }
 
 }

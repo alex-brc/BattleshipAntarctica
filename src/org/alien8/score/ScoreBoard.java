@@ -154,7 +154,7 @@ public class ScoreBoard {
   public void render() {
 	
     // Draw black background
-    renderer.drawFilledRect(cornerX, cornerY, Parameters.SCOREBOARD_HEIGHT, Parameters.SCOREBOARD_WIDTH, 0x000000, true);
+    renderer.drawFilledRect(cornerX, cornerY, Parameters.SCOREBOARD_WIDTH, Parameters.SCOREBOARD_HEIGHT, 0x000000, true);
           
     // Draw header text
     renderer.drawText("Name", cornerX + 40, cornerY + this.renderVerticalBuffer, true, FontColor.WHITE);
