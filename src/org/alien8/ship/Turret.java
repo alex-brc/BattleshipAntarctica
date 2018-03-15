@@ -150,7 +150,6 @@ public class Turret implements Serializable {
       Position pos = getTargetPosition();
       Renderer.getInstance().drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
     }
-
   }
 
   /**

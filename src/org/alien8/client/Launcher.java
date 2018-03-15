@@ -31,9 +31,8 @@ public class Launcher {
     launcher.loadAudioManager();
 
     // Connect to server
-    launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr + "...";
-    System.out.println(launcher.loadStatus);
-    launcher.connect();
+    //launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr + "...";
+    //launcher.connect();
 
     // Make the scoreboard
     launcher.loadStatus = "Constructing a scoreboard...";

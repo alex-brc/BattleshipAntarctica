@@ -28,6 +28,8 @@ import org.alien8.score.ScoreEvent;
 import org.alien8.server.GameEvent;
 import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
+import org.alien8.ui.MainMenu;
+import org.alien8.ui.SplashScreen;
 import org.alien8.util.LogManager;
 
 /*
@@ -40,6 +42,7 @@ public class Client implements Runnable {
    */
   private volatile boolean running = false;
   private boolean gameRunning = false;
+  private boolean playersCompeting = false;
   private boolean waitingToExit = false;
   private static Client instance;
   private Thread thread;
@@ -55,19 +58,31 @@ public class Client implements Runnable {
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
+  private ScoreBoard scoreBoard;
+  private SplashScreen splash = null;
+  private MainMenu menu = null;
+
+  public enum State {
+    MAIN_MENU, SPLASH_SCREEN, IN_GAME
+  }
+
+  private State state = State.SPLASH_SCREEN;
+
   private ClientTCP clientTCP;
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
 
+  private Client() {
+    model = ModelManager.getInstance();
+    splash = new SplashScreen();
+    menu = new MainMenu();
+  }
+
   public static Client getInstance() {
     if (instance == null)
       instance = new Client();
     return instance;
-  }
-
-  private Client() {
-    model = ModelManager.getInstance();
   }
 
   /**
@@ -110,66 +125,72 @@ public class Client implements Runnable {
   public void run() {
     // Game loop goes here
 
-    long lastTime = getTime();
-    long currentTime = 0;
-    double catchUp = 0;
-
-    int frameRate = 0;
-    long frameTimer = getTime();
-    int tickRate = 0;
-    long tickTimer = getTime();
-
     while (running) {
-      if (gameRunning && !waitingToExit) {
-        currentTime = getTime();
+      switch (state) {
+        case SPLASH_SCREEN:
+          Renderer.getInstance().render(splash);
+          break;
+        case MAIN_MENU:
+          Renderer.getInstance().render(menu);
+          break;
+        case IN_GAME:
+          long lastTime = getTime();
+          long currentTime = 0;
+          double catchUp = 0;
 
-        // Get the amount of update()s the model needs to catch up
-        //
-        // timeNow - timeLastUpdateWasDone -->
-        // timeToCatchUp = ----------------------------------
-        // deltaTPerTick --> how long a "tick" is
-        //
-        catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+          int frameRate = 0;
+          long frameTimer = getTime();
+          int tickRate = 0;
+          long tickTimer = getTime();
 
-        // Call update() as many times as needed to compensate before rendering
-        while (catchUp >= 1) {
-          try {
-            this.sendInputSample();
-            this.receivePacket();
-            this.receivePacket();
-          } catch (IOException e) {
-            // Do nothing, if reached here gameRunning && waitingToExit should be set false
+          while (gameRunning) {
+            if (playersCompeting && !waitingToExit) {
+              currentTime = getTime();
+
+              // Get the amount of update()s the model needs to catch up
+              //
+              // timeNow - timeLastUpdateWasDone -->
+              // timeToCatchUp = ----------------------------------
+              // deltaTPerTick --> how long a "tick" is
+              //
+              catchUp +=
+                  (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+
+              // Call update() as many times as needed to compensate before rendering
+              while (catchUp >= 1) {
+                try {
+                  this.sendInputSample();
+                  this.receivePacket();
+                  this.receivePacket();
+                } catch (IOException e) {
+                  // Do nothing, if reached here playersCompeting && waitingToExit should be set
+                  // false
+                }
+
+                tickRate++;
+                catchUp--;
+                // Update last time
+                lastTime = getTime();
+              }
+            }
+            Renderer.getInstance().render(model);
+            frameRate++;
+
+            // Update the FPS timer every FPS_FREQ^-1 seconds
+            if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
+              frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
+              FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
+              frameRate = 0;
+              // System.out.println(FPS);
+            }
+            if (waitingToExit && !playersCompeting) {
+              Renderer.getInstance().render(model);
+            }
           }
-
-          tickRate++;
-          catchUp--;
-          // Update last time
-          lastTime = getTime();
-        }
-        // Call the renderer
-        Renderer.getInstance().render(model);
-        frameRate++;
-
-        // Update the FPS timer every FPS_FREQ^-1 seconds
-        if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
-          frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-          FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
-          frameRate = 0;
-          // System.out.println("FPS: " + FPS);
-        }
-        if (getTime() - tickTimer > Parameters.N_SECOND) {
-          tickTimer += Parameters.N_SECOND;
-          TICKS = (TICKS + tickRate) / 2;
-          // System.out.println("Ticks: " + TICKS);
-          tickRate = 0;
-        }
-      }
-      if (waitingToExit && !gameRunning) {
-        // Call the renderer
-        Renderer.getInstance().render(model);
+          break;
       }
     }
-    System.out.println("stopped");
+    System.out.println("Client stopped");
   }
 
   public Timer getTimer() {
@@ -200,14 +221,14 @@ public class Client implements Runnable {
   private long getTime() {
     return System.nanoTime();
   }
-  
+
   public void waitToExit() {
     waitingToExit = true;
-    gameRunning = false;
+    playersCompeting = false;
     udpSocket.close();
     multiCastSocket.close();
   }
-  
+
   public boolean isWaitingToExit() {
     return waitingToExit;
   }
@@ -251,14 +272,15 @@ public class Client implements Runnable {
         clientTCP = new ClientTCP(fromServer);
         clientTCP.start();
         gameRunning = true;
+        playersCompeting = true;
 
       } catch (BindException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
             "Could not bind to any port. Firewalls?\n" + e.toString());
         return false;
       } catch (SocketException e) {
-        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
-            "A socket exception occured.\n" + e.toString());
+        System.out.println("Server " + serverIPStr + " didn't response");
+        this.disconnect();
         return false;
       } catch (UnknownHostException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
@@ -382,11 +404,11 @@ public class Client implements Runnable {
 
     return seed;
   }
-  
+
   public void setTimeBeforeExiting(int t) {
     this.timeBeforeExiting = t;
   }
-  
+
   public int getTimeBeforeExiting() {
     return this.timeBeforeExiting;
   }
@@ -397,12 +419,18 @@ public class Client implements Runnable {
    */
   public void disconnect() {
     try {
-      clientTCP.end();
+      if (clientTCP != null)
+        clientTCP.end();
       gameRunning = false;
-      waitingToExit = false; 
-      tcpSocket.close();
-      udpSocket.close();
-      multiCastSocket.close();
+      playersCompeting = false;
+      waitingToExit = false;
+      this.setState(State.MAIN_MENU);
+      if (tcpSocket != null)
+        tcpSocket.close();
+      if (udpSocket != null)
+        udpSocket.close();
+      if (multiCastSocket != null)
+        multiCastSocket.close();
 
       // Reset relevant field
       // TODO: reset model instance
@@ -422,6 +450,13 @@ public class Client implements Runnable {
       sendingByte = null;
     } catch (IOException e) {
       // Trying to close a closed socket, it's ok just proceed
+    }
+  }
+
+  public void setState(State s) {
+    state = s;
+    if (s == State.IN_GAME) {
+      connect(menu.getIP());
     }
   }
 
