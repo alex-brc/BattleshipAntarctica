@@ -4,20 +4,26 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
 import org.alien8.items.Effect;
 import org.alien8.items.HealthItem;
 import org.alien8.items.HealthPickup;
+import org.alien8.items.InvulnerableItem;
 import org.alien8.items.InvulnerablePickup;
 import org.alien8.items.Mine;
+import org.alien8.items.MineItem;
 import org.alien8.items.MinePickup;
+import org.alien8.items.NoCooldownItem;
 import org.alien8.items.NoCooldownPickup;
 import org.alien8.items.Pickup;
 import org.alien8.items.PlaneDropper;
+import org.alien8.items.SpeedItem;
 import org.alien8.items.SpeedPickup;
 import org.alien8.items.Torpedo;
+import org.alien8.items.TorpedoItem;
 import org.alien8.items.TorpedoPickup;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
@@ -138,19 +144,19 @@ public class ModelManager {
         	s.giveItem(new HealthItem());
         	break;
         case Pickup.MINE_PICKUP: 
-        	s.giveItem(new HealthItem());
+        	s.giveItem(new MineItem());
         	break;
         case Pickup.INVULNERABLE_PICKUP: 
-        	s.giveItem(new HealthItem());
+        	s.giveItem(new InvulnerableItem());
         	break;
         case Pickup.SPEED_PICKUP: 
-        	s.giveItem(new HealthItem());
+        	s.giveItem(new SpeedItem());
         	break;
         case Pickup.NO_COOLDOWN_PICKUP: 
-        	s.giveItem(new HealthItem());
+        	s.giveItem(new NoCooldownItem());
         	break;
         case Pickup.TORPEDO_PICKUP: 
-        	s.giveItem(new HealthItem());
+        	s.giveItem(new TorpedoItem());
         	break;
         default:
         	// Don't give an item

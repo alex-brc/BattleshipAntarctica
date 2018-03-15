@@ -11,7 +11,6 @@ import org.alien8.audio.AudioManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
-import org.alien8.score.ScoreBoard;
 import org.alien8.ship.Ship;
 
 import net.jafama.FastMath;

@@ -6,14 +6,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.FloatControl.Type;
-
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.util.LogManager;
-
-import net.jafama.FastMath;
 
 /**
  * This audio manager is responsible for all game audio, handles sound FX and also volume.

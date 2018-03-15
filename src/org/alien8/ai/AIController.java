@@ -1,13 +1,9 @@
 package org.alien8.ai;
 
 import java.util.Iterator;
-import java.util.Random;
-
 import org.alien8.core.Entity;
 import org.alien8.core.ModelManager;
 import org.alien8.ship.Ship;
-
-import net.jafama.FastMath;
 
 import org.alien8.physics.Position;
 import org.alien8.core.Parameters;

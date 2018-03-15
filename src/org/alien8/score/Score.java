@@ -1,7 +1,6 @@
 package org.alien8.score;
 
 import org.alien8.core.Parameters;
-import org.alien8.items.Mine;
 import org.alien8.server.Player;
 import org.alien8.ship.Bullet;
 

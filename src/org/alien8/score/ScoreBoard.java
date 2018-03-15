@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.alien8.core.Parameters;
-import org.alien8.items.Mine;
 import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;

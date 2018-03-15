@@ -2,7 +2,6 @@ package org.alien8.core;
 
 import java.io.Serializable;
 
-import org.alien8.items.Effect;
 import org.alien8.physics.Position;
 import net.jafama.FastMath;
 

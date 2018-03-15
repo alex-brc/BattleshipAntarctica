@@ -10,6 +10,7 @@ public abstract class Item {
 
 	public Item(Sprite sprite, int itemType) {
 		this.sprite = sprite;
+		this.itemType = itemType;
 	}
 	
 	/**

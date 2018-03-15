@@ -2,8 +2,6 @@ package org.alien8.client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import org.alien8.core.ClientMessage;
 import org.alien8.core.ServerMessage;
 
 public class ClientTCP extends Thread {
