@@ -43,6 +43,7 @@ public class Client implements Runnable {
    */
   private volatile boolean running = false;
   private boolean gameRunning = false;
+  private boolean playersCompeting = false;
   private boolean waitingToExit = false;
   private static Client instance;
   private Thread thread;
@@ -124,43 +125,7 @@ public class Client implements Runnable {
   public void run() {
     // Game loop goes here
 
-    long lastTime = getTime();
-    long currentTime = 0;
-    double catchUp = 0;
-
-    int frameRate = 0;
-    long frameTimer = getTime();
-    int tickRate = 0;
-    long tickTimer = getTime();
-
     while (running) {
-      if (gameRunning && !waitingToExit) {
-        currentTime = getTime();
-
-        // Get the amount of update()s the model needs to catch up
-        //
-        // timeNow - timeLastUpdateWasDone -->
-        // timeToCatchUp = ----------------------------------
-        // deltaTPerTick --> how long a "tick" is
-        //
-        catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
-
-        // Call update() as many times as needed to compensate before rendering
-        while (catchUp >= 1) {
-          try {
-            this.sendInputSample();
-            this.receivePacket();
-            this.receivePacket();
-          } catch (IOException e) {
-            // Do nothing, if reached here gameRunning && waitingToExit should be set false
-          }
-
-          tickRate++;
-          catchUp--;
-          // Update last time
-          lastTime = getTime();
-        }
-      }
       // Call the renderer
       // aiPlayer.update();
       switch(state){
@@ -171,24 +136,61 @@ public class Client implements Runnable {
           Renderer.getInstance().render(menu);
           break;
         case IN_GAME:
-          Renderer.getInstance().render(model);
+          long lastTime = getTime();
+          long currentTime = 0;
+          double catchUp = 0;
+
+          int frameRate = 0;
+          long frameTimer = getTime();
+          int tickRate = 0;
+          long tickTimer = getTime();
+          
+          while (gameRunning) {
+            if (playersCompeting && !waitingToExit) {
+              currentTime = getTime();
+
+              // Get the amount of update()s the model needs to catch up
+              //
+              // timeNow - timeLastUpdateWasDone -->
+              // timeToCatchUp = ----------------------------------
+              // deltaTPerTick --> how long a "tick" is
+              //
+              catchUp += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+
+              // Call update() as many times as needed to compensate before rendering
+              while (catchUp >= 1) {
+                try {
+                  this.sendInputSample();
+                  this.receivePacket();
+                  this.receivePacket();
+                } catch (IOException e) {
+                  // Do nothing, if reached here playersCompeting && waitingToExit should be set false
+                }
+
+                tickRate++;
+                catchUp--;
+                // Update last time
+                lastTime = getTime();
+              }
+            }
+            Renderer.getInstance().render(model);
+            frameRate++;
+
+            // Update the FPS timer every FPS_FREQ^-1 seconds
+            if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
+              frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
+              FPS = ( frameRate * Parameters.FPS_FREQ + FPS ) / 2;
+              frameRate = 0;
+              //System.out.println(FPS);
+            }
+            if (waitingToExit && !playersCompeting) {
+              // Call the renderer
+              Renderer.getInstance().render(model);
+            }            
+          }
           break;
       }
-      
-      // Renderer.getInstance(model.getMap().getIceGrid()).render(model);
-      frameRate++;
 
-      // Update the FPS timer every FPS_FREQ^-1 seconds
-      if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
-        frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-        FPS = ( frameRate * Parameters.FPS_FREQ + FPS ) / 2;
-        frameRate = 0;
-        System.out.println(FPS);
-      }
-      if (waitingToExit && !gameRunning) {
-        // Call the renderer
-        Renderer.getInstance().render(model);
-      }
     }
     System.out.println("stopped");
   }
@@ -224,7 +226,7 @@ public class Client implements Runnable {
   
   public void waitToExit() {
     waitingToExit = true;
-    gameRunning = false;
+    playersCompeting = false;
     udpSocket.close();
     multiCastSocket.close();
   }
@@ -272,6 +274,7 @@ public class Client implements Runnable {
         clientTCP = new ClientTCP(fromServer);
         clientTCP.start();
         gameRunning = true;
+        playersCompeting = true;
 
       } catch (BindException e) {
         LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
@@ -420,7 +423,9 @@ public class Client implements Runnable {
     try {
       clientTCP.end();
       gameRunning = false;
+      playersCompeting = false;
       waitingToExit = false; 
+      this.setState(State.MAIN_MENU);
       tcpSocket.close();
       udpSocket.close();
       multiCastSocket.close();
