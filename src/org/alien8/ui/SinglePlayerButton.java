@@ -6,4 +6,8 @@ public class SinglePlayerButton extends Button{
 		super(x, y, width, height, "Play single-player");
 	}
 
+	public void executeAction(){
+		
+	}
+	
 }
