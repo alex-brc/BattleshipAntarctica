@@ -45,6 +45,7 @@ public class Sprite implements Serializable {
 	public Sprite(Sprite s){
 		width = s.getWidth();
 		height = s.getHeight();
+		pixels = new int[width*height];
 		System.arraycopy(s.getPixels(), 0, pixels, 0, s.getPixels().length);
 	}
 	

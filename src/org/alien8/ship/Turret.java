@@ -167,10 +167,10 @@ public class Turret implements Serializable {
     // TODO Auto-generated method stub
     return null;
 
-    if(distance != minDistance) {
+    /*if(distance != minDistance) {
     	Position pos = getTargetPosition();
     	r.drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
-    }
+    }*/
 
   }
   
@@ -197,9 +197,5 @@ public class Turret implements Serializable {
 
   protected Ship getShip() {
     return ship;
-  }
-
-  public double getDistance() {
-	return distance;
   }
 }

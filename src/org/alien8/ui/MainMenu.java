@@ -28,4 +28,8 @@ public class MainMenu {
 		exBtn.render(r);
 	}
 	
+	public String getIP(){
+		return ip.getInput();
+	}
+	
 }

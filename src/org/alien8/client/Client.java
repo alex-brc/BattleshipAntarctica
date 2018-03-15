@@ -146,6 +146,7 @@ public class Client implements Runnable {
           Renderer.getInstance().render(menu);
           break;
         case IN_GAME:
+          System.out.println("Test");
           Renderer.getInstance().render(model);
           break;
       }
@@ -398,6 +399,9 @@ public class Client implements Runnable {
   }
   
   public void setState(State s){
+	  if (s == State.IN_GAME && state != State.IN_GAME){
+		  connect(menu.getIP());
+	  }
 	  state = s;
   }
 

@@ -32,4 +32,8 @@ public class IPField {
 		}
 	}
 	
+	public String getInput(){
+		return text;
+	}
+	
 }
