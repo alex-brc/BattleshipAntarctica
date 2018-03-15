@@ -30,6 +30,9 @@ public class AIController{
 		//Fires both turrets at the closest ship
 		myShip.frontTurretCharge();
 		myShip.rearTurretCharge();
+		if (myShip.hasItem()){
+			myShip.useItem();
+		}
 		changeDefaultTurn++;
 		if (changeDefaultTurn > 1200){
 			rightTurnDefault = !rightTurnDefault;
