@@ -2,7 +2,6 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-
 import net.jafama.FastMath;
 
 public class PhysicsManager {
@@ -63,7 +62,6 @@ public class PhysicsManager {
     e.setPosition(new Position(pos.getX() + xdiff, pos.getY() + ydiff));
 
     // Update the Oriented Bounding Box
-    // TODO: This causes an error.
     e.translateObb(xdiff, ydiff);
     // Deal with terrain collision
     e.dealWithInIce(iceGrid);
@@ -80,8 +78,8 @@ public class PhysicsManager {
    */
   public static void rotateEntity(Entity e, double angle) {
     /**
-     * First, squeeze the speed into the [0,4pi/5] interval
-     * 								4pi/5 since we want the ship at top speed to be able to turn slowly
+     * First, squeeze the speed into the [0,4pi/5] interval 4pi/5 since we want the ship at top
+     * speed to be able to turn slowly
      *
      * g(x) : [0,SHIP_TOP_SPEED_FORWARD] -> [0,4pi/5]
      */
@@ -89,10 +87,10 @@ public class PhysicsManager {
     /**
      * Then put this speed through the function:
      *
-     * f : (0,PI) -> [0,1] f(x) = sin^2(x),
+     * f : (0,PI) -> [0,1.5] f(x) = sin^2(x) + 0.5,
      *
      */
-    double rotModifier = FastMath.pow(FastMath.sin(squeezedSpeed), 2);
+    double rotModifier = FastMath.pow(FastMath.sin(squeezedSpeed), 2) + 0.5;
     // Then apply this modifier to the angle, with a parametrised weight
     angle *= rotModifier * Parameters.ROTATION_MODIFIER;
 

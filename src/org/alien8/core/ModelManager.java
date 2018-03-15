@@ -7,15 +7,26 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
+import org.alien8.items.Effect;
+import org.alien8.items.HealthItem;
+import org.alien8.items.HealthPickup;
+import org.alien8.items.InvulnerablePickup;
+import org.alien8.items.Mine;
+import org.alien8.items.MinePickup;
+import org.alien8.items.NoCooldownPickup;
+import org.alien8.items.Pickup;
+import org.alien8.items.PlaneDropper;
+import org.alien8.items.SpeedPickup;
+import org.alien8.items.Torpedo;
+import org.alien8.items.TorpedoPickup;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
-import org.alien8.ship.BigBullet;
+import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
-import org.alien8.ship.SmallBullet;
 
 
 /**
@@ -57,48 +68,47 @@ public class ModelManager {
     map = new Map(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH, 8, 8, seed);
   }
 
-  /**
-   * Server update(). Loops through all the entities and updates the game state
-   */
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
+    // System.out.println(entities.size());
     AIController ai = null;
-    Player pl = null;
-    Ship sh = null;
-    ClientInputSample cis = null;
     for (Entity ent : entities) {
       // Remove the entity if it's marked itself for deletion
       if (ent.isToBeDeleted()) {
         entities.remove(ent);
-        System.out.println("Removed " + ent.toString());
+        // Accelerate it's removal
+        ent = null;
         // Skip the rest
         continue;
       }
       if (ent instanceof Ship) {
-        sh = (Ship) ent;
-        ai = Server.getAIByShip(sh);
-        pl = Server.getPlayerByShip(sh);
-
+        // Handle player stuff
+        Ship ship = (Ship) ent;
+        ai = Server.getInstance().getAIByShip(ship);
         if (ai != null) {
           ai.update();
-        } else if (pl != null) {
-          cis = latestCIS.get(pl);
-          if (cis != null)
-            InputManager.processInputs(sh, cis);
-        }
+        } else
+          for (Player p : latestCIS.keySet()) {
+            if (ent == p.getShip()) {
+              Ship s = (Ship) ent;
+              s.updateEffect();
+              ClientInputSample cis = latestCIS.get(p);
+              InputManager.processInputs(s, cis);
+              break;
+            }
+          }
       }
 
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
     }
-    ArrayList<Collision> collisions =
-        (ArrayList<Collision>) collisionDetector.checkForCollisions(entities);
+    ArrayList<Collision> collisions = collisionDetector.checkForCollisions(entities);
     for (Collision c : collisions) {
-      // System.out.println("Collision");
+      // System.out.println("Resolving collision");
       c.resolveCollision();
     }
-  }
 
+  }
 
   /**
    * Sync the client with the server
@@ -108,18 +118,60 @@ public class ModelManager {
     // Remove all entities
     for (Entity e : entities) {
       entities.remove(e);
+      this.lastSerial = 0;
     }
 
     // Add updated entities
     for (EntityLite el : entitiesLite) {
       if (el.entityType == 0) { // Player Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
-        s.setSerial(el.serial);
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
-        s.getMidTurret().setDirection(el.midTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
+        s.getFrontTurret().setDistance(el.frontTurretCharge);
+        s.getRearTurret().setDistance(el.rearTurretCharge);
+        
+        // Give item
+        switch(el.itemType) {
+        case Pickup.HEALTH_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.MINE_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.INVULNERABLE_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.SPEED_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.NO_COOLDOWN_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        case Pickup.TORPEDO_PICKUP: 
+        	s.giveItem(new HealthItem());
+        	break;
+        default:
+        	// Don't give an item
+        	break;
+        }
+        
+        // Apply effect
+        switch(el.effectType) {
+        case Pickup.INVULNERABLE_PICKUP: 
+        	s.applyEffect(new Effect(0, Effect.INVULNERABLE));
+        	break;
+        case Pickup.SPEED_PICKUP: 
+        	s.applyEffect(new Effect(0, Effect.SPEED));
+        	break;
+        case Pickup.NO_COOLDOWN_PICKUP: 
+        	s.applyEffect(new Effect(0, Effect.NO_COOLDOWN));
+        	break;
+        default:
+        	// No effect
+        	break;
+        }
 
         if (el.toBeDeleted) {
           s.delete();
@@ -130,13 +182,12 @@ public class ModelManager {
         }
 
         this.addEntity(s);
+        s.setSerial(el.serial);
       } else if (el.entityType == 1) { // AI Ship
         Ship s = new Ship(el.position, el.direction, el.colour);
-        s.setSerial(el.serial);
         s.setSpeed(el.speed);
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
-        s.getMidTurret().setDirection(el.midTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
 
         if (el.toBeDeleted) {
@@ -144,28 +195,65 @@ public class ModelManager {
         }
 
         this.addEntity(s);
-      } else if (el.entityType == 2) { // SmallBullet
-        SmallBullet sb = new SmallBullet(el.position, el.direction, el.distance, el.source);
-        sb.setSerial(el.serial);
-        sb.setSpeed(el.speed);
-        sb.setTravelled(el.travelled);
+      } else if (el.entityType == 2) { // Bullet
+        Bullet b = new Bullet(el.position, el.direction, el.distance, el.source);
+        b.setSpeed(el.speed);
+        b.setTravelled(el.travelled);
 
         if (el.toBeDeleted) {
-          sb.delete();
+          b.delete();
         }
 
-        this.addEntity(sb);
-      } else if (el.entityType == 3) { // BigBullet
-        BigBullet bb = new BigBullet(el.position, el.direction, el.distance, el.source);
-        bb.setSerial(el.serial);
-        bb.setSpeed(el.speed);
-        bb.setTravelled(el.travelled);
+        this.addEntity(b);
+      } else if (el.entityType == 3) { // Pickup
+        Pickup p = null;
+        switch (el.pickupType) {
+          case Pickup.HEALTH_PICKUP:
+            p = new HealthPickup(el.position);
+            break;
+          case Pickup.MINE_PICKUP:
+            p = new MinePickup(el.position);
+            break;
+          case Pickup.INVULNERABLE_PICKUP:
+            p = new InvulnerablePickup(el.position);
+            break;
+          case Pickup.SPEED_PICKUP:
+            p = new SpeedPickup(el.position);
+            break;
+          case Pickup.NO_COOLDOWN_PICKUP:
+            p = new NoCooldownPickup(el.position);
+            break;
+          case Pickup.TORPEDO_PICKUP:
+            p = new TorpedoPickup(el.position);
+            break;
+        }
 
         if (el.toBeDeleted) {
-          bb.delete();
+          p.delete();
         }
 
-        this.addEntity(bb);
+        this.addEntity(p);
+      } else if (el.entityType == 4) { // Plane
+        PlaneDropper pd = new PlaneDropper(el.position, el.direction);
+        if (el.toBeDeleted) {
+          pd.delete();
+        }
+
+        this.addEntity(pd);
+      } else if (el.entityType == 5) { // Mine
+        Mine m = new Mine(el.position, 0);
+        if (el.toBeDeleted) {
+          m.delete();
+        }
+
+        this.addEntity(m);
+      } else if (el.entityType == 6) { // Torpedo
+        Torpedo t = new Torpedo(el.position, 0, el.direction);
+        if (el.toBeDeleted) {
+          t.delete();
+        }
+
+        this.addEntity(t);
       }
     }
   }

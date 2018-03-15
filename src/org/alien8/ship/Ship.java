@@ -5,11 +5,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
+import org.alien8.items.Effect;
+import org.alien8.items.Item;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
+import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-
 import net.jafama.FastMath;
 
 /**
@@ -24,9 +26,11 @@ public class Ship extends Entity implements Serializable {
   private static final long serialVersionUID = -432334137390727161L;
   private Turret frontTurret;
   private Turret rearTurret;
-  private Turret midTurret;
+  private Item item;
+  private Effect effect;
   private int colour;
   private Sprite sprite;
+
 
   public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
@@ -34,12 +38,33 @@ public class Ship extends Entity implements Serializable {
     this.colour = colour;
     sprite = Sprite.makeShipSprite(colour);
 
-    frontTurret = new Turret(position, Turret.SMALL, this);
-    midTurret = new Turret(position, Turret.BIG, this);
-    rearTurret = new Turret(position, Turret.SMALL, this);
+    frontTurret = new Turret(position, this.getSerial());
+    rearTurret = new Turret(position, this.getSerial());
 
-    setTurretsDirection(new Position(0, 0));
     setTurretsPosition();
+    setTurretsDirection(new Position(0, 0));
+  }
+
+  /**
+   * Called every tick to see if we need to alter any active effect
+   */
+  public void updateEffect() {
+    if (effect != null) {
+      if (effect.getEndTime() < System.currentTimeMillis())
+        effect = null;
+      else if (effect.getEffectType() == Effect.NO_COOLDOWN) {
+        this.getFrontTurret().resetCooldown();
+        this.getRearTurret().resetCooldown();
+      }
+    }
+  }
+
+  @Override
+  public void setSpeed(double speed) {
+    if (effect != null && effect.getEffectType() == Effect.SPEED) {
+      super.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD * Parameters.ITEM_SPEED_ITEM_MULTIPLIER);
+    } else
+      super.setSpeed(speed);
   }
 
   @Override
@@ -47,7 +72,6 @@ public class Ship extends Entity implements Serializable {
     this.position = position;
 
     setTurretsPosition();
-    // Turrets direction set in model
   }
 
   /**
@@ -68,7 +92,8 @@ public class Ship extends Entity implements Serializable {
     double ra = 0;
 
     // Front
-    double angle = Renderer.getScreenPosition(frontTurret.getPosition()).getAngleTo(mousePosition);
+    double angle = Renderer.getInstance().getScreenPosition(frontTurret.getPosition())
+        .getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -77,20 +102,39 @@ public class Ship extends Entity implements Serializable {
       frontTurret.setDirection(angle);
 
     // Rear
-    angle = Renderer.getScreenPosition(rearTurret.getPosition()).getAngleTo(mousePosition);
+    angle = Renderer.getInstance().getScreenPosition(rearTurret.getPosition())
+        .getAngleTo(mousePosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
     // Range of motion: [5*pi/4, 3*pi/4]
     if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
       rearTurret.setDirection(angle);
+  }
 
-    // Mid
-    angle = Renderer.getScreenPosition(midTurret.getPosition()).getAngleTo(mousePosition);
-    angle = PhysicsManager.shiftAngle((-1) * angle + FastMath.PI / 2);
-    // No need to get relative angle.
-    // This can go shoot it wants
-    midTurret.setDirection(angle);
+  public void setTurretsDirectionAI(Position mousePosition) {
+    // Had to make this to allow the AI ships to aim at positions
+    double ra = 0;
+
+    // Front
+    double angle = Renderer.getInstance().getScreenPositionAI(frontTurret.getPosition())
+        .getAngleTo(mousePosition);
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
+    ra = PhysicsManager.shiftAngle(ra);
+    // Range of motion: [pi/4,7*pi/4]
+    if (ra > 1.0 * FastMath.PI / 4 && ra < 7.0 * FastMath.PI / 4)
+      frontTurret.setDirection(angle);
+
+    // Rear
+    angle = Renderer.getInstance().getScreenPositionAI(rearTurret.getPosition())
+        .getAngleTo(mousePosition);
+    angle = (-1) * angle + FastMath.PI / 2;
+    ra = angle + (FastMath.PI - this.getDirection());
+    ra = PhysicsManager.shiftAngle(ra);
+    // Range of motion: [5*pi/4, 3*pi/4]
+    if (ra < 3.0 * FastMath.PI / 4 || ra > 5.0 * FastMath.PI / 4)
+      rearTurret.setDirection(angle);
   }
 
   /**
@@ -104,42 +148,98 @@ public class Ship extends Entity implements Serializable {
     // the tip of the ship.
     double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
 
-    frontTurret.setPosition(this.getPosition().addPosition(
-        new Position(r * FastMath.cos(this.getDirection()), r * FastMath.sin(this.getDirection()))));
+    frontTurret.setPosition(this.getPosition()
+        .addPosition(new Position(FastMath.floor(r * FastMath.cos(this.getDirection())),
+            FastMath.floor(r * FastMath.sin(this.getDirection())))));
 
-    rearTurret.setPosition(this.getPosition().addPosition(
-        new Position((-r) * FastMath.cos(this.getDirection()), (-r) * FastMath.sin(this.getDirection()))));
+    rearTurret.setPosition(this.getPosition()
+        .addPosition(new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())),
+            FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
 
-    midTurret.setPosition(this.getPosition());
+  }
+
+  @Override
+  public void setSerial(long serial) {
+    this.serial = serial;
+    frontTurret.setShipSerial(serial);
+    rearTurret.setShipSerial(serial);
   }
 
   public void render() {
     Renderer r = Renderer.getInstance();
 
-    // // Render four corners of bounding box
-    // for (int i = 0; i < 4; i++) {
-    // // Color front two points blue
-    // if (i == 1 || i == 2) {
-    // r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0x0000FF,
-    // false);
-    // }
-    // // Color back two points red
-    // else {
-    // r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0xFF0000,
-    // false);
-    // }
-    // }
-    //
-    // r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
-    // false);
+    if (Parameters.DEBUG_MODE) {
+      // Render four corners of bounding box
+      for (int i = 0; i < 4; i++) {
+        // Color front two points blue
+        if (i == 1 || i == 2) {
+          r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0x0000FF,
+              false);
+        }
+        // Color back two points red
+        else {
+          r.drawRect((int) this.getObb()[i].getX(), (int) this.getObb()[i].getY(), 4, 4, 0xFF0000,
+              false);
+        }
+      }
+      r.drawRect((int) this.getPosition().getX(), (int) this.getPosition().getY(), 4, 4, 0x00FFFF,
+          false);
 
-    // Render turrets
+      /// Display AABB
+      Position pos = getPosition();
+      double length = getLength();
+      double x = pos.getX();
+      double y = pos.getY();
+
+      double dir = PhysicsManager.shiftAngle(getDirection());
+      double hypotenuse = length / 2;
+      Position max;
+      Position min;
+
+      if (dir >= 0 && dir < Math.PI / 2) {
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI / 2 && dir < Math.PI) {
+        dir = Math.PI - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      } else if (dir >= Math.PI && dir < 3 * Math.PI / 2) {
+        dir = (3 * Math.PI / 2) - dir;
+        max = new Position(x + hypotenuse * FastMath.sin(dir), y - hypotenuse * FastMath.cos(dir));
+        min = new Position(x - hypotenuse * FastMath.sin(dir), y + hypotenuse * FastMath.cos(dir));
+      } else {
+        dir = (2 * Math.PI) - dir;
+        max = new Position(x + hypotenuse * FastMath.cos(dir), y - hypotenuse * FastMath.sin(dir));
+        min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
+      }
+
+      // // Calculate max and min points
+      // Position max = new Position((pos.getX() + 0.5 * length * FastMath.cos(getDirection())),
+      // (pos.getY() + 0.5 * length * FastMath.sin(getDirection())));
+      // Position min = new Position((pos.getX() - 0.5 * length * FastMath.cos(getDirection())),
+      // (pos.getY() - 0.5 * length * FastMath.sin(getDirection())));
+      r.drawText("MAX", new Double(max.getX()).intValue(), new Double(max.getY()).intValue(), false,
+          FontColor.BLACK);
+      r.drawText("MIN", new Double(min.getX()).intValue(), new Double(min.getY()).intValue(), false,
+          FontColor.WHITE);
+
+      r.drawRect(new Double(min.getX()).intValue(), new Double(max.getY()).intValue(),
+          new Double(max.getX() - min.getX()).intValue(),
+          new Double(min.getY() - max.getY()).intValue(), 0x00FF00, false);
+    }
+
+
+    // Render ship sprite
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+    // Display health
+    r.drawText(new Integer(new Double(getHealth()).intValue()).toString(),
+        new Double(getPosition().getX()).intValue() + 20,
+        new Double(getPosition().getY()).intValue(), false, FontColor.BLACK);
+    // Render turrets
     frontTurret.render();
     rearTurret.render();
-    midTurret.render();
   }
 
   /**
@@ -177,6 +277,15 @@ public class Ship extends Entity implements Serializable {
     this.setPosition(
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
+
+    // // Handle rotation of the ship
+    // if (xdiff != 0) {
+    // if (getDirection())
+    // }
+    //
+    //
+    // PhysicsManager.rotateEntity(this, xdiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
+    // PhysicsManager.rotateEntity(this, ydiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
   }
 
   /**
@@ -184,78 +293,80 @@ public class Ship extends Entity implements Serializable {
    * ice.
    */
   public void dealWithInIce(boolean[][] iceGrid) {
-    double shipX = getPosition().getX();
-    double shipY = getPosition().getY();
+    if (Parameters.ICE_IS_SOLID) {
+      double shipX = getPosition().getX();
+      double shipY = getPosition().getY();
 
-    // Checks each corner of the ship
-    for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
-      Position corner = (Position) iterator.next();
-      // Rounds the Position (stored as double) to int so we can use it access the map array
-      int x = (int) FastMath.rint(corner.getX());
-      int y = (int) FastMath.rint(corner.getY());
+      // Checks each corner of the ship
+      for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
+        Position corner = (Position) iterator.next();
+        // Rounds the Position (stored as double) to int so we can use it access the map array
+        int x = (int) FastMath.rint(corner.getX());
+        int y = (int) FastMath.rint(corner.getY());
 
-      try {
-        // The technique here is to search in all directions (up, down, left, right) to find the
-        // minimum distance a ship would have to be moved to push it out of the ice. This should
-        // give good performance as the ship will not have strayed too far into the ice, so the
-        // minimum distance is the accurate direction to 'push' it out of the ice
-        if (iceGrid[x][y]) {
-          // System.out.println("Collision with ice");
-          int posXdiff = findDiff(iceGrid, x, y, 1, 0);
-          // System.out.println("posX done");
-          int posYdiff = findDiff(iceGrid, x, y, 0, 1);
-          // System.out.println("posY done");
-          int negXdiff = findDiff(iceGrid, x, y, -1, 0);
-          // System.out.println("negX done");
-          int negYdiff = findDiff(iceGrid, x, y, 0, -1);
-          // System.out.println("negY done");
+        try {
+          // The technique here is to search in all directions (up, down, left, right) to find the
+          // minimum distance a ship would have to be moved to push it out of the ice. This should
+          // give good performance as the ship will not have strayed too far into the ice, so the
+          // minimum distance is the accurate direction to 'push' it out of the ice
+          if (iceGrid[x][y]) {
+            // System.out.println("Collision with ice");
+            int posXdiff = findDiff(iceGrid, x, y, 1, 0);
+            // System.out.println("posX done");
+            int posYdiff = findDiff(iceGrid, x, y, 0, 1);
+            // System.out.println("posY done");
+            int negXdiff = findDiff(iceGrid, x, y, -1, 0);
+            // System.out.println("negX done");
+            int negYdiff = findDiff(iceGrid, x, y, 0, -1);
+            // System.out.println("negY done");
 
-          int xdiff;
-          int ydiff;
+            int xdiff;
+            int ydiff;
 
 
-          // Finds minimum x distance
-          if (posXdiff >= negXdiff) {
-            xdiff = -negXdiff;
-          } else {
-            xdiff = posXdiff;
-          }
-          // Finds minimum y distance
-          if (posYdiff >= negYdiff) {
-            ydiff = -negYdiff;
-          } else {
-            ydiff = posYdiff;
-          }
-          // Finds minimum overall distance and adjusts ship Position and bounding box
-          if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
-            setPosition(new Position(shipX, shipY + ydiff));
-            translateObb(0, ydiff);
-            if (ydiff <= 0) {
-
+            // Finds minimum x distance
+            if (posXdiff >= negXdiff) {
+              xdiff = -negXdiff;
+            } else {
+              xdiff = posXdiff;
             }
-            // PhysicsManager.rotateEntity(this, -ydiff * Parameters.ICE_BOUNCINESS);
-            // initObb();
-          } else {
-            setPosition(new Position(shipX + xdiff, shipY));
-            translateObb(xdiff, 0);
-            // PhysicsManager.rotateEntity(this, -xdiff * Parameters.ICE_BOUNCINESS);
-            // initObb();
+            // Finds minimum y distance
+            if (posYdiff >= negYdiff) {
+              ydiff = -negYdiff;
+            } else {
+              ydiff = posYdiff;
+            }
+            // Finds minimum overall distance and adjusts ship Position and bounding box
+            if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
+              setPosition(new Position(shipX, shipY + ydiff));
+              translateObb(0, ydiff);
+              if (ydiff <= 0) {
+
+              }
+              PhysicsManager.rotateEntity(this, -ydiff * Parameters.ICE_BOUNCINESS);
+              initObb();
+            } else {
+              setPosition(new Position(shipX + xdiff, shipY));
+              translateObb(xdiff, 0);
+              PhysicsManager.rotateEntity(this, -xdiff * Parameters.ICE_BOUNCINESS);
+              initObb();
+            }
+
+            if (getDirection() >= 0 && getDirection() < FastMath.PI) {
+              PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            } else {
+              PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            }
+
+            // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
+            // System.out.println("Health: " + getHealth());
+
+            // Halve the ship's speed for now
+            // setSpeed(getSpeed() / 2);
           }
-
-          // if (getDirection() >= 0 && getDirection() < FastMath.PI) {
-          // PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
-          // } else {
-          // PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
-          // }
-
-          // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
-          // System.out.println("Health: " + getHealth());
-
-          // Halve the ship's speed for now
-          // setSpeed(getSpeed() / 2);
+        } catch (ArrayIndexOutOfBoundsException e) {
+          // This happens if the entity touches the edge of the map, so we deal with it gracefully
         }
-      } catch (ArrayIndexOutOfBoundsException e) {
-        // This happens if the entity touches the edge of the map, so we deal with it gracefully
       }
     }
   }
@@ -287,13 +398,9 @@ public class Ship extends Entity implements Serializable {
     // Return the difference anyway
     return diff;
   }
-  
+
   public Turret getFrontTurret() {
     return this.frontTurret;
-  }
-
-  public Turret getMidTurret() {
-    return this.midTurret;
   }
 
   public Turret getRearTurret() {
@@ -308,8 +415,12 @@ public class Ship extends Entity implements Serializable {
     return rearTurret.getDirection();
   }
 
-  public double getMidTurretDirection() {
-    return midTurret.getDirection();
+  public double getFrontTurretCharge() {
+    return frontTurret.getDistance();
+  }
+
+  public double getRearTurretCharge() {
+    return rearTurret.getDistance();
   }
 
   public int getColour() {
@@ -320,20 +431,12 @@ public class Ship extends Entity implements Serializable {
     frontTurret.charge();
   }
 
-  public void midTurretCharge() {
-    midTurret.charge();
-  }
-
   public void rearTurretCharge() {
     rearTurret.charge();
   }
 
   public void frontTurretShoot() {
     frontTurret.shoot();
-  }
-
-  public void midTurretShoot() {
-    midTurret.shoot();
   }
 
   public void rearTurretShoot() {
@@ -352,4 +455,49 @@ public class Ship extends Entity implements Serializable {
     return "Ship " + this.getSerial() + "," + this.getPosition();
   }
 
+  public void giveItem(Item item) {
+    if (this.item == null) {
+      this.item = item;
+      System.out.println("Picked up a " + item.getClass());
+    }
+  }
+
+  public void useItem() {
+    if (item != null) {
+      this.item.use();
+      item = null;
+    }
+  }
+
+  public boolean hasItem() {
+    if (item == null)
+      return false;
+    return true;
+  }
+
+  public void applyEffect(Effect effect) {
+    this.effect = effect;
+  }
+
+  public int getEffectType() {
+	  if(effect != null)
+		  return this.effect.getEffectType();
+	  return -1;
+  }
+
+  public boolean underEffect() {
+    if (effect == null)
+      return false;
+    return true;
+  }
+
+  public Item getItem() {
+    return item;
+  }
+  public int getItemType() {
+	  if(item != null)
+		  return this.item.getItemType();
+	  return -1;
+  }
 }
+

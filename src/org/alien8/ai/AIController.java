@@ -18,35 +18,28 @@ public class AIController{
 	protected ModelManager model;
 	protected Ship myShip;
 	protected Entity target;
-	private int compassDirection;
-	/*
-	*       (N)
-	*     5  6  7
-	*      \ | /
-	*(W) 4 -- -- 0 (E)
-	*      / | \
-	*     3  2  1
-	*       (S)
-	*/
-	private static int collisionCheckStart = 60; //Checks every 2 seconds (120 ticks) for a collision
-	protected int collisionCheckCountDown;
+	protected boolean[][] iceGrid;
+	protected boolean rightTurnDefault = true;
+	protected int changeDefaultTurn = 0;
 	
 	public AIController(Ship ship){
-		// Note: changed this to a Ship constructor, easier to handle in server and more practical
 		model = ModelManager.getInstance();
-		myShip = ship; //All ai ships start facing East - temporary
-		collisionCheckCountDown = collisionCheckStart;
+		iceGrid = model.getMap().getIceGrid();
+		myShip = ship;
 	}
 	
 	public void update(){
-		calcCompassDirection();
 		target = findClosestTarget();
-		myShip.setTurretsDirection(target.getPosition());
-		//At the moment it just fires all turrets at the closest ship
+		myShip.setTurretsDirectionAI(target.getPosition());
+		//Fires both turrets at the closest ship
 		myShip.frontTurretCharge();
-		myShip.midTurretCharge();
 		myShip.rearTurretCharge();
-		wander(); //Moves mostly aimlessly around the map
+		changeDefaultTurn++;
+		if (changeDefaultTurn > 1200){
+			rightTurnDefault = !rightTurnDefault;
+			changeDefaultTurn = 0;
+		}
+		wander(); //Moves around the map, avoiding ice
 	}
 	
 	public Entity findClosestTarget(){
@@ -80,137 +73,56 @@ public class AIController{
 		return myShip;
 	}
 	
-	public void calcCompassDirection(){
-		//Having the ship have a compass direction makes the isInFront function easier to compute
-		double currDirection = myShip.getDirection();
-		if ((currDirection >= (FastMath.PI/8)) && (currDirection < (3*FastMath.PI/8))){
-			compassDirection = 1; //South-East
-		}
-		else if ((currDirection >= (3*FastMath.PI/8)) && (currDirection < (5*FastMath.PI/8))){
-			compassDirection = 2; //South
-		}
-		else if ((currDirection >= (5*FastMath.PI/8)) && (currDirection < (7*FastMath.PI/8))){
-			compassDirection = 3; //South-West
-		}
-		else if ((currDirection >= (7*FastMath.PI/8)) && (currDirection < (9*FastMath.PI/8))){
-			compassDirection = 4; //West
-		}
-		else if ((currDirection >= (9*FastMath.PI/8)) && (currDirection < (11*FastMath.PI/8))){
-			compassDirection = 5; //North-West
-		}
-		else if ((currDirection >= (11*FastMath.PI/8)) && (currDirection < (13*FastMath.PI/8))){
-			compassDirection = 6; //North
-		}
-		else if ((currDirection >= (13*FastMath.PI/8)) && (currDirection < (15*FastMath.PI/8))){
-			compassDirection = 7; //North-East
-		}
-		else{
-			compassDirection = 0; //East - need to check with others that direction can't be >= 2PI
-		}
+	public boolean rayDetect(int rayLength){
+		Position[] corners = myShip.getObb();
+		double direction = myShip.getDirection();
+		double xNose = (corners[0].getX() + corners[1].getX())/2.0;
+		double yNose = (corners[0].getY() + corners[1].getY())/2.0;
+		Position nose = new Position(xNose,yNose);
+		return drawRay(corners[0], direction, rayLength) || drawRay(corners[1], direction, rayLength) || drawRay(nose, direction, rayLength); 
 	}
 	
-	public void wander(){
-		
-		/*Moving around by predicting collisions and avoiding them - Work in Progress:
-		* If it sees a potencial collision and it will spin on the spot for a bit and then try and move again
-		*/
-		if ((collisionCheckCountDown == collisionCheckStart) && predictCollision()){
-			collisionCheckCountDown--;
-			PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE,
-              PhysicsManager.shiftAngle(myShip.getDirection() + FastMath.PI));
-			PhysicsManager.rotateEntity(myShip,
-              (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-		}
-		//Differnt from above so we don't have to run predictCollision everytime
-		else if (collisionCheckCountDown < collisionCheckStart){
-			collisionCheckCountDown--;
-			PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE,
-              PhysicsManager.shiftAngle(myShip.getDirection() + FastMath.PI));
-			PhysicsManager.rotateEntity(myShip,
-              (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-			  
-			if (collisionCheckCountDown <= 0){
-				collisionCheckCountDown = collisionCheckStart;
+	public boolean drawRay(Position start, double dir, int maxR){
+		double x0 = start.getX();
+		double y0 = start.getY();
+		for (int r = 1;r <=maxR; r++){
+			int x = (int)Math.round(x0 + r*Math.cos(dir));
+			int y = (int)Math.round(y0 + r*Math.sin(dir));
+			if (y >= Parameters.MAP_HEIGHT || x <= 0 || y <= 0 || x >= Parameters.MAP_WIDTH || iceGrid[x][y] ){
+				return true;
 			}
-		}
-		// Just moves forward when it doesn't see any potencial collisions
-		else{
-			PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
-		}
-	}
-	
-	public boolean predictCollision(){
-		//Function tries to predict if the ship might collide with something soon, so that it can be avoided
-		Entity closestCollider = null;
-		Position currentPos = myShip.getPosition();
-		/*These checks are for being close to the edge of the map (and going in the direction of the edge)
-		* Values may need fiddling and also should be in terms of the map dimensions not 100 or 1949
-		*/
-		if ((currentPos.getX() <= 100) && (compassDirection == 3 || compassDirection == 4 || compassDirection == 5)){
-			return true;
-		}
-		if ((currentPos.getX() >= 1948) && (compassDirection == 1 || compassDirection == 0 || compassDirection == 7)){
-			return true;
-		}
-		if ((currentPos.getY() <= 100) && (compassDirection == 5 || compassDirection == 6 || compassDirection == 7)){
-			return true;
-		}
-		if ((currentPos.getY() >= 1948) && (compassDirection == 1 || compassDirection == 2 || compassDirection == 3)){
-			return true;
-		}
-		
-		Iterator<Entity> entities = model.getEntities().iterator();
-		double shortestDistance = 10000;
-		//Iterates over the entities and finds the closest one that the ship is going in the direction of
-		while(entities.hasNext()){
-			Entity currentEntity = entities.next();
-			double currentDistance = currentPos.distanceTo(currentEntity.getPosition());
-			if ((currentDistance < shortestDistance) && (myShip.getSerial() != currentEntity.getSerial()) && isInFront(currentEntity)){
-				closestCollider = currentEntity;
-				shortestDistance = currentDistance;
-			}
-		}
-		//If the found entity is within 50 pixels then it thinks it might collide with it
-		//Should probably parameterise this distance
-		if (shortestDistance <= 50){
-			return true;
 		}
 		return false;
 	}
 	
-	public boolean isInFront(Entity potentialCollider){
-		//Checks to see if the potencial collider is indeed in the direction that the ship is going in
-		double xc = potentialCollider.getPosition().getX();
-		double yc = potentialCollider.getPosition().getY();
-		double xm = myShip.getPosition().getX();
-		double ym = myShip.getPosition().getY();
-		
-		if (compassDirection == 0){
-			return (xc > xm); //Not quite right (all primary compass directions)
+	public void wander(){
+		if (rayDetect((int)Parameters.SHIP_LENGTH)){
+			PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE, PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));
+			
+			double locEastDir = myShip.getDirection();
+			locEastDir = PhysicsManager.shiftAngle(locEastDir - (Math.PI/2d));
+			double locWestDir = PhysicsManager.shiftAngle(locEastDir + Math.PI);
+			boolean obstToEast = drawRay(myShip.getPosition(), locEastDir, (int)Parameters.SHIP_LENGTH);
+			boolean obstToWest = drawRay(myShip.getPosition(), locWestDir, (int)Parameters.SHIP_LENGTH);
+			if (rightTurnDefault){
+				if (obstToWest){
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()-Math.PI/64d));
+				}
+				else{
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()+Math.PI/64d));
+				}
+			}
+			else{
+				if (obstToEast){
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()+Math.PI/64d));
+				}
+				else{
+					myShip.setDirection(PhysicsManager.shiftAngle(myShip.getDirection()-Math.PI/64d));
+				}
+			}
 		}
-		else if (compassDirection == 1){
-			return (xc > xm)&&(yc < ym);
-		}
-		else if (compassDirection == 2){
-			return (yc < ym);
-		}
-		else if (compassDirection == 3){
-			return (xc < xm)&&(yc < ym);
-		}
-		else if (compassDirection == 4){
-			return (xc < xm);
-		}
-		else if (compassDirection == 5){
-			return (xc < xm)&&(yc > ym);
-		}
-		else if (compassDirection == 6){
-			return (yc > ym);
-		}
-		else if (compassDirection == 7){
-			return (xc > xm)&&(yc > ym);
-		}
-		else {
-			return false;
+		else{
+			PhysicsManager.applyForce(myShip, Parameters.SHIP_FORWARD_FORCE, myShip.getDirection());
 		}
 	}
 

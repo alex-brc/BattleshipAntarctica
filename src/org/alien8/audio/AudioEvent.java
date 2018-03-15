@@ -1,6 +1,7 @@
-package org.alien8.server;
+package org.alien8.audio;
 
 import org.alien8.physics.Position;
+import org.alien8.server.GameEvent;
 
 public class AudioEvent extends GameEvent {
 

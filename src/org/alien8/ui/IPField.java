@@ -1,6 +1,7 @@
 package org.alien8.ui;
 
 import org.alien8.client.InputManager;
+import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 
 public class IPField {
@@ -22,7 +23,7 @@ public class IPField {
 	public void render(Renderer r){
 		r.drawFilledRect(x, y, width, height, backCol, true);
 		r.drawRect(x, y, width, height, bordCol, true);
-		r.drawText(text, x, y, true);
+		r.drawText(text, x, y, true, FontColor.WHITE);
 		InputManager in = InputManager.getInstance();
 		char c = in.getKeyTyped();
 		if (((c >= '0' && c <= '9') || c == '.') && text.length() < 15){

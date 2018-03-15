@@ -118,4 +118,21 @@ public class Position implements Serializable{
 			return true;
 		return false;
 	}
+	
+	/**
+	 * Verifies if two positions are approximately equal
+	 * @param position to check against 
+	 * @param margin the margin that would be acceptable to call the position approximate
+	 * @return true if they are approximately equal, false otherwise
+	 */
+	public boolean approximately(Position position, double margin) {
+		if(FastMath.abs(this.getX() 
+					- position.getX()) > margin)
+			return false;
+		
+		if(FastMath.abs(this.getY() - position.getY()) > margin)
+			return false;
+		
+		return true;
+	}
 }

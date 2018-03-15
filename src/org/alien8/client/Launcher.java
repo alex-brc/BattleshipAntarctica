@@ -1,34 +1,33 @@
 package org.alien8.client;
 
 import org.alien8.audio.AudioManager;
-import org.alien8.rendering.Renderer;
 import org.alien8.score.ScoreBoard;
 import org.alien8.util.LogManager;
 
 public class Launcher {
   public static Launcher instance;
   private String loadStatus;
-  private String serverIPstr = "172.22.35.217";
+  private String serverIPstr = "192.168.0.16";
   private Client game;
 
   private Launcher() {
     // Nothing
   }
-
+  
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
-    launcher.game = new Client();
+
+    // Loading client window
+    launcher.game = Client.getInstance();
     Launcher.instance = launcher;
     // Load log manager
     launcher.loadStatus = "Preparing logger...";
+    System.out.println(launcher.loadStatus);
     launcher.loadLogManager();
-
-    // Load renderer
-    launcher.loadStatus = "Building renderer...";
-    launcher.loadRenderer();
 
     // Load audio manager
     launcher.loadStatus = "Loading sounds...";
+    System.out.println(launcher.loadStatus);
     launcher.loadAudioManager();
 
     // Connect to server
@@ -37,6 +36,7 @@ public class Launcher {
 
     // Make the scoreboard
     launcher.loadStatus = "Constructing a scoreboard...";
+    System.out.println(launcher.loadStatus);
     launcher.loadScoreBoard();
 
     // Start the game
@@ -55,16 +55,12 @@ public class Launcher {
     LogManager.getInstance();
   }
 
-  private void loadRenderer() {
-    Renderer.getInstance();
-  }
-
   private void loadAudioManager() {
     AudioManager.getInstance();
   }
 
   private void loadScoreBoard() {
-    ScoreBoard.getInstance().startListener();
+    ScoreBoard.getInstance();
   }
 
   private void connect() {

@@ -1,8 +1,9 @@
 package org.alien8.core;
 
 import java.io.Serializable;
-import org.alien8.physics.Position;
 
+import org.alien8.items.Effect;
+import org.alien8.physics.Position;
 import net.jafama.FastMath;
 
 /**
@@ -128,8 +129,8 @@ public abstract class Entity implements Serializable, Cloneable {
 
   public abstract void render();
 
-  public void damage(double damage) {
-    // Dying handled externally
+  public void damage(double damage) {  
+	// Dying handled externally
     health -= damage;
   }
 
@@ -142,7 +143,7 @@ public abstract class Entity implements Serializable, Cloneable {
   public boolean isOutOfBounds() {
     double x = this.getPosition().getX();
     double y = this.getPosition().getY();
-    if (x < 0 && x > Parameters.MAP_WIDTH && y < 0 && y > Parameters.MAP_HEIGHT)
+    if (x < 0 || x > Parameters.MAP_WIDTH || y < 0 || y > Parameters.MAP_HEIGHT)
       return true;
     return false;
   }
@@ -234,13 +235,13 @@ public abstract class Entity implements Serializable, Cloneable {
   }
 
   public void setSerial(long serial) {
-	this.serial = serial;
+    this.serial = serial;
   }
 
   public void save() {
-	  this.toBeDeleted = false;
+    this.toBeDeleted = false;
   }
-  
+
   public void delete() {
     this.toBeDeleted = true;
   }
@@ -249,7 +250,7 @@ public abstract class Entity implements Serializable, Cloneable {
     return toBeDeleted;
   }
 
-  
+
   @Override
   public Object clone() throws CloneNotSupportedException {
     return super.clone();

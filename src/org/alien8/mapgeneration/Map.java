@@ -1,13 +1,7 @@
 package org.alien8.mapgeneration;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.alien8.core.Parameters;
-import org.alien8.physics.AABB;
-import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
-
-import net.jafama.FastMath;
 
 public class Map {
   protected int length;
@@ -15,7 +9,7 @@ public class Map {
   protected int lengthDensity;
   protected int widthDensity;
   protected boolean[][] iceGrid;
-  protected List<AABB> roughAABBs = new ArrayList<AABB>();
+  protected int[][] minimap;
   protected long seed;
 
   public Map(int l, int w, int lD, int wD, long s) {
@@ -27,6 +21,7 @@ public class Map {
     // Map is a 2-D array depicting if each pixel is either ice or water (True = ice, False = water)
     iceGrid = new boolean[l][w];
     makeMap(); // Actually generates the Map using the PerlinNoise class
+    makeMinimap();
     // makeRoughAABBs(Parameters.MAP_BOX_SIZE); //Gives the ice hitboxes
   }
 
@@ -45,51 +40,57 @@ public class Map {
     }
   }
 
-  protected void makeRoughAABBs(int boxSize) {
-    /*
-     * Function that gives all the ice basic hitboxes Works by checking every square of a given size
-     * if the majority of the pixels are ice or not If the majority is ice it makes the whole box a
-     * hitbox/entity
-     */
-    for (int y = 0; y < width; y += boxSize) {
-      for (int x = 0; x < length; x += boxSize) {
+  /**
+   * Creates a minimap from the large map. This method is called once to avoid regenerating the
+   * minimap at each tick, which would be unnecessary as the terrain doesn't change.
+   */
+  private void makeMinimap() {
+    int bigWidth = Parameters.MAP_WIDTH;
+    int bigHeight = Parameters.MAP_HEIGHT;
+    int smallWidth = Parameters.MINIMAP_WIDTH;
+    int smallHeight = Parameters.MINIMAP_HEIGHT;
 
-        int countIce = 0;
-        for (int locY = y; locY < (y + boxSize); locY++) {
-          for (int locX = x; locX < (x + boxSize); locX++) {
-            if (iceGrid[locX][locY]) {
-              countIce++;
+    int widthScale = bigWidth / smallWidth;
+    int heightScale = bigHeight / smallHeight;
+
+    minimap = new int[smallWidth][smallHeight];
+
+    for (int j = 0; j < smallHeight; j++) {
+      for (int i = 0; i < smallWidth; i++) {
+        int ice = 0;
+        int water = 0;
+        for (int y = j * heightScale; y < (j + 1) * heightScale; y++) {
+          for (int x = i * widthScale; x < (i + 1) * widthScale; x++) {
+            if (iceGrid[x][y]) {
+              ice++;
+            } else {
+              water++;
             }
           }
         }
-
-        if (1.0 * countIce / (boxSize * boxSize) > Parameters.ICE_BOX_DENSITY) {
-          // Just need to generate a bunch of values for initialising an entity/hitbox
-
-          double centerX = x + (FastMath.ceil(boxSize / 2.0d) - 1);
-          double centerY = y + (FastMath.ceil(boxSize / 2.0d) - 1);
-          Position center = new Position(centerX, centerY);
-          Ice newIce = new Ice(center);
-
-          Position newMin = new Position((double) x, (double) y);
-          Position newMax = new Position((double) (x + boxSize - 1), (double) (y + boxSize - 1));
-          AABB newAABB = new AABB(newMin, newMax, newIce);
-          roughAABBs.add(newAABB);
+        if (ice > water) {
+          minimap[i][j] = 0xffffff;
+        } else {
+          minimap[i][j] = 0x5555ff;
         }
       }
     }
-  }
-
-  public List<AABB> getAABBs() {
-    return roughAABBs;
   }
 
   public boolean[][] getIceGrid() {
     return iceGrid;
   }
 
+  /**
+   * Gets the minimap.
+   * 
+   * @return an int array where each int represents a colored pixel
+   */
+  public int[][] getMinimap() {
+    return minimap;
+  }
+
   public void render(Renderer r) {
-    // r.drawMap(iceGrid);
     r.drawViewport(iceGrid);
   }
 }

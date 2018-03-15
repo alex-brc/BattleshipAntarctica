@@ -2,14 +2,15 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.mapgeneration.Ice;
+import org.alien8.items.Effect;
+import org.alien8.items.Mine;
+import org.alien8.items.Pickup;
+import org.alien8.items.Torpedo;
 import org.alien8.score.ScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
-
-import net.jafama.FastMath;
 
 public class Collision {
   private Entity entity1;
@@ -50,21 +51,88 @@ public class Collision {
     } else if ((entity1 instanceof Bullet) & (entity2 instanceof Ship)) {
       resolveBulletShipCollision((Bullet) entity1, (Ship) entity2);
     }
-    // // Collision between a Ship and Ice
-    // else if ((entity1 instanceof Ship) & (entity2 instanceof Ice)) {
-    // resolveShipIceCollision((Ship) entity1, (Ice) entity2);
-    // } else if ((entity1 instanceof Ice) & (entity2 instanceof Ship)) {
-    // resolveShipIceCollision((Ship) entity2, (Ice) entity1);
-    // }
-    // // Collision between a Bullet and Ice
-    // else if ((entity1 instanceof Bullet) & (entity2 instanceof Ice)) {
-    // resolveBulletIceCollision((Bullet) entity1, (Ice) entity2);
-    // } else if ((entity1 instanceof Ice) & (entity2 instanceof Bullet)) {
-    // resolveBulletIceCollision((Bullet) entity2, (Ice) entity1);
-    // }
+    // Collision between a Ship and a Pickup
+    else if((entity1 instanceof Ship) & (entity2 instanceof Pickup)) {
+    	resolveShipPickupCollision((Ship) entity1, (Pickup) entity2);
+    } else if((entity1 instanceof Pickup) & (entity2 instanceof Ship)) {
+    	resolveShipPickupCollision((Ship) entity2, (Pickup) entity1);
+    }
+    // Collision between a Ship and a Mine
+    else if((entity1 instanceof Ship) & (entity2 instanceof Mine)) {
+    	resolveShipMineCollision((Ship) entity1, (Mine) entity2);
+    } else if((entity1 instanceof Mine) & (entity2 instanceof Ship)) {
+    	resolveShipMineCollision((Ship) entity2, (Mine) entity1);
+    }
+    // Collision between a Ship and a Torpedo
+    else if((entity1 instanceof Ship) & (entity2 instanceof Torpedo)) {
+    	resolveShipTorpedoCollision((Ship) entity1, (Torpedo) entity2);
+    } else if((entity1 instanceof Torpedo) & (entity2 instanceof Ship)) {
+    	resolveShipTorpedoCollision((Ship) entity2, (Torpedo) entity1);
+    }
+  }
+
+  private void resolveShipTorpedoCollision(Ship ship, Torpedo torpedo) {
+	  if (ship.getSerial() == torpedo.getSource())
+		  return;
+	  if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
+		  return;
+
+	  // Mine damages ship
+	  ship.damage(Parameters.TORPEDO_DAMAGE);
+	  // Award score to the mine owner
+	  Player deployer = Server.getInstance().getPlayer(torpedo.getSource());
+	  // If it's AI, no points
+	  if (deployer != null)
+		  ScoreBoard.getInstance().giveScore(deployer, Parameters.TORPEDO_SCORE);
+	  // See if ship has been destroyed
+	  if (new Double(ship.getHealth()).intValue() <= 0) {
+		  System.out.println("A ship died!");
+		  ship.delete();
+		  // Award score to the killer
+		  // If it's AI, no points
+		  if (deployer != null)
+			  ScoreBoard.getInstance().giveKill(deployer);
+	  }
+	  // Destroy mine
+	  torpedo.delete();
+  }
+
+  private void resolveShipMineCollision(Ship ship, Mine mine) {
+	  if (ship.getSerial() == mine.getSource())
+		  return;
+	  if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
+		  return;
+
+	  // Mine damages ship
+	  ship.damage(Parameters.MINE_DAMAGE);
+	  // Award score to the mine owner
+	  Player deployer = Server.getInstance().getPlayer(mine.getSource());
+	  // If it's AI, no points
+	  if (deployer != null)
+		  ScoreBoard.getInstance().giveScore(deployer, Parameters.MINE_SCORE);
+	  // See if ship has been destroyed
+	  if (new Double(ship.getHealth()).intValue() <= 0) {
+		  System.out.println("A ship died!");
+		  ship.delete();
+		  // Award score to the killer
+		  // If it's AI, no points
+		  if (deployer != null)
+			  ScoreBoard.getInstance().giveKill(deployer);
+	  }
+	  // Destroy mine
+	  mine.delete();
+
+  }
+
+  private void resolveShipPickupCollision(Ship ship, Pickup pickup) {
+	 if(!ship.hasItem()) {
+		 pickup.onPickup(ship);
+	 }
+	 pickup.delete();
   }
 
   private void resolveShipShipCollision(Ship ship1, Ship ship2) {
+
     System.out.println("ship hit ship!");
     double speed1 = entity1.getSpeed();
     double speed2 = entity2.getSpeed();
@@ -72,7 +140,6 @@ public class Collision {
     double direction2 = entity2.getDirection();
 
     // Move ships apart according to the Minimum Translation Vector
-    // System.out.println("Cur" + entity1.getPosition());
     // mod 10 allows distance to be scaled down so that objects don't fly away from each other as
     // much
     double mtvX = mtv.getDistance() * mtv.getAxis().getX() % 10;
@@ -121,49 +188,54 @@ public class Collision {
     // This means that we can just swap their speed and direction
     // We multiply speed by the coefficient of restitution to decrease it
     entity1.setSpeed(speed2 * Parameters.RESTITUTION_COEFFICIENT);
-    PhysicsManager.rotateEntity(entity1, (direction1 - direction2) % 5);
+    PhysicsManager.rotateEntity(entity1,
+        ((direction1 - direction2) % 5) * Parameters.COLLISION_ROTATION_MODIFIER);
     // entity1.setDirection(direction2);
     entity2.setSpeed(speed1 * Parameters.RESTITUTION_COEFFICIENT);
-    PhysicsManager.rotateEntity(entity2, (direction2 - direction1) % 5);
+    PhysicsManager.rotateEntity(entity2,
+        ((direction2 - direction1) % 5) * Parameters.COLLISION_ROTATION_MODIFIER);
     // entity2.setDirection(direction1);
 
     // Each ship takes damage proportional to the momentum of the other ship
     entity1.damage(speed2 * entity2.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
     entity2.damage(speed1 * entity1.getMass() * Parameters.COLLISION_DAMAGE_MODIFIER);
+    // Delete ships if dead
+    if (new Double(entity1.getHealth()).intValue() <= 0) {
+      System.out.println("A ship died!");
+      entity1.delete();
+    }
+    if (new Double(entity2.getHealth()).intValue() <= 0) {
+      System.out.println("A ship died!");
+      entity2.delete();
+    }
   }
 
   private void resolveBulletShipCollision(Bullet bullet, Ship ship) {
     // This allows us to ignore cases where a ship shoots itself
-    if (bullet.getSource() != ship.getSerial()) {
-      System.out.println("bullet hit ship");
-      // Bullet damages ship
-      ship.damage(bullet.getDamage());
-      // Award score to the bullet owner
-      Player shooter = Server.getPlayer(bullet);
-      // If it's AI, no points
-      if(shooter != null)
-      	ScoreBoard.getInstance().giveHit(shooter, bullet);
-      // See if ship has been destroyed
-      if (ship.getHealth() <= 0) {
+	//System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
+    if (bullet.getSource() == ship.getSerial()) 
+    	return; 
+    if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
+    	return;
+    	
+    System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
+    // Bullet damages ship
+    ship.damage(bullet.getDamage());
+    // Award score to the bullet owner
+    Player shooter = Server.getInstance().getPlayer(bullet.getSource());
+    // If it's AI, no points
+    if (shooter != null)
+    	ScoreBoard.getInstance().giveHit(shooter, bullet);
+    // See if ship has been destroyed
+    if (new Double(ship.getHealth()).intValue() <= 0) {
     	System.out.println("A ship died!");
-        ship.delete();
-        // Award score to the killer
-        // If it's AI, no points
-        if(shooter != null)
-        	ScoreBoard.getInstance().giveKill(shooter);
-      }
-      // Destroy bullet
-      bullet.delete();
+    	ship.delete();
+    	// Award score to the killer
+    	// If it's AI, no points
+    	if (shooter != null)
+    		ScoreBoard.getInstance().giveKill(shooter);
     }
-  }
-
-  private void resolveShipIceCollision(Ship ship, Ice ice) {
-    System.out.println("ship hit ice");
-    ship.setDirection(FastMath.PI + ship.getDirection());
-  }
-
-  private void resolveBulletIceCollision(Bullet bullet, Ice ice) {
-    System.out.println("bullet hit ice");
+    // Destroy bullet
     bullet.delete();
   }
 }

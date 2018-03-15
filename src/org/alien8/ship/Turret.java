@@ -1,34 +1,26 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
-
-import org.alien8.client.InputManager;
+import org.alien8.audio.AudioEvent;
 import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-import org.alien8.server.AudioEvent;
 import org.alien8.server.Server;
-
 import net.jafama.FastMath;
 
 public class Turret implements Serializable {
 
   private static final long serialVersionUID = -7308366899275446394L;
-  // Type of bullets this turret shoots
-  public static final int SMALL = 1;
-  public static final int BIG = 2;
-  // The parent ship of this turret
-  private Ship ship;
+  // The parent ship of this turret serial
+  private long shipSerial;
   // Position will be handled by Ship class
   private Position position;
   // Orientation in radians
   private double direction;
   // Last time it shot in nanoseconds
   private long lastShot;
-  // Type of bullets this turret shoots
-  private int type;
   // Cooldown of this turret
   private long cooldown;
   // Charged distance of this turret
@@ -36,19 +28,16 @@ public class Turret implements Serializable {
   private final double minDistance;
   private final double maxDistance;
 
-  private Sprite sprite = Sprite.turret; // for now
+  private Sprite sprite = Sprite.turret;
 
-  public Turret(Position position, int type, Ship ship) {
-    this.ship = ship;
+  public Turret(Position position, long shipSerial) {
+    this.shipSerial = shipSerial;
     this.position = position;
     this.direction = 0;
-    this.type = type;
-    this.cooldown = (type == Turret.BIG) ? Parameters.BIG_BULLET_CD : Parameters.SMALL_BULLET_CD;
+    this.cooldown = Parameters.TURRET_CD;
     this.lastShot = System.currentTimeMillis() - cooldown;
-    this.minDistance =
-        (type == Turret.BIG) ? Parameters.BIG_BULLET_MIN_DIST : Parameters.SMALL_BULLET_MIN_DIST;
-    this.maxDistance =
-        (type == Turret.BIG) ? Parameters.BIG_BULLET_MAX_DIST : Parameters.SMALL_BULLET_MAX_DIST;
+    this.minDistance = Parameters.TURRET_MIN_DIST;
+    this.maxDistance = Parameters.TURRET_MAX_DIST;
     this.distance = this.minDistance;
   }
 
@@ -61,8 +50,6 @@ public class Turret implements Serializable {
       this.distance += Parameters.CHARGE_INCREMENT;
     else
       this.shoot();
-
-    this.distance++;
   }
 
   /**
@@ -74,15 +61,10 @@ public class Turret implements Serializable {
     if (distance == this.minDistance || this.isOnCooldown())
       return;
 
-    if (type == Turret.BIG) {
-      ModelManager.getInstance().addEntity(Server.getBigBullet(this.getPosition(), this.getDirection(),
-          distance, this.getShip().getSerial()));
-    } else {
-      ModelManager.getInstance().addEntity(Server.getSmallBullet(this.getPosition(), this.getDirection(),
-          distance, this.getShip().getSerial()));
-    }
+    ModelManager.getInstance().addEntity(Server.getInstance().getBullet(this.getPosition(), this.getDirection(),
+    		distance, this.getShipSerial()));
 
-    Server.addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
+    Server.getInstance().addEvent(new AudioEvent(AudioEvent.Type.SHOOT, this.getPosition()));
     this.startCooldown();
     this.distance = this.minDistance;
   }
@@ -94,16 +76,16 @@ public class Turret implements Serializable {
     return direction;
   }
 
-  /**
-   * @return the time of the last shot
-   */
-
+  public void resetCooldown() {
+	  this.lastShot = System.currentTimeMillis() - cooldown;
+  }
+  
   public boolean isOnCooldown() {
     if (System.currentTimeMillis() - this.lastShot < this.cooldown)
       return true;
     return false;
   }
-
+  
   /**
    * Puts the turret on cooldown.
    */
@@ -122,14 +104,14 @@ public class Turret implements Serializable {
       return 0;
     return result;
   }
-  
+
   public Position getTargetPosition() {
-	  Position result = new Position(0,0);
-	  
-	  result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
-	  result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
-	  
-	  return result;
+    Position result = new Position(0, 0);
+
+    result.setX(this.getPosition().getX() + FastMath.cos(this.getDirection()) * this.getDistance());
+    result.setY(this.getPosition().getY() + FastMath.sin(this.getDirection()) * this.getDistance());
+
+    return result;
   }
 
   /**
@@ -157,23 +139,19 @@ public class Turret implements Serializable {
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
 
-    // if (this.isOnCooldown())
-    // r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
-    // else
-    // r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
+    if (Parameters.DEBUG_MODE) {
+      if (this.isOnCooldown())
+        r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0xFF0000, false);
+      else
+        r.drawRect((int) position.getX(), (int) position.getY(), 4, 4, 0x00FF00, false);
+    }
+
+    if (distance != minDistance) {
+      Position pos = getTargetPosition();
+      Renderer.getInstance().drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
+    }
   }
 
-  public Position getScreenPosition() {
-    // TODO Auto-generated method stub
-    return null;
-
-    /*if(distance != minDistance) {
-    	Position pos = getTargetPosition();
-    	r.drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
-    }*/
-
-  }
-  
   /**
    * @param direction the direction to set
    */
@@ -195,7 +173,15 @@ public class Turret implements Serializable {
     this.position = position;
   }
 
-  protected Ship getShip() {
-    return ship;
+  protected long getShipSerial() {
+    return shipSerial;
+  }
+
+  public void setDistance(double distance) {
+    this.distance = distance;
+  }
+
+  public void setShipSerial(long shipSerial) {
+    this.shipSerial = shipSerial;
   }
 }

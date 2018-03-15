@@ -2,6 +2,7 @@ package org.alien8.ui;
 
 import org.alien8.client.InputManager;
 import org.alien8.physics.Position;
+import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.util.LogManager;
 
@@ -33,7 +34,7 @@ public class Button {
 		}else{
 			r.drawFilledRect(x, y, width, height, col, true);
 		}
-		r.drawText(text, x + width/2 - (text.length()*16)/2, y+1, true);
+		r.drawText(text, x + width/2 - (text.length()*16)/2, y+1, true, FontColor.WHITE);
 	}
 	
 	public void executeAction(){

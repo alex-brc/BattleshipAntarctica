@@ -1,14 +1,13 @@
 package org.alien8.score;
 
 import org.alien8.core.Parameters;
-import org.alien8.server.GameEvent;
+import org.alien8.items.Mine;
 import org.alien8.server.Player;
 import org.alien8.ship.Bullet;
 
-public class Score extends GameEvent implements Comparable<Score> {
+public class Score implements Comparable<Score> {
 
-  private static final long serialVersionUID = -1613827319434373237L;
-
+  private long shipSerial;
   private String name;
   private int colour;
   private int score;
@@ -18,11 +17,21 @@ public class Score extends GameEvent implements Comparable<Score> {
   public Score(Player player) {
     this.name = player.getName();
     this.colour = player.getShip().getColour();
+    this.shipSerial = player.getShip().getSerial();
     this.score = 0;
     this.kills = 0;
     this.alive = true;
   }
-
+  
+  public Score(ScoreEvent event) {
+	 this.name = event.getName();
+	 this.shipSerial = event.getShipSerial();
+	 this.colour = event.getColour();
+	 this.score = event.getScore();
+	 this.kills = event.getKills();
+	 this.alive = event.getAlive();
+  }
+  
   /**
    * Awards the score earned for landing a shot.
    * 
@@ -33,7 +42,14 @@ public class Score extends GameEvent implements Comparable<Score> {
   public void giveHit(Bullet bullet) {
     this.score += (int) bullet.getDistance() * Parameters.DISTANCE_MULTIPLIER + 15;
   }
-
+  
+  /**
+   * Awards a static score for exploding someone with a minte
+   */
+  public void giveScore(int score) {
+    this.score += score;
+  }
+  
   /**
    * Awards the score earned for killing someone
    * 
@@ -56,7 +72,7 @@ public class Score extends GameEvent implements Comparable<Score> {
     return colour;
   }
 
-  public long getScore() {
+  public int getScore() {
     return score;
   }
 
@@ -66,6 +82,10 @@ public class Score extends GameEvent implements Comparable<Score> {
 
   public boolean getAlive() {
     return alive;
+  }
+
+  public long getShipSerial() {
+	return shipSerial;
   }
 
   @Override
@@ -80,4 +100,12 @@ public class Score extends GameEvent implements Comparable<Score> {
     return result;
   }
 
+  public ScoreEvent exportToEvent() {
+	  return new ScoreEvent(this);
+  }
+  
+  public void importFromEvent(ScoreEvent event) {
+	  
+  }
+  
 }
