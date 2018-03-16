@@ -4,9 +4,8 @@ import org.alien8.client.InputManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
-import org.alien8.util.LogManager;
 
-public class Button {
+public abstract class Button {
 
 	private int x, y, width, height;
 	private int col, hCol;
@@ -42,10 +41,7 @@ public class Button {
 		r.drawText(text, x + width/2 - (text.length()*16)/2, y + (height-16)/2, true, FontColor.WHITE);
 	}
 	
-	public void executeAction(){
-		LogManager.getInstance().log("UI", LogManager.Scope.DEBUG, "Inactive button clicked.");
-		//This button does nothing; override to add functionality.
-	}
+	public abstract void executeAction();
 	
 	/**
 	 * Changes the text of the button

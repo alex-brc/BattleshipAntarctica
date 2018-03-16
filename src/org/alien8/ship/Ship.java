@@ -213,11 +213,6 @@ public class Ship extends Entity implements Serializable {
         min = new Position(x - hypotenuse * FastMath.cos(dir), y + hypotenuse * FastMath.sin(dir));
       }
 
-      // // Calculate max and min points
-      // Position max = new Position((pos.getX() + 0.5 * length * FastMath.cos(getDirection())),
-      // (pos.getY() + 0.5 * length * FastMath.sin(getDirection())));
-      // Position min = new Position((pos.getX() - 0.5 * length * FastMath.cos(getDirection())),
-      // (pos.getY() - 0.5 * length * FastMath.sin(getDirection())));
       r.drawText("MAX", new Double(max.getX()).intValue(), new Double(max.getY()).intValue(), false,
           FontColor.BLACK);
       r.drawText("MIN", new Double(min.getX()).intValue(), new Double(min.getY()).intValue(), false,
@@ -458,7 +453,6 @@ public class Ship extends Entity implements Serializable {
   public void giveItem(Item item) {
     if (this.item == null) {
       this.item = item;
-      System.out.println("Picked up a " + item.getClass());
     }
   }
 

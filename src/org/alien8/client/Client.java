@@ -15,6 +15,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
@@ -29,7 +30,9 @@ import org.alien8.server.GameEvent;
 import org.alien8.server.Server;
 import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
+import org.alien8.ui.Lobby;
 import org.alien8.ui.MainMenu;
+import org.alien8.ui.NameScreen;
 import org.alien8.ui.SettingsMenu;
 import org.alien8.ui.SplashScreen;
 import org.alien8.util.LogManager;
@@ -52,6 +55,8 @@ public class Client implements Runnable {
   private Timer timer;
   private int timeBeforeExiting = 10;
   private int FPS = 0;
+  private String clientName = null;
+  private LinkedList<String> opponents = new LinkedList<String>();
   private InetAddress clientIP = null;
   private InetAddress serverIP = null;
   private InetAddress multiCastIP = null;
@@ -62,9 +67,11 @@ public class Client implements Runnable {
   private SplashScreen splash = null;
   private MainMenu menu = null;
   private SettingsMenu settings = null;
+  private NameScreen nameScreen = null;
+  private Lobby lobby = null;
 
   public enum State {
-    MAIN_MENU, SPLASH_SCREEN, IN_GAME, SETTINGS_MENU
+	  NAME_SCREEN, MAIN_MENU, SPLASH_SCREEN, IN_GAME, SETTINGS_MENU, IN_LOBBY
   }
 
   private State state = State.SPLASH_SCREEN;
@@ -76,9 +83,11 @@ public class Client implements Runnable {
 
   private Client() {
     model = ClientModelManager.getInstance();
+    nameScreen = new NameScreen();
     splash = new SplashScreen();
     menu = new MainMenu();
     settings = new SettingsMenu();
+    lobby = new Lobby();
   }
 
   public static Client getInstance() {
@@ -129,12 +138,18 @@ public class Client implements Runnable {
         case SPLASH_SCREEN:
           Renderer.getInstance().render(splash);
           break;
+        case NAME_SCREEN:
+          Renderer.getInstance().render(nameScreen);
+          break;
         case MAIN_MENU:
           Renderer.getInstance().render(menu);
           break;
         case SETTINGS_MENU:
           Renderer.getInstance().render(settings);
     	  break;
+        case IN_LOBBY:
+          Renderer.getInstance().render(lobby);
+          break;
         case IN_GAME:
           // Play the ambient music
           AudioManager.getInstance().startAmbient();
@@ -152,9 +167,9 @@ public class Client implements Runnable {
 
               // Get the amount of update()s the model needs to catch up
               //
-              // timeNow - timeLastUpdateWasDone -->
+              // 				  timeNow - timeLastUpdateWasDone    --> time elapsed
               // timeToCatchUp = ----------------------------------
-              // deltaTPerTick --> how long a "tick" is
+              // 							deltaTPerTick            --> how long a "tick" is
               //
               catchUp +=
                   (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
@@ -206,6 +221,10 @@ public class Client implements Runnable {
     return this.menu;
   }
 
+  public NameScreen getNameScreen() {
+	return this.nameScreen;
+  }
+  
   /**
    * Getter for the latest FPS estimation.
    * 
@@ -469,6 +488,32 @@ public class Client implements Runnable {
 
   public void setState(State s) {
     state = s;
+  }
+
+  /**
+   * @return the client's name
+   */
+  public String getClientName() {
+	  return clientName;
+  }
+
+  /**
+   * @param clientName the client name to set
+   */
+  public void setClientName(String clientName) {
+	  this.clientName = clientName;
+	  this.opponents.add(clientName);
+  }
+
+  /**
+   * @return the opponents' names
+   */
+  public LinkedList<String> getOpponents() {
+	  return opponents;
+  }
+  
+  public Lobby getLobby() {
+	return lobby;
   }
 
 }
