@@ -4,6 +4,10 @@ import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import net.jafama.FastMath;
 
+/**
+ * This class contains methods related to physics operations that are applied in the game world.
+ *
+ */
 public class PhysicsManager {
   /**
    * Applies a force to an Entity. Must be called for every tick that the force is applied.
