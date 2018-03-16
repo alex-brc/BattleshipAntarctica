@@ -8,7 +8,7 @@ import org.alien8.client.Client.State;
 public class CreateServerButton extends Button {
 
   public CreateServerButton(int x, int y, int width, int height) {
-    super(x, y, width, height, "Create a server");
+    super(x, y, width, height, "create a server");
 
   }
 
@@ -19,7 +19,7 @@ public class CreateServerButton extends Button {
     try {
       localServerIPStr = Inet4Address.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
-      System.out.println("Fail to get local server IP address");
+      System.out.println("fail to get local server IP address");
     }
     if (localServerIPStr != null)
       Client.getInstance().connect(localServerIPStr);

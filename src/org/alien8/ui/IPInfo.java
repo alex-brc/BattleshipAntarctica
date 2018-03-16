@@ -23,7 +23,7 @@ public class IPInfo {
     } catch (UnknownHostException e) {
       System.out.println("Fail to get local server IP address");
     }
-    text = "Your server IP: " + localServerIPStr;
+    text = "your server IP is " + localServerIPStr;
   }
 
   public void render(Renderer r) {

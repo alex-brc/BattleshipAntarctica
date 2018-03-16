@@ -55,6 +55,9 @@ public class Parameters {
   public static final int BIG_BORDER = 96;
   public static final int MINIMAP_WIDTH = 64;
   public static final int MINIMAP_HEIGHT = 64;
+  public static final int GAME_PARALLAX_WEIGHT = 35;
+  public static final int MENU_PARALLAX_WEIGHT = 100;
+  
   //////////////////////////////////////////////////////////
 
 

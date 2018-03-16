@@ -33,6 +33,7 @@ public class Sprite implements Serializable {
   public static Sprite item_torpedo = new Sprite("/org/alien8/assets/item_torpedo.png");
   public static Sprite pickup = new Sprite("/org/alien8/assets/pickup.png");
   public static Sprite title_screen = new Sprite("/org/alien8/assets/title_screen.png");
+  public static Sprite logo = new Sprite("/org/alien8/assets/logo.png");
 
   public Sprite(String path) {
     this.path = path;

@@ -30,6 +30,7 @@ import org.alien8.server.Server;
 import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
 import org.alien8.ui.MainMenu;
+import org.alien8.ui.SettingsMenu;
 import org.alien8.ui.SplashScreen;
 import org.alien8.util.LogManager;
 
@@ -60,9 +61,10 @@ public class Client implements Runnable {
   private MulticastSocket multiCastSocket = null;
   private SplashScreen splash = null;
   private MainMenu menu = null;
+  private SettingsMenu settings = null;
 
   public enum State {
-    MAIN_MENU, SPLASH_SCREEN, IN_GAME
+    MAIN_MENU, SPLASH_SCREEN, IN_GAME, SETTINGS_MENU
   }
 
   private State state = State.SPLASH_SCREEN;
@@ -76,6 +78,7 @@ public class Client implements Runnable {
     model = ClientModelManager.getInstance();
     splash = new SplashScreen();
     menu = new MainMenu();
+    settings = new SettingsMenu();
   }
 
   public static Client getInstance() {
@@ -95,9 +98,6 @@ public class Client implements Runnable {
 
     // Make a timer
     timer = new Timer(0);
-
-    // Play the ambient music
-    AudioManager.getInstance().startAmbient();
 
     LogManager.getInstance().log("Client", LogManager.Scope.INFO, "Booting client...");
     thread = new Thread(this, "Battleship Antarctica");
@@ -132,7 +132,13 @@ public class Client implements Runnable {
         case MAIN_MENU:
           Renderer.getInstance().render(menu);
           break;
+        case SETTINGS_MENU:
+          Renderer.getInstance().render(settings);
+    	  break;
         case IN_GAME:
+          // Play the ambient music
+          AudioManager.getInstance().startAmbient();
+        	
           long lastTime = getTime();
           long currentTime = 0;
           double catchUp = 0;
@@ -183,7 +189,10 @@ public class Client implements Runnable {
               Renderer.getInstance().render(model);
             }
           }
+          AudioManager.getInstance().stopAmbient();
           break;
+	default:
+		break;
       }
     }
     System.out.println("Client stopped");

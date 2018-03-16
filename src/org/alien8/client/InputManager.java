@@ -32,6 +32,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   private boolean sPressed = false; // Slow down
   private boolean dPressed = false; // Turn right
   private boolean spacePressed = false; // Use item
+  private Position lastLmbClick = new Position(-1,-1); // For clicking menu buttons
 
   // Not synced - local controls
   private boolean escPressed = false; // Pull up menu
@@ -166,6 +167,22 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   public Position mousePosition() {
     return mousePosition;
   }
+  
+  /**
+   * @return the position of the last mouse click
+   */
+  public Position lastLmbClick() {
+	  return lastLmbClick;
+  }
+  
+  /**
+   * Resets the last click position
+   */
+  public void resetLastLmbClick() {
+	  lastLmbClick.setX(-1);
+	  lastLmbClick.setY(-1);
+  }
+  
 
 
   @Override
@@ -277,7 +294,9 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
   @Override
   public void mouseClicked(MouseEvent e) {
-    // Not interesting
+    if(e.getButton() == MouseEvent.BUTTON1) {
+    	this.lastLmbClick = new Position(e.getPoint().getX(), e.getPoint().getY());
+    }
   }
 
   @Override

@@ -19,6 +19,9 @@ import org.alien8.util.LogManager;
  * 
  */
 public class AudioManager implements Runnable {
+  public static final int SFX = -99;
+  public static final int AMBIENT = -98;
+
   public static final int AIRPLANE_PASS = 0;
   public static final int SFX_SHIP_SHOOT = 1;
   public static final int SFX_ICE_CRASH = 2;
@@ -41,8 +44,6 @@ public class AudioManager implements Runnable {
   private LinkedList<Clip> shoot1Pool;
   private LinkedList<Clip> shoot2Pool;
   private LinkedList<Clip> shoot3Pool;
-  private LinkedList<Clip> iceCrashPool;
-  private LinkedList<Clip> shipCrashPool;
 
   private AudioManager() {
     LogManager.getInstance().log("Audio", LogManager.Scope.INFO, "Loading sound files...");
@@ -53,8 +54,6 @@ public class AudioManager implements Runnable {
       shoot1Pool = new LinkedList<Clip>();
       shoot2Pool = new LinkedList<Clip>();
       shoot3Pool = new LinkedList<Clip>();
-      shipCrashPool = new LinkedList<Clip>();
-      iceCrashPool = new LinkedList<Clip>();
 
       // Pool shoot sound effects
       for (int i = 0; i < Parameters.SFX_POOL_SIZE; i++) {
@@ -134,6 +133,12 @@ public class AudioManager implements Runnable {
   public void startAmbient() {
     setVolume(ambient, ambientVolumeValue);
     ambient.loop(Clip.LOOP_CONTINUOUSLY);
+  }
+  
+  public void stopAmbient() {
+	ambient.stop();
+	ambient.flush();
+	ambient.setFramePosition(0);
   }
 
   public static AudioManager getInstance() {
@@ -219,20 +224,20 @@ public class AudioManager implements Runnable {
    * Ambient volume goes in steps of 0.1 from 0.0f to 1.0f
    */
   public void ambientDecreaseVolume() {
-    if (ambientVolumeValue != 0.0f) {
-      ambientVolumeValue -= 0.1f;
-      setVolume(ambient, ambientVolumeValue);
-    }
+	  ambientVolumeValue -= 0.1f;
+	  if(ambientVolumeValue < 0)
+		  ambientVolumeValue = 0f;
+	  setVolume(ambient, ambientVolumeValue);
   }
 
   /**
    * Ambient volume goes in steps of 0.1 from 0.0f to 1.0f
    */
   public void ambientIncreaseVolume() {
-    if (ambientVolumeValue != 1.0f) {
-      ambientVolumeValue += 0.1f;
-      setVolume(ambient, ambientVolumeValue);
-    }
+	  ambientVolumeValue += 0.1f;
+	  if(ambientVolumeValue > 1)
+		  ambientVolumeValue = 1f;
+	  setVolume(ambient, ambientVolumeValue);
   }
 
   /**
@@ -255,16 +260,18 @@ public class AudioManager implements Runnable {
    * Sfx volume goes in steps of 0.1 from 0.0f to 1.0f
    */
   public void sfxDecreaseVolume() {
-    if (sfxVolumeValue != 0.0f)
-      sfxVolumeValue -= 0.1f;
+	sfxVolumeValue -= 0.1f;
+    if (sfxVolumeValue < 0)
+      sfxVolumeValue = 0f;
   }
 
   /**
    * Sfx volume goes in steps of 0.1 from 0.0f to 1.0f
    */
   public void sfxIncreaseVolume() {
-    if (sfxVolumeValue != 1.0f)
-      sfxVolumeValue += 0.1f;
+	  sfxVolumeValue += 0.1f;
+	    if (sfxVolumeValue > 1)
+	      sfxVolumeValue = 1f;
   }
 
   /**
@@ -312,4 +319,13 @@ public class AudioManager implements Runnable {
   private double distanceVolumeFunction(double distance) {
     return (1 - (distance / Parameters.MAX_HEARING_DISTANCE));
   }
+  
+  public double getAmbientVolumeValue() {
+		return ambientVolumeValue;
+	}
+
+	public double getSfxVolumeValue() {
+		return sfxVolumeValue;
+	}
+
 }
