@@ -51,15 +51,15 @@ x mapgeneration:
 	x MapVector
 	x PerlinNoise
 x physics:
-	x AABB
-	x AxisVector
-	x Collision
-	x CollisionDetector
-	x IntervalValue
-	x IntervalValueType
-	x MTV
+	/ AABB
+	/ AxisVector
+	/ Collision
+	/ CollisionDetector
+	/ IntervalValue
+	/ IntervalValueType
+	/ MTV
 	x PhysicsManager
-	x Position
+	/ Position
 	x Projection
 x rendering:
 	x Font
