@@ -11,12 +11,13 @@ import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
 import org.alien8.client.Launcher;
+import org.alien8.core.ClientModelManager;
 import org.alien8.core.Entity;
-import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
+import org.alien8.core.ServerModelManager;
 import org.alien8.physics.Position;
+import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
-import org.alien8.score.ScoreBoard;
 import org.alien8.server.Timer;
 import org.alien8.ship.Ship;
 import org.alien8.ui.MainMenu;
@@ -107,19 +108,19 @@ public class Renderer extends Canvas {
   // instance = new Renderer(iceGrid);
   // return instance;
   // }
-  
+
   /**
    * The render() method renders all entities to the screen in their current state
    */
-  public void render(ModelManager model) {
-	BufferStrategy bs = getBufferStrategy(); // gets canvas buffer strategy
-	if (bs == null) {
-		  createBufferStrategy(3); // if none found, create a triple buffering strategy
-		  requestFocus();
-		  return;
-		}
-	clear();
-	
+  public void render(ClientModelManager model) {
+    BufferStrategy bs = getBufferStrategy(); // gets canvas buffer strategy
+    if (bs == null) {
+      createBufferStrategy(3); // if none found, create a triple buffering strategy
+      requestFocus();
+      return;
+    }
+    clear();
+
     // Get x and y scroll from the player
     Ship player = model.getPlayer();
     xScroll = (int) (player.getPosition().getX() - width / 2);
@@ -140,11 +141,16 @@ public class Renderer extends Canvas {
     drawHudFrame();
     // Render score header
     drawText("SCORE", 16, 16, true, FontColor.WHITE);
-    Score score = ScoreBoard.getInstance().getScore(model.getPlayer().getSerial());
-    if (score == null)
+    if (model.getPlayer() != null) {
+      Score score = ClientScoreBoard.getInstance().getScore(model.getPlayer().getSerial());
+      if (score == null)
+        drawText("0", 16, 40, true, FontColor.WHITE);
+      else
+        drawText(Long.toString(score.getScore()), 16, 40, true, FontColor.WHITE);
+    } else {
       drawText("0", 16, 40, true, FontColor.WHITE);
-    else
-      drawText(Long.toString(score.getScore()), 16, 40, true, FontColor.WHITE);
+    }
+
     // Render health bar
     drawText("HEALTH", 203, 16, true, FontColor.WHITE);
     drawBar(Sprite.health_bar, player.getHealth(), Parameters.SHIP_HEALTH, 203, 40, true);
@@ -177,10 +183,11 @@ public class Renderer extends Canvas {
     drawMinimap(720, 16, true);
 
     if (InputManager.getInstance().shiftPressed() || Client.getInstance().isWaitingToExit())
-      ScoreBoard.getInstance().render();
-    
+      ClientScoreBoard.getInstance().render();
+
     if (Client.getInstance().isWaitingToExit()) {
-      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 550, true, FontColor.BLACK);
+      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 550, true,
+          FontColor.BLACK);
       drawText("seconds", 230, 550, true, FontColor.BLACK);
       drawText("before", 360, 550, true, FontColor.BLACK);
       drawText("exiting", 480, 550, true, FontColor.BLACK);
@@ -193,67 +200,67 @@ public class Renderer extends Canvas {
     // }
 
     // Graphics object from buffer strategy
- 	Graphics g = bs.getDrawGraphics();
- 	g.setColor(Color.BLACK);
- 	// Background rectangle same size as canvas
- 	g.fillRect(0, 0, getWidth(), getHeight());
- 	// Draw image with pixel data from image raster
+    Graphics g = bs.getDrawGraphics();
+    g.setColor(Color.BLACK);
+    // Background rectangle same size as canvas
+    g.fillRect(0, 0, getWidth(), getHeight());
+    // Draw image with pixel data from image raster
     g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
- 	// g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
- 	// Necessary to clear memory
- 	g.dispose();
- 	// Displays the buffer strategy to the monitor
- 	bs.show();
-  }
-  
-  public void render(SplashScreen splash){
-	BufferStrategy bs = getBufferStrategy();
-	if (bs == null) {
-	  createBufferStrategy(3); // if none found, create a triple buffering strategy
-	  requestFocus();
-	  return;
-	}
-    clear();
-	  
-	splash.render(this);
-	  
-	// Graphics object from buffer strategy
-	Graphics g = bs.getDrawGraphics();
-	g.setColor(Color.BLACK);
-	// Background rectangle same size as canvas
-	g.fillRect(0, 0, getWidth(), getHeight());
-	// Draw image with pixel data from image raster
-	g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
     // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
-	// Necessary to clear memory
-	g.dispose();
-	// Displays the buffer strategy to the monitor
-	bs.show();
+    // Necessary to clear memory
+    g.dispose();
+    // Displays the buffer strategy to the monitor
+    bs.show();
   }
 
-  public void render(MainMenu menu){
-	BufferStrategy bs = getBufferStrategy();
-	if (bs == null) {
-	  createBufferStrategy(3); // if none found, create a triple buffering strategy
-	  requestFocus();
-	  return;
-	}
+  public void render(SplashScreen splash) {
+    BufferStrategy bs = getBufferStrategy();
+    if (bs == null) {
+      createBufferStrategy(3); // if none found, create a triple buffering strategy
+      requestFocus();
+      return;
+    }
     clear();
-	  
-	menu.render(this);
-	  
-	// Graphics object from buffer strategy
-	Graphics g = bs.getDrawGraphics();
-	g.setColor(Color.BLACK);
-	// Background rectangle same size as canvas
-	g.fillRect(0, 0, getWidth(), getHeight());
-	// Draw image with pixel data from image raster
-	g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-	// g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
-	// Necessary to clear memory
-	g.dispose();
-	// Displays the buffer strategy to the monitor
-	bs.show();
+
+    splash.render(this);
+
+    // Graphics object from buffer strategy
+    Graphics g = bs.getDrawGraphics();
+    g.setColor(Color.BLACK);
+    // Background rectangle same size as canvas
+    g.fillRect(0, 0, getWidth(), getHeight());
+    // Draw image with pixel data from image raster
+    g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+    // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
+    // Necessary to clear memory
+    g.dispose();
+    // Displays the buffer strategy to the monitor
+    bs.show();
+  }
+
+  public void render(MainMenu menu) {
+    BufferStrategy bs = getBufferStrategy();
+    if (bs == null) {
+      createBufferStrategy(3); // if none found, create a triple buffering strategy
+      requestFocus();
+      return;
+    }
+    clear();
+
+    menu.render(this);
+
+    // Graphics object from buffer strategy
+    Graphics g = bs.getDrawGraphics();
+    g.setColor(Color.BLACK);
+    // Background rectangle same size as canvas
+    g.fillRect(0, 0, getWidth(), getHeight());
+    // Draw image with pixel data from image raster
+    g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+    // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
+    // Necessary to clear memory
+    g.dispose();
+    // Displays the buffer strategy to the monitor
+    bs.show();
   }
 
   /**
@@ -280,16 +287,12 @@ public class Renderer extends Canvas {
     drawFilledRect(xp + 7, yp + 7, barLength, barHeight, color, fixed);
   }
 
-  /*private void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
-=======
-  public void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
->>>>>>> master
-    for (int y = yp; y < yp + height; y++) {
-      for (int x = xp; x < xp + length; x++) {
-        drawPixel(x, y, color, fixed);
-      }
-    }
-  }*/
+  /*
+   * private void drawFilledRect(int xp, int yp, int height, int length, int color, boolean fixed) {
+   * ======= public void drawFilledRect(int xp, int yp, int height, int length, int color, boolean
+   * fixed) { >>>>>>> master for (int y = yp; y < yp + height; y++) { for (int x = xp; x < xp +
+   * length; x++) { drawPixel(x, y, color, fixed); } } }
+   */
 
   /**
    * Draws a black frame around the viewport. The top edge of this frame is where the HUD components
@@ -372,22 +375,24 @@ public class Renderer extends Canvas {
         pixels[(xp + width) + y * this.width] = col;
     }
   }
-  
-  public void drawFilledRect(int xp, int yp, int width, int height, int col, boolean fixed){
-	  if (!fixed){
-			xp -= xScroll;
-			yp -= yScroll;
-		}
-		//Like renderTileColour but a specified rectangle of any size
-		for (int y = 0; y < height; y++){
-			int ya = y + yp;
-			for (int x = 0; x < width; x++){
-				int xa = x + xp;
-				if (xa < -width || xa >= this.width|| ya < 0 || ya >= this.height) break;
-				if (xa < 0) xa = 0;
-				pixels[xa+ya*this.width] = col;
-			}
-		}
+
+  public void drawFilledRect(int xp, int yp, int width, int height, int col, boolean fixed) {
+    if (!fixed) {
+      xp -= xScroll;
+      yp -= yScroll;
+    }
+    // Like renderTileColour but a specified rectangle of any size
+    for (int y = 0; y < height; y++) {
+      int ya = y + yp;
+      for (int x = 0; x < width; x++) {
+        int xa = x + xp;
+        if (xa < -width || xa >= this.width || ya < 0 || ya >= this.height)
+          break;
+        if (xa < 0)
+          xa = 0;
+        pixels[xa + ya * this.width] = col;
+      }
+    }
   }
 
   public void drawPixel(int x, int y, int col, boolean fixed) {
@@ -451,34 +456,36 @@ public class Renderer extends Canvas {
    *        {@code false} if the text moves relative to the position of the player
    */
   private void drawMinimap(int x, int y, boolean fixed) {
-    // Render terrain
-    int[][] minimap = ModelManager.getInstance().getMap().getMinimap();
-    for (int j = 0; j < minimap.length; j++) {
-      for (int i = 0; i < minimap[0].length; i++) {
-        drawPixel(x + i, y + j, minimap[i][j], fixed);
+    if (ClientModelManager.getInstance().getMap() != null) {
+      // Render terrain
+      int[][] minimap = ClientModelManager.getInstance().getMap().getMinimap();
+      for (int j = 0; j < minimap.length; j++) {
+        for (int i = 0; i < minimap[0].length; i++) {
+          drawPixel(x + i, y + j, minimap[i][j], fixed);
+        }
       }
-    }
 
-    int widthScale = Parameters.MAP_WIDTH / Parameters.MINIMAP_WIDTH;
-    int heightScale = Parameters.MAP_HEIGHT / Parameters.MINIMAP_HEIGHT;
-    // Render ships
-    for (Entity ent : ModelManager.getInstance().getEntities()) {
-      if (ent instanceof Ship) {
-        double xPos = ent.getPosition().getX();
-        double yPos = ent.getPosition().getY();
-        int renderXPos = (int) FastMath.round(xPos / widthScale);
-        int renderYPos = (int) FastMath.round(yPos / heightScale);
-        // Displays a dot for the ship on the minimap
-        // As 1 pixel is too small to see, actually display 3x3 pixels for the ship
-        drawPixel(x + renderXPos, y + renderYPos, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos + 1, y + renderYPos, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos + 2, y + renderYPos, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos + 1, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos + 2, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos + 1, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
-        drawPixel(x + renderXPos + 2, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
+      int widthScale = Parameters.MAP_WIDTH / Parameters.MINIMAP_WIDTH;
+      int heightScale = Parameters.MAP_HEIGHT / Parameters.MINIMAP_HEIGHT;
+      // Render ships
+      for (Entity ent : ServerModelManager.getInstance().getEntities()) {
+        if (ent instanceof Ship) {
+          double xPos = ent.getPosition().getX();
+          double yPos = ent.getPosition().getY();
+          int renderXPos = (int) FastMath.round(xPos / widthScale);
+          int renderYPos = (int) FastMath.round(yPos / heightScale);
+          // Displays a dot for the ship on the minimap
+          // As 1 pixel is too small to see, actually display 3x3 pixels for the ship
+          drawPixel(x + renderXPos, y + renderYPos, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos + 1, y + renderYPos, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos + 2, y + renderYPos, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos + 1, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos + 2, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos + 1, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
+          drawPixel(x + renderXPos + 2, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
+        }
       }
     }
   }

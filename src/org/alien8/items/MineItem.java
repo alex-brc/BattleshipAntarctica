@@ -1,6 +1,6 @@
 package org.alien8.items;
 
-import org.alien8.core.ModelManager;
+import org.alien8.core.ServerModelManager;
 import org.alien8.rendering.Sprite;
 
 public class MineItem extends Item {
@@ -14,6 +14,6 @@ public class MineItem extends Item {
 	 */
 	@Override
 	public void use() {
-		ModelManager.getInstance().addEntity(new Mine(ship.getPosition(), ship.getSerial()));
+		ServerModelManager.getInstance().addEntity(new Mine(ship.getPosition(), ship.getSerial()));
 	}
 }

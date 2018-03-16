@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
-import org.alien8.core.ModelManager;
+import org.alien8.core.ServerModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.items.Mine;
 import org.alien8.items.Pickup;
@@ -71,7 +71,7 @@ public class ServerGameHandler extends Thread {
         timer += Parameters.N_SECOND;
         seconds--;
         if (seconds % 10 == 0)
-          ModelManager.getInstance().addEntity(new PlaneDropper());
+          ServerModelManager.getInstance().addEntity(new PlaneDropper());
         updateServerTimer();
       }
 
@@ -173,7 +173,7 @@ public class ServerGameHandler extends Thread {
   }
 
   public void updateGameStateByCIS() {
-    ModelManager.getInstance().updateServer(latestCIS);
+    ServerModelManager.getInstance().updateServer(latestCIS);
   }
 
   /*

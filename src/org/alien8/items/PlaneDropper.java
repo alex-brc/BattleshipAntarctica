@@ -3,7 +3,7 @@ package org.alien8.items;
 import java.util.Random;
 
 import org.alien8.core.Entity;
-import org.alien8.core.ModelManager;
+import org.alien8.core.ServerModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -68,7 +68,7 @@ public class PlaneDropper extends Entity {
 			pickup = new TorpedoPickup(packetPosition);
 			break;
 		}
-		ModelManager.getInstance().addEntity(pickup);
+		ServerModelManager.getInstance().addEntity(pickup);
 	}
 	
 	private Position getMiddleOfMap() {

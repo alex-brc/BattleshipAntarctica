@@ -3,17 +3,17 @@ package org.alien8.ui;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import org.alien8.client.Client;
-import org.alien8.client.Launcher;
 import org.alien8.client.Client.State;
 
-public class SinglePlayerButton extends Button {
+public class CreateServerButton extends Button {
 
-  public SinglePlayerButton(int x, int y, int width, int height) {
-    super(x, y, width, height, "Single-player");
+  public CreateServerButton(int x, int y, int width, int height) {
+    super(x, y, width, height, "Create a server");
+
   }
 
   public void executeAction() {
-    Client.getInstance().createServer(1);
+    Client.getInstance().createServer(16);
     Client.getInstance().setState(State.IN_GAME);
     String localServerIPStr = null;
     try {

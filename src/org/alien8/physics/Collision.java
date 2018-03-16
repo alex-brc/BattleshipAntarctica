@@ -6,7 +6,7 @@ import org.alien8.items.Effect;
 import org.alien8.items.Mine;
 import org.alien8.items.Pickup;
 import org.alien8.items.Torpedo;
-import org.alien8.score.ScoreBoard;
+import org.alien8.score.ServerScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
@@ -83,7 +83,7 @@ public class Collision {
 	  Player deployer = Server.getInstance().getPlayer(torpedo.getSource());
 	  // If it's AI, no points
 	  if (deployer != null)
-		  ScoreBoard.getInstance().giveScore(deployer, Parameters.TORPEDO_SCORE);
+		  ServerScoreBoard.getInstance().giveScore(deployer, Parameters.TORPEDO_SCORE);
 	  // See if ship has been destroyed
 	  if (new Double(ship.getHealth()).intValue() <= 0) {
 		  System.out.println("A ship died!");
@@ -91,7 +91,7 @@ public class Collision {
 		  // Award score to the killer
 		  // If it's AI, no points
 		  if (deployer != null)
-			  ScoreBoard.getInstance().giveKill(deployer);
+			  ServerScoreBoard.getInstance().giveKill(deployer);
 	  }
 	  // Destroy mine
 	  torpedo.delete();
@@ -109,7 +109,7 @@ public class Collision {
 	  Player deployer = Server.getInstance().getPlayer(mine.getSource());
 	  // If it's AI, no points
 	  if (deployer != null)
-		  ScoreBoard.getInstance().giveScore(deployer, Parameters.MINE_SCORE);
+		  ServerScoreBoard.getInstance().giveScore(deployer, Parameters.MINE_SCORE);
 	  // See if ship has been destroyed
 	  if (new Double(ship.getHealth()).intValue() <= 0) {
 		  System.out.println("A ship died!");
@@ -117,7 +117,7 @@ public class Collision {
 		  // Award score to the killer
 		  // If it's AI, no points
 		  if (deployer != null)
-			  ScoreBoard.getInstance().giveKill(deployer);
+			  ServerScoreBoard.getInstance().giveKill(deployer);
 	  }
 	  // Destroy mine
 	  mine.delete();
@@ -225,7 +225,7 @@ public class Collision {
     Player shooter = Server.getInstance().getPlayer(bullet.getSource());
     // If it's AI, no points
     if (shooter != null)
-    	ScoreBoard.getInstance().giveHit(shooter, bullet);
+    	ServerScoreBoard.getInstance().giveHit(shooter, bullet);
     // See if ship has been destroyed
     if (new Double(ship.getHealth()).intValue() <= 0) {
     	System.out.println("A ship died!");
@@ -233,7 +233,7 @@ public class Collision {
     	// Award score to the killer
     	// If it's AI, no points
     	if (shooter != null)
-    		ScoreBoard.getInstance().giveKill(shooter);
+    		ServerScoreBoard.getInstance().giveKill(shooter);
     }
     // Destroy bullet
     bullet.delete();

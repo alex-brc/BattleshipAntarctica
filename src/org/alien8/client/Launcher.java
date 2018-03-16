@@ -1,13 +1,12 @@
 package org.alien8.client;
 
 import org.alien8.audio.AudioManager;
-import org.alien8.score.ScoreBoard;
+import org.alien8.score.ServerScoreBoard;
 import org.alien8.util.LogManager;
 
 public class Launcher {
   public static Launcher instance;
   private String loadStatus;
-  private String serverIPstr = "172.22.35.217";
   private Client game;
 
   private Launcher() {
@@ -29,10 +28,6 @@ public class Launcher {
     launcher.loadStatus = "Loading sounds...";
     System.out.println(launcher.loadStatus);
     launcher.loadAudioManager();
-
-    // Connect to server
-    //launcher.loadStatus = "Connecting to server at " + launcher.serverIPstr + "...";
-    //launcher.connect();
 
     // Make the scoreboard
     launcher.loadStatus = "Constructing a scoreboard...";
@@ -60,17 +55,7 @@ public class Launcher {
   }
 
   private void loadScoreBoard() {
-    ScoreBoard.getInstance();
+    ServerScoreBoard.getInstance();
   }
 
-  private void connect() {
-    System.out.println("Connecting to " + serverIPstr + "...");
-    LogManager.getInstance().log("Networking", LogManager.Scope.INFO,
-        "Connecting to host at " + serverIPstr + "...");
-    if (!game.connect(serverIPstr)) {
-      LogManager.getInstance().log("Networking", LogManager.Scope.CRITICAL, "Connection failed.");
-      System.out.println("Connection failed. Are you running a server?");
-      System.exit(-1);
-    }
-  }
 }

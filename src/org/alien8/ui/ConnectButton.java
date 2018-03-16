@@ -1,7 +1,7 @@
 package org.alien8.ui;
 
 import org.alien8.client.Client.State;
-import org.alien8.client.Launcher;
+import org.alien8.client.Client;
 
 public class ConnectButton extends Button{
 
@@ -11,7 +11,8 @@ public class ConnectButton extends Button{
 	}
 	
 	public void executeAction(){
-		Launcher.getInstance().getRunningClient().setState(State.IN_GAME);
+		Client.getInstance().setState(State.IN_GAME);
+		Client.getInstance().connect(Client.getInstance().getMenu().getIP());
 	}
 
 }

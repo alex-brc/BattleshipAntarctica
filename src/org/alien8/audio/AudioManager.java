@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
-import org.alien8.core.ModelManager;
+import org.alien8.core.ClientModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.util.LogManager;
@@ -149,7 +149,7 @@ public class AudioManager implements Runnable {
    *        shooting sounds at random
    */
   public void playSound(int type, Position position) {
-    double dist = ModelManager.getInstance().getPlayer().getPosition().distanceTo(position);
+    double dist = ClientModelManager.getInstance().getPlayer().getPosition().distanceTo(position);
 
     // Only play it if it's in hearing range
     if (dist > Parameters.MAX_HEARING_DISTANCE)

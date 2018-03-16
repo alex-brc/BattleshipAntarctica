@@ -19,11 +19,11 @@ import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
-import org.alien8.core.ModelManager;
+import org.alien8.core.ServerModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.items.PlaneDropper;
 import org.alien8.physics.Position;
-import org.alien8.score.ScoreBoard;
+import org.alien8.score.ServerScoreBoard;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
@@ -39,7 +39,7 @@ public class Server implements Runnable {
   private InetAddress multiCastIP = null;
   private ServerSocket tcpSocket = null;
   private DatagramSocket udpSocket = null;
-  private ModelManager model = ModelManager.getInstance();
+  private ServerModelManager model = ServerModelManager.getInstance();
   private ConcurrentLinkedQueue<Entity> entities = model.getEntities();
   private ConcurrentHashMap<Player, ClientInputSample> latestCIS =
       new ConcurrentHashMap<Player, ClientInputSample>();
@@ -50,15 +50,12 @@ public class Server implements Runnable {
   private LinkedList<GameEvent> events = new LinkedList<GameEvent>();
   private ServerGameHandler sgh = null;
   private Long seed = (new Random()).nextLong();
+  private ServerScoreBoard scoreboard = ServerScoreBoard.getInstance();
+  private int maxPlayer;
   private volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
 
-  public static void main(String[] args) {
-    Server s = Server.getInstance();
-    s.start();
-  }
-
   private Server() {
-
+    // Prevent instantiation
   }
 
   public static Server getInstance() {
@@ -83,8 +80,12 @@ public class Server implements Runnable {
     }
   }
 
+  public void setMaxPlayer(int max) {
+    this.maxPlayer = max;
+  }
+
   public void reset() {
-    // TODO: reset ModelManager
+    model.reset();
     thread = null;
     hostIP = null;
     multiCastIP = null;
@@ -98,6 +99,7 @@ public class Server implements Runnable {
     chList = new ArrayList<ClientHandler>();
     events = new LinkedList<GameEvent>();
     seed = (new Random()).nextLong();
+    scoreboard.reset();
     bullets = new LinkedList<Bullet>();
   }
 
@@ -116,10 +118,11 @@ public class Server implements Runnable {
       System.out.println("UDP socket IP: " + udpSocket.getLocalAddress());
 
       // Process clients' connect/disconnect request
-      while (true) {
+      for (int i = 0; i < maxPlayer; i++) {
         // Receive and process client's packet
         LogManager.getInstance().log("Server", LogManager.Scope.INFO,
             "Waiting for client request...");
+        System.out.println("accepting..");
         Socket client = tcpSocket.accept();
         InetAddress clientIP = client.getInetAddress();
         ObjectInputStream fromClient = new ObjectInputStream(client.getInputStream());
@@ -140,7 +143,7 @@ public class Server implements Runnable {
       cnfe.printStackTrace();
     }
 
-    System.out.println("Server stopped");
+    System.out.println("Server no longer accept client connection");
   }
 
   private void setHostIP() {
@@ -163,10 +166,6 @@ public class Server implements Runnable {
     for (int i = 0; i < Parameters.BULLET_POOL_SIZE; i++)
       bullets.add(new Bullet(new Position(0, 0), 0, 0, 0));
 
-    // Initialise ScoreBoard
-    // Without a thread, it doesn't listen on input.
-    ScoreBoard.getInstance();
-
     // Initialise AIs
     if (Parameters.AI_ON)
       initializeAIs();
@@ -178,10 +177,11 @@ public class Server implements Runnable {
   }
 
   private void initializeAIs() {
-    // Ai controllers should be put in the
-    // ConcurrentHashMap<Ship, AIController> aiMap
-    // so the loop has constant time access to the AI controller given the ship
-    // also, remember to give them colours
+    /*
+     * Ai controllers should be put in the ConcurrentHashMap<Ship, AIController> aiMap so the loop
+     * has constant time access to the AI controller given the ship also, remember to give them
+     * colours
+     */
 
     // test ai
     for (int i = 1; i <= 7; i++) {
@@ -222,7 +222,7 @@ public class Server implements Runnable {
       shipToBeRemoved.delete();
       playerMap.remove(shipToBeRemoved);
       latestCIS.remove(pToBeRemoved);
-      ScoreBoard.getInstance().remove(pToBeRemoved);
+      ServerScoreBoard.getInstance().remove(pToBeRemoved);
       chList.remove(ch);
       ch.end();
     }
@@ -289,19 +289,36 @@ public class Server implements Runnable {
   public Position getRandomPosition() {
     boolean[][] iceGrid = model.getMap().getIceGrid();
     Random r = new Random();
-    double randomX = 0;
-    double randomY = 0;
-    boolean isIcePosition = true;
+    int randomX = 0;
+    int randomY = 0;
+    boolean appropriatePosition = false;
 
     // Choose a random position without ice for ship spawning
-    while (isIcePosition) {
-      randomX = (double) r.nextInt(Parameters.MAP_WIDTH);
-      randomY = (double) r.nextInt(Parameters.MAP_HEIGHT);
+    while (!appropriatePosition) {
+      boolean collideWithIce = false;
+      int minX = (int) Parameters.SHIP_LENGTH;
+      int minY = (int) Parameters.SHIP_WIDTH;
+      int maxX = Parameters.MAP_WIDTH - (int) Parameters.SHIP_LENGTH;
+      int maxY = Parameters.MAP_HEIGHT - (int) Parameters.SHIP_WIDTH;
+      randomX = r.nextInt((maxX - minX) + 1) + minX;
+      randomY = r.nextInt((maxY - minY) + 1) + minY;
 
-      if (!iceGrid[(int) randomX][(int) randomY]) {
-        isIcePosition = false;
+      outerloop: for (int x = randomX - (int) Parameters.SHIP_LENGTH; x < randomX
+          + (int) Parameters.SHIP_LENGTH; x++) {
+        for (int y = randomY - (int) Parameters.SHIP_WIDTH; y < randomY
+            + (int) Parameters.SHIP_WIDTH; y++) {
+          if (iceGrid[x][y]) {
+            collideWithIce = true;
+            break outerloop;
+          }
+        }
+      }
+
+      if (!collideWithIce) {
+        appropriatePosition = true;
       }
     }
+
     return new Position(randomX, randomY);
   }
 

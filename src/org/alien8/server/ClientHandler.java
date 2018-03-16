@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
-import org.alien8.core.ModelManager;
+import org.alien8.core.ServerModelManager;
 import org.alien8.core.ServerMessage;
 import org.alien8.physics.Position;
 import org.alien8.score.Score;
-import org.alien8.score.ScoreBoard;
+import org.alien8.score.ServerScoreBoard;
 import org.alien8.score.ScoreEvent;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
@@ -33,7 +33,7 @@ public class ClientHandler extends Thread {
   private Long mapSeed;
   private ObjectOutputStream toClient;
   private ObjectInputStream fromClient;
-  private ModelManager model = ModelManager.getInstance();
+  private ServerModelManager model = ServerModelManager.getInstance();
   private volatile boolean run = true;
 
   public ClientHandler(InetAddress clientIP, int clientUdpPort, ArrayList<Player> playerList,
@@ -97,7 +97,7 @@ public class ClientHandler extends Thread {
     // Setup client's player info
     Player p = new Player(name, clientIP, clientUdpPort, s);
     playerMap.put(s, p);
-    ScoreBoard.getInstance().add(p);
+    ServerScoreBoard.getInstance().add(p);
 
     this.sendMapSeed(p, s);
     this.sendGameState(p, s);
@@ -168,7 +168,7 @@ public class ClientHandler extends Thread {
   private void sendGameState(Player p, Ship s) {
     ArrayList<EntityLite> entsLite = this.calculateEntitiesLite(entities);
     LinkedList<ScoreEvent> initialScores = new LinkedList<ScoreEvent>();
-    for(Score score : ScoreBoard.getInstance().getScores())
+    for(Score score : ServerScoreBoard.getInstance().getScores())
     	initialScores.add(score.exportToEvent());
     try {
       toClient.writeObject(entsLite);
@@ -210,7 +210,7 @@ public class ClientHandler extends Thread {
   private void disconnectClient(Player p, Ship s) {
     s.delete();
     playerMap.remove(s);
-    ScoreBoard.getInstance().remove(p);
+    ServerScoreBoard.getInstance().remove(p);
     Server.getInstance().getCHList().remove(this);
     this.end();
   }

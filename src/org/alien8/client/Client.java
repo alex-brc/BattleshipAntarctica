@@ -18,14 +18,15 @@ import java.util.LinkedList;
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
+import org.alien8.core.ClientModelManager;
 import org.alien8.core.EntityLite;
-import org.alien8.core.ModelManager;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
+import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
-import org.alien8.score.ScoreBoard;
 import org.alien8.score.ScoreEvent;
 import org.alien8.server.GameEvent;
+import org.alien8.server.Server;
 import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
 import org.alien8.ui.MainMenu;
@@ -46,11 +47,10 @@ public class Client implements Runnable {
   private boolean waitingToExit = false;
   private static Client instance;
   private Thread thread;
-  private ModelManager model;
+  private ClientModelManager model;
   private Timer timer;
   private int timeBeforeExiting = 10;
   private int FPS = 0;
-  private int TICKS = 0;
   private InetAddress clientIP = null;
   private InetAddress serverIP = null;
   private InetAddress multiCastIP = null;
@@ -58,7 +58,6 @@ public class Client implements Runnable {
   private Socket tcpSocket = null;
   private DatagramSocket udpSocket = null;
   private MulticastSocket multiCastSocket = null;
-  private ScoreBoard scoreBoard;
   private SplashScreen splash = null;
   private MainMenu menu = null;
 
@@ -74,7 +73,7 @@ public class Client implements Runnable {
   private byte[] sendingByte;
 
   private Client() {
-    model = ModelManager.getInstance();
+    model = ClientModelManager.getInstance();
     splash = new SplashScreen();
     menu = new MainMenu();
   }
@@ -140,8 +139,6 @@ public class Client implements Runnable {
 
           int frameRate = 0;
           long frameTimer = getTime();
-          int tickRate = 0;
-          long tickTimer = getTime();
 
           while (gameRunning) {
             if (playersCompeting && !waitingToExit) {
@@ -167,7 +164,6 @@ public class Client implements Runnable {
                   // false
                 }
 
-                tickRate++;
                 catchUp--;
                 // Update last time
                 lastTime = getTime();
@@ -195,6 +191,10 @@ public class Client implements Runnable {
 
   public Timer getTimer() {
     return this.timer;
+  }
+  
+  public MainMenu getMenu() {
+    return this.menu;
   }
 
   /**
@@ -231,6 +231,11 @@ public class Client implements Runnable {
 
   public boolean isWaitingToExit() {
     return waitingToExit;
+  }
+  
+  public void createServer(int maxPlayer) {
+    Server.getInstance().setMaxPlayer(maxPlayer);
+    Server.getInstance().start();
   }
 
   /**
@@ -354,7 +359,7 @@ public class Client implements Runnable {
       if (event instanceof AudioEvent)
         AudioManager.getInstance().addEvent((AudioEvent) event);
       else if (event instanceof ScoreEvent) {
-        ScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
+        ClientScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
       } else if (event instanceof TimerEvent) {
         timer = new Timer((TimerEvent) event);
       }
@@ -367,7 +372,7 @@ public class Client implements Runnable {
   private void updateGameState(ArrayList<EntityLite> entsLite) {
     if (entsLite != null)
       // Sync the game state with server
-      ModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
+      ClientModelManager.getInstance().sync(entsLite, clientIP, clientUdpPort);
   }
 
   /*
@@ -387,7 +392,7 @@ public class Client implements Runnable {
     }
 
     for (ScoreEvent score : scores)
-      ScoreBoard.getInstance().update(new Score(score));
+      ClientScoreBoard.getInstance().update(new Score(score));
 
     return entsLite;
   }
@@ -433,10 +438,10 @@ public class Client implements Runnable {
         multiCastSocket.close();
 
       // Reset relevant field
-      // TODO: reset model instance
+      model.reset();
+      ClientScoreBoard.getInstance().reset();
       timer = null;
       FPS = 0;
-      TICKS = 0;
       clientIP = null;
       serverIP = null;
       multiCastIP = null;
@@ -455,9 +460,6 @@ public class Client implements Runnable {
 
   public void setState(State s) {
     state = s;
-    if (s == State.IN_GAME) {
-      connect(menu.getIP());
-    }
   }
 
 }

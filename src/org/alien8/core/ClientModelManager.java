@@ -26,11 +26,6 @@ import org.alien8.items.Torpedo;
 import org.alien8.items.TorpedoItem;
 import org.alien8.items.TorpedoPickup;
 import org.alien8.mapgeneration.Map;
-import org.alien8.physics.Collision;
-import org.alien8.physics.CollisionDetector;
-import org.alien8.physics.PhysicsManager;
-import org.alien8.server.Player;
-import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 
@@ -43,20 +38,16 @@ import org.alien8.ship.Ship;
  * 
  * @version 1.0
  */
-public class ModelManager {
+public class ClientModelManager {
 
   private long lastSerial = 0;
-  private static ModelManager instance;
+  private static ClientModelManager instance;
   private ConcurrentLinkedQueue<Entity> entities = new ConcurrentLinkedQueue<Entity>();
-  private CollisionDetector collisionDetector = new CollisionDetector();
   private Map map;
   private Ship player;
 
-  private ModelManager() {
-    // Normally this exists only to defeat instantiation
-
-    entities = new ConcurrentLinkedQueue<Entity>();
-    collisionDetector = new CollisionDetector();
+  private ClientModelManager() {
+    // Prevent global instantiation
   }
 
   /**
@@ -64,56 +55,21 @@ public class ModelManager {
    * 
    * @return an instance of the active ModelManager
    */
-  public static ModelManager getInstance() {
+  public static ClientModelManager getInstance() {
     if (instance == null)
-      instance = new ModelManager();
+      instance = new ClientModelManager();
     return instance;
+  }
+  
+  public void reset() {
+    lastSerial = 0;
+    entities = new ConcurrentLinkedQueue<Entity>();
+    map = null;
+    player = null;
   }
 
   public void makeMap(long seed) {
     map = new Map(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH, 8, 8, seed);
-  }
-
-  public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
-    // Loop through all the entities
-    // System.out.println(entities.size());
-    AIController ai = null;
-    for (Entity ent : entities) {
-      // Remove the entity if it's marked itself for deletion
-      if (ent.isToBeDeleted()) {
-        entities.remove(ent);
-        // Accelerate it's removal
-        ent = null;
-        // Skip the rest
-        continue;
-      }
-      if (ent instanceof Ship) {
-        // Handle player stuff
-        Ship ship = (Ship) ent;
-        ai = Server.getInstance().getAIByShip(ship);
-        if (ai != null) {
-          ai.update();
-        } else
-          for (Player p : latestCIS.keySet()) {
-            if (ent == p.getShip()) {
-              Ship s = (Ship) ent;
-              s.updateEffect();
-              ClientInputSample cis = latestCIS.get(p);
-              InputManager.processInputs(s, cis);
-              break;
-            }
-          }
-      }
-
-      // Update the position of the entity
-      PhysicsManager.updatePosition(ent, map.getIceGrid());
-    }
-    ArrayList<Collision> collisions = collisionDetector.checkForCollisions(entities);
-    for (Collision c : collisions) {
-      // System.out.println("Resolving collision");
-      c.resolveCollision();
-    }
-
   }
 
   /**
@@ -141,42 +97,42 @@ public class ModelManager {
         // Give item
         switch(el.itemType) {
         case Pickup.HEALTH_PICKUP: 
-        	s.giveItem(new HealthItem());
-        	break;
+            s.giveItem(new HealthItem());
+            break;
         case Pickup.MINE_PICKUP: 
-        	s.giveItem(new MineItem());
-        	break;
+            s.giveItem(new MineItem());
+            break;
         case Pickup.INVULNERABLE_PICKUP: 
-        	s.giveItem(new InvulnerableItem());
-        	break;
+            s.giveItem(new InvulnerableItem());
+            break;
         case Pickup.SPEED_PICKUP: 
-        	s.giveItem(new SpeedItem());
-        	break;
+            s.giveItem(new SpeedItem());
+            break;
         case Pickup.NO_COOLDOWN_PICKUP: 
-        	s.giveItem(new NoCooldownItem());
-        	break;
+            s.giveItem(new NoCooldownItem());
+            break;
         case Pickup.TORPEDO_PICKUP: 
-        	s.giveItem(new TorpedoItem());
-        	break;
+            s.giveItem(new TorpedoItem());
+            break;
         default:
-        	// Don't give an item
-        	break;
+            // Don't give an item
+            break;
         }
         
         // Apply effect
         switch(el.effectType) {
         case Pickup.INVULNERABLE_PICKUP: 
-        	s.applyEffect(new Effect(0, Effect.INVULNERABLE));
-        	break;
+            s.applyEffect(new Effect(0, Effect.INVULNERABLE));
+            break;
         case Pickup.SPEED_PICKUP: 
-        	s.applyEffect(new Effect(0, Effect.SPEED));
-        	break;
+            s.applyEffect(new Effect(0, Effect.SPEED));
+            break;
         case Pickup.NO_COOLDOWN_PICKUP: 
-        	s.applyEffect(new Effect(0, Effect.NO_COOLDOWN));
-        	break;
+            s.applyEffect(new Effect(0, Effect.NO_COOLDOWN));
+            break;
         default:
-        	// No effect
-        	break;
+            // No effect
+            break;
         }
 
         if (el.toBeDeleted) {
