@@ -5,6 +5,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.core.Entity;
 import net.jafama.FastMath;
 
+/**
+ * This class is used for checking for Collisions between Entities in the game.
+ *
+ */
 public class CollisionDetector {
   /**
    * Checks for Collisions between a set of Entities.
@@ -26,7 +30,6 @@ public class CollisionDetector {
     // Rules out collisions between objects that are far away from each other
     ArrayList<IntervalValue> intervalValues = sort(aabbs);
     ArrayList<Collision> potentialCollisions = sweep(intervalValues);
-    // System.out.println("Potential: " + potentialCollisions.size());
 
     /*
      * NARROW PHASE: In this phase, we inspect each of our potential collisions to determine which
@@ -297,15 +300,21 @@ public class CollisionDetector {
     }
   }
 
+  /**
+   * Returns the amount of overlap between two Projections.
+   * 
+   * @param p1 the first Projection
+   * @param p2 the second Projection
+   * @return the amount of overlap between two Projections
+   */
   private double getOverlap(Projection p1, Projection p2) {
-    double thing1 = p2.getMin() - p1.getMax();
-    double thing2 = p1.getMin() - p2.getMax();
-    double abs1 = FastMath.abs(thing1);
-    double abs2 = FastMath.abs(thing2);
+    double length1 = p2.getMin() - p1.getMax();
+    double length2 = p1.getMin() - p2.getMax();
+    double abs1 = FastMath.abs(length1);
+    double abs2 = FastMath.abs(length2);
     double res = FastMath.min(abs1, abs2);
+    // Divide by 1000 to ensure that the numbers involved are not so huge
     return res / 1000;
-    // return FastMath.min(FastMath.abs(p2.getMin() - p1.getMax()), FastMath.abs(p1.getMin() -
-    // p2.getMax()));
   }
 }
 
