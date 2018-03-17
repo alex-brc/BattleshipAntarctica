@@ -34,7 +34,7 @@ import org.alien8.ui.SettingsMenu;
 import org.alien8.ui.SplashScreen;
 import org.alien8.util.LogManager;
 
-/*
+/**
  * A singleton game client, loops and do nothing when not in game (gameRunning == false).
  */
 public class Client implements Runnable {
@@ -134,11 +134,11 @@ public class Client implements Runnable {
           break;
         case SETTINGS_MENU:
           Renderer.getInstance().render(settings);
-    	  break;
+          break;
         case IN_GAME:
           // Play the ambient music
           AudioManager.getInstance().startAmbient();
-        	
+
           long lastTime = getTime();
           long currentTime = 0;
           double catchUp = 0;
@@ -191,8 +191,8 @@ public class Client implements Runnable {
           }
           AudioManager.getInstance().stopAmbient();
           break;
-	default:
-		break;
+        default:
+          break;
       }
     }
     System.out.println("Client stopped");
@@ -201,7 +201,7 @@ public class Client implements Runnable {
   public Timer getTimer() {
     return this.timer;
   }
-  
+
   public MainMenu getMenu() {
     return this.menu;
   }
@@ -241,7 +241,7 @@ public class Client implements Runnable {
   public boolean isWaitingToExit() {
     return waitingToExit;
   }
-  
+
   public void createServer(int maxPlayer) {
     Server.getInstance().setMaxPlayer(maxPlayer);
     Server.getInstance().start();

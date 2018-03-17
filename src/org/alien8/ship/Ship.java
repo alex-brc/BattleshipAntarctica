@@ -255,10 +255,12 @@ public class Ship extends Entity implements Serializable {
       if (corner.getX() > Parameters.MAP_WIDTH) {
         if (corner.getX() - Parameters.MAP_WIDTH > xdiff) {
           xdiff = corner.getX() - Parameters.MAP_WIDTH;
+          // flipDir();
         }
       } else if (corner.getX() < 0) {
         if (corner.getX() < xdiff) {
           xdiff = corner.getX();
+          // flipDir();
         }
       }
 
@@ -266,10 +268,12 @@ public class Ship extends Entity implements Serializable {
       if (corner.getY() > Parameters.MAP_HEIGHT) {
         if (corner.getY() - Parameters.MAP_HEIGHT > ydiff) {
           ydiff = corner.getY() - Parameters.MAP_HEIGHT;
+          // flipDir();
         }
       } else if (corner.getY() < 0) {
         if (corner.getY() < ydiff) {
           ydiff = corner.getY();
+          // flipDir();
         }
       }
     }
@@ -286,6 +290,13 @@ public class Ship extends Entity implements Serializable {
     //
     // PhysicsManager.rotateEntity(this, xdiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
     // PhysicsManager.rotateEntity(this, ydiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
+  }
+
+  private void flipDir() {
+    // TEMP
+    // Reverse direction if out of bounds
+    PhysicsManager.rotateEntity(this, FastMath.PI);
+    rotateObb(getDirection() + FastMath.PI);
   }
 
   /**
@@ -480,9 +491,9 @@ public class Ship extends Entity implements Serializable {
   }
 
   public int getEffectType() {
-	  if(effect != null)
-		  return this.effect.getEffectType();
-	  return -1;
+    if (effect != null)
+      return this.effect.getEffectType();
+    return -1;
   }
 
   public boolean underEffect() {
@@ -494,10 +505,11 @@ public class Ship extends Entity implements Serializable {
   public Item getItem() {
     return item;
   }
+
   public int getItemType() {
-	  if(item != null)
-		  return this.item.getItemType();
-	  return -1;
+    if (item != null)
+      return this.item.getItemType();
+    return -1;
   }
 }
 

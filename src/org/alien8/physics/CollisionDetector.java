@@ -30,6 +30,7 @@ public class CollisionDetector {
     // Rules out collisions between objects that are far away from each other
     ArrayList<IntervalValue> intervalValues = sort(aabbs);
     ArrayList<Collision> potentialCollisions = sweep(intervalValues);
+    // System.out.println("Potential: " + potentialCollisions.size());
 
     /*
      * NARROW PHASE: In this phase, we inspect each of our potential collisions to determine which
@@ -218,6 +219,7 @@ public class CollisionDetector {
         return null;
       }
     }
+
     // Control flow reaches this point if no gap has been found between the two Entities, so they
     // must collide
     return minTranslationVector;

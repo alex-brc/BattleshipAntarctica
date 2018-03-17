@@ -9,7 +9,7 @@ import org.alien8.rendering.Sprite;
 public class TorpedoItem extends Item {
   public TorpedoItem() {
     // Doesn't have a ship at this point
-    super(Sprite.item_torpedo, Pickup.SPEED_PICKUP);
+    super(Sprite.item_torpedo, Pickup.TORPEDO_PICKUP);
   }
 
   /**

@@ -3,7 +3,6 @@ package org.alien8.ui;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import org.alien8.client.Client;
-import org.alien8.client.Launcher;
 import org.alien8.client.Client.State;
 
 public class SinglePlayerButton extends Button {
@@ -24,5 +23,4 @@ public class SinglePlayerButton extends Button {
     if (localServerIPStr != null)
       Client.getInstance().connect(localServerIPStr);
   }
-
 }
