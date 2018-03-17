@@ -33,12 +33,13 @@ public class ClientHandler extends Thread {
   private Long mapSeed;
   private ObjectOutputStream toClient;
   private ObjectInputStream fromClient;
+  private String playerName;
   private ServerModelManager model = ServerModelManager.getInstance();
   private volatile boolean run = true;
 
   public ClientHandler(InetAddress clientIP, int clientUdpPort, ArrayList<Player> playerList,
       ConcurrentLinkedQueue<Entity> entities, ConcurrentHashMap<Ship, Player> playerMap,
-      Long mapSeed, ObjectOutputStream toClient, ObjectInputStream fromClient) {
+      Long mapSeed, ObjectOutputStream toClient, ObjectInputStream fromClient, String playerName) {
     this.clientIP = clientIP;
     this.clientUdpPort = clientUdpPort;
     this.playerList = playerList;
@@ -47,6 +48,7 @@ public class ClientHandler extends Thread {
     this.mapSeed = mapSeed;
     this.toClient = toClient;
     this.fromClient = fromClient;
+    this.playerName = playerName;
   }
   
   public void end() {
@@ -78,16 +80,7 @@ public class ClientHandler extends Thread {
   }
 
   public void run() {
-    // Start the server game loop if it is the first client connecting
-    if (playerList.size() == 0) {
-      Server.getInstance().startSGH();
-    }
-
     Position randPos = Server.getInstance().getRandomPosition();
-
-    // TODO: ADD NAMES TO PLAYERS
-    int k = (new Random()).nextInt(1000);
-    String name = "" + k;
 
     // Setup client's ship
     int randColour = (new Random()).nextInt(0xFFFFFF);
@@ -95,7 +88,7 @@ public class ClientHandler extends Thread {
     model.addEntity(s);
 
     // Setup client's player info
-    Player p = new Player(name, clientIP, clientUdpPort, s);
+    Player p = new Player(playerName, clientIP, clientUdpPort, s);
     playerMap.put(s, p);
     ServerScoreBoard.getInstance().add(p);
 
@@ -107,7 +100,6 @@ public class ClientHandler extends Thread {
     while (run) {
       try {
         fromClient.readObject();
-        
       } catch (ClassNotFoundException cnfe) {
         LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
             "Class of serialized object cannot be found." + cnfe.toString());

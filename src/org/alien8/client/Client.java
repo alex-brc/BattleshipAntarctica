@@ -280,7 +280,7 @@ public class Client implements Runnable {
         clientUdpPort = udpSocket.getLocalPort();
 
         // Serialize a ClientMessage (connect) Object into byte array
-        ClientMessage connectRequest = new ClientMessage(0, udpSocket.getLocalPort());
+        ClientMessage connectRequest = new ClientMessage(0, udpSocket.getLocalPort(), clientName);
         ObjectOutputStream toServer = new ObjectOutputStream(tcpSocket.getOutputStream());
         ObjectInputStream fromServer = new ObjectInputStream(tcpSocket.getInputStream());
         toServer.writeObject(connectRequest);
@@ -294,7 +294,7 @@ public class Client implements Runnable {
         model.sync(entsLite, clientIP, clientUdpPort);
 
         // Serialize a ClientMessage (ready) Object into byte array
-        ClientMessage ready = new ClientMessage(1, udpSocket.getLocalPort());
+        ClientMessage ready = new ClientMessage(1, udpSocket.getLocalPort(), clientName);
         toServer.writeObject(ready);
 
         // Set up multicast socket for receiving game states from server
