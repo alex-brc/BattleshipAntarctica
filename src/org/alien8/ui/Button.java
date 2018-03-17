@@ -17,7 +17,7 @@ public abstract class Button {
 		this.width = width;
 		this.height = height;
 		this.text = text;
-		col = 0x888888;
+		col = 0x000000;
 		hCol = 0xAAAAAA;
 	}
 	
@@ -36,7 +36,7 @@ public abstract class Button {
 				executeAction();
 			}
 		}else{
-			r.drawFilledRect(x, y, width, height, col, true);
+			r.drawRect(x, y, width, height, hCol, true);
 		}
 		r.drawText(text, x + width/2 - (text.length()*16)/2, y + (height-16)/2, true, FontColor.WHITE);
 	}

@@ -1,5 +1,6 @@
 package org.alien8.ui;
 
+import org.alien8.client.InputManager;
 import org.alien8.rendering.Renderer;
 
 public class NameScreen implements Page {
@@ -27,6 +28,9 @@ public class NameScreen implements Page {
 		conInfo.render(r);
 		nameBox.render(r);
 		nameBtn.render(r);
+		
+		if(InputManager.getInstance().getKeyTyped() == 13) // Enter
+			nameBtn.executeAction();
 	}
 	
 	public String getContent() {

@@ -24,7 +24,7 @@ public class TextBox {
   public void render(Renderer r) {
     r.drawFilledRect(x, y, width, height, backCol, true);
     r.drawRect(x, y, width, height, bordCol, true);
-    r.drawText(text, x, y, true, FontColor.WHITE);
+    r.drawText(text, x + width/2 - text.length()*16 / 2, y, true, FontColor.WHITE);
     char c = InputManager.getInstance().getKeyTyped();
     if ( ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.') && text.length() < charLimit) {
       text += c;

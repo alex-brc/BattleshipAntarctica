@@ -6,7 +6,7 @@ import org.alien8.client.Client.State;
 public class StartButton extends Button {
 
 	public StartButton(int x, int y, int width, int height) {
-		super(x, y, width, height, "start game");
+		super(x, y, width, height, "start");
 	}
 
 	@Override

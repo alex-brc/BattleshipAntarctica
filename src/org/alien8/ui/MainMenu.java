@@ -16,7 +16,7 @@ public class MainMenu implements Page {
 	
 	public MainMenu(){
 	    int infoWidth = (12 * 16) + (15 * 16) + 4; //Prepend text * font size + IP length * font size + padding
-		int fieldWidth = (15 * 16) + 6; //IP length * font size + padding
+		int fieldWidth = (18 * 16) + 4; //IP length * font size + padding
 		int btnWidth = (18 * 16) + 4; //Max button text length * font size + padding
 		int height = 40; //Font size + padding;
 		int vPad = 8; // Spacing between buttons = r.getWidth() / vPad
@@ -27,7 +27,7 @@ public class MainMenu implements Page {
 		spBtn = new SinglePlayerButton(r.getWidth() / 2 - btnWidth / 2, vOffset + r.getHeight() / vPad, btnWidth, height);
 		ipInfo = new IPInfo(r.getWidth() / 2 - infoWidth / 2, vOffset + (r.getHeight() / vPad) * 2 - height/2 - 2, infoWidth, height);
 		csBtn = new CreateServerButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 2, btnWidth, height);
-		ipField = new TextBox(r.getWidth() / 2 - fieldWidth / 2, vOffset + (r.getHeight() / vPad) * 3 - height/2 - 2, fieldWidth, 18, 15);
+		ipField = new TextBox(r.getWidth() / 2 - fieldWidth / 2, vOffset + (r.getHeight() / vPad) * 3 - height/2 + 2, fieldWidth, 18, 15);
 		conInfo = new InfoBox(r.getWidth() / 2 - fieldWidth / 2 - 32, vOffset + (r.getHeight() / vPad) * 3 + height + 4, infoWidth, height);
 		conBtn = new ConnectButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 3, btnWidth, height);
 		exBtn = new ExitButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 5, btnWidth, height);
