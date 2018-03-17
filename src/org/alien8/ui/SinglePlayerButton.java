@@ -9,7 +9,7 @@ import org.alien8.client.Client.State;
 public class SinglePlayerButton extends Button {
 
   public SinglePlayerButton(int x, int y, int width, int height) {
-    super(x, y, width, height, "Single-player");
+    super(x, y, width, height, "single-player");
   }
 
   public void executeAction() {

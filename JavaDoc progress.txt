@@ -16,36 +16,34 @@ x client:
 	x ClientTCP
 	x ClientWindowListener
 	x InputManager
-	x Launcher
+	/ Launcher
 x core:
-	x Attributes
 	x ClientMessage
 	x ClientModelManager
-	x Entity
+	/ Entity
 	x EntityLite
 	x Parameters
-	x Properties
 	x ServerMessage
 	x ServerModelManager
-x items:
-	x Effect
-	x HealthItem
-	x HealthPickup
-	x InvulnerableItem
-	x InvulnerablePickup
-	x Item
-	x Mine
-	x MineItem
-	x MinePickup
-	x NoCooldownItem
-	x NoCooldownPickup
-	x Pickup
-	x PlaneDropper
-	x SpeedItem
-	x SpeedPickup
-	x Torpedo
-	x TorpedoItem
-	x TorpedoPickup
+/ items:
+	/ Effect
+	/ HealthItem
+	/ HealthPickup
+	/ InvulnerableItem
+	/ InvulnerablePickup
+	/ Item
+	/ Mine
+	/ MineItem
+	/ MinePickup
+	/ NoCooldownItem
+	/ NoCooldownPickup
+	/ Pickup
+	/ PlaneDropper
+	/ SpeedItem
+	/ SpeedPickup
+	/ Torpedo
+	/ TorpedoItem
+	/ TorpedoPickup
 x mapgeneration:
 	x Map
 	x MapVector
@@ -61,11 +59,11 @@ x mapgeneration:
 	/ PhysicsManager
 	/ Position
 	/ Projection
-x rendering:
-	x Font
-	x FontColor
-	x Renderer
-	x Sprite
+/ rendering:
+	/ Font
+	/ FontColor
+	/ Renderer
+	/ Sprite
 x score:
 	x ClientScoreBoard
 	x Score

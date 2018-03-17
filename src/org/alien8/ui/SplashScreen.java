@@ -12,7 +12,7 @@ public class SplashScreen {
 	private String text;
 	
 	public SplashScreen(){
-		text = "Press any key to continue";
+		text = "press any key to continue";
 	}
 	
 	public void render(Renderer r){

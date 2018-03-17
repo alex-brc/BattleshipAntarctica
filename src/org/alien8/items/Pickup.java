@@ -7,6 +7,10 @@ import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import org.alien8.ship.Ship;
 
+/**
+ * This class represents a item pickup that contains an Item and can be picked up by ships.
+ *
+ */
 public abstract class Pickup extends Entity {
   private static final long serialVersionUID = 2171627902685805520L;
   public static final int HEALTH_PICKUP = 0;
@@ -17,11 +21,17 @@ public abstract class Pickup extends Entity {
   public static final int TORPEDO_PICKUP = 5;
   public static final int NUMBER_OF_PICKUPS = 6;
 
-
   protected Item item;
   protected Sprite sprite;
   protected int pickupType;
 
+  /**
+   * Constructor.
+   * 
+   * @param position
+   * @param item
+   * @param pickupType
+   */
   public Pickup(Position position, Item item, int pickupType) {
     super(position, 0, 0, 0, Parameters.ITEM_LENGTH, Parameters.ITEM_WIDTH);
     this.item = item;
@@ -30,7 +40,15 @@ public abstract class Pickup extends Entity {
   }
 
   /**
-   * Called when item is picked up (i.e. when a player runs over it)
+   * @return the type of the Pickup
+   */
+  public int getPickupType() {
+    return pickupType;
+  }
+
+  /**
+   * Provides the Ship that collected this Pickup with the Item contained within the Pickup. Called
+   * when a Ship runs over it.
    */
   public void onPickup(Ship ship) {
     item.setShip(ship);
@@ -46,15 +64,10 @@ public abstract class Pickup extends Entity {
   @Override
   public void dealWithOutOfBounds() {
     // Will never be out of bounds
-
   }
 
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
     // Will never be in ice
-  }
-
-  public int getPickupType() {
-    return pickupType;
   }
 }

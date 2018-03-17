@@ -1,18 +1,49 @@
 package org.alien8.ui;
 
-import org.alien8.client.Client.State;
+import java.util.concurrent.TimeUnit;
+
 import org.alien8.client.Client;
+import org.alien8.client.Client.State;
 
 public class ConnectButton extends Button{
 
-	public ConnectButton(int x, int y, int width, int height, IPField ip) {
-		super(x, y, width, height, "Connect to server");
+	public ConnectButton(int x, int y, int width, int height) {
+		super(x, y, width, height, "connect to server");
 		
 	}
 	
 	public void executeAction(){
+		// Verify the ip
+		String ip = Client.getInstance().getMenu().getIP();
+		// Check if there's enough addresses 
+		int dots = ip.length() - ip.replace(".", "").length();
+		if(dots != 3) {
+			showMessage("that IP was invalid");
+			return;
+		} else {
+			// Check if all addresses are in 0,255
+			String[] tokens = ip.split(".");
+			for(String s : tokens) {
+				int k = Integer.parseInt(s);
+				if(k < 0 || k > 255) {
+					showMessage("that IP was invalid");
+					return;
+				}
+			}
+		}
+		// IP is okay
+		showMessage(" connecting...");
+		boolean connected = Client.getInstance().connect(ip);
+		if(!connected) {
+			showMessage("  couldn't connect");
+			return;
+		}
+		// Connected
 		Client.getInstance().setState(State.IN_GAME);
-		Client.getInstance().connect(Client.getInstance().getMenu().getIP());
+	}
+	
+	private void showMessage(String message) {
+		Client.getInstance().getMenu().setConnectInfo(message);
 	}
 
 }
