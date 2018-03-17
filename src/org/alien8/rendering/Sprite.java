@@ -6,6 +6,10 @@ import java.io.Serializable;
 import javax.imageio.ImageIO;
 import net.jafama.FastMath;
 
+/**
+ * This class represents a sprite image in the game. It also contains static pre-loaded sprites.
+ *
+ */
 public class Sprite implements Serializable {
 
   private static final long serialVersionUID = -7826033026339264249L;
@@ -35,16 +39,21 @@ public class Sprite implements Serializable {
   public static Sprite title_screen = new Sprite("/org/alien8/assets/title_screen.png");
   public static Sprite logo = new Sprite("/org/alien8/assets/logo.png");
 
+  /**
+   * Constructor.
+   * 
+   * @param path the file path for the Sprite's image
+   */
   public Sprite(String path) {
     this.path = path;
     load();
   }
 
   /**
-   * Creates an empty sprite
+   * Creates an empty Sprite.
    * 
-   * @param width
-   * @param height
+   * @param width the width of the Sprite's image
+   * @param height the height of the Sprite's image
    */
   public Sprite(int width, int height) {
     this.width = width;
@@ -53,9 +62,9 @@ public class Sprite implements Serializable {
   }
 
   /**
-   * Creates a copy of a sprite
+   * Creates a copy of a Sprite.
    * 
-   * @param s
+   * @param s the Sprite to copy
    */
   public Sprite(Sprite s) {
     width = s.getWidth();
@@ -63,6 +72,13 @@ public class Sprite implements Serializable {
     System.arraycopy(s.getPixels(), 0, pixels, 0, s.getPixels().length);
   }
 
+  /**
+   * Constructor.
+   * 
+   * @param pixels an int[] of colours representing the pixels of the Sprite
+   * @param width the width of the Sprite's image
+   * @param height the height of the Sprite's image
+   */
   public Sprite(int[] pixels, int width, int height) {
     this.pixels = new int[width * height];
     System.arraycopy(pixels, 0, this.pixels, 0, pixels.length);
@@ -70,6 +86,48 @@ public class Sprite implements Serializable {
     this.height = height;
   }
 
+  /**
+   * @return the width of this Sprite
+   */
+  public int getWidth() {
+    return width;
+  }
+
+  /**
+   * @return the height of this Sprite
+   */
+  public int getHeight() {
+    return height;
+  }
+
+  /**
+   * @return the int[] of pixels representing this Sprite
+   */
+  public int[] getPixels() {
+    return pixels;
+  }
+
+  /**
+   * Loads a Sprite from a file.
+   */
+  private void load() {
+    try {
+      BufferedImage image = ImageIO.read(Sprite.class.getResource(path));
+      width = image.getWidth();
+      height = image.getHeight();
+      pixels = new int[width * height];
+      image.getRGB(0, 0, width, height, pixels, 0, width);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Rotates a Sprite by an angle.
+   * 
+   * @param a the angle to rotate by
+   * @return the rotated Sprite
+   */
   public Sprite rotateSprite(double a) {
     Sprite s = new Sprite(
         (int) (height * FastMath.abs(FastMath.sin(a)) + width * FastMath.abs(FastMath.cos(a))),
@@ -102,6 +160,13 @@ public class Sprite implements Serializable {
     return s;
   }
 
+  /**
+   * Creates a Sprite[] from a sprite sheet.
+   * 
+   * @param sheet the sheet to create Sprites from
+   * @param size the size of each Sprite in the sheet
+   * @return a Sprite[]
+   */
   public static Sprite[] split(Sprite sheet, int size) {
     int total = (sheet.getWidth() * sheet.getHeight()) / (size * size);
     Sprite[] sprites = new Sprite[total];
@@ -124,18 +189,12 @@ public class Sprite implements Serializable {
     return sprites;
   }
 
-  private void load() {
-    try {
-      BufferedImage image = ImageIO.read(Sprite.class.getResource(path));
-      width = image.getWidth();
-      height = image.getHeight();
-      pixels = new int[width * height];
-      image.getRGB(0, 0, width, height, pixels, 0, width);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
+  /**
+   * Makes a Ship Sprite of the specified colour.
+   * 
+   * @param colour the colour of the Ship
+   * @return the Ship Sprite
+   */
   public static Sprite makeShipSprite(int colour) {
     Sprite newSprite = Sprite.ship_green;
 
@@ -144,17 +203,4 @@ public class Sprite implements Serializable {
 
     return newSprite;
   }
-
-  public int[] getPixels() {
-    return pixels;
-  }
-
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
-  }
-
 }

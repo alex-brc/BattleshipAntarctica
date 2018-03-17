@@ -59,11 +59,11 @@ x mapgeneration:
 	/ PhysicsManager
 	/ Position
 	/ Projection
-x rendering:
-	x Font
-	x FontColor
-	x Renderer
-	x Sprite
+/ rendering:
+	/ Font
+	/ FontColor
+	/ Renderer
+	/ Sprite
 x score:
 	x ClientScoreBoard
 	x Score
