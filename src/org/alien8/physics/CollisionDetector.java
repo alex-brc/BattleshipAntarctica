@@ -5,6 +5,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.core.Entity;
 import net.jafama.FastMath;
 
+/**
+ * This class is used for checking for Collisions between Entities in the game.
+ *
+ */
 public class CollisionDetector {
   /**
    * Checks for Collisions between a set of Entities.
@@ -12,38 +16,71 @@ public class CollisionDetector {
    * @param entities a List of Entities which are being checked for collisions
    * @return a List of Collisions
    */
-  public ArrayList<Collision> checkForCollisions(ConcurrentLinkedQueue<Entity> entities) {
-    /*
-     * BROAD PHASE: In this phase, we do some rough spatial examination of the Entities to rule out
-     * collisions between objects that are very far away. We end up with a list of potential
-     * collisions which are verified in the narrow phase
-     */
-    // Create an Axis-Aligned Bounding Box (AABB) for each entity
-    // AABBs are a rough approximation of an object's shape
-    ArrayList<AABB> aabbs = createAabbs(entities);
+  public void findAndResolveCollisions(ConcurrentLinkedQueue<Entity> entities) {
+    // /*
+    // * BROAD PHASE: In this phase, we do some rough spatial examination of the Entities to rule
+    // out
+    // * collisions between objects that are very far away. We end up with a list of potential
+    // * collisions which are verified in the narrow phase
+    // */
+    // // Create an Axis-Aligned Bounding Box (AABB) for each entity
+    // // AABBs are a rough approximation of an object's shape
+    // ArrayList<AABB> aabbs = createAabbs(entities);
+    //
+    // // Sort and sweep algorithm
+    // // Rules out collisions between objects that are far away from each other
+    // ArrayList<IntervalValue> intervalValues = sort(aabbs);
+    // ArrayList<Collision> potentialCollisions = sweep(intervalValues);
 
-    // Sort and sweep algorithm
-    // Rules out collisions between objects that are far away from each other
-    ArrayList<IntervalValue> intervalValues = sort(aabbs);
-    ArrayList<Collision> potentialCollisions = sweep(intervalValues);
-    // System.out.println("Potential: " + potentialCollisions.size());
+    // Just check for collisions between all objects. There is no noticeable change in performance
+    ArrayList<Collision> potentialCollisions = new ArrayList<Collision>();
+    for (Entity e1 : entities) {
+      for (Entity e2 : entities) {
+        if (e1.getSerial() != e2.getSerial() && !collisionInList(potentialCollisions, e2, e1)) {
+          potentialCollisions.add(new Collision(e1, e2));
+        }
+      }
+    }
 
     /*
      * NARROW PHASE: In this phase, we inspect each of our potential collisions to determine which
      * ones are real
      */
-    ArrayList<Collision> verifiedCollisions = new ArrayList<>();
+    // ArrayList<Collision> verifiedCollisions = new ArrayList<>();
     // Verify each of our potential collisions
     for (Collision c : potentialCollisions) {
       MTV vector = verifyCollision(c);
       if (vector != null) {
-        verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2(), vector));
+        // verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2(), vector));
+        Collision col = new Collision(c.getEntity1(), c.getEntity2(), vector);
+        col.resolveCollision();
       }
+      // if (verifyCollision(c)) {
+      // verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2()));
+      // }
     }
     // System.out.println("Verified: " + verifiedCollisions.size());
 
     // Return the collisions that we have found
-    return verifiedCollisions;
+    // return verifiedCollisions;
+  }
+
+  /**
+   * Checks if a Collision between two Entities already exists in a list.
+   * 
+   * @param list the list to check
+   * @param e1 the first Entity involved in the Collision
+   * @param e2 the second Entity involved in the Collision
+   * @return
+   */
+  private boolean collisionInList(ArrayList<Collision> list, Entity e1, Entity e2) {
+    for (Collision c : list) {
+      if (c.getEntity1().getSerial() == e1.getSerial()
+          && c.getEntity2().getSerial() == e2.getSerial()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -52,6 +89,7 @@ public class CollisionDetector {
    * @param entities a List of Entities
    * @return a list of AABB's. Each one represents one Entity
    */
+  @Deprecated
   private ArrayList<AABB> createAabbs(ConcurrentLinkedQueue<Entity> entities) {
     ArrayList<AABB> aabbs = new ArrayList<AABB>();
     for (Entity e : entities) {
@@ -98,6 +136,7 @@ public class CollisionDetector {
    * @param aabbs a List of AABBs
    * @return a sorted List of IntervalValues
    */
+  @Deprecated
   private ArrayList<IntervalValue> sort(ArrayList<AABB> aabbs) {
     ArrayList<IntervalValue> intervalValues = new ArrayList<IntervalValue>();
     for (AABB aabb : aabbs) {
@@ -119,6 +158,7 @@ public class CollisionDetector {
    * @param item the IntervalValue being inserted
    * @param intervalValues the List into which the IntervalValue is being inserted
    */
+  @Deprecated
   private void insert(IntervalValue item, ArrayList<IntervalValue> intervalValues) {
     // If the list is empty, just add the item
     if (intervalValues.isEmpty()) {
@@ -144,6 +184,7 @@ public class CollisionDetector {
    * @param intervalValues a sorted List of IntervalValues
    * @return a List of potential Collisions
    */
+  @Deprecated
   private ArrayList<Collision> sweep(ArrayList<IntervalValue> intervalValues) {
     ArrayList<Collision> potentialCollisions = new ArrayList<>();
     // Creates a list to store active intervals
@@ -215,11 +256,44 @@ public class CollisionDetector {
         return null;
       }
     }
+
     // Control flow reaches this point if no gap has been found between the two Entities, so they
     // must collide
     return minTranslationVector;
   }
 
+  // private boolean verifyCollision(Collision c) {
+  // // Get the two Entities' bounding boxes
+  // Position[] box1 = c.getEntity1().getObb();
+  // Position[] box2 = c.getEntity2().getObb();
+  // // Get the two sets of axes to test
+  // AxisVector[] axes1 = getAxes(box1);
+  // AxisVector[] axes2 = getAxes(box2);
+  // // Check against first set of axes
+  // for (AxisVector axis : axes1) {
+  // // Project both boxes onto a single axis
+  // Projection p1 = project(box1, axis);
+  // Projection p2 = project(box2, axis);
+  // // Check for overlap in the projections
+  // // If no overlap is found, there must be a gap between the Entities, meaning they are not
+  // // colliding so the method returns false
+  // if (!overlap(p1, p2)) {
+  // return false;
+  // }
+  // }
+  // // Check against second set of axes
+  // for (AxisVector axis : axes2) {
+  // Projection p1 = project(box1, axis);
+  // Projection p2 = project(box2, axis);
+  // if (!overlap(p1, p2)) {
+  // return false;
+  // }
+  // }
+  //
+  // // Control flow reaches this point if no gap has been found between the two Entities, so they
+  // // must collide
+  // return true;
+  // }
 
 
   /**
@@ -297,15 +371,21 @@ public class CollisionDetector {
     }
   }
 
+  /**
+   * Returns the amount of overlap between two Projections.
+   * 
+   * @param p1 the first Projection
+   * @param p2 the second Projection
+   * @return the amount of overlap between two Projections
+   */
   private double getOverlap(Projection p1, Projection p2) {
-    double thing1 = p2.getMin() - p1.getMax();
-    double thing2 = p1.getMin() - p2.getMax();
-    double abs1 = FastMath.abs(thing1);
-    double abs2 = FastMath.abs(thing2);
+    double length1 = p2.getMin() - p1.getMax();
+    double length2 = p1.getMin() - p2.getMax();
+    double abs1 = FastMath.abs(length1);
+    double abs2 = FastMath.abs(length2);
     double res = FastMath.min(abs1, abs2);
+    // Divide by 1000 to ensure that the numbers involved are not so huge
     return res / 1000;
-    // return FastMath.min(FastMath.abs(p2.getMin() - p1.getMax()), FastMath.abs(p1.getMin() -
-    // p2.getMax()));
   }
 }
 

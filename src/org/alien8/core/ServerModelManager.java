@@ -1,14 +1,11 @@
 package org.alien8.core;
 
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
 import org.alien8.mapgeneration.Map;
-import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.server.Player;
@@ -46,7 +43,7 @@ public class ServerModelManager {
       instance = new ServerModelManager();
     return instance;
   }
-  
+
   public void reset() {
     lastSerial = 0;
     entities = new ConcurrentLinkedQueue<Entity>();
@@ -92,11 +89,11 @@ public class ServerModelManager {
       // Update the position of the entity
       PhysicsManager.updatePosition(ent, map.getIceGrid());
     }
-    ArrayList<Collision> collisions = collisionDetector.checkForCollisions(entities);
-    for (Collision c : collisions) {
-      // System.out.println("Resolving collision");
-      c.resolveCollision();
-    }
+    collisionDetector.findAndResolveCollisions(entities);
+    // for (Collision c : collisions) {
+    // // System.out.println("Resolving collision");
+    // // c.resolveCollision();
+    // }
 
   }
 
