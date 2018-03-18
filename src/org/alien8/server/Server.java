@@ -51,7 +51,7 @@ public class Server implements Runnable {
   private ServerGameHandler sgh = null;
   private Long seed = (new Random()).nextLong();
   private ServerScoreBoard scoreboard = ServerScoreBoard.getInstance();
-  private int maxPlayer;
+  private Integer maxPlayer;
   private volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
 
   private Server() {
@@ -98,6 +98,7 @@ public class Server implements Runnable {
     playerList = new ArrayList<Player>();
     chList = new ArrayList<ClientHandler>();
     events = new LinkedList<GameEvent>();
+    sgh = null;
     seed = (new Random()).nextLong();
     scoreboard.reset();
     bullets = new LinkedList<Bullet>();
@@ -128,7 +129,10 @@ public class Server implements Runnable {
         ObjectInputStream fromClient = new ObjectInputStream(client.getInputStream());
         ObjectOutputStream toClient = new ObjectOutputStream(client.getOutputStream());
         ClientMessage cr = (ClientMessage) fromClient.readObject();
-        processClientMessage(clientIP, cr, toClient, fromClient);
+        if (sgh == null)
+          processClientMessage(clientIP, cr, toClient, fromClient);
+        else
+          break;
       }
 
     } catch (SocketException se) {
@@ -214,7 +218,7 @@ public class Server implements Runnable {
   }
 
   public void disconnectPlayer(InetAddress clientIP, int clientPort) {
-    if (isPlayerConnected(clientIP, clientPort) && sgh.isGameRunning()) {
+    if (isPlayerConnected(clientIP, clientPort)) {
       Player pToBeRemoved = this.getPlayerByIpAndPort(clientIP, clientPort);
       Ship shipToBeRemoved = pToBeRemoved.getShip();
       ClientHandler ch = this.getClientHandlerByIpAndPort(clientIP, clientPort);
@@ -225,6 +229,7 @@ public class Server implements Runnable {
       ServerScoreBoard.getInstance().remove(pToBeRemoved);
       chList.remove(ch);
       ch.end();
+      System.out.println("Client disconnected");
     }
   }
 
