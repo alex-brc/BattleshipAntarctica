@@ -28,9 +28,6 @@ public class NameScreen implements Page {
 		conInfo.render(r);
 		nameBox.render(r);
 		nameBtn.render(r);
-		
-		if(InputManager.getInstance().getKeyTyped() == 13) // Enter
-			nameBtn.executeAction();
 	}
 	
 	public String getContent() {

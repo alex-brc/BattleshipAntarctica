@@ -40,7 +40,9 @@ public class Sprite implements Serializable {
   public static Sprite title_screen = new Sprite("/org/alien8/assets/title_screen.png");
   public static Sprite logo = new Sprite("/org/alien8/assets/logo.png");
   public static Sprite controls = new Sprite("/org/alien8/assets/controls.png");
-
+  public static Sprite effect_speed = new Sprite("/org/alien8/assets/effect_speed.png");
+  public static Sprite effect_invulnerable = new Sprite("/org/alien8/assets/effect_invulnerable.png");
+  public static Sprite crosshair = new Sprite("/org/alien8/assets/crosshair.png");
   /**
    * Constructor.
    * 

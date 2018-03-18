@@ -1,14 +1,16 @@
 package org.alien8.items;
 
+import org.alien8.rendering.Renderer;
+
 /**
  * This class represents a status effect that an Entity is currently under (e.g. speed boost,
  * invulnerable etc.).
  *
  */
 public class Effect {
-  public static int SPEED = 0;
-  public static int NO_COOLDOWN = 1;
-  public static int INVULNERABLE = 2;
+  public static final int SPEED = 0;
+  public static final int NO_COOLDOWN = 1;
+  public static final int INVULNERABLE = 2;
 
   // When this effect expires, in nanoseconds
   private long endTime;

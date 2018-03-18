@@ -382,7 +382,6 @@ public class Client implements Runnable {
 
   private void receiveEvents(GameEvent event) {
     // Send audio events to AudioManager
-    System.out.println(event.getClass());
     if (event != null) {
       if (event instanceof AudioEvent)
         AudioManager.getInstance().addEvent((AudioEvent) event);
