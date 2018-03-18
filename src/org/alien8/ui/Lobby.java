@@ -28,6 +28,11 @@ public class Lobby implements Page {
 		
 	}
 	
+	public void setNotHost() {
+	    this.isHost = false;
+	        
+	}
+	
 	public void render(Renderer renderer) {
 		if(isHost) {
 			startBtn.render(renderer);

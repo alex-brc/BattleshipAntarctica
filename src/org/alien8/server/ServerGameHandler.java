@@ -35,6 +35,7 @@ public class ServerGameHandler extends Thread {
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
+  private volatile boolean running = false;
   private volatile boolean gameRunning = true;
   private int seconds;
 
