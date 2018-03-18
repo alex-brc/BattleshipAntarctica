@@ -78,6 +78,15 @@ public class ClientHandler extends Thread {
       // Do nothing
     }
   }
+  
+
+  public void sendStartGame() {
+	  try {
+		  toClient.writeObject(new ServerMessage(3));
+	  } catch (IOException ioe) {
+		  // Do nothing
+	  }
+  }
 
   public void run() {
     Position randPos = Server.getInstance().getRandomPosition();

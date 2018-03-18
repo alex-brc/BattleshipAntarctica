@@ -56,7 +56,7 @@ public class Client implements Runnable {
   private int timeBeforeExiting = 10;
   private int FPS = 0;
   private String clientName = null;
-  private LinkedList<String> opponents = new LinkedList<String>();
+  private ArrayList<String> opponents = new ArrayList<String>();
   private InetAddress clientIP = null;
   private InetAddress serverIP = null;
   private InetAddress multiCastIP = null;
@@ -292,7 +292,7 @@ public class Client implements Runnable {
         // Receive the initial game state from server
         ArrayList<EntityLite> entsLite = this.receiveGameStateTCP(fromServer);
         model.sync(entsLite, clientIP, clientUdpPort);
-
+        
         // Serialize a ClientMessage (ready) Object into byte array
         ClientMessage ready = new ClientMessage(1, udpSocket.getLocalPort(), clientName);
         toServer.writeObject(ready);
@@ -383,6 +383,7 @@ public class Client implements Runnable {
 
   private void receiveEvents(GameEvent event) {
     // Send audio events to AudioManager
+	System.out.println(event.getClass());
     if (event != null) {
       if (event instanceof AudioEvent)
         AudioManager.getInstance().addEvent((AudioEvent) event);
@@ -508,7 +509,7 @@ public class Client implements Runnable {
   /**
    * @return the opponents' names
    */
-  public LinkedList<String> getOpponents() {
+  public ArrayList<String> getOpponents() {
 	  return opponents;
   }
   

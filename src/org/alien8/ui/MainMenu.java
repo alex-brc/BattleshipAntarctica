@@ -5,7 +5,6 @@ import org.alien8.rendering.Renderer;
 public class MainMenu implements Page {
 
 	private SinglePlayerButton spBtn;
-	private IPInfo ipInfo;
 	private CreateServerButton csBtn;
 	private TextBox ipField;
 	private ConnectButton conBtn;
@@ -25,10 +24,9 @@ public class MainMenu implements Page {
 		Renderer r = Renderer.getInstance();
 		// Make buttons
 		spBtn = new SinglePlayerButton(r.getWidth() / 2 - btnWidth / 2, vOffset + r.getHeight() / vPad, btnWidth, height);
-		ipInfo = new IPInfo(r.getWidth() / 2 - infoWidth / 2, vOffset + (r.getHeight() / vPad) * 2 - height/2 - 2, infoWidth, height);
 		csBtn = new CreateServerButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 2, btnWidth, height);
 		ipField = new TextBox(r.getWidth() / 2 - fieldWidth / 2, vOffset + (r.getHeight() / vPad) * 3 - height/2 + 2, fieldWidth, 18, 15);
-		conInfo = new InfoBox(r.getWidth() / 2 - fieldWidth / 2 - 32, vOffset + (r.getHeight() / vPad) * 3 + height + 4, infoWidth, height);
+		conInfo = new InfoBox(r.getWidth() / 2 - fieldWidth / 2 - 4, vOffset + (r.getHeight() / vPad) * 3 + height + 4, infoWidth, height);
 		conBtn = new ConnectButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 3, btnWidth, height);
 		exBtn = new ExitButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 5, btnWidth, height);
 		setBtn = new SettingButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 4, btnWidth, height);
@@ -40,7 +38,6 @@ public class MainMenu implements Page {
 	
 	public void render(Renderer r){
 		spBtn.render(r);
-		ipInfo.render(r);
 		csBtn.render(r);
 		ipField.render(r);
 		conBtn.render(r);

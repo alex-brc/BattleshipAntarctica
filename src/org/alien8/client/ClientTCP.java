@@ -2,6 +2,7 @@ package org.alien8.client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+
 import org.alien8.core.ServerMessage;
 
 public class ClientTCP extends Thread {
@@ -25,6 +26,9 @@ public class ClientTCP extends Thread {
         }
         else if (msg.getType() == 2) { // Server stopped
           Client.getInstance().disconnect();
+        }
+        else if (msg.getType() == 3) { // Start game
+          Client.getInstance().setState(Client.State.IN_GAME);
         }
       } catch (IOException ioe){ // Unexpected disconnection
         Client.getInstance().disconnect();

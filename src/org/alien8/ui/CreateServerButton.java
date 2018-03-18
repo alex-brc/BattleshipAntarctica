@@ -13,8 +13,8 @@ public class CreateServerButton extends Button {
   }
 
   public void executeAction() {
-    Client.getInstance().createServer(16);
-	Client.getInstance().getLobby().fill();
+    Client.getInstance().createServer(8);
+    Client.getInstance().getLobby().setHost();	
     Client.getInstance().setState(State.IN_LOBBY);
     String localServerIPStr = null;
     try {

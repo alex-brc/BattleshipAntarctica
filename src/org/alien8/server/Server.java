@@ -253,6 +253,9 @@ public class Server implements Runnable {
 
   public void startSGH() {
     sgh = new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
+    for(ClientHandler ch : chList) {
+    	ch.sendStartGame();
+    }
     sgh.start();
   }
 

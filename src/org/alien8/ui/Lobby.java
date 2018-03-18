@@ -1,36 +1,44 @@
 package org.alien8.ui;
 
-import org.alien8.client.Client;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
+import org.alien8.rendering.Sprite;
 
 public class Lobby implements Page {
-	private String ip;
 	private boolean isHost = false;
-	private LobbyList list;
 	private StartButton startBtn;
+	private InteractiveLogo logo;
+	private String ip;
 	
 	public Lobby() {
-		Renderer r = Renderer.getInstance();
-		list = new LobbyList(100);
-		startBtn = new StartButton(360, 500, 80, 30);
-	}
-	
-	public void fill() {
-		this.ip = Client.getInstance().getMenu().getIP();
-		for(String name : Client.getInstance().getOpponents()) {
-			list.add(name);
+		logo = new InteractiveLogo(Renderer.getInstance().getWidth()/2, 100);
+		startBtn = new StartButton(360, 530, 80, 30);
+		try {
+			ip = "server ip: " + InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	public void setHost() {
 		this.isHost = true;
+		
 	}
 	
 	public void render(Renderer renderer) {
-		startBtn.render(renderer);
-		list.render(renderer);
-		
-		
+		if(isHost) {
+			startBtn.render(renderer);
+			renderer.drawText(ip, renderer.getWidth() / 2 - ip.length()*8, 180, true, FontColor.WHITE);
+		}
+		else {
+			renderer.drawText("the host can start the game",renderer.getWidth() / 2 - "the host can start the game".length()*8, 530, true, FontColor.WHITE);
+			renderer.drawText("waiting for players", renderer.getWidth() / 2 - "waiting for players".length()*8, 180, true, FontColor.WHITE);
+		}
+		logo.render();
+		renderer.drawSprite(renderer.getWidth()/2 - Sprite.controls.getWidth()/2, renderer.getHeight()/2 - Sprite.controls.getHeight()/2 + 60, Sprite.controls, true );
 		
 	}	
 }

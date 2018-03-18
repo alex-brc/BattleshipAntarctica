@@ -4,9 +4,10 @@ import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 
 /**
- * This class provides a mean of displaying a 
- * message to the client after it tries to 
- * connect to a server.
+ * This class provides a mean of displaying
+ * static text to the screen at a position.
+ * Essentially, it's a functional wrapper 
+ * for <code>Renderer.drawText()</code>
  *
  */
 public class InfoBox {
@@ -16,7 +17,7 @@ public class InfoBox {
   private String text;
   
   /**
-   * Basic constructor for the ConnectInfo
+   * Basic constructor for the InfoBox
    * 
    * @param x the x coordinate of the position to render at
    * @param y the y coordinate of the position to render at

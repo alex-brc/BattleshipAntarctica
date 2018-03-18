@@ -1,10 +1,7 @@
 package org.alien8.ui;
 
-import java.util.concurrent.TimeUnit;
-
 import org.alien8.client.Client;
 import org.alien8.client.Client.State;
-import org.alien8.rendering.Renderer;
 
 public class ConnectButton extends Button{
 
@@ -39,7 +36,6 @@ public class ConnectButton extends Button{
 			return;
 		}
 		// Connected, fill up the lobby properly
-		Client.getInstance().getLobby().fill();
 		Client.getInstance().setState(State.IN_LOBBY);
 	}
 	
