@@ -12,7 +12,7 @@ import org.alien8.rendering.Sprite;
  */
 public class Mine extends Entity {
   private static final long serialVersionUID = -799176400440902424L;
-
+  protected Sprite sprite;
   private long shipSerial;
 
   /**
@@ -23,6 +23,7 @@ public class Mine extends Entity {
    */
   public Mine(Position position, long shipSerial) {
     super(position, 0, 0, 0, Parameters.MINE_LENGTH, Parameters.MINE_WIDTH);
+    this.sprite = Sprite.mine;
     this.shipSerial = shipSerial;
   }
 
@@ -36,8 +37,8 @@ public class Mine extends Entity {
   @Override
   public void render() {
     // TODO give this a sprite
-    Renderer.getInstance().drawSprite((int) position.getX() - Sprite.bullet.getWidth() / 2,
-        (int) position.getY() - Sprite.bullet.getHeight() / 2, Sprite.bullet, false);
+    Renderer.getInstance().drawSprite((int) position.getX() - sprite.getWidth() / 2,
+        (int) position.getY() - sprite.getHeight() / 2, sprite, false);
   }
 
   @Override
