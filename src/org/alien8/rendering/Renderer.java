@@ -6,9 +6,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-
 import javax.swing.JFrame;
-
 import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
@@ -25,7 +23,6 @@ import org.alien8.score.Score;
 import org.alien8.server.Timer;
 import org.alien8.ship.Ship;
 import org.alien8.ui.Page;
-
 import net.jafama.FastMath;
 
 /**
@@ -215,29 +212,30 @@ public class Renderer extends Canvas {
   }
 
   public void render(Page page) {
-	  BufferStrategy bs = getBufferStrategy();
-	  if (bs == null) {
-		  createBufferStrategy(3); // if none found, create a triple buffering strategy
-		  requestFocus();
-		  return;
-	  }
-	  clear();
+    BufferStrategy bs = getBufferStrategy();
+    if (bs == null) {
+      createBufferStrategy(3); // if none found, create a triple buffering strategy
+      requestFocus();
+      return;
+    }
+    clear();
 
-	  page.render(this);
+    page.render(this);
 
-	  // Graphics object from buffer strategy
-	  Graphics g = bs.getDrawGraphics();
-	  g.setColor(Color.BLACK);
-	  // Background rectangle same size as canvas
-	  g.fillRect(0, 0, getWidth(), getHeight());
-	  // Draw image with pixel data from image raster
-	  g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-	  // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
-	  // Necessary to clear memory
-	  g.dispose();
-	  // Displays the buffer strategy to the monitor
-	  bs.show();
- }
+    // Graphics object from buffer strategy
+    Graphics g = bs.getDrawGraphics();
+    g.setColor(Color.BLACK);
+    // Background rectangle same size as canvas
+    g.fillRect(0, 0, getWidth(), getHeight());
+    // Draw image with pixel data from image raster
+    g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+    // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
+    // Necessary to clear memory
+    g.dispose();
+    // Displays the buffer strategy to the monitor
+    bs.show();
+  }
+
   /**
    * Draws a pixel of the specified colour at the specified location on the screen.
    * 
@@ -255,7 +253,7 @@ public class Renderer extends Canvas {
     if (x >= 0 && y >= 0 && x < width && y < height)
       pixels[x + y * width] = col;
   }
-  
+
   /**
    * Draws a Sprite on the screen.
    * 
@@ -549,8 +547,6 @@ public class Renderer extends Canvas {
           drawEntityDot(ent, x, y, widthScale, heightScale, 0xF83800);
         }
       }
-
-      System.out.println("X: " + xScroll + ", Y: " + yScroll);
 
       // Render border of view
       int miniX = x + (xScroll + Parameters.SMALL_BORDER) / widthScale;

@@ -15,7 +15,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
@@ -71,7 +70,7 @@ public class Client implements Runnable {
   private Lobby lobby = null;
 
   public enum State {
-	  NAME_SCREEN, MAIN_MENU, SPLASH_SCREEN, IN_GAME, SETTINGS_MENU, IN_LOBBY
+    NAME_SCREEN, MAIN_MENU, SPLASH_SCREEN, IN_GAME, SETTINGS_MENU, IN_LOBBY
   }
 
   private State state = State.SPLASH_SCREEN;
@@ -146,7 +145,7 @@ public class Client implements Runnable {
           break;
         case SETTINGS_MENU:
           Renderer.getInstance().render(settings);
-    	  break;
+          break;
         case IN_LOBBY:
           Renderer.getInstance().render(lobby);
           break;
@@ -167,9 +166,9 @@ public class Client implements Runnable {
 
               // Get the amount of update()s the model needs to catch up
               //
-              // 				  timeNow - timeLastUpdateWasDone    --> time elapsed
+              // timeNow - timeLastUpdateWasDone --> time elapsed
               // timeToCatchUp = ----------------------------------
-              // 							deltaTPerTick            --> how long a "tick" is
+              // deltaTPerTick --> how long a "tick" is
               //
               catchUp +=
                   (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
@@ -222,9 +221,9 @@ public class Client implements Runnable {
   }
 
   public NameScreen getNameScreen() {
-	return this.nameScreen;
+    return this.nameScreen;
   }
-  
+
   /**
    * Getter for the latest FPS estimation.
    * 
@@ -292,7 +291,7 @@ public class Client implements Runnable {
         // Receive the initial game state from server
         ArrayList<EntityLite> entsLite = this.receiveGameStateTCP(fromServer);
         model.sync(entsLite, clientIP, clientUdpPort);
-        
+
         // Serialize a ClientMessage (ready) Object into byte array
         ClientMessage ready = new ClientMessage(1, udpSocket.getLocalPort(), clientName);
         toServer.writeObject(ready);
@@ -383,7 +382,7 @@ public class Client implements Runnable {
 
   private void receiveEvents(GameEvent event) {
     // Send audio events to AudioManager
-	System.out.println(event.getClass());
+    System.out.println(event.getClass());
     if (event != null) {
       if (event instanceof AudioEvent)
         AudioManager.getInstance().addEvent((AudioEvent) event);
@@ -495,26 +494,26 @@ public class Client implements Runnable {
    * @return the client's name
    */
   public String getClientName() {
-	  return clientName;
+    return clientName;
   }
 
   /**
    * @param clientName the client name to set
    */
   public void setClientName(String clientName) {
-	  this.clientName = clientName;
-	  this.opponents.add(clientName);
+    this.clientName = clientName;
+    this.opponents.add(clientName);
   }
 
   /**
    * @return the opponents' names
    */
   public ArrayList<String> getOpponents() {
-	  return opponents;
+    return opponents;
   }
-  
+
   public Lobby getLobby() {
-	return lobby;
+    return lobby;
   }
 
   public State getState() {
