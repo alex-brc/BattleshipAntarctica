@@ -15,6 +15,8 @@ import org.alien8.core.ClientModelManager;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.core.ServerModelManager;
+import org.alien8.items.Pickup;
+import org.alien8.items.PlaneDropper;
 import org.alien8.physics.Position;
 import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
@@ -605,22 +607,49 @@ public class Renderer extends Canvas {
       // Render ships
       for (Entity ent : ServerModelManager.getInstance().getEntities()) {
         if (ent instanceof Ship) {
-          double xPos = ent.getPosition().getX();
-          double yPos = ent.getPosition().getY();
-          int renderXPos = (int) FastMath.round(xPos / widthScale);
-          int renderYPos = (int) FastMath.round(yPos / heightScale);
-          // Displays a dot for the ship on the minimap
-          // As 1 pixel is too small to see, actually display 3x3 pixels for the ship
-          drawPixel(x + renderXPos, y + renderYPos, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos + 1, y + renderYPos, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos + 2, y + renderYPos, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos + 1, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos + 2, y + renderYPos + 1, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos + 1, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
-          drawPixel(x + renderXPos + 2, y + renderYPos + 2, ((Ship) ent).getColour(), fixed);
+          drawEntityDot(ent, x, y, widthScale, heightScale, ((Ship) ent).getColour());
+        } else if (ent instanceof Pickup) {
+          drawEntityDot(ent, x, y, widthScale, heightScale, 0x503000);
+        } else if (ent instanceof PlaneDropper) {
+          drawEntityDot(ent, x, y, widthScale, heightScale, 0xF83800);
         }
+      }
+
+      System.out.println("X: " + xScroll + ", Y: " + yScroll);
+
+      // Render border of view
+      int miniX = x + (xScroll + Parameters.SMALL_BORDER) / widthScale;
+      int miniY = y + (yScroll + Parameters.BIG_BORDER) / heightScale;
+      int miniViewWidth = ((Parameters.RENDERER_SIZE.width - (2 * Parameters.SMALL_BORDER))
+          / Parameters.MINIMAP_WIDTH) * 2;
+      int miniViewHeight =
+          ((Parameters.RENDERER_SIZE.height - (Parameters.BIG_BORDER + Parameters.SMALL_BORDER))
+              / Parameters.MINIMAP_HEIGHT) * 2;
+      drawRect(miniX, miniY, miniViewWidth, miniViewHeight, 0xF83800, true);
+    }
+  }
+
+  /**
+   * Draws a dot on the minimap representing an Entity.
+   * 
+   * @param ent the Entity to draw a dot for
+   * @param x the x position of the minimap
+   * @param y the y position of the minimap
+   * @param widthScale the scale of the map to the minimap (width-wise)
+   * @param heightScale the scale of the map to the minimap (height-wise)
+   * @param colour the colour of the dot to draw
+   */
+  private void drawEntityDot(Entity ent, int x, int y, int widthScale, int heightScale,
+      int colour) {
+    double xPos = ent.getPosition().getX();
+    double yPos = ent.getPosition().getY();
+    int renderXPos = (int) FastMath.round(xPos / widthScale);
+    int renderYPos = (int) FastMath.round(yPos / heightScale);
+    // Displays a dot for the ship on the minimap
+    // As 1 pixel is too small to see, actually display 3x3 pixels for the ship
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        drawPixel(x + renderXPos + i, y + renderYPos + j, colour, true);
       }
     }
   }
