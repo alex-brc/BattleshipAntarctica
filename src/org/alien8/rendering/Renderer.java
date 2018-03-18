@@ -6,7 +6,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+
 import javax.swing.JFrame;
+
 import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
@@ -22,9 +24,8 @@ import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
 import org.alien8.server.Timer;
 import org.alien8.ship.Ship;
-import org.alien8.ui.MainMenu;
-import org.alien8.ui.SettingsMenu;
-import org.alien8.ui.SplashScreen;
+import org.alien8.ui.Page;
+
 import net.jafama.FastMath;
 
 /**
@@ -103,96 +104,6 @@ public class Renderer extends Canvas {
     for (int i = 0; i < pixels.length; i++) {
       pixels[i] = 0; // cycles through all pixels and sets them to 0, resetting the array
     }
-  }
-
-  /**
-   * Renders the splash screen.
-   * 
-   * @param splash the splash screen to render
-   */
-  public void render(SplashScreen splash) {
-    BufferStrategy bs = getBufferStrategy();
-    if (bs == null) {
-      createBufferStrategy(3); // if none found, create a triple buffering strategy
-      requestFocus();
-      return;
-    }
-    clear();
-
-    splash.render(this);
-
-    // Graphics object from buffer strategy
-    Graphics g = bs.getDrawGraphics();
-    g.setColor(Color.BLACK);
-    // Background rectangle same size as canvas
-    g.fillRect(0, 0, getWidth(), getHeight());
-    // Draw image with pixel data from image raster
-    g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-    // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
-    // Necessary to clear memory
-    g.dispose();
-    // Displays the buffer strategy to the monitor
-    bs.show();
-  }
-
-  /**
-   * Renders the main menu.
-   * 
-   * @param menu the main menu to render
-   */
-  public void render(MainMenu menu) {
-    BufferStrategy bs = getBufferStrategy();
-    if (bs == null) {
-      createBufferStrategy(3); // if none found, create a triple buffering strategy
-      requestFocus();
-      return;
-    }
-    clear();
-
-    menu.render(this);
-
-    // Graphics object from buffer strategy
-    Graphics g = bs.getDrawGraphics();
-    g.setColor(Color.BLACK);
-    // Background rectangle same size as canvas
-    g.fillRect(0, 0, getWidth(), getHeight());
-    // Draw image with pixel data from image raster
-    g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-    // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
-    // Necessary to clear memory
-    g.dispose();
-    // Displays the buffer strategy to the monitor
-    bs.show();
-  }
-
-  /**
-   * Renders the settings menu.
-   * 
-   * @param settings the settings menu to render
-   */
-  public void render(SettingsMenu settings) {
-    BufferStrategy bs = getBufferStrategy();
-    if (bs == null) {
-      createBufferStrategy(3); // if none found, create a triple buffering strategy
-      requestFocus();
-      return;
-    }
-    clear();
-
-    settings.render(this);
-
-    // Graphics object from buffer strategy
-    Graphics g = bs.getDrawGraphics();
-    g.setColor(Color.BLACK);
-    // Background rectangle same size as canvas
-    g.fillRect(0, 0, getWidth(), getHeight());
-    // Draw image with pixel data from image raster
-    g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-    // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
-    // Necessary to clear memory
-    g.dispose();
-    // Displays the buffer strategy to the monitor
-    bs.show();
   }
 
   /**
@@ -303,6 +214,30 @@ public class Renderer extends Canvas {
     bs.show();
   }
 
+  public void render(Page page) {
+	  BufferStrategy bs = getBufferStrategy();
+	  if (bs == null) {
+		  createBufferStrategy(3); // if none found, create a triple buffering strategy
+		  requestFocus();
+		  return;
+	  }
+	  clear();
+
+	  page.render(this);
+
+	  // Graphics object from buffer strategy
+	  Graphics g = bs.getDrawGraphics();
+	  g.setColor(Color.BLACK);
+	  // Background rectangle same size as canvas
+	  g.fillRect(0, 0, getWidth(), getHeight());
+	  // Draw image with pixel data from image raster
+	  g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+	  // g.fillRect(Mouse.getX(), Mouse.getY(), 64, 64);
+	  // Necessary to clear memory
+	  g.dispose();
+	  // Displays the buffer strategy to the monitor
+	  bs.show();
+ }
   /**
    * Draws a pixel of the specified colour at the specified location on the screen.
    * 
@@ -320,7 +255,7 @@ public class Renderer extends Canvas {
     if (x >= 0 && y >= 0 && x < width && y < height)
       pixels[x + y * width] = col;
   }
-
+  
   /**
    * Draws a Sprite on the screen.
    * 

@@ -197,7 +197,7 @@ public class Server implements Runnable {
       ObjectOutputStream toClient, ObjectInputStream fromClient) {
     if (cr.getType() == 0) { // Connect request
       ClientHandler ch = new ClientHandler(clientIP, cr.getUdpPort(), playerList, entities,
-          playerMap, seed, toClient, fromClient);
+          playerMap, seed, toClient, fromClient, cr.getPlayerName());
       chList.add(ch);
       ch.start();
     }
@@ -253,6 +253,9 @@ public class Server implements Runnable {
 
   public void startSGH() {
     sgh = new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
+    for(ClientHandler ch : chList) {
+    	ch.sendStartGame();
+    }
     sgh.start();
   }
 

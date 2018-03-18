@@ -1,7 +1,5 @@
 package org.alien8.ui;
 
-import java.util.concurrent.TimeUnit;
-
 import org.alien8.client.Client;
 import org.alien8.client.Client.State;
 
@@ -32,14 +30,13 @@ public class ConnectButton extends Button{
 			}
 		}
 		// IP is okay
-		showMessage(" connecting...");
 		boolean connected = Client.getInstance().connect(ip);
 		if(!connected) {
 			showMessage("  couldn't connect");
 			return;
 		}
-		// Connected
-		Client.getInstance().setState(State.IN_GAME);
+		// Connected, fill up the lobby properly
+		Client.getInstance().setState(State.IN_LOBBY);
 	}
 	
 	private void showMessage(String message) {

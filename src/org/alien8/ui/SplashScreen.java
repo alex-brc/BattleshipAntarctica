@@ -7,7 +7,7 @@ import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 
-public class SplashScreen {
+public class SplashScreen implements Page{
 	
 	private String text;
 	
@@ -20,7 +20,7 @@ public class SplashScreen {
 		r.drawText(text, r.getWidth() / 2 - (text.length()*16) / 2, r.getHeight()/3 - 8, true, FontColor.WHITE);
 		
 		if (InputManager.getInstance().anyPressed()){
-			Launcher.getInstance().getRunningClient().setState(State.MAIN_MENU);
+			Launcher.getInstance().getRunningClient().setState(State.NAME_SCREEN);
 		}
 	}
 	
