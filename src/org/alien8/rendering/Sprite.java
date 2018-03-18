@@ -198,7 +198,7 @@ public class Sprite implements Serializable {
    */
   public static Sprite makeShipSprite(int colour) {
     Sprite newSprite = Sprite.ship_green;
-
+    
     // TODO: Make a sprite with the given colour
     // For assigning random colours to player's ships.
 
