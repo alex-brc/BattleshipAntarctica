@@ -281,15 +281,6 @@ public class Ship extends Entity implements Serializable {
     this.setPosition(
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
-
-    // // Handle rotation of the ship
-    // if (xdiff != 0) {
-    // if (getDirection())
-    // }
-    //
-    //
-    // PhysicsManager.rotateEntity(this, xdiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
-    // PhysicsManager.rotateEntity(this, ydiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
   }
 
   private void flipDir() {
@@ -308,6 +299,7 @@ public class Ship extends Entity implements Serializable {
       double shipX = getPosition().getX();
       double shipY = getPosition().getY();
 
+      int i = 0;
       // Checks each corner of the ship
       for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
         Position corner = (Position) iterator.next();
@@ -348,26 +340,39 @@ public class Ship extends Entity implements Serializable {
               ydiff = posYdiff;
             }
             // Finds minimum overall distance and adjusts ship Position and bounding box
+            double minDistance = 0;
             if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
+              minDistance = ydiff;
               setPosition(new Position(shipX, shipY + ydiff));
               translateObb(0, ydiff);
-              if (ydiff <= 0) {
-
-              }
               PhysicsManager.rotateEntity(this, -ydiff * Parameters.ICE_BOUNCINESS);
               initObb();
             } else {
+              minDistance = xdiff;
               setPosition(new Position(shipX + xdiff, shipY));
               translateObb(xdiff, 0);
               PhysicsManager.rotateEntity(this, -xdiff * Parameters.ICE_BOUNCINESS);
               initObb();
             }
 
-            if (getDirection() >= 0 && getDirection() < FastMath.PI) {
-              PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            double rotateAmount = minDistance * Parameters.ICE_BOUNCINESS;
+            if (i == 0 || i == 3) {
+              PhysicsManager.rotateEntity(this, rotateAmount);
+              initObb();
             } else {
-              PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+              // In this case, i == 1 or i == 2
+              PhysicsManager.rotateEntity(this, -rotateAmount);
             }
+
+            i++;
+
+
+
+            // if (getDirection() >= 0 && getDirection() < FastMath.PI) {
+            // PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            // } else {
+            // PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            // }
 
             // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
             // System.out.println("Health: " + getHealth());
@@ -469,7 +474,7 @@ public class Ship extends Entity implements Serializable {
   public void giveItem(Item item) {
     if (this.item == null) {
       this.item = item;
-      System.out.println("Picked up a " + item.getClass());
+      // System.out.println("Picked up a " + item.getClass());
     }
   }
 

@@ -123,7 +123,7 @@ public class Parameters {
   /**
    * Affects how 'bouncy' ice is when collided with.
    */
-  public static final double ICE_BOUNCINESS = 0.02;
+  public static final double ICE_BOUNCINESS = 0.005;
   public static final double OUT_OF_BOUNDS_PUSHBACK = 10;
   public static final double OUT_OF_BOUNDS_BOUNCINESS = 0.02;
   //////////////////////////////////////////////////////////
