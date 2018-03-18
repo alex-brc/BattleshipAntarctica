@@ -12,7 +12,6 @@ public class StartButton extends Button {
 
 	@Override
 	public void executeAction() {
-		Server.getInstance().startSGH();
 		Client.getInstance().setState(State.IN_GAME);
 	}
 

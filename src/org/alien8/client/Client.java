@@ -517,4 +517,8 @@ public class Client implements Runnable {
 	return lobby;
   }
 
+  public State getState() {
+	  return this.state;
+  }
+
 }
