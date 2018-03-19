@@ -321,7 +321,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   public void keyTyped(KeyEvent e) {
 	if (e.getKeyCode() != KeyEvent.VK_ENTER){
 	  typed = e.getKeyChar();
-	  //System.out.println(c);
 	}
 	// Mute all sounds with M
     if(e.getKeyCode() == KeyEvent.VK_M) {

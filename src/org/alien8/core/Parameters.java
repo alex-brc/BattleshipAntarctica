@@ -4,11 +4,11 @@ import java.awt.Dimension;
 import net.jafama.FastMath;
 
 /**
- * This class is meant to hold all the important <code> final </code> parameters for all classes to
- * easily access. If everyone uses these, we could technically just change these parameters, build,
- * run and have the game running at a different speed, maybe projectiles are faster, maybe
- * acceleration from input is more intense, etc. Essentially, this can be viewed as a universal
- * control panel. Change a parameter from here and the change ripples through the code.
+ * This class holds all the important <code> final</code> parameters for all classes to easily
+ * access. If everyone uses these, we could technically just change these parameters, build, run and
+ * have the game running at a different speed, maybe projectiles are faster, maybe acceleration from
+ * input is more intense, etc. Essentially, this can be viewed as a universal control panel. Change
+ * a parameter from here and the change ripples through the code.
  * <p>
  * Taking that into consideration, every tweak-able parameter and important constant should be
  * written in here.
@@ -57,7 +57,7 @@ public class Parameters {
   public static final int MINIMAP_HEIGHT = 64;
   public static final int GAME_PARALLAX_WEIGHT = 35;
   public static final int MENU_PARALLAX_WEIGHT = 100;
-  
+
   //////////////////////////////////////////////////////////
 
 
@@ -79,8 +79,8 @@ public class Parameters {
   public static final double SHIP_WIDTH = 25;
   public static final double SHIP_HEALTH = 100;
   public static final double SHIP_TOP_SPEED_REACH_TIME = 200;
-  public static final double SHIP_TOP_SPEED_FORWARD = 2;
-  public static final double SHIP_TOP_SPEED_BACKWARD = 2;
+  public static final double SHIP_TOP_SPEED_FORWARD = 1.4;
+  public static final double SHIP_TOP_SPEED_BACKWARD = 1.4;
   public static final double SHIP_MASS = 1000;
   public static final double SHIP_FORWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME;
@@ -115,7 +115,7 @@ public class Parameters {
   /**
    * Affects how much damage ships take in collisions.
    */
-  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.0005;
   public static final double COLLISION_ROTATION_MODIFIER = 0.2;
   /**
    * Affects how much the speed impacts the turning rate.
@@ -129,7 +129,7 @@ public class Parameters {
   /**
    * Affects how 'bouncy' ice is when collided with.
    */
-  public static final double ICE_BOUNCINESS = 0.02;
+  public static final double ICE_BOUNCINESS = 0.005;
   public static final double OUT_OF_BOUNDS_PUSHBACK = 10;
   public static final double OUT_OF_BOUNDS_BOUNCINESS = 0.02;
   //////////////////////////////////////////////////////////
@@ -175,6 +175,10 @@ public class Parameters {
   public static final int TORPEDO_SCORE = 100;
   //////////////////////////////////////////////////////////
 
+  /// TEST PARAMETERS
+  public static final double DOUBLE_PRECISION = 0.001;
+
+  //////////////////////////////////////////////////////////
 
   /// UNUSED PARAMETERS
   /**

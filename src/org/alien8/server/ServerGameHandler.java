@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
-import org.alien8.core.ServerModelManager;
 import org.alien8.core.Parameters;
+import org.alien8.core.ServerModelManager;
 import org.alien8.items.Mine;
 import org.alien8.items.Pickup;
 import org.alien8.items.PlaneDropper;
@@ -35,6 +35,7 @@ public class ServerGameHandler extends Thread {
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
+  private volatile boolean running = false;
   private volatile boolean gameRunning = true;
   private int seconds;
 
@@ -80,18 +81,20 @@ public class ServerGameHandler extends Thread {
         gameRunning = false;
       }
     }
-    
+
     // Notice all clients game has ended
     for (ClientHandler ch : Server.getInstance().getCHList()) {
       ch.sendEndGameMessage();
     }
 
     long timeWhenGameEnds = getNanoTime();
-    
+
     // Wait 10 seconds before the server shut down (for players to read the leaderboard)
-    while (getNanoTime() - timeWhenGameEnds < Parameters.TIME_BEFORE_SERVER_END * (long) Parameters.N_SECOND) {
-      int timeBeforeExiting = Parameters.TIME_BEFORE_SERVER_END - (int) ((getNanoTime() - timeWhenGameEnds) / Parameters.N_SECOND);
-      
+    while (getNanoTime() - timeWhenGameEnds < Parameters.TIME_BEFORE_SERVER_END
+        * (long) Parameters.N_SECOND) {
+      int timeBeforeExiting = Parameters.TIME_BEFORE_SERVER_END
+          - (int) ((getNanoTime() - timeWhenGameEnds) / Parameters.N_SECOND);
+
       // Send info about how much time before exiting for client's renderer to update the time
       for (ClientHandler ch : Server.getInstance().getCHList()) {
         ch.sendTimeBeforeExiting(timeBeforeExiting);
@@ -101,7 +104,8 @@ public class ServerGameHandler extends Thread {
     // Notice all clients that server has been shut down
     for (ClientHandler ch : Server.getInstance().getCHList()) {
       ch.sendServerStoppedMessage();
-      ch.end(); // Will not immediately stop the client handler, it stops when server's TCP socket is closed (which throw exception for ch)
+      ch.end(); // Will not immediately stop the client handler, it stops when server's TCP socket
+                // is closed (which throw exception for ch)
     }
 
     // Stop the server
@@ -125,7 +129,7 @@ public class ServerGameHandler extends Thread {
   private long getNanoTime() {
     return System.nanoTime();
   }
-  
+
   public boolean isGameRunning() {
     return gameRunning;
   }
@@ -191,8 +195,7 @@ public class ServerGameHandler extends Thread {
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
               s.getRearTurretDirection(), s.getFrontTurretCharge(), s.getRearTurretCharge(),
-              s.getColour(), s.getItemType(), s.getEffectType(),
-              p.getIP(), p.getPort()));
+              s.getColour(), s.getItemType(), s.getEffectType(), p.getIP(), p.getPort()));
         } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),

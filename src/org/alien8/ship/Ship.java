@@ -235,6 +235,26 @@ public class Ship extends Entity implements Serializable {
     // Render turrets
     frontTurret.render();
     rearTurret.render();
+
+    if(effect != null) {
+    	Sprite sp = null;
+    	switch(effect.getEffectType()) {
+    	case Effect.NO_COOLDOWN:
+    		sp = Sprite.item_no_cooldown;
+    		break;
+    	case Effect.SPEED:
+    		sp = Sprite.effect_speed;
+    		sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI /2);
+    		break;
+    	case Effect.INVULNERABLE:
+    		sp = Sprite.effect_invulnerable;
+    		sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI /2);
+    		break;
+    	}
+    	
+    	Renderer.getInstance().drawSprite((int) this.getPosition().getX() - sp.getWidth()/2, 
+				(int) this.getPosition().getY() - sp.getHeight()/2, sp, false);
+    }
   }
 
   /**
@@ -250,10 +270,12 @@ public class Ship extends Entity implements Serializable {
       if (corner.getX() > Parameters.MAP_WIDTH) {
         if (corner.getX() - Parameters.MAP_WIDTH > xdiff) {
           xdiff = corner.getX() - Parameters.MAP_WIDTH;
+          // flipDir();
         }
       } else if (corner.getX() < 0) {
         if (corner.getX() < xdiff) {
           xdiff = corner.getX();
+          // flipDir();
         }
       }
 
@@ -261,10 +283,12 @@ public class Ship extends Entity implements Serializable {
       if (corner.getY() > Parameters.MAP_HEIGHT) {
         if (corner.getY() - Parameters.MAP_HEIGHT > ydiff) {
           ydiff = corner.getY() - Parameters.MAP_HEIGHT;
+          // flipDir();
         }
       } else if (corner.getY() < 0) {
         if (corner.getY() < ydiff) {
           ydiff = corner.getY();
+          // flipDir();
         }
       }
     }
@@ -272,15 +296,13 @@ public class Ship extends Entity implements Serializable {
     this.setPosition(
         new Position(this.getPosition().getX() - xdiff, this.getPosition().getY() - ydiff));
     this.translateObb(-xdiff, -ydiff);
+  }
 
-    // // Handle rotation of the ship
-    // if (xdiff != 0) {
-    // if (getDirection())
-    // }
-    //
-    //
-    // PhysicsManager.rotateEntity(this, xdiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
-    // PhysicsManager.rotateEntity(this, ydiff * Parameters.OUT_OF_BOUNDS_BOUNCINESS);
+  private void flipDir() {
+    // TEMP
+    // Reverse direction if out of bounds
+    PhysicsManager.rotateEntity(this, FastMath.PI);
+    rotateObb(getDirection() + FastMath.PI);
   }
 
   /**
@@ -292,6 +314,7 @@ public class Ship extends Entity implements Serializable {
       double shipX = getPosition().getX();
       double shipY = getPosition().getY();
 
+      int i = 0;
       // Checks each corner of the ship
       for (Iterator<Position> iterator = Arrays.asList(getObb()).iterator(); iterator.hasNext();) {
         Position corner = (Position) iterator.next();
@@ -332,26 +355,39 @@ public class Ship extends Entity implements Serializable {
               ydiff = posYdiff;
             }
             // Finds minimum overall distance and adjusts ship Position and bounding box
+            double minDistance = 0;
             if (FastMath.abs(xdiff) >= FastMath.abs(ydiff)) {
+              minDistance = ydiff;
               setPosition(new Position(shipX, shipY + ydiff));
               translateObb(0, ydiff);
-              if (ydiff <= 0) {
-
-              }
               PhysicsManager.rotateEntity(this, -ydiff * Parameters.ICE_BOUNCINESS);
               initObb();
             } else {
+              minDistance = xdiff;
               setPosition(new Position(shipX + xdiff, shipY));
               translateObb(xdiff, 0);
               PhysicsManager.rotateEntity(this, -xdiff * Parameters.ICE_BOUNCINESS);
               initObb();
             }
 
-            if (getDirection() >= 0 && getDirection() < FastMath.PI) {
-              PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            double rotateAmount = minDistance * Parameters.ICE_BOUNCINESS;
+            if (i == 0 || i == 3) {
+              PhysicsManager.rotateEntity(this, rotateAmount);
+              initObb();
             } else {
-              PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+              // In this case, i == 1 or i == 2
+              PhysicsManager.rotateEntity(this, -rotateAmount);
             }
+
+            i++;
+
+
+
+            // if (getDirection() >= 0 && getDirection() < FastMath.PI) {
+            // PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            // } else {
+            // PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
+            // }
 
             // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
             // System.out.println("Health: " + getHealth());
@@ -474,9 +510,9 @@ public class Ship extends Entity implements Serializable {
   }
 
   public int getEffectType() {
-	  if(effect != null)
-		  return this.effect.getEffectType();
-	  return -1;
+    if (effect != null)
+      return this.effect.getEffectType();
+    return -1;
   }
 
   public boolean underEffect() {
@@ -488,10 +524,11 @@ public class Ship extends Entity implements Serializable {
   public Item getItem() {
     return item;
   }
+
   public int getItemType() {
-	  if(item != null)
-		  return this.item.getItemType();
-	  return -1;
+    if (item != null)
+      return this.item.getItemType();
+    return -1;
   }
 }
 

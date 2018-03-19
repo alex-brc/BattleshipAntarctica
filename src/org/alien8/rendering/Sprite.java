@@ -6,6 +6,10 @@ import java.io.Serializable;
 import javax.imageio.ImageIO;
 import net.jafama.FastMath;
 
+/**
+ * This class represents a sprite image in the game. It also contains static pre-loaded sprites.
+ *
+ */
 public class Sprite implements Serializable {
 
   private static final long serialVersionUID = -7826033026339264249L;
@@ -32,20 +36,28 @@ public class Sprite implements Serializable {
   public static Sprite item_speed = new Sprite("/org/alien8/assets/item_speed.png");
   public static Sprite item_torpedo = new Sprite("/org/alien8/assets/item_torpedo.png");
   public static Sprite pickup = new Sprite("/org/alien8/assets/pickup.png");
+  public static Sprite mine = new Sprite("/org/alien8/assets/mine.png");
   public static Sprite title_screen = new Sprite("/org/alien8/assets/title_screen.png");
   public static Sprite logo = new Sprite("/org/alien8/assets/logo.png");
   public static Sprite controls = new Sprite("/org/alien8/assets/controls.png");
-
+  public static Sprite effect_speed = new Sprite("/org/alien8/assets/effect_speed.png");
+  public static Sprite effect_invulnerable = new Sprite("/org/alien8/assets/effect_invulnerable.png");
+  public static Sprite crosshair = new Sprite("/org/alien8/assets/crosshair.png");
+  /**
+   * Constructor.
+   * 
+   * @param path the file path for the Sprite's image
+   */
   public Sprite(String path) {
     this.path = path;
     load();
   }
 
   /**
-   * Creates an empty sprite
+   * Creates an empty Sprite.
    * 
-   * @param width
-   * @param height
+   * @param width the width of the Sprite's image
+   * @param height the height of the Sprite's image
    */
   public Sprite(int width, int height) {
     this.width = width;
@@ -54,16 +66,24 @@ public class Sprite implements Serializable {
   }
 
   /**
-   * Creates a copy of a sprite
+   * Creates a copy of a Sprite.
    * 
-   * @param s
+   * @param s the Sprite to copy
    */
   public Sprite(Sprite s) {
     width = s.getWidth();
     height = s.getHeight();
+    pixels = new int[width*height];
     System.arraycopy(s.getPixels(), 0, pixels, 0, s.getPixels().length);
   }
 
+  /**
+   * Constructor.
+   * 
+   * @param pixels an int[] of colours representing the pixels of the Sprite
+   * @param width the width of the Sprite's image
+   * @param height the height of the Sprite's image
+   */
   public Sprite(int[] pixels, int width, int height) {
     this.pixels = new int[width * height];
     System.arraycopy(pixels, 0, this.pixels, 0, pixels.length);
@@ -71,6 +91,48 @@ public class Sprite implements Serializable {
     this.height = height;
   }
 
+  /**
+   * @return the width of this Sprite
+   */
+  public int getWidth() {
+    return width;
+  }
+
+  /**
+   * @return the height of this Sprite
+   */
+  public int getHeight() {
+    return height;
+  }
+
+  /**
+   * @return the int[] of pixels representing this Sprite
+   */
+  public int[] getPixels() {
+    return pixels;
+  }
+
+  /**
+   * Loads a Sprite from a file.
+   */
+  private void load() {
+    try {
+      BufferedImage image = ImageIO.read(Sprite.class.getResource(path));
+      width = image.getWidth();
+      height = image.getHeight();
+      pixels = new int[width * height];
+      image.getRGB(0, 0, width, height, pixels, 0, width);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Rotates a Sprite by an angle.
+   * 
+   * @param a the angle to rotate by
+   * @return the rotated Sprite
+   */
   public Sprite rotateSprite(double a) {
     Sprite s = new Sprite(
         (int) (height * FastMath.abs(FastMath.sin(a)) + width * FastMath.abs(FastMath.cos(a))),
@@ -99,10 +161,111 @@ public class Sprite implements Serializable {
           s.getPixels()[(int) nx + (int) ny * s.getWidth()] = pixels[x + y * width];
       }
     }
+    for (int y = 0; y < s.getHeight(); y++){
+    	for (int x = 0; x < s.getWidth(); x++){
+    		if (s.getPixels()[x + y * s.getWidth()] == 0xffff00ff){
+    			/*
+    			 * 1 4 6
+    			 * 2 x 7
+    			 * 3 5 8
+    			 */
+    			int count = 0;
+    			int totalR = 0;
+    			int totalG = 0;
+    			int totalB = 0;
+        		if (x > 0){
+        			if (y > 0){
+        				int hex1 = s.getPixels()[(x-1) + (y-1) * s.getWidth()] % 0xff000000;
+        				if (hex1 != 0xff00ff){
+        					count++;
+        					totalR += (hex1 & 0xff0000) >> 16;
+        					totalG += (hex1 & 0xff00) >> 8;
+    						totalB += (hex1 & 0xff);
+        				}
+        			}
+        			int hex2 = s.getPixels()[(x-1) + y * s.getWidth()] % 0xff000000;
+        			if (hex2 != 0xffff00ff){
+        				count++;
+        				totalR += (hex2 & 0xff0000) >> 16;
+    					totalG += (hex2 & 0xff00) >> 8;
+						totalB += (hex2 & 0xff);
+        			}
+        			if (y < s.getHeight() -1){
+        				int hex3 = s.getPixels()[(x-1) + (y+1) * s.getWidth()] % 0xff000000;
+        				if (hex3 != 0xffff00ff){
+        					count++;
+        					totalR += (hex3 & 0xff0000) >> 16;
+        					totalG += (hex3 & 0xff00) >> 8;
+    						totalB += (hex3 & 0xff);
+        				}
+        			}
+        		}
+        		if (y > 0){
+        			int hex4 = s.getPixels()[x + (y-1) * s.getWidth()] % 0xff000000;
+        			if (hex4 != 0xffff00ff){
+    					count++;
+    					totalR += (hex4 & 0xff0000) >> 16;
+    					totalG += (hex4 & 0xff00) >> 8;
+						totalB += (hex4 & 0xff);
+    				}
+        		}
+        		if (y < s.getHeight() -1){
+        			int hex5 = s.getPixels()[x + (y+1) * s.getWidth()] % 0xff000000;
+        			if (hex5 != 0xffff00ff){
+    					count++;
+    					totalR += (hex5 & 0xff0000) >> 16;
+    					totalG += (hex5 & 0xff00) >> 8;
+						totalB += (hex5 & 0xff);
+    				}
+        		}
+        		if (x < s.getWidth() -1){
+        			if (y > 0){
+        				int hex6 = s.getPixels()[(x+1) + (y-1) * s.getWidth()] % 0xff000000;
+        				if (hex6 != 0xff00ff){
+        					count++;
+        					totalR += (hex6 & 0xff0000) >> 16;
+        					totalG += (hex6 & 0xff00) >> 8;
+    						totalB += (hex6 & 0xff);
+        				}
+        			}
+        			int hex7 = s.getPixels()[(x+1) + y * s.getWidth()] % 0xff000000;
+    				if (hex7 != 0xff00ff){
+    					count++;
+    					totalR += (hex7 & 0xff0000) >> 16;
+    					totalG += (hex7 & 0xff00) >> 8;
+						totalB += (hex7 & 0xff);
+    				}
+    				if (y < s.getHeight() -1){
+        				int hex8 = s.getPixels()[(x+1) + (y+1) * s.getWidth()] % 0xff000000;
+        				if (hex8 != 0xff00ff){
+        					count++;
+        					totalR += (hex8 & 0xff0000) >> 16;
+        					totalG += (hex8 & 0xff00) >> 8;
+    						totalB += (hex8 & 0xff);
+        				}
+        			}
+        		}
+        		if (count > 6){
+        			int r = totalR / count;
+        			int g = totalG / count;
+        			int b = totalB / count;
+        			int hex = 0xff000000 + (r * 0x10000) + (g * 0x100) + b;
+        			s.getPixels()[x + y * s.getWidth()] = hex;
+        		}
+    		}
+    	}
+    }
 
     return s;
   }
 
+  /**
+   * Creates a Sprite[] from a sprite sheet.
+   * 
+   * @param sheet the sheet to create Sprites from
+   * @param size the size of each Sprite in the sheet
+   * @return a Sprite[]
+   */
   public static Sprite[] split(Sprite sheet, int size) {
     int total = (sheet.getWidth() * sheet.getHeight()) / (size * size);
     Sprite[] sprites = new Sprite[total];
@@ -125,37 +288,19 @@ public class Sprite implements Serializable {
     return sprites;
   }
 
-  private void load() {
-    try {
-      BufferedImage image = ImageIO.read(Sprite.class.getResource(path));
-      width = image.getWidth();
-      height = image.getHeight();
-      pixels = new int[width * height];
-      image.getRGB(0, 0, width, height, pixels, 0, width);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
+  /**
+   * Makes a Ship Sprite of the specified colour.
+   * 
+   * @param colour the colour of the Ship
+   * @return the Ship Sprite
+   */
   public static Sprite makeShipSprite(int colour) {
-    Sprite newSprite = Sprite.ship_green;
-
-    // TODO: Make a sprite with the given colour
-    // For assigning random colours to player's ships.
-
+    Sprite newSprite = new Sprite(Sprite.ship_green);
+    for (int i = 0; i < newSprite.getPixels().length; i++){
+    	if (newSprite.getPixels()[i] == 0xff00b800){
+    		newSprite.getPixels()[i] = colour;
+    	}
+    }
     return newSprite;
   }
-
-  public int[] getPixels() {
-    return pixels;
-  }
-
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
-  }
-
 }

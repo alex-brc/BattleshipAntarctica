@@ -3,8 +3,7 @@ package org.alien8.ui;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import org.alien8.client.Client;
-import org.alien8.client.Launcher;
-import org.alien8.client.Client.State;
+import org.alien8.server.Server;
 
 public class SinglePlayerButton extends Button {
 
@@ -14,7 +13,6 @@ public class SinglePlayerButton extends Button {
 
   public void executeAction() {
     Client.getInstance().createServer(1);
-    Client.getInstance().setState(State.IN_GAME);
     String localServerIPStr = null;
     try {
       localServerIPStr = Inet4Address.getLocalHost().getHostAddress();
@@ -23,6 +21,8 @@ public class SinglePlayerButton extends Button {
     }
     if (localServerIPStr != null)
       Client.getInstance().connect(localServerIPStr);
+    
+    // Game start
+	Server.getInstance().startSGH();
   }
-
 }
