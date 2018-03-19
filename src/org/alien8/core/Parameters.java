@@ -17,6 +17,7 @@ import net.jafama.FastMath;
 public class Parameters {
 
   /// GENERIC GAME PARAMETERS
+  /** Toggles rendering the box. */
   public static final boolean RENDER_BOX = true;
   /** Determines if ice can be collided with or not. */
   public static final boolean ICE_IS_SOLID = true;
@@ -62,9 +63,10 @@ public class Parameters {
   public static final int MINIMAP_WIDTH = 64;
   /** Height of the minimap on the HUD. */
   public static final int MINIMAP_HEIGHT = 64;
+  /** Affects how the game view moves when the mouse is aimed around the screen. */
   public static final int GAME_PARALLAX_WEIGHT = 20;
+  /** Affects how much the game logo moves in menus when the mouse is aimed around the screen. */
   public static final int MENU_PARALLAX_WEIGHT = 100;
-
   //////////////////////////////////////////////////////////
 
 
@@ -73,12 +75,19 @@ public class Parameters {
   public static final int MAP_HEIGHT = 2048;
   /** Width of the map. */
   public static final int MAP_WIDTH = 2048;
+  /** Level of deep water on the map. */
   public static final double DEEP_WATER_LEVEL = 0.55d;
+  /** Level of shallow water. */
   public static final double SHALLOW_WATER_LEVEL = 0.61d;
+  /** Level of thin ice. */
   public static final double THIN_ICE_LEVEL = 0.62d;
+  /** Colour of deep water. */
   public static final int DEEP_WATER_COLOR = 0x5555ff;
+  /** Colour of shallow water. */
   public static final int SHALLOW_WATER_COLOR = 0x9999FF;
+  /** Colour of thin ice. */
   public static final int THIN_ICE_COLOR = 0xEAEAFF;
+  /** Colour of thick ice. */
   public static final int THICK_ICE_COLOR = 0xF5FFFA;
   //////////////////////////////////////////////////////////
 
@@ -120,7 +129,6 @@ public class Parameters {
   /** Speed of a Bullet. */
   public static final double BULLET_SPEED = 8;
   /** Damage dealt by a Bullet. */
-  public static final double BULLET_SPEED = 8;
   public static final double BULLET_DAMAGE = 10;
   /** Size of the Bullet pool on the server. */
   public static final int BULLET_POOL_SIZE = 50;
@@ -175,26 +183,44 @@ public class Parameters {
 
 
   /// ITEMS PARAMETERS
+  /** Speed of a cargo plane. */
   public static final double PLANE_SPEED = 3;
+  /** Width of a Pickup. */
   public static final double ITEM_WIDTH = 32;
+  /** Length (height) of a Pickup. */
   public static final double ITEM_LENGTH = 32;
+  /** Amount of health a Ship regains after using a HealthItem. */
   public static final double ITEM_HEALTH_ITEM_VALUE = 25;
-  public static final int ITEM_SPEED_ITEM_DURATION = 2; // in seconds
+  /** Length of time, in seconds, that a SpeedItem lasts. */
+  public static final int ITEM_SPEED_ITEM_DURATION = 2;
+  /** Affects how fast a Ship travels when using a SpeedItem. */
   public static final int ITEM_SPEED_ITEM_MULTIPLIER = 2; // ship top speed multiplied by this
-  public static final int ITEM_NO_COOLDOWN_ITEM_DURATION = 5; // in seconds
-  public static final int ITEM_INVULNERABLE_ITEM_DURATION = 5; // in seconds
+  /** Length of time, in seconds, that a NoCooldownItem lasts. */
+  public static final int ITEM_NO_COOLDOWN_ITEM_DURATION = 5;
+  /** Length of time, in seconds, that a InvulnerableItem lasts. */
+  public static final int ITEM_INVULNERABLE_ITEM_DURATION = 5;
+  /** Width of a Mine. */
   public static final int MINE_WIDTH = 32;
+  /** Length (height) of a Mine. */
   public static final int MINE_LENGTH = 32;
+  /** Damage dealt to a Ship when colliding with a Mine. */
   public static final int MINE_DAMAGE = 50;
+  /** Amount of points gained when an enemy Ship collides with a Player's Mine. */
   public static final int MINE_SCORE = 100;
+  /** Length of a Torpedo. */
   public static final int TORPEDO_LENGTH = 32;
+  /** Width of a Torpedo. */
   public static final int TORPEDO_WIDTH = 16;
+  /** Damage dealt by a Torpedo. */
   public static final int TORPEDO_DAMAGE = 30;
+  /** Speed of a Torpedo. */
   public static final int TORPEDO_SPEED = 8;
+  /** Amount of points gained when a Player's Torpedo hits another Ship. */
   public static final int TORPEDO_SCORE = 100;
   //////////////////////////////////////////////////////////
 
   /// TEST PARAMETERS
+  /** Amount of acceptable precision loss for double values. */
   public static final double DOUBLE_PRECISION = 0.001;
 
   //////////////////////////////////////////////////////////
