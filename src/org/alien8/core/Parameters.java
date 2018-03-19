@@ -64,7 +64,13 @@ public class Parameters {
   /// MAP PARAMETERS
   public static final int MAP_HEIGHT = 2048;
   public static final int MAP_WIDTH = 2048;
-  public static final double WATER_LEVEL = 0.4d;
+  public static final double DEEP_WATER_LEVEL = 0.55d;
+  public static final double SHALLOW_WATER_LEVEL = 0.61d;
+  public static final double THIN_ICE_LEVEL = 0.62d;
+  public static final int DEEP_WATER_COLOR = 0x3232FF;
+  public static final int SHALLOW_WATER_COLOR = 0x9999FF;
+  public static final int THIN_ICE_COLOR = 0xEAEAFF;
+  public static final int THICK_ICE_COLOR = 0xF5FFFA;
   //////////////////////////////////////////////////////////
 
 

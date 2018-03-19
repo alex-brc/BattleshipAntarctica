@@ -501,7 +501,7 @@ public class Renderer extends Canvas {
    * @param grid a 2D boolean array where {@code true} represents ice, and {@code false} represents
    *        water
    */
-  public void drawViewport(boolean[][] grid) {
+  public void drawViewport(double[][] grid) {
     int x0 = xScroll + Parameters.SMALL_BORDER;
     int x1 = xScroll + width - Parameters.SMALL_BORDER + 1;
     int y0 = yScroll + Parameters.BIG_BORDER;
@@ -510,11 +510,14 @@ public class Renderer extends Canvas {
     for (int y = y0; y < y1; y++) {
       for (int x = x0; x < x1; x++) {
         if (x >= 0 && y >= 0 && x < Parameters.MAP_WIDTH && y < Parameters.MAP_HEIGHT) {
-          if (grid[x][y]) {
-            drawPixel(x, y, 0xffffff, false);
-          } else {
-            drawPixel(x, y, 0x5555ff, false);
-          }
+        	if(grid[x][y] < Parameters.DEEP_WATER_LEVEL)
+          	  drawPixel(x,y,Parameters.DEEP_WATER_COLOR,false);
+            else if(Parameters.DEEP_WATER_LEVEL <= grid[x][y] && grid[x][y] < Parameters.SHALLOW_WATER_LEVEL)
+          	  drawPixel(x,y,Parameters.SHALLOW_WATER_COLOR,false);
+            else if(Parameters.SHALLOW_WATER_LEVEL <= grid[x][y] && grid[x][y] < Parameters.THIN_ICE_LEVEL)
+          	  drawPixel(x,y,Parameters.THIN_ICE_COLOR,false);
+            else if(Parameters.THIN_ICE_LEVEL <= grid[x][y])
+          	  drawPixel(x,y,Parameters.THICK_ICE_COLOR,false);
         }
       }
     }
