@@ -154,7 +154,7 @@ public class ClientHandler extends Thread {
         } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getRearTurretDirection(), s.getColour()));
+              s.getRearTurretDirection(), s.getEffectType(), s.getColour()));
         }
 
       } else if (e instanceof Bullet) {

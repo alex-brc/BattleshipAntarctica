@@ -43,6 +43,7 @@ public class Sprite implements Serializable {
   public static Sprite effect_speed = new Sprite("/org/alien8/assets/effect_speed.png");
   public static Sprite effect_invulnerable = new Sprite("/org/alien8/assets/effect_invulnerable.png");
   public static Sprite crosshair = new Sprite("/org/alien8/assets/crosshair.png");
+  public static Sprite torpedo = new Sprite("/org/alien8/assets/torpedo.png");
   /**
    * Constructor.
    * 

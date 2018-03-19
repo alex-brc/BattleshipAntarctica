@@ -13,6 +13,7 @@ public class Map {
   protected int lengthDensity;
   protected int widthDensity;
   protected boolean[][] iceGrid;
+  protected double[][] noiseGrid;
   protected int[][] minimap;
   protected long seed;
 
@@ -42,15 +43,15 @@ public class Map {
    * Creates the Map using procedural generation.
    */
   protected void makeMap() {
-    double waterLevel = Parameters.WATER_LEVEL; // Defines the cut-off point for water or ice
+    double waterLevel = Parameters.THIN_ICE_LEVEL; // Defines the cut-off point for water or ice
     // Gets a noise grid from the PerlinNoise class
-    double[][] noiseGrid =
+    noiseGrid =
         PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity, seed);
     // Loops over all the pixels setting them to either ice (True) or water (False) based on the
     // water level
     for (int y = 0; y < width; y++) {
       for (int x = 0; x < length; x++) {
-        boolean isIce = (noiseGrid[x][y] <= waterLevel);
+        boolean isIce = (noiseGrid[x][y] >= waterLevel);
         iceGrid[x][y] = isIce;
       }
     }
@@ -100,6 +101,10 @@ public class Map {
   public boolean[][] getIceGrid() {
     return iceGrid;
   }
+  
+  public double[][] getNoiseGrid() {
+	  return noiseGrid;
+  }
 
   /**
    * Gets the minimap.
@@ -116,6 +121,6 @@ public class Map {
    * @param r the Renderer instance used to render this Map
    */
   public void render(Renderer r) {
-    r.drawViewport(iceGrid);
+    r.drawViewport(noiseGrid);
   }
 }

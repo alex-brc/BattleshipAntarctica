@@ -7,6 +7,7 @@ import org.alien8.core.Parameters;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
+import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
 /**
@@ -96,6 +97,7 @@ public class ServerScoreBoard {
         if (player.getShip().getSerial() == sc.getShipSerial()) {
           sc.giveScore(Parameters.TORPEDO_SCORE);
           Server.getInstance().addEvent(sc.exportToEvent());
+          order();
           return;
         }
     } catch (NullPointerException e) {
@@ -118,6 +120,7 @@ public class ServerScoreBoard {
       if (player.getShip().getSerial() == score.getShipSerial()) {
         score.giveKill();
         Server.getInstance().addEvent(score.exportToEvent());
+        order();
         return;
       }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
@@ -136,6 +139,7 @@ public class ServerScoreBoard {
         if (player.getShip().getSerial() == score.getShipSerial()) {
           score.giveHit(bullet);
           Server.getInstance().addEvent(score.exportToEvent());
+          order();
           return;
         }
     } catch (NullPointerException e) {
@@ -149,13 +153,13 @@ public class ServerScoreBoard {
   }
 
   /**
-   * Kill a certain Player, marking them as dead.
+   * Kill a certain Player, marking that player as dead on the scoreboard.
    * 
-   * @param player the Player to kill
+   * @param ship the ship belonging to the player to kill
    */
-  public void kill(Player player) {
+  public void kill(Ship ship) {
     for (Score score : scores)
-      if (player.getShip().getSerial() == score.getShipSerial()) {
+      if (ship.getSerial() == score.getShipSerial()) {
         score.kill();
         Server.getInstance().addEvent(score.exportToEvent());
         return;

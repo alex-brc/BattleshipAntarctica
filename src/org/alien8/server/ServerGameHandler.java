@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -35,7 +36,6 @@ public class ServerGameHandler extends Thread {
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
   private byte[] sendingByte;
-  private volatile boolean running = false;
   private volatile boolean gameRunning = true;
   private int seconds;
 
@@ -74,12 +74,15 @@ public class ServerGameHandler extends Thread {
         seconds--;
         if (seconds % 10 == 0)
           ServerModelManager.getInstance().addEntity(new PlaneDropper());
+        if(ServerModelManager.getInstance().countShips() == 1)
+          gameRunning = false;
         updateServerTimer();
       }
 
-      if (seconds <= 0) {
+      if (seconds <= 0 ) {
         gameRunning = false;
       }
+      
     }
 
     // Notice all clients game has ended
@@ -116,7 +119,7 @@ public class ServerGameHandler extends Thread {
   public int getSeconds() {
     return seconds;
   }
-
+  
   public void updateServerTimer() {
     Server.getInstance().addEvent(new TimerEvent(seconds));
   }
@@ -199,7 +202,7 @@ public class ServerGameHandler extends Thread {
         } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getRearTurretDirection(), s.getColour()));
+              s.getRearTurretDirection(), s.getEffectType(), s.getColour()));
         }
 
       } else if (e instanceof Bullet) {

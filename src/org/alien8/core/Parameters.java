@@ -62,7 +62,7 @@ public class Parameters {
   public static final int MINIMAP_WIDTH = 64;
   /** Height of the minimap on the HUD. */
   public static final int MINIMAP_HEIGHT = 64;
-  public static final int GAME_PARALLAX_WEIGHT = 35;
+  public static final int GAME_PARALLAX_WEIGHT = 20;
   public static final int MENU_PARALLAX_WEIGHT = 100;
 
   //////////////////////////////////////////////////////////
@@ -73,8 +73,13 @@ public class Parameters {
   public static final int MAP_HEIGHT = 2048;
   /** Width of the map. */
   public static final int MAP_WIDTH = 2048;
-  /** Threshold for water/ice. Used in map generation. */
-  public static final double WATER_LEVEL = 0.4d;
+  public static final double DEEP_WATER_LEVEL = 0.55d;
+  public static final double SHALLOW_WATER_LEVEL = 0.61d;
+  public static final double THIN_ICE_LEVEL = 0.62d;
+  public static final int DEEP_WATER_COLOR = 0x5555ff;
+  public static final int SHALLOW_WATER_COLOR = 0x9999FF;
+  public static final int THIN_ICE_COLOR = 0xEAEAFF;
+  public static final int THICK_ICE_COLOR = 0xF5FFFA;
   //////////////////////////////////////////////////////////
 
 
@@ -88,9 +93,9 @@ public class Parameters {
   /** Time take for a Ship to reach top speed. */
   public static final double SHIP_TOP_SPEED_REACH_TIME = 200;
   /** Top forward speed of a Ship. */
-  public static final double SHIP_TOP_SPEED_FORWARD = 1.4;
+  public static final double SHIP_TOP_SPEED_FORWARD = 2;
   /** Top backward speed of a Ship. */
-  public static final double SHIP_TOP_SPEED_BACKWARD = 1.4;
+  public static final double SHIP_TOP_SPEED_BACKWARD = 2;
   /** Mass of a Ship. */
   public static final double SHIP_MASS = 1000;
   /** Force applied to a Ship when moving forwards. */
@@ -113,8 +118,9 @@ public class Parameters {
   /** Length of a Bullet. */
   public static final double BULLET_LENGTH = 8;
   /** Speed of a Bullet. */
-  public static final double BULLET_SPEED = 4;
+  public static final double BULLET_SPEED = 8;
   /** Damage dealt by a Bullet. */
+  public static final double BULLET_SPEED = 8;
   public static final double BULLET_DAMAGE = 10;
   /** Size of the Bullet pool on the server. */
   public static final int BULLET_POOL_SIZE = 50;
@@ -184,7 +190,7 @@ public class Parameters {
   public static final int TORPEDO_LENGTH = 32;
   public static final int TORPEDO_WIDTH = 16;
   public static final int TORPEDO_DAMAGE = 30;
-  public static final int TORPEDO_SPEED = 5;
+  public static final int TORPEDO_SPEED = 8;
   public static final int TORPEDO_SCORE = 100;
   //////////////////////////////////////////////////////////
 
