@@ -125,4 +125,12 @@ public class ServerModelManager {
   public void setMap(Map m) {
     map = m;
   }
+
+  public int countShips() {
+	  int counter = 0;
+	  for(Entity ent : entities)
+		  if(ent instanceof Ship)
+			  counter++;
+	  return counter;
+  }
 }

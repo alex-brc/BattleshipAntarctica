@@ -21,7 +21,7 @@ public class ClientScoreBoard {
     Position screenCenter =
         new Position(Parameters.RENDERER_SIZE.width / 2, Parameters.RENDERER_SIZE.height / 2);
     cornerX = (int) screenCenter.getX() - Parameters.SCOREBOARD_WIDTH / 2;
-    cornerY = (int) screenCenter.getY() - Parameters.SCOREBOARD_HEIGHT / 2;
+    cornerY = 40 + (int) screenCenter.getY() - Parameters.SCOREBOARD_HEIGHT / 2;
     renderVerticalBuffer = 10;
     renderFontHeight = 25;
     renderer = Renderer.getInstance();

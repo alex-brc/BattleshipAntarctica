@@ -55,7 +55,7 @@ public class Parameters {
   public static final int BIG_BORDER = 96;
   public static final int MINIMAP_WIDTH = 64;
   public static final int MINIMAP_HEIGHT = 64;
-  public static final int GAME_PARALLAX_WEIGHT = 35;
+  public static final int GAME_PARALLAX_WEIGHT = 20;
   public static final int MENU_PARALLAX_WEIGHT = 100;
 
   //////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ public class Parameters {
   public static final double DEEP_WATER_LEVEL = 0.55d;
   public static final double SHALLOW_WATER_LEVEL = 0.61d;
   public static final double THIN_ICE_LEVEL = 0.62d;
-  public static final int DEEP_WATER_COLOR = 0x3232FF;
+  public static final int DEEP_WATER_COLOR = 0x5555ff;
   public static final int SHALLOW_WATER_COLOR = 0x9999FF;
   public static final int THIN_ICE_COLOR = 0xEAEAFF;
   public static final int THICK_ICE_COLOR = 0xF5FFFA;
@@ -79,8 +79,8 @@ public class Parameters {
   public static final double SHIP_WIDTH = 25;
   public static final double SHIP_HEALTH = 100;
   public static final double SHIP_TOP_SPEED_REACH_TIME = 200;
-  public static final double SHIP_TOP_SPEED_FORWARD = 1.4;
-  public static final double SHIP_TOP_SPEED_BACKWARD = 1.4;
+  public static final double SHIP_TOP_SPEED_FORWARD = 2;
+  public static final double SHIP_TOP_SPEED_BACKWARD = 2;
   public static final double SHIP_MASS = 1000;
   public static final double SHIP_FORWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME;
@@ -97,7 +97,7 @@ public class Parameters {
   public static final double BULLET_MASS = 10;
   public static final double BULLET_WIDTH = 4;
   public static final double BULLET_LENGTH = 8;
-  public static final double BULLET_SPEED = 4;
+  public static final double BULLET_SPEED = 8;
   public static final double BULLET_DAMAGE = 10;
   public static final int BULLET_POOL_SIZE = 50;
   public static final int TURRET_CD = 1000;
@@ -171,7 +171,7 @@ public class Parameters {
   public static final int TORPEDO_LENGTH = 32;
   public static final int TORPEDO_WIDTH = 16;
   public static final int TORPEDO_DAMAGE = 30;
-  public static final int TORPEDO_SPEED = 5;
+  public static final int TORPEDO_SPEED = 8;
   public static final int TORPEDO_SCORE = 100;
   //////////////////////////////////////////////////////////
 

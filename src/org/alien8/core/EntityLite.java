@@ -71,7 +71,7 @@ public class EntityLite implements Serializable {
   // For AI Ship
   public EntityLite(long serial, int entityType, Position position, boolean toBeDeleted,
       double direction, double speed, double health, double frontTurretDirection,
-      double rearTurretDirection, int colour) {
+      double rearTurretDirection, int effectType, int colour) {
     this.serial = serial;
     this.entityType = entityType;
     this.position = position;
@@ -82,6 +82,7 @@ public class EntityLite implements Serializable {
     this.frontTurretDirection = frontTurretDirection;
     this.rearTurretDirection = rearTurretDirection;
     this.colour = colour;
+    this.effectType = effectType;
   }
 
   // For Bullet

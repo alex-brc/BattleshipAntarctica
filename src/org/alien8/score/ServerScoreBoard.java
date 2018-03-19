@@ -8,6 +8,7 @@ import org.alien8.core.Parameters;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
 import org.alien8.ship.Bullet;
+import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
 public class ServerScoreBoard {
@@ -45,6 +46,7 @@ public class ServerScoreBoard {
       if (player.getShip().getSerial() == score.getShipSerial()) {
         score.giveKill();
         Server.getInstance().addEvent(score.exportToEvent());
+        order();
         return;
       }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
@@ -57,6 +59,7 @@ public class ServerScoreBoard {
         if (player.getShip().getSerial() == score.getShipSerial()) {
           score.giveHit(bullet);
           Server.getInstance().addEvent(score.exportToEvent());
+          order();
           return;
         }
     } catch (NullPointerException e) {
@@ -75,6 +78,7 @@ public class ServerScoreBoard {
 	        if (player.getShip().getSerial() == sc.getShipSerial()) {
 	          sc.giveScore(Parameters.TORPEDO_SCORE);
 	          Server.getInstance().addEvent(sc.exportToEvent());
+	          order();
 	          return;
 	        }
 	    } catch (NullPointerException e) {
@@ -87,9 +91,9 @@ public class ServerScoreBoard {
 	        "In giveHit(): given player not found on the scoreboard.");
   }
   
-  public void kill(Player player) {
+  public void kill(Ship ship) {
     for (Score score : scores)
-      if (player.getShip().getSerial() == score.getShipSerial()) {
+      if (ship.getSerial() == score.getShipSerial()) {
         score.kill();
         Server.getInstance().addEvent(score.exportToEvent());
         return;
