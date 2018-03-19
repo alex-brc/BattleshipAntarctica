@@ -18,11 +18,17 @@ public class Parameters {
 
   /// GENERIC GAME PARAMETERS
   public static final boolean RENDER_BOX = true;
+  /** Determines if ice can be collided with or not. */
   public static final boolean ICE_IS_SOLID = true;
+  /** The maximum number of players allowed in a match. */
   public static final int MAX_PLAYERS = 16;
-  public static final int MATCH_LENGTH = 300; // in seconds
-  public static final int TIME_BEFORE_SERVER_END = 10; // in seconds
+  /** The length of a match in seconds. */
+  public static final int MATCH_LENGTH = 300;
+  /** The length of time in seconds before a server ends once a game has finished. */
+  public static final int TIME_BEFORE_SERVER_END = 10;
+  /** Determines if AI ships spawn on the map in a game. */
   public static final boolean AI_ON = true;
+  /** Toggles certain features, such as visible bounding boxes. */
   public static final boolean DEBUG_MODE = false;
 
   /// SERVER PARAMETERS
@@ -31,11 +37,11 @@ public class Parameters {
    * pretty long itself.
    */
   public static final int NUMBER_CONNECT_ATTEMPTS = 3;
-  /**
-   * How often the model calls update() on the entities. It's actually a bit lower than that.
-   */
+  /** How often the model calls update() on the entities. It's actually a bit lower than that. */
   public static final int TICKS_PER_SECOND = 80;
+  /** Port the server runs on. */
   public static final int SERVER_PORT = 4446;
+  /** Port for multicasting. */
   public static final int MULTI_CAST_PORT = 4445;
   public static final int SERVER_SOCKET_BLOCK_TIME = 100;
   public static final int LIST_LENGTH_PER_PACKET = 5000;
@@ -46,14 +52,15 @@ public class Parameters {
 
 
   /// RENDERER PARAMETERS
-  /**
-   * Dimension object for the renderer dimensions
-   */
+  /** Dimension object for the renderer dimensions. */
   public static final Dimension RENDERER_SIZE = new Dimension(800, 600);
-  // public static final Dimension VIEWPORT_SIZE = new Dimension(600, 400);
+  /** The size of a small border of the HUD. */
   public static final int SMALL_BORDER = 16;
+  /** The size of a big border of the HUD. */
   public static final int BIG_BORDER = 96;
+  /** Width of the minimap on the HUD. */
   public static final int MINIMAP_WIDTH = 64;
+  /** Height of the minimap on the HUD. */
   public static final int MINIMAP_HEIGHT = 64;
   public static final int GAME_PARALLAX_WEIGHT = 35;
   public static final int MENU_PARALLAX_WEIGHT = 100;
@@ -62,89 +69,101 @@ public class Parameters {
 
 
   /// MAP PARAMETERS
+  /** Height of the map. */
   public static final int MAP_HEIGHT = 2048;
+  /** Width of the map. */
   public static final int MAP_WIDTH = 2048;
+  /** Threshold for water/ice. Used in map generation. */
   public static final double WATER_LEVEL = 0.4d;
   //////////////////////////////////////////////////////////
 
 
   /// SHIP PARAMETERS
+  /** Length of a Ship. */
   public static final double SHIP_LENGTH = 100;
+  /** Width of a Ship. */
   public static final double SHIP_WIDTH = 25;
+  /** Maximum health of a Ship. */
   public static final double SHIP_HEALTH = 100;
+  /** Time take for a Ship to reach top speed. */
   public static final double SHIP_TOP_SPEED_REACH_TIME = 200;
+  /** Top forward speed of a Ship. */
   public static final double SHIP_TOP_SPEED_FORWARD = 1.4;
+  /** Top backward speed of a Ship. */
   public static final double SHIP_TOP_SPEED_BACKWARD = 1.4;
+  /** Mass of a Ship. */
   public static final double SHIP_MASS = 1000;
+  /** Force applied to a Ship when moving forwards. */
   public static final double SHIP_FORWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME;
+  /** Force applied to a Ship when moving backwards. */
   public static final double SHIP_BACKWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_BACKWARD / SHIP_TOP_SPEED_REACH_TIME;
+  /** Amount rotated by a Ship in radians per second. */
   public static final double SHIP_ROTATION_PER_SEC = FastMath.PI / 3;
   //////////////////////////////////////////////////////////
 
 
   /// BULLET PARAMETERS
-  /**
-   * Bullet parameters. Cooldowns in milliseconds.
-   */
+  // Bullet parameters. Cooldowns in milliseconds.
+  /** Mass of a Bullet. */
   public static final double BULLET_MASS = 10;
+  /** Width of a Bullet. */
   public static final double BULLET_WIDTH = 4;
+  /** Length of a Bullet. */
   public static final double BULLET_LENGTH = 8;
+  /** Speed of a Bullet. */
   public static final double BULLET_SPEED = 4;
+  /** Damage dealt by a Bullet. */
   public static final double BULLET_DAMAGE = 10;
+  /** Size of the Bullet pool on the server. */
   public static final int BULLET_POOL_SIZE = 50;
   public static final int TURRET_CD = 1000;
+  /** Minimum distance a Turret is allowed to fire. */
   public static final int TURRET_MIN_DIST = 0;
+  /** Maximum distance a Turret is allowed to fire. */
   public static final int TURRET_MAX_DIST = 400;
-  /**
-   * This modifier affects how much distance holding down a button gives to the turret shot every
-   * tick
-   */
+  /** Affects how much distance holding down a button gives to the turret shot every tick. */
   public static final double CHARGE_INCREMENT = 4;
   //////////////////////////////////////////////////////////
 
 
   /// PHYSICS PARAMETERS
-  /**
-   * Affects how much damage ships take in collisions.
-   */
+  /** Affects how much damage ships take in collisions. */
   public static final double COLLISION_DAMAGE_MODIFIER = 0.0005;
+  /** Affects how much Ships rotate in collisions with each other. */
   public static final double COLLISION_ROTATION_MODIFIER = 0.2;
-  /**
-   * Affects how much the speed impacts the turning rate.
-   */
+  /** Affects how much the speed impacts the turning rate. */
   public static final double ROTATION_MODIFIER = 1;
+  /** Friction modifier affecting speed loss. */
   public static final double FRICTION = 0.997;
-  /**
-   * Affects how much speed is lost when Entities collide
-   */
+  /** Affects how much speed is lost when Entities collide. */
   public static final double RESTITUTION_COEFFICIENT = 0.5;
-  /**
-   * Affects how 'bouncy' ice is when collided with.
-   */
+  /** Affects how 'bouncy' ice is when collided with. */
   public static final double ICE_BOUNCINESS = 0.005;
-  public static final double OUT_OF_BOUNDS_PUSHBACK = 10;
-  public static final double OUT_OF_BOUNDS_BOUNCINESS = 0.02;
   //////////////////////////////////////////////////////////
 
 
   /// AUDIO PARAMETERS
-  /**
-   * Maximum number of "shoot" audio clips running at the same time
-   */
+  /** Maximum number of "shoot" audio clips running at the same time. */
   public static final int SFX_POOL_SIZE = 5;
+  /** Initial volume of sound effects. */
   public static final float INITIAL_VOLUME_SFX = 0.8f;
+  /** Initial volume of ambient sound. */
   public static final float INITIAL_VOLUME_AMBIENT = 0.8f;
+  /** Maximum distance sound can be heard from. */
   public static final int MAX_HEARING_DISTANCE = 1500;
   //////////////////////////////////////////////////////////
 
 
   /// SCORE PARAMETERS
+  /** Amount of points awarded for every kill. */
   public static final int SCORE_PER_KILL = 1000;
   public static final float KILL_STREAK_MULTIPLIER = 0.1f;
   public static final float DISTANCE_MULTIPLIER = 0.1f;
+  /** Height of scoreboard in pixels. */
   public static final int SCOREBOARD_HEIGHT = 450;
+  /** Width of scoreboard in pixels. */
   public static final int SCOREBOARD_WIDTH = 550;
   //////////////////////////////////////////////////////////
 

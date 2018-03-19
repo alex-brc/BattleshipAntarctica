@@ -15,7 +15,7 @@ x client:
 	x ClientInputSample
 	x ClientTCP
 	x ClientWindowListener
-	x InputManager
+	/ InputManager
 	/ Launcher
 x core:
 	x ClientMessage
