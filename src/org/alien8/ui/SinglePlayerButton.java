@@ -5,12 +5,27 @@ import java.net.UnknownHostException;
 import org.alien8.client.Client;
 import org.alien8.server.Server;
 
+/**
+ * This class represents a Button used to start a single player game.
+ *
+ */
 public class SinglePlayerButton extends Button {
 
+  /**
+   * Constructor.
+   * 
+   * @param x the x position to display at
+   * @param y the y position to display at
+   * @param width the width of this Button in pixels
+   * @param height the height of this Button in pixels
+   */
   public SinglePlayerButton(int x, int y, int width, int height) {
     super(x, y, width, height, "single-player");
   }
 
+  /**
+   * Starts a single player game.
+   */
   public void executeAction() {
     Client.getInstance().createServer(1);
     String localServerIPStr = null;
@@ -21,8 +36,8 @@ public class SinglePlayerButton extends Button {
     }
     if (localServerIPStr != null)
       Client.getInstance().connect(localServerIPStr);
-    
+
     // Game start
-	Server.getInstance().startSGH();
+    Server.getInstance().startSGH();
   }
 }

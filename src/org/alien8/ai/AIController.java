@@ -2,12 +2,17 @@ package org.alien8.ai;
 
 import java.util.Iterator;
 import org.alien8.core.Entity;
-import org.alien8.core.ServerModelManager;
-import org.alien8.ship.Ship;
-import org.alien8.physics.Position;
 import org.alien8.core.Parameters;
+import org.alien8.core.ServerModelManager;
 import org.alien8.physics.PhysicsManager;
+import org.alien8.physics.Position;
+import org.alien8.ship.Ship;
 
+/**
+ * This class represents a controller for an AI Ship which will move around the map and shoot at
+ * other Ships.
+ *
+ */
 public class AIController {
 
   protected ServerModelManager model;
@@ -17,31 +22,41 @@ public class AIController {
   protected boolean rightTurnDefault = true;
   protected int changeDefaultTurn = 0;
 
+  /**
+   * Constructor.
+   * 
+   * @param ship the Ship Entity this AI controls
+   */
   public AIController(Ship ship) {
     model = ServerModelManager.getInstance();
     iceGrid = model.getMap().getIceGrid();
     myShip = ship;
   }
 
-  public void update() {
-    target = findClosestTarget();
-    if (target != null) {
-      myShip.setTurretsDirectionAI(target.getPosition());
-      // Fires both turrets at the closest ship
-      myShip.frontTurretCharge();
-      myShip.rearTurretCharge();
-    }
-    if (myShip.hasItem()) {
-      myShip.useItem();
-    }
-    changeDefaultTurn++;
-    if (changeDefaultTurn > 1200) {
-      rightTurnDefault = !rightTurnDefault;
-      changeDefaultTurn = 0;
-    }
-    wander(); // Moves around the map, avoiding ice
+  /**
+   * @return the Ship controlled by this AI
+   */
+  public Ship getShip() {
+    return myShip;
   }
 
+  /**
+   * @return the current target Entity of this Ship
+   */
+  public Entity getTarget() {
+    return target;
+  }
+
+  /**
+   * @param target the target Entity to set
+   */
+  public void setTarget(Ship target) {
+    this.target = target;
+  }
+
+  /**
+   * @return the closest enemy Ship to this AI
+   */
   public Entity findClosestTarget() {
     Entity closestTarget = null;
     Position currentPos = myShip.getPosition();
@@ -63,18 +78,36 @@ public class AIController {
     return closestTarget;
   }
 
-  public void setTarget(Ship target) {
-    this.target = target;
+  /**
+   * Updates this AI's behaviour as appropriate, finding a target, using an Item or wandering the
+   * map.
+   */
+  public void update() {
+    target = findClosestTarget();
+    if (target != null) {
+      myShip.setTurretsDirectionAI(target.getPosition());
+      // Fires both turrets at the closest ship
+      myShip.frontTurretCharge();
+      myShip.rearTurretCharge();
+    }
+    if (myShip.hasItem()) {
+      myShip.useItem();
+    }
+    changeDefaultTurn++;
+    if (changeDefaultTurn > 1200) {
+      rightTurnDefault = !rightTurnDefault;
+      changeDefaultTurn = 0;
+    }
+    wander(); // Moves around the map, avoiding ice
   }
 
-  public Entity getTarget() {
-    return target;
-  }
-
-  public Ship getShip() {
-    return myShip;
-  }
-
+  /**
+   * Draws 3 rays out from the front of the ship in order to detect ice in front of it, returning
+   * {@code true} if ice is detected.
+   * 
+   * @param rayLength the length of the rays to draw
+   * @return {@code true} if ice is detected, {@code false} if not
+   */
   public boolean rayDetect(int rayLength) {
     Position[] corners = myShip.getObb();
     double direction = myShip.getDirection();
@@ -85,6 +118,15 @@ public class AIController {
         || drawRay(nose, direction, rayLength);
   }
 
+  /**
+   * Draws a line out from a point in a direction for a certain length, returning {@code true} if
+   * that line ever hits some ice.
+   * 
+   * @param start the starting Position
+   * @param dir the direction in radians to draw the line
+   * @param maxR the maximum range of the line
+   * @return {@code true} if the line hits ice, {@code false} if not
+   */
   public boolean drawRay(Position start, double dir, int maxR) {
     double x0 = start.getX();
     double y0 = start.getY();
@@ -99,6 +141,9 @@ public class AIController {
     return false;
   }
 
+  /**
+   * Wanders around the map, avoiding ice and walls.
+   */
   public void wander() {
     if (rayDetect((int) Parameters.SHIP_LENGTH)) {
       PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE,

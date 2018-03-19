@@ -4,12 +4,12 @@ To insert JavaDoc in Eclipse, type "/**" above a method or class and press Enter
 x = not done
 / = done
 
-x ai:
-	x AIController	
-x audio:
-	x AudioEvent
-	x AudioManager
-	x SoundEffects
+/ ai:
+	/ AIController	
+/ audio:
+	/ AudioEvent
+	/ AudioManager
+	/ SoundEffects
 x client:
 	x Client
 	x ClientInputSample
@@ -44,10 +44,10 @@ x core:
 	/ Torpedo
 	/ TorpedoItem
 	/ TorpedoPickup
-x mapgeneration:
-	x Map
-	x MapVector
-	x PerlinNoise
+/ mapgeneration:
+	/ Map
+	/ MapVector
+	/ PerlinNoise
 / physics:
 	/ AABB
 	/ AxisVector
@@ -64,32 +64,43 @@ x mapgeneration:
 	/ FontColor
 	/ Renderer
 	/ Sprite
-x score:
-	x ClientScoreBoard
-	x Score
-	x ScoreEvent
-	x ServerScoreBoard
+/ score:
+	/ ClientScoreBoard
+	/ Score
+	/ ScoreEvent
+	/ ServerScoreBoard
 x server:
 	x ClientHandler
-	x GameEvent
+	/ GameEvent
 	x Player
 	x Server
 	x ServerGameHandler
 	x Timer
 	x TimerEvent
-x ship:
-	x Bullet
-	x Ship
-	x Turret
-x ui:
-	x Button
-	x ConnectButton
-	x CreateServerButton
-	x ExitButton
-	x IPField
-	x IPInfo
-	x MainMenu
-	x SinglePlayerButton
-	x SplashScreen
+/ ship:
+	/ Bullet
+	/ Ship
+	/ Turret
+/ ui:
+	/ Button
+	/ ConnectButton
+	/ CreateServerButton
+	/ ExitButton
+	/ InfoBox
+	/ InteractiveLogo
+	/ Lobby
+	/ MainMenu
+	/ MuteButton
+	/ NameButton
+	/ NameScreen
+	/ Page
+	/ ReturnToMainButton
+	/ SettingButton
+	/ SettingsMenu
+	/ SinglePlayerButton
+	/ SplashScreen
+	/ StartButton
+	/ TextBox
+	/ VolumeButton
 x util:
 	x LogManager

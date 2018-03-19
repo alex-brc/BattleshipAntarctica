@@ -9,6 +9,10 @@ import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import net.jafama.FastMath;
 
+/**
+ * This class represents a bullet Entity in the game.
+ *
+ */
 public class Bullet extends Entity implements Serializable {
 
   private static final long serialVersionUID = -4758229490654529751L;
@@ -18,6 +22,14 @@ public class Bullet extends Entity implements Serializable {
   private double travelled;
   private long source;
 
+  /**
+   * Constructor.
+   * 
+   * @param position the Position of this Bullet in XY coordinates
+   * @param direction the direction this Bullet is travelling in
+   * @param distance the distance this Bullet will travel
+   * @param source the serial ID of the Ship that fired this Bullet
+   */
   public Bullet(Position position, double direction, double distance, long source) {
     super(position, direction, Parameters.BULLET_SPEED, Parameters.BULLET_MASS,
         Parameters.BULLET_LENGTH, Parameters.BULLET_WIDTH);
@@ -28,6 +40,9 @@ public class Bullet extends Entity implements Serializable {
     this.source = source;
   }
 
+  /**
+   * @param position the Position to set
+   */
   @Override
   public void setPosition(Position position) {
     this.position = position;
@@ -38,44 +53,61 @@ public class Bullet extends Entity implements Serializable {
       this.delete();
   }
 
+  /**
+   * @return the distance this Bullet will travel
+   */
+  public double getDistance() {
+    return distance;
+  }
+
+  /**
+   * @param distance the distance to set
+   */
+  public void setDistance(double distance) {
+    this.distance = distance;
+  }
+
+  /**
+   * @return the damage this Bullet deals when colliding with a Ship
+   */
   public double getDamage() {
     return damage;
   }
 
   /**
-   * This method should delete a bullet if it goes out of the bounds of the map. It isn't too
-   * crucial as bullets automatically delete after they have travelled their distance.
+   * @return the distance this Bullet has travelled
    */
-  public void dealWithOutOfBounds() {
-    if (this.isOutOfBounds()) {
-      this.delete();
-    }
-  }
-
-  public void setSource(long source) {
-    this.source = source;
-  }
-
-  public long getSource() {
-    return source;
-  }
-
-  public void setDistance(double distance) {
-    this.distance = distance;
-  }
-
-  public double getDistance() {
-    return distance;
-  }
-
   public double getTravelled() {
     return travelled;
   }
 
+  /**
+   * @param travelled the distance to set
+   */
   public void setTravelled(double travelled) {
     this.travelled = travelled;
   }
 
+  /**
+   * @return the serial ID of the Ship that fired this Bullet
+   */
+  public long getSource() {
+    return source;
+  }
+
+  /**
+   * @param source the serial ID to set
+   */
+  public void setSource(long source) {
+    this.source = source;
+  }
+
+  /**
+   * Checks for equality between this Bullet and another.
+   * 
+   * @param b the other Bullet
+   * @return {@code true} if the Bullets are equal, {@code false} if not
+   */
   public boolean equals(Bullet b) {
     return this.getSerial() == b.getSerial() && this.getPosition().equals(b.getPosition())
         && this.isToBeDeleted() == b.isToBeDeleted() && this.getMass() == b.getMass()
@@ -84,26 +116,17 @@ public class Bullet extends Entity implements Serializable {
         && this.getDistance() == b.getDistance() && this.getTravelled() == b.getTravelled();
   }
 
+  /**
+   * @return a String representation of this Bullet
+   */
   public String toString() {
     return "Bullet: " + this.travelled + "/" + this.getDistance() + ", " + this.getSerial() + ", "
         + this.getPosition();
   }
 
-  @Override
-  public void dealWithInIce(boolean[][] iceGrid) {
-    if (Parameters.ICE_IS_SOLID) {
-      int x = (int) FastMath.rint(getPosition().getX());
-      int y = (int) FastMath.rint(getPosition().getY());
-      try {
-        if (iceGrid[x][y] == true) {
-          this.delete();
-        }
-      } catch (ArrayIndexOutOfBoundsException e) {
-        // This happens if the entity touches the edge of the map
-      }
-    }
-  }
-
+  /**
+   * Renders this Bullet to the screen.
+   */
   @Override
   public void render() {
 
@@ -155,5 +178,33 @@ public class Bullet extends Entity implements Serializable {
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+  }
+
+  /**
+   * Checks if this Bullet is out of the bounds of the map, and deletes it if it is.
+   */
+  public void dealWithOutOfBounds() {
+    if (this.isOutOfBounds()) {
+      this.delete();
+    }
+  }
+
+
+  /**
+   * Checks if this Bullet is within ice, and deletes it if it is.
+   */
+  @Override
+  public void dealWithInIce(boolean[][] iceGrid) {
+    if (Parameters.ICE_IS_SOLID) {
+      int x = (int) FastMath.rint(getPosition().getX());
+      int y = (int) FastMath.rint(getPosition().getY());
+      try {
+        if (iceGrid[x][y] == true) {
+          this.delete();
+        }
+      } catch (ArrayIndexOutOfBoundsException e) {
+        // This happens if the entity touches the edge of the map
+      }
+    }
   }
 }

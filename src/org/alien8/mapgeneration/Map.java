@@ -3,6 +3,10 @@ package org.alien8.mapgeneration;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
 
+/**
+ * This class represents the map in the game, made up of ice and water.
+ *
+ */
 public class Map {
   protected int length;
   protected int width;
@@ -12,6 +16,15 @@ public class Map {
   protected int[][] minimap;
   protected long seed;
 
+  /**
+   * Constructor.
+   * 
+   * @param l the length (height) of this Map
+   * @param w the width of this Map
+   * @param lD the length density of this Map, used in this Map's generation
+   * @param wD the height density of this Map, used in this Map's generation
+   * @param s the random seed used to generate this Map
+   */
   public Map(int l, int w, int lD, int wD, long s) {
     length = l;
     width = w;
@@ -25,6 +38,9 @@ public class Map {
     // makeRoughAABBs(Parameters.MAP_BOX_SIZE); //Gives the ice hitboxes
   }
 
+  /**
+   * Creates the Map using procedural generation.
+   */
   protected void makeMap() {
     double waterLevel = Parameters.WATER_LEVEL; // Defines the cut-off point for water or ice
     // Gets a noise grid from the PerlinNoise class
@@ -41,7 +57,7 @@ public class Map {
   }
 
   /**
-   * Creates a minimap from the large map. This method is called once to avoid regenerating the
+   * Creates a minimap from the large Map. This method is called once to avoid regenerating the
    * minimap at each tick, which would be unnecessary as the terrain doesn't change.
    */
   private void makeMinimap() {
@@ -77,6 +93,10 @@ public class Map {
     }
   }
 
+  /**
+   * @return a 2D array of booleans where {@code true} represents ice and {@code false} represents
+   *         water
+   */
   public boolean[][] getIceGrid() {
     return iceGrid;
   }
@@ -84,12 +104,17 @@ public class Map {
   /**
    * Gets the minimap.
    * 
-   * @return an int array where each int represents a colored pixel
+   * @return an int array where each int represents a coloured pixel
    */
   public int[][] getMinimap() {
     return minimap;
   }
 
+  /**
+   * Renders the currently visible area of this Map to the screen.
+   * 
+   * @param r the Renderer instance used to render this Map
+   */
   public void render(Renderer r) {
     r.drawViewport(iceGrid);
   }

@@ -15,9 +15,8 @@ import org.alien8.rendering.Sprite;
 import net.jafama.FastMath;
 
 /**
- * Developer's notes:
- * 
- * 
+ * This class represents a ship Entity within the game.
+ * <P>
  * All calculations relative to the ship consider the ship "located" at the position right under the
  * center of mass of the ship. Turrets are moved together with it with that consideration in mind.
  * 
@@ -31,7 +30,13 @@ public class Ship extends Entity implements Serializable {
   private int colour;
   private Sprite sprite;
 
-
+  /**
+   * Constructor.
+   * 
+   * @param position the Position of this Ship in XY coordinates
+   * @param direction the direction this Ship is travelling in
+   * @param colour the colour of this Ship
+   */
   public Ship(Position position, double direction, int colour) {
     super(position, direction, 0, Parameters.SHIP_MASS, Parameters.SHIP_LENGTH,
         Parameters.SHIP_WIDTH, Parameters.SHIP_HEALTH);
@@ -46,27 +51,8 @@ public class Ship extends Entity implements Serializable {
   }
 
   /**
-   * Called every tick to see if we need to alter any active effect
+   * @param position the Position to set
    */
-  public void updateEffect() {
-    if (effect != null) {
-      if (effect.getEndTime() < System.currentTimeMillis())
-        effect = null;
-      else if (effect.getEffectType() == Effect.NO_COOLDOWN) {
-        this.getFrontTurret().resetCooldown();
-        this.getRearTurret().resetCooldown();
-      }
-    }
-  }
-
-  @Override
-  public void setSpeed(double speed) {
-    if (effect != null && effect.getEffectType() == Effect.SPEED) {
-      super.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD * Parameters.ITEM_SPEED_ITEM_MULTIPLIER);
-    } else
-      super.setSpeed(speed);
-  }
-
   @Override
   public void setPosition(Position position) {
     this.position = position;
@@ -75,8 +61,119 @@ public class Ship extends Entity implements Serializable {
   }
 
   /**
+   * @param serial the serial ID to set
+   */
+  @Override
+  public void setSerial(long serial) {
+    this.serial = serial;
+    frontTurret.setShipSerial(serial);
+    rearTurret.setShipSerial(serial);
+  }
+
+  /**
+   * @param speed the speed to set
+   */
+  @Override
+  public void setSpeed(double speed) {
+    if (effect != null && effect.getEffectType() == Effect.SPEED) {
+      super.setSpeed(Parameters.SHIP_TOP_SPEED_FORWARD * Parameters.ITEM_SPEED_ITEM_MULTIPLIER);
+    } else
+      super.setSpeed(speed);
+  }
+
+  /**
+   * @return the front Turret of this Ship
+   */
+  public Turret getFrontTurret() {
+    return this.frontTurret;
+  }
+
+  /**
+   * @return the direction the front Turret of this Ship is facing
+   */
+  public double getFrontTurretDirection() {
+    return frontTurret.getDirection();
+  }
+
+  /**
+   * @return the charge of the front Turret of this Ship
+   */
+  public double getFrontTurretCharge() {
+    return frontTurret.getDistance();
+  }
+
+  /**
+   * Charges the front Turret of this Ship.
+   */
+  public void frontTurretCharge() {
+    frontTurret.charge();
+  }
+
+  /**
+   * Shoots the front Turret of this Ship.
+   */
+  public void frontTurretShoot() {
+    frontTurret.shoot();
+  }
+
+  /**
+   * @return the rear Turret of this Ship
+   */
+  public Turret getRearTurret() {
+    return this.rearTurret;
+  }
+
+  /**
+   * @return the direction the rear Turret of this Ship is facing
+   */
+  public double getRearTurretDirection() {
+    return rearTurret.getDirection();
+  }
+
+  /**
+   * @return the charge of the rear Turret of this Ship
+   */
+  public double getRearTurretCharge() {
+    return rearTurret.getDistance();
+  }
+
+  /**
+   * Charges the rear Turret of this Ship.
+   */
+  public void rearTurretCharge() {
+    rearTurret.charge();
+  }
+
+  /**
+   * Shoots the rear Turret of this Ship.
+   */
+  public void rearTurretShoot() {
+    rearTurret.shoot();
+  }
+
+  /**
+   * Sets the position for all turrets considering the ship's Position and direction.
+   * 
+   * @param shipPosition the ship's position
+   */
+  public void setTurretsPosition() {
+    // The radius from the ship position to the turret position
+    // Chosen to be a fifth of the length of the ship AWAY from
+    // the tip of the ship.
+    double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
+
+    frontTurret.setPosition(this.getPosition()
+        .addPosition(new Position(FastMath.floor(r * FastMath.cos(this.getDirection())),
+            FastMath.floor(r * FastMath.sin(this.getDirection())))));
+
+    rearTurret.setPosition(this.getPosition()
+        .addPosition(new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())),
+            FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
+  }
+
+  /**
    * Sets the direction for all turrets for the new mouse position considering the current ship
-   * direction for limiting the movement of turrets
+   * direction for limiting the movement of turrets.
    * 
    * @param mousePosition the latest position of the cursor
    */
@@ -112,13 +209,19 @@ public class Ship extends Entity implements Serializable {
       rearTurret.setDirection(angle);
   }
 
-  public void setTurretsDirectionAI(Position mousePosition) {
+  /**
+   * Sets the direction for all turrets for the target Position considering the current ship
+   * direction for limiting the movement of turrets.
+   * 
+   * @param targetPosition the latest position of the cursor
+   */
+  public void setTurretsDirectionAI(Position targetPosition) {
     // Had to make this to allow the AI ships to aim at positions
     double ra = 0;
 
     // Front
     double angle = Renderer.getInstance().getScreenPositionAI(frontTurret.getPosition())
-        .getAngleTo(mousePosition);
+        .getAngleTo(targetPosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -128,7 +231,7 @@ public class Ship extends Entity implements Serializable {
 
     // Rear
     angle = Renderer.getInstance().getScreenPositionAI(rearTurret.getPosition())
-        .getAngleTo(mousePosition);
+        .getAngleTo(targetPosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -138,33 +241,120 @@ public class Ship extends Entity implements Serializable {
   }
 
   /**
-   * Sets the position for all turrets considering the ship's position and direction
-   * 
-   * @param shipPosition the ship's position
+   * @return the Item this Ship is currently carrying
    */
-  public void setTurretsPosition() {
-    // The radius from the ship position to the turret position
-    // Chosen to be a fifth of the length of the ship AWAY from
-    // the tip of the ship.
-    double r = 2 * 0.2 * Parameters.SHIP_LENGTH;
-
-    frontTurret.setPosition(this.getPosition()
-        .addPosition(new Position(FastMath.floor(r * FastMath.cos(this.getDirection())),
-            FastMath.floor(r * FastMath.sin(this.getDirection())))));
-
-    rearTurret.setPosition(this.getPosition()
-        .addPosition(new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())),
-            FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
-
+  public Item getItem() {
+    return item;
   }
 
-  @Override
-  public void setSerial(long serial) {
-    this.serial = serial;
-    frontTurret.setShipSerial(serial);
-    rearTurret.setShipSerial(serial);
+  /**
+   * @return the type of the Item this Ship is currently carrying
+   */
+  public int getItemType() {
+    if (item != null)
+      return this.item.getItemType();
+    return -1;
   }
 
+  /**
+   * @param item the Item to give to this Ship
+   */
+  public void giveItem(Item item) {
+    if (this.item == null) {
+      this.item = item;
+    }
+  }
+
+  /**
+   * Uses the Item this Ship is currently carrying.
+   */
+  public void useItem() {
+    if (item != null) {
+      this.item.use();
+      item = null;
+    }
+  }
+
+  /**
+   * @return {@code true} if this Ship is carrying an Item, {@code false} if not
+   */
+  public boolean hasItem() {
+    if (item == null)
+      return false;
+    return true;
+  }
+
+  /**
+   * @return {@code true} if this Ship is under an Effect, {@code false} if not
+   */
+  public boolean underEffect() {
+    if (effect == null)
+      return false;
+    return true;
+  }
+
+  /**
+   * @return the type of the Effect this Ship is currently under
+   */
+  public int getEffectType() {
+    if (effect != null)
+      return this.effect.getEffectType();
+    return -1;
+  }
+
+  /**
+   * @param effect the Effect to apply to this Ship
+   */
+  public void applyEffect(Effect effect) {
+    this.effect = effect;
+  }
+
+  /**
+   * Checks if any active effects of this Ship need updating, and alters them if necessary. Must be
+   * called every tick.
+   */
+  public void updateEffect() {
+    if (effect != null) {
+      if (effect.getEndTime() < System.currentTimeMillis())
+        effect = null;
+      else if (effect.getEffectType() == Effect.NO_COOLDOWN) {
+        this.getFrontTurret().resetCooldown();
+        this.getRearTurret().resetCooldown();
+      }
+    }
+  }
+
+  /**
+   * @return the colour value of this Ship
+   */
+  public int getColour() {
+    return this.colour;
+  }
+
+  /**
+   * Checks for equality between this Ship and another.
+   * 
+   * @param s the other Ship
+   * @return {@code true} if the Ships are equal, {@code false} if not
+   */
+  public boolean equals(Ship s) {
+    return this.getSerial() == s.getSerial() && this.getPosition().equals(s.getPosition())
+        && this.isToBeDeleted() == s.isToBeDeleted() && this.getMass() == s.getMass()
+        && this.getSpeed() == s.getSpeed() && this.getDirection() == s.getDirection()
+        && this.getLength() == s.getLength() && this.getWidth() == s.getWidth()
+        && this.getHealth() == s.getHealth();
+  }
+
+  /**
+   * @return a String representation of this Ship
+   */
+  public String toString() {
+    return "Ship " + this.getSerial() + "," + this.getPosition();
+  }
+
+  /**
+   * Renders this Ship to the screen.
+   */
   public void render() {
     Renderer r = Renderer.getInstance();
 
@@ -236,29 +426,29 @@ public class Ship extends Entity implements Serializable {
     frontTurret.render();
     rearTurret.render();
 
-    if(effect != null) {
-    	Sprite sp = null;
-    	switch(effect.getEffectType()) {
-    	case Effect.NO_COOLDOWN:
-    		sp = Sprite.item_no_cooldown;
-    		break;
-    	case Effect.SPEED:
-    		sp = Sprite.effect_speed;
-    		sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI /2);
-    		break;
-    	case Effect.INVULNERABLE:
-    		sp = Sprite.effect_invulnerable;
-    		sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI /2);
-    		break;
-    	}
-    	
-    	Renderer.getInstance().drawSprite((int) this.getPosition().getX() - sp.getWidth()/2, 
-				(int) this.getPosition().getY() - sp.getHeight()/2, sp, false);
+    if (effect != null) {
+      Sprite sp = null;
+      switch (effect.getEffectType()) {
+        case Effect.NO_COOLDOWN:
+          sp = Sprite.item_no_cooldown;
+          break;
+        case Effect.SPEED:
+          sp = Sprite.effect_speed;
+          sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI / 2);
+          break;
+        case Effect.INVULNERABLE:
+          sp = Sprite.effect_invulnerable;
+          sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI / 2);
+          break;
+      }
+
+      Renderer.getInstance().drawSprite((int) this.getPosition().getX() - sp.getWidth() / 2,
+          (int) this.getPosition().getY() - sp.getHeight() / 2, sp, false);
     }
   }
 
   /**
-   * Method to stop a ship from going out of the bounds of the map. The ship will go as far as the
+   * Prevents this Ship from moving outside of the bounds of the map. The Ship will go as far as the
    * border of the map and not be able to travel further.
    */
   public void dealWithOutOfBounds() {
@@ -270,12 +460,10 @@ public class Ship extends Entity implements Serializable {
       if (corner.getX() > Parameters.MAP_WIDTH) {
         if (corner.getX() - Parameters.MAP_WIDTH > xdiff) {
           xdiff = corner.getX() - Parameters.MAP_WIDTH;
-          // flipDir();
         }
       } else if (corner.getX() < 0) {
         if (corner.getX() < xdiff) {
           xdiff = corner.getX();
-          // flipDir();
         }
       }
 
@@ -283,12 +471,10 @@ public class Ship extends Entity implements Serializable {
       if (corner.getY() > Parameters.MAP_HEIGHT) {
         if (corner.getY() - Parameters.MAP_HEIGHT > ydiff) {
           ydiff = corner.getY() - Parameters.MAP_HEIGHT;
-          // flipDir();
         }
       } else if (corner.getY() < 0) {
         if (corner.getY() < ydiff) {
           ydiff = corner.getY();
-          // flipDir();
         }
       }
     }
@@ -298,16 +484,8 @@ public class Ship extends Entity implements Serializable {
     this.translateObb(-xdiff, -ydiff);
   }
 
-  private void flipDir() {
-    // TEMP
-    // Reverse direction if out of bounds
-    PhysicsManager.rotateEntity(this, FastMath.PI);
-    rotateObb(getDirection() + FastMath.PI);
-  }
-
   /**
-   * Method to stop a ship from going through ice on the map. Simply stops the ship from entering
-   * ice.
+   * Prevents this Ship from going through ice on the map.
    */
   public void dealWithInIce(boolean[][] iceGrid) {
     if (Parameters.ICE_IS_SOLID) {
@@ -340,7 +518,6 @@ public class Ship extends Entity implements Serializable {
 
             int xdiff;
             int ydiff;
-
 
             // Finds minimum x distance
             if (posXdiff >= negXdiff) {
@@ -380,20 +557,6 @@ public class Ship extends Entity implements Serializable {
             }
 
             i++;
-
-
-
-            // if (getDirection() >= 0 && getDirection() < FastMath.PI) {
-            // PhysicsManager.rotateEntity(this, FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
-            // } else {
-            // PhysicsManager.rotateEntity(this, -FastMath.abs(xdiff) * Parameters.ICE_BOUNCINESS);
-            // }
-
-            // damage(properties.getSpeed() * Parameters.COLLISION_DAMAGE_MODIFIER);
-            // System.out.println("Health: " + getHealth());
-
-            // Halve the ship's speed for now
-            // setSpeed(getSpeed() / 2);
           }
         } catch (ArrayIndexOutOfBoundsException e) {
           // This happens if the entity touches the edge of the map, so we deal with it gracefully
@@ -403,7 +566,7 @@ public class Ship extends Entity implements Serializable {
   }
 
   /**
-   * Method to find the distance a Ship is from water in a single direction. Used in the
+   * Finds the distance this Ship is from water in a single direction. Used in the
    * {@code dealWithInIce()} method to find the distance to push a Ship out of ice.
    * 
    * @param iceGrid a 2-dimensional boolean array which represents the map
@@ -428,107 +591,6 @@ public class Ship extends Entity implements Serializable {
     }
     // Return the difference anyway
     return diff;
-  }
-
-  public Turret getFrontTurret() {
-    return this.frontTurret;
-  }
-
-  public Turret getRearTurret() {
-    return this.rearTurret;
-  }
-
-  public double getFrontTurretDirection() {
-    return frontTurret.getDirection();
-  }
-
-  public double getRearTurretDirection() {
-    return rearTurret.getDirection();
-  }
-
-  public double getFrontTurretCharge() {
-    return frontTurret.getDistance();
-  }
-
-  public double getRearTurretCharge() {
-    return rearTurret.getDistance();
-  }
-
-  public int getColour() {
-    return this.colour;
-  }
-
-  public void frontTurretCharge() {
-    frontTurret.charge();
-  }
-
-  public void rearTurretCharge() {
-    rearTurret.charge();
-  }
-
-  public void frontTurretShoot() {
-    frontTurret.shoot();
-  }
-
-  public void rearTurretShoot() {
-    rearTurret.shoot();
-  }
-
-  public boolean equals(Ship s) {
-    return this.getSerial() == s.getSerial() && this.getPosition().equals(s.getPosition())
-        && this.isToBeDeleted() == s.isToBeDeleted() && this.getMass() == s.getMass()
-        && this.getSpeed() == s.getSpeed() && this.getDirection() == s.getDirection()
-        && this.getLength() == s.getLength() && this.getWidth() == s.getWidth()
-        && this.getHealth() == s.getHealth();
-  }
-
-  public String toString() {
-    return "Ship " + this.getSerial() + "," + this.getPosition();
-  }
-
-  public void giveItem(Item item) {
-    if (this.item == null) {
-      this.item = item;
-    }
-  }
-
-  public void useItem() {
-    if (item != null) {
-      this.item.use();
-      item = null;
-    }
-  }
-
-  public boolean hasItem() {
-    if (item == null)
-      return false;
-    return true;
-  }
-
-  public void applyEffect(Effect effect) {
-    this.effect = effect;
-  }
-
-  public int getEffectType() {
-    if (effect != null)
-      return this.effect.getEffectType();
-    return -1;
-  }
-
-  public boolean underEffect() {
-    if (effect == null)
-      return false;
-    return true;
-  }
-
-  public Item getItem() {
-    return item;
-  }
-
-  public int getItemType() {
-    if (item != null)
-      return this.item.getItemType();
-    return -1;
   }
 }
 

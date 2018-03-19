@@ -1,15 +1,29 @@
 package org.alien8.mapgeneration;
 
 import java.util.Random;
-
 import net.jafama.FastMath;
 
+/**
+ * This class implements the Perlin noise algorithm, allowing a Map to be procedurally generated.
+ *
+ */
 public class PerlinNoise {
 
-  // The gradient vectors can only be one of the 4 unit vectors
+  /**
+   * Array of the 4 unit vectors for gradients.
+   */
   static MapVector[] gradientVectors = {new MapVector(1d, 1d), new MapVector(1d, -1d),
       new MapVector(-1d, 1d), new MapVector(-1d, -1d)};
 
+  /**
+   * Calculates the vector distance between two given points in x and y.
+   * 
+   * @param px the x coordinate of the destination point
+   * @param py the y coordinate of the destination point
+   * @param gx the x coordinate of the source point
+   * @param gy the y coordinate of the source point
+   * @return a MapVector giving the distance between the two points given
+   */
   public static MapVector distance(double px, double py, double gx, double gy) {
     /*
      * Calculates the x distance and y distance given to vectors gx and gy refer to the coordinates
@@ -22,21 +36,50 @@ public class PerlinNoise {
     return new MapVector(outx, outy);
   }
 
+  /**
+   * Calculates the dot product of two vectors.
+   * 
+   * @param u the first vector
+   * @param v the second vector
+   * @return the dot product between the vectors
+   */
   public static double dotProduct(MapVector u, MapVector v) {
     double out = (u.getX() * v.getX() + u.getY() * v.getY());
     return out;
   }
 
+  /**
+   * Implements the standard Perlin fade function to give smoother noise: 6n^5 - 15n^4 + 10n^3.
+   * 
+   * @param n n parameter
+   * @return the faded value
+   */
   public static double fade(double n) {
     // The standard perlin fade function to give smoother noise: 6n^5 - 15n^4 + 10n^3
     return n * n * n * (n * (n * 6 - 15) + 10);
   }
 
+  /**
+   * Implements the linear interpolation function: a + w * (b - a).
+   * 
+   * @param a a parameter
+   * @param b b parameter
+   * @param w w parameter
+   * @return the interpolated value
+   */
   public static double linInterpolate(double a, double b, double w) {
     // Linear Interpolation function
     return a + w * (b - a);
   }
 
+  /**
+   * Calculates the Perlin value of a given XY coordinate.
+   * 
+   * @param x the x coordinate
+   * @param y the y coordinate
+   * @param gradients the four unit vectors
+   * @return the Perlin value of the XY coordinate
+   */
   public static double perlin(double x, double y, MapVector[][] gradients) {
     // Calculates the perlin value of a given xy coordinate
     /*
@@ -81,11 +124,21 @@ public class PerlinNoise {
     return outValue;
   }
 
+  /**
+   * Generates a 2D array of Perlin noise.
+   * 
+   * @param xPxlSize the x dimension of the pixel size
+   * @param yPxlSize the y dimension of the pixel size
+   * @param xGridSize the x dimension of the grid size
+   * @param yGridSize the y dimension of the grid size/
+   * @param seed the random seed used to generate the grid
+   * @return the 2D Perlin grid
+   */
   public static double[][] generateNoiseGrid(int xPxlSize, int yPxlSize, int xGridSize,
       int yGridSize, long seed) {
     /*
-     * PxlSize dimensions are difining the whole picture of noise (as a grid of pixels) GridSize
-     * dimensions are difining the grid on top of the noise that has a gradient vector at each point
+     * PxlSize dimensions are defining the whole picture of noise (as a grid of pixels) GridSize
+     * dimensions are defining the grid on top of the noise that has a gradient vector at each point
      * (Changing the grid size will change the density of noise)
      */
     double[][] noiseGrid = new double[xPxlSize][yPxlSize];
@@ -123,11 +176,11 @@ public class PerlinNoise {
    * = 0; Color c = new Color(0,0,0);
    * 
    * for (int y = 0; y < pxlSize; y++){ for (int x = 0; x < pxlSize; x++){ //colV =
-   * (int)FastMath.floor(testNoise[x][y]*255d); if (testNoise[x][y] > 0.4){ if (testNoise[x][y] <= 0.7){
-   * c = new Color(0,64,128); }else if (testNoise[x][y] <= 0.9){ c = new Color(0,51,102); }else{ c =
-   * new Color(0,38,77); } } else{ if (testNoise[x][y] >= 0.2){ c = new Color(179,255,255); }else if
-   * (testNoise[x][y] >= 0.1){ c = new Color(204,255,255); }else { c = new Color(230,255,255); } }
-   * image.setRGB(x, y, c.getRGB()); } }
+   * (int)FastMath.floor(testNoise[x][y]*255d); if (testNoise[x][y] > 0.4){ if (testNoise[x][y] <=
+   * 0.7){ c = new Color(0,64,128); }else if (testNoise[x][y] <= 0.9){ c = new Color(0,51,102);
+   * }else{ c = new Color(0,38,77); } } else{ if (testNoise[x][y] >= 0.2){ c = new
+   * Color(179,255,255); }else if (testNoise[x][y] >= 0.1){ c = new Color(204,255,255); }else { c =
+   * new Color(230,255,255); } } image.setRGB(x, y, c.getRGB()); } }
    * 
    * JFrame frame = new JFrame(); frame.getContentPane().setLayout(new FlowLayout());
    * frame.getContentPane().add(new JLabel(new ImageIcon(image))); frame.pack();
