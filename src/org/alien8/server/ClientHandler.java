@@ -108,6 +108,7 @@ public class ClientHandler extends Thread {
     // Keep reading from client to track the connection status (Disconnection is catched by exception)
     while (run) {
       try {
+        System.out.println("ok");
         fromClient.readObject();
       } catch (ClassNotFoundException cnfe) {
         LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,

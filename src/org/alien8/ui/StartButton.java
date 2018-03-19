@@ -1,7 +1,5 @@
 package org.alien8.ui;
 
-import org.alien8.client.Client;
-import org.alien8.client.Client.State;
 import org.alien8.server.Server;
 
 public class StartButton extends Button {
@@ -12,7 +10,7 @@ public class StartButton extends Button {
 
 	@Override
 	public void executeAction() {
-		Client.getInstance().setState(State.IN_GAME);
+		Server.getInstance().startSGH();
 	}
 
 }

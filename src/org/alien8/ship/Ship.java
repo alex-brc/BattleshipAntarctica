@@ -235,6 +235,26 @@ public class Ship extends Entity implements Serializable {
     // Render turrets
     frontTurret.render();
     rearTurret.render();
+
+    if(effect != null) {
+    	Sprite sp = null;
+    	switch(effect.getEffectType()) {
+    	case Effect.NO_COOLDOWN:
+    		sp = Sprite.item_no_cooldown;
+    		break;
+    	case Effect.SPEED:
+    		sp = Sprite.effect_speed;
+    		sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI /2);
+    		break;
+    	case Effect.INVULNERABLE:
+    		sp = Sprite.effect_invulnerable;
+    		sp = sp.rotateSprite(this.getDirection() * -1 + Math.PI /2);
+    		break;
+    	}
+    	
+    	Renderer.getInstance().drawSprite((int) this.getPosition().getX() - sp.getWidth()/2, 
+				(int) this.getPosition().getY() - sp.getHeight()/2, sp, false);
+    }
   }
 
   /**

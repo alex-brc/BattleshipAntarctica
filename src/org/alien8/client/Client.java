@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -160,50 +161,50 @@ public class Client implements Runnable {
           int frameRate = 0;
           long frameTimer = getTime();
 
-          while (gameRunning) {
-            if (playersCompeting && !waitingToExit) {
-              currentTime = getTime();
+          try {
+            while (gameRunning) {
+              if (playersCompeting && !waitingToExit) {
+                currentTime = getTime();
 
-              // Get the amount of update()s the model needs to catch up
-              //
-              // timeNow - timeLastUpdateWasDone --> time elapsed
-              // timeToCatchUp = ----------------------------------
-              // deltaTPerTick --> how long a "tick" is
-              //
-              catchUp +=
-                  (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+                // Get the amount of update()s the model needs to catch up
+                //
+                // timeNow - timeLastUpdateWasDone --> time elapsed
+                // timeToCatchUp = ----------------------------------
+                // deltaTPerTick --> how long a "tick" is
+                //
+                catchUp +=
+                    (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
 
-              // Call update() as many times as needed to compensate before rendering
-              while (catchUp >= 1) {
-                try {
+                // Call update() as many times as needed to compensate before rendering
+                while (catchUp >= 1) {
                   this.sendInputSample();
                   this.receivePacket();
                   this.receivePacket();
-                } catch (IOException e) {
-                  // Do nothing, if reached here playersCompeting && waitingToExit should be set
-                  // false
-                }
 
-                catchUp--;
-                // Update last time
-                lastTime = getTime();
+                  catchUp--;
+                  // Update last time
+                  lastTime = getTime();
+                }
+              }
+              Renderer.getInstance().render(model);
+              frameRate++;
+
+              // Update the FPS timer every FPS_FREQ^-1 seconds
+              if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
+                frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
+                FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
+                frameRate = 0;
+                // System.out.println(FPS);
+              }
+              if (waitingToExit && !playersCompeting) {
+                Renderer.getInstance().render(model);
               }
             }
-            Renderer.getInstance().render(model);
-            frameRate++;
-
-            // Update the FPS timer every FPS_FREQ^-1 seconds
-            if (getTime() - frameTimer > Parameters.N_SECOND / Parameters.FPS_FREQ) {
-              frameTimer += Parameters.N_SECOND / Parameters.FPS_FREQ;
-              FPS = (frameRate * Parameters.FPS_FREQ + FPS) / 2;
-              frameRate = 0;
-              // System.out.println(FPS);
-            }
-            if (waitingToExit && !playersCompeting) {
-              Renderer.getInstance().render(model);
-            }
+            AudioManager.getInstance().stopAmbient();
+            
+          } catch (IOException ioe) {
+            // Do nothing just proceed and end the game loop
           }
-          AudioManager.getInstance().stopAmbient();
           break;
         default:
           break;
@@ -275,6 +276,7 @@ public class Client implements Runnable {
         clientIP = InetAddress.getLocalHost();
         serverIP = InetAddress.getByName(serverIPStr);
         tcpSocket = new Socket(serverIP, Parameters.SERVER_PORT);
+        tcpSocket.setSoTimeout(2000);
         udpSocket = new DatagramSocket();
         clientUdpPort = udpSocket.getLocalPort();
 
@@ -301,26 +303,31 @@ public class Client implements Runnable {
         multiCastSocket = new MulticastSocket(Parameters.MULTI_CAST_PORT);
         multiCastSocket.joinGroup(multiCastIP);
 
+        tcpSocket.setSoTimeout(0);
         clientTCP = new ClientTCP(fromServer);
         clientTCP.start();
         gameRunning = true;
         playersCompeting = true;
+        System.out.println("ok");
 
+      } catch (SocketTimeoutException e) {
+        this.disconnect();
+        return false;
       } catch (BindException e) {
-        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
-            "Could not bind to any port. Firewalls?\n" + e.toString());
+        System.out.println("Could not bind to " + serverIPStr);
+        this.disconnect();
         return false;
       } catch (SocketException e) {
         System.out.println("Server " + serverIPStr + " didn't response");
         this.disconnect();
         return false;
       } catch (UnknownHostException e) {
-        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
-            "Unknown host. Check host details.\n" + e.toString());
+        System.out.println("Unknown host " + serverIPStr);
+        this.disconnect();
         return false;
       } catch (IOException e) {
-        LogManager.getInstance().log("Client", LogManager.Scope.CRITICAL,
-            "IO exception.\n" + e.toString());
+        System.out.println("I/O error " + serverIPStr);
+        this.disconnect();
         return false;
       }
       LogManager.getInstance().log("Client", LogManager.Scope.INFO,
@@ -382,7 +389,6 @@ public class Client implements Runnable {
 
   private void receiveEvents(GameEvent event) {
     // Send audio events to AudioManager
-    System.out.println(event.getClass());
     if (event != null) {
       if (event instanceof AudioEvent)
         AudioManager.getInstance().addEvent((AudioEvent) event);
@@ -406,15 +412,18 @@ public class Client implements Runnable {
   /*
    * Receive the game state from the server through TCP connection
    */
-  private ArrayList<EntityLite> receiveGameStateTCP(ObjectInputStream fromServer) {
+  private ArrayList<EntityLite> receiveGameStateTCP(ObjectInputStream fromServer)
+      throws SocketTimeoutException, IOException {
     ArrayList<EntityLite> entsLite = null;
     LinkedList<ScoreEvent> scores = null;
 
     try {
       entsLite = (ArrayList<EntityLite>) fromServer.readObject();
       scores = (LinkedList<ScoreEvent>) fromServer.readObject();
+    } catch (SocketTimeoutException ste) {
+      throw ste;
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      throw ioe;
     } catch (ClassNotFoundException cnfe) {
       cnfe.printStackTrace();
     }
@@ -425,12 +434,14 @@ public class Client implements Runnable {
     return entsLite;
   }
 
-  private Long getMapSeed(ObjectInputStream fromServer) {
+  private Long getMapSeed(ObjectInputStream fromServer) throws SocketTimeoutException, IOException {
     Long seed = null;
     try {
       seed = (Long) fromServer.readObject();
+    } catch (SocketTimeoutException ste) {
+      throw ste;
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      throw ioe;
     } catch (ClassNotFoundException cnfe) {
       cnfe.printStackTrace();
     }
@@ -469,7 +480,9 @@ public class Client implements Runnable {
       model.reset();
       ClientScoreBoard.getInstance().reset();
       timer = null;
+      timeBeforeExiting = 10;
       FPS = 0;
+      opponents = new ArrayList<String>();
       clientIP = null;
       serverIP = null;
       multiCastIP = null;
@@ -481,6 +494,7 @@ public class Client implements Runnable {
       buf = new byte[65536];
       receivedByte = null;
       sendingByte = null;
+      lobby.setNotHost();
     } catch (IOException e) {
       // Trying to close a closed socket, it's ok just proceed
     }
@@ -517,7 +531,7 @@ public class Client implements Runnable {
   }
 
   public State getState() {
-	  return this.state;
+    return this.state;
   }
 
 }

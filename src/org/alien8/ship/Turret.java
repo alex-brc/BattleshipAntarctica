@@ -148,7 +148,7 @@ public class Turret implements Serializable {
 
     if (distance != minDistance) {
       Position pos = getTargetPosition();
-      Renderer.getInstance().drawRect((int) pos.getX(), (int) pos.getY(), 6, 6, 0xFF0000, false);
+      Renderer.getInstance().drawSprite((int)pos.getX() - Sprite.crosshair.getWidth(), (int)pos.getY() - Sprite.crosshair.getHeight(), Sprite.crosshair, false);
     }
   }
 

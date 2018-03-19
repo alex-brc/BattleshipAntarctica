@@ -73,8 +73,8 @@ public class Parameters {
   public static final double SHIP_WIDTH = 25;
   public static final double SHIP_HEALTH = 100;
   public static final double SHIP_TOP_SPEED_REACH_TIME = 200;
-  public static final double SHIP_TOP_SPEED_FORWARD = 2;
-  public static final double SHIP_TOP_SPEED_BACKWARD = 2;
+  public static final double SHIP_TOP_SPEED_FORWARD = 1.4;
+  public static final double SHIP_TOP_SPEED_BACKWARD = 1.4;
   public static final double SHIP_MASS = 1000;
   public static final double SHIP_FORWARD_FORCE =
       SHIP_MASS * SHIP_TOP_SPEED_FORWARD / SHIP_TOP_SPEED_REACH_TIME;
@@ -109,7 +109,7 @@ public class Parameters {
   /**
    * Affects how much damage ships take in collisions.
    */
-  public static final double COLLISION_DAMAGE_MODIFIER = 0.01;
+  public static final double COLLISION_DAMAGE_MODIFIER = 0.0005;
   public static final double COLLISION_ROTATION_MODIFIER = 0.2;
   /**
    * Affects how much the speed impacts the turning rate.
