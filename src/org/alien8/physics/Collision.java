@@ -124,6 +124,7 @@ public class Collision {
     // See if ship has been destroyed
     if (new Double(ship.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
+      ServerScoreBoard.getInstance().kill(ship);
       ship.delete();
       // Award score to the killer
       // If it's AI, no points
@@ -137,8 +138,8 @@ public class Collision {
   /**
    * Resolves a Collision between two Ships.
    * 
-   * @param bullet the first Ship involved in the Collision
-   * @param ship the second Ship involved in the Collision
+   * @param ship1 the first Ship involved in the Collision
+   * @param ship2 the second Ship involved in the Collision
    */
   private void resolveShipShipCollision(Ship ship1, Ship ship2) {
     System.out.println("ship hit ship!");
@@ -194,10 +195,12 @@ public class Collision {
     // Delete ships if dead
     if (new Double(entity1.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
+      ServerScoreBoard.getInstance().kill(ship1);
       entity1.delete();
     }
     if (new Double(entity2.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
+      ServerScoreBoard.getInstance().kill(ship2);
       entity2.delete();
     }
   }
@@ -237,6 +240,7 @@ public class Collision {
     // See if ship has been destroyed
     if (new Double(ship.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
+      ServerScoreBoard.getInstance().kill(ship);
       ship.delete();
       // Award score to the killer
       // If it's AI, no points
@@ -270,6 +274,7 @@ public class Collision {
     // See if ship has been destroyed
     if (new Double(ship.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
+      ServerScoreBoard.getInstance().kill(ship);
       ship.delete();
       // Award score to the killer
       // If it's AI, no points

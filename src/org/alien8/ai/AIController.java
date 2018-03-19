@@ -99,6 +99,7 @@ public class AIController {
       changeDefaultTurn = 0;
     }
     wander(); // Moves around the map, avoiding ice
+    myShip.updateEffect(); // Tick effect
   }
 
   /**

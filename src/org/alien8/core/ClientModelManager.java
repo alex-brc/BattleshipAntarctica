@@ -120,18 +120,18 @@ public class ClientModelManager {
         }
         
         // Apply effect
-        switch(el.effectType) {
+        switch(el.effectType+1) {
         case Pickup.INVULNERABLE_PICKUP: 
-            s.applyEffect(new Effect(0, Effect.INVULNERABLE));
+            s.applyEffect(new Effect(999999999, Effect.INVULNERABLE));
             break;
-        case Pickup.SPEED_PICKUP: 
-            s.applyEffect(new Effect(0, Effect.SPEED));
+        case Pickup.SPEED_PICKUP:  
+            s.applyEffect(new Effect(999999999, Effect.SPEED));
             break;
-        case Pickup.NO_COOLDOWN_PICKUP: 
-            s.applyEffect(new Effect(0, Effect.NO_COOLDOWN));
+        case Pickup.NO_COOLDOWN_PICKUP:  
+            s.applyEffect(new Effect(999999999, Effect.NO_COOLDOWN));
             break;
         default:
-            // No effect
+        	// Don't apply effect
             break;
         }
 
@@ -151,7 +151,23 @@ public class ClientModelManager {
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
-
+     
+        // Apply effect
+        switch(el.effectType+1) {
+        case Pickup.INVULNERABLE_PICKUP: 
+            s.applyEffect(new Effect(999999999, Effect.INVULNERABLE));
+            break;
+        case Pickup.SPEED_PICKUP:  
+            s.applyEffect(new Effect(999999999, Effect.SPEED));
+            break;
+        case Pickup.NO_COOLDOWN_PICKUP:  
+            s.applyEffect(new Effect(999999999, Effect.NO_COOLDOWN));
+            break;
+        default:
+        	// Don't apply effect
+            break;
+        }
+        
         if (el.toBeDeleted) {
           s.delete();
         }

@@ -39,7 +39,7 @@ public class Torpedo extends Entity {
   @Override
   public void render() {
     // TODO give this a sprite
-    Sprite currentSprite = Sprite.bullet.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    Sprite currentSprite = Sprite.torpedo.rotateSprite(-(this.getDirection() + FastMath.PI));
     Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
   }
