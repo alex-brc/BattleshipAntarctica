@@ -269,6 +269,38 @@ public abstract class Entity implements Serializable, Cloneable {
   }
 
   /**
+   * Checks for equality between this Entity and another.
+   * 
+   * @param e the other Entity
+   * @return {@code true} if the Entities are equal, {@code false} if not
+   */
+  public boolean equals(Entity e) {
+    if (position.equals(e.position) && serial == e.serial && toBeDeleted == e.toBeDeleted
+        && mass == e.mass && speed == e.speed && direction == e.direction && length == e.length
+        && width == e.width && health == e.health && obbEquals(e.obb)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Checks for equality between this Entity's Oriented Bounding Box (OBB), and that of another
+   * Entity's.
+   * 
+   * @param obb2 the other OBB
+   * @return {@code true} if the OBB's are equal, {@code false} if not
+   */
+  public boolean obbEquals(Position[] obb2) {
+    for (int i = 0; i < 4; i++) {
+      if (!obb[i].equals(obb2[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * @return {@code true} if the Entity is the player, {@code false} if not
    */
   public boolean isPlayer() {

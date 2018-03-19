@@ -169,6 +169,10 @@ public class Parameters {
   public static final int TORPEDO_SCORE = 100;
   //////////////////////////////////////////////////////////
 
+  /// TEST PARAMETERS
+  public static final double DOUBLE_PRECISION = 0.001;
+
+  //////////////////////////////////////////////////////////
 
   /// UNUSED PARAMETERS
   /**
