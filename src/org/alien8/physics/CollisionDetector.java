@@ -14,9 +14,10 @@ public class CollisionDetector {
    * Checks for Collisions between a set of Entities.
    * 
    * @param entities a List of Entities which are being checked for collisions
+   * @return
    * @return a List of Collisions
    */
-  public void findAndResolveCollisions(ConcurrentLinkedQueue<Entity> entities) {
+  public ArrayList<Collision> findCollisions(ConcurrentLinkedQueue<Entity> entities) {
     // /*
     // * BROAD PHASE: In this phase, we do some rough spatial examination of the Entities to rule
     // out
@@ -42,27 +43,29 @@ public class CollisionDetector {
       }
     }
 
+    System.out.println(potentialCollisions.size());
+
     /*
      * NARROW PHASE: In this phase, we inspect each of our potential collisions to determine which
      * ones are real
      */
-    // ArrayList<Collision> verifiedCollisions = new ArrayList<>();
+    ArrayList<Collision> verifiedCollisions = new ArrayList<>();
     // Verify each of our potential collisions
     for (Collision c : potentialCollisions) {
       MTV vector = verifyCollision(c);
       if (vector != null) {
-        // verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2(), vector));
-        Collision col = new Collision(c.getEntity1(), c.getEntity2(), vector);
-        col.resolveCollision();
+        verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2(), vector));
+        // Collision col = new Collision(c.getEntity1(), c.getEntity2(), vector);
+        // col.resolveCollision();
       }
       // if (verifyCollision(c)) {
       // verifiedCollisions.add(new Collision(c.getEntity1(), c.getEntity2()));
       // }
     }
-    // System.out.println("Verified: " + verifiedCollisions.size());
+    System.out.println("Verified: " + verifiedCollisions.size());
 
     // Return the collisions that we have found
-    // return verifiedCollisions;
+    return verifiedCollisions;
   }
 
   /**
@@ -222,7 +225,7 @@ public class CollisionDetector {
    * @param c the Collision which is being checked
    * @return <code>true</code> if the Entities are colliding, <code>false</code> if they are not
    */
-  private MTV verifyCollision(Collision c) {
+  public MTV verifyCollision(Collision c) {
     // Set overlap to be very large
     MTV minTranslationVector = new MTV(1000, null);
 

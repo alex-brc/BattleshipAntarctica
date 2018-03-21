@@ -14,11 +14,13 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public enum SoundEffects {
 
-  AMBIENT("/org/alien8/assets/ambient_waves.wav"), WIND(
-      "/org/alien8/assets/wind.wav"), AIRPLANE_PASS(
-          "/org/alien8/assets/airplane_pass.wav"), SHIP_SHOOT_1(
-              "/org/alien8/assets/cannon1.wav"), SHIP_SHOOT_2(
-                  "/org/alien8/assets/cannon2.wav"), SHIP_SHOOT_3("/org/alien8/assets/cannon3.wav");
+  AMBIENT("/org/alien8/assets/ambient_waves.wav"), WIND("/org/alien8/assets/wind.wav"), MENU_MUSIC(
+      "/org/alien8/assets/12 Shingle Tingle.wav"), INGAME_MUSIC(
+          "/org/alien8/assets/04 Shell Shock Shake.wav"), AIRPLANE_PASS(
+              "/org/alien8/assets/airplane_pass.wav"), SHIP_SHOOT_1(
+                  "/org/alien8/assets/cannon1.wav"), SHIP_SHOOT_2(
+                      "/org/alien8/assets/cannon2.wav"), SHIP_SHOOT_3(
+                          "/org/alien8/assets/cannon3.wav");
 
   public String fileName;
 

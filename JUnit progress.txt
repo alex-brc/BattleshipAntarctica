@@ -52,12 +52,12 @@ x mapgeneration:
 x physics:
 	/ AABB
 	x AxisVector
-	x Collision
-	x CollisionDetector
+	/ Collision
+	/ CollisionDetector
 	x IntervalValue
 	x IntervalValueType
 	x MTV
-	x PhysicsManager
+	/ PhysicsManager
 	x Position
 	x Projection
 x rendering:
