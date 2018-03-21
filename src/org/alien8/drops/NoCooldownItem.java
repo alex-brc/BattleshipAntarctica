@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Sprite;
@@ -14,7 +14,7 @@ public class NoCooldownItem extends Item {
    */
   public NoCooldownItem() {
     // Doesn't have a ship at this point
-    super(Sprite.item_no_cooldown, Pickup.NO_COOLDOWN_PICKUP);
+    super(Sprite.item_no_cooldown, Pickup.NO_COOLDOWN);
   }
 
   /**

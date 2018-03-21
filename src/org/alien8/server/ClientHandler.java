@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -37,6 +36,19 @@ public class ClientHandler extends Thread {
   private ServerModelManager model = ServerModelManager.getInstance();
   private volatile boolean run = true;
 
+  /**
+   * Constructor
+   * 
+   * @param clientIP Client's IP address
+   * @param clientUdpPort Client's UDP port number
+   * @param playerList List of player
+   * @param entities List of entity
+   * @param playerMap Ship to Player table
+   * @param mapSeed Map seed
+   * @param toClient Output stream for writing data to client
+   * @param fromClient Input stream for reading data from client
+   * @param playerName Player's name
+   */
   public ClientHandler(InetAddress clientIP, int clientUdpPort, ArrayList<Player> playerList,
       ConcurrentLinkedQueue<Entity> entities, ConcurrentHashMap<Ship, Player> playerMap,
       Long mapSeed, ObjectOutputStream toClient, ObjectInputStream fromClient, String playerName) {
@@ -50,11 +62,13 @@ public class ClientHandler extends Thread {
     this.fromClient = fromClient;
     this.playerName = playerName;
   }
-  
+
+  // Stop the thread
   public void end() {
     run = false;
   }
-  
+
+  // Send end game message to client
   public void sendEndGameMessage() {
     try {
       toClient.writeObject(new ServerMessage(0));
@@ -62,7 +76,8 @@ public class ClientHandler extends Thread {
       // Do nothing
     }
   }
-  
+
+  // Send the time before exiting the match to client
   public void sendTimeBeforeExiting(int timeBeforeExiting) {
     try {
       toClient.writeObject(new ServerMessage(1, timeBeforeExiting));
@@ -70,7 +85,8 @@ public class ClientHandler extends Thread {
       // Do nothing
     }
   }
-  
+
+  // Send server stopped message to client
   public void sendServerStoppedMessage() {
     try {
       toClient.writeObject(new ServerMessage(2));
@@ -78,16 +94,21 @@ public class ClientHandler extends Thread {
       // Do nothing
     }
   }
-  
 
+
+  // Send start game message to client
   public void sendStartGame() {
-	  try {
-		  toClient.writeObject(new ServerMessage(3));
-	  } catch (IOException ioe) {
-		  // Do nothing
-	  }
+    try {
+      toClient.writeObject(new ServerMessage(3));
+    } catch (IOException ioe) {
+      // Do nothing
+    }
   }
 
+  /**
+   * Run loop for communicating with client
+   */
+  @Override
   public void run() {
     Position randPos = Server.getInstance().getRandomPosition();
 
@@ -105,38 +126,56 @@ public class ClientHandler extends Thread {
     this.sendGameState(p, s);
     this.waitForReadyMessage(p, s);
 
-    // Keep reading from client to track the connection status (Disconnection is catched by exception)
+    // Keep reading from client to track the connection status
     while (run) {
       try {
-        System.out.println("ok");
         fromClient.readObject();
       } catch (ClassNotFoundException cnfe) {
-        LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-            "Class of serialized object cannot be found." + cnfe.toString());
-        cnfe.printStackTrace();
+        // Won't happen
         Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
-      } catch (IOException ioe) { // Client disconnected / Server closing the input stream when game ends
+      } catch (IOException ioe) {
         Server.getInstance().disconnectPlayer(clientIP, clientUdpPort);
       }
     }
-    
+
     System.out.println("Client Handler (" + clientIP + ", " + clientUdpPort + ") stopped");
   }
 
+  /**
+   * Send the map seed to client
+   * 
+   * @param p The Player object of the client
+   * @param s The Ship object of the client
+   */
   private void sendMapSeed(Player p, Ship s) {
     try {
       toClient.writeObject(mapSeed);
     } catch (IOException ioe) {
-      LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-          "Could not send map seed to client. " + ioe.toString());
-      ioe.printStackTrace();
       this.disconnectClient(p, s);
     }
-    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO, "Sent seed to client. ");
+  }
+
+  /**
+   * Send a full snapshot of game state to client
+   * 
+   * @param p The Player object of the client
+   * @param s The Ship object of the client
+   */
+  private void sendGameState(Player p, Ship s) {
+    ArrayList<EntityLite> entsLite = this.calculateEntitiesLite(entities);
+    LinkedList<ScoreEvent> initialScores = new LinkedList<ScoreEvent>();
+    for (Score score : ServerScoreBoard.getInstance().getScores())
+      initialScores.add(score.exportToEvent());
+    try {
+      toClient.writeObject(entsLite);
+      toClient.writeObject(initialScores);
+    } catch (IOException ioe) {
+      this.disconnectClient(p, s);
+    }
   }
 
   /*
-   * Create a compressed set of entities (game state) from the original set of entities
+   * Create a compressed set of entities (ArrayList of EntityLite) from the original set of entities
    */
   private ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
     ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
@@ -149,8 +188,7 @@ public class ClientHandler extends Thread {
           EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
               s.getRearTurretDirection(), s.getFrontTurretCharge(), s.getRearTurretCharge(),
-              s.getColour(), s.getItemType(), s.getEffectType(), 
-              p.getIP(), p.getPort()));
+              s.getColour(), s.getItemType(), s.getEffectType(), p.getIP(), p.getPort()));
         } else { // AI ship
           EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
               s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
@@ -167,24 +205,12 @@ public class ClientHandler extends Thread {
     return EntitiesLite;
   }
 
-  private void sendGameState(Player p, Ship s) {
-    ArrayList<EntityLite> entsLite = this.calculateEntitiesLite(entities);
-    LinkedList<ScoreEvent> initialScores = new LinkedList<ScoreEvent>();
-    for(Score score : ServerScoreBoard.getInstance().getScores())
-    	initialScores.add(score.exportToEvent());
-    try {
-      toClient.writeObject(entsLite);
-      toClient.writeObject(initialScores);
-    } catch (IOException ioe) {
-      LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-          "Could not send entsLite to client. " + ioe.toString());
-      ioe.printStackTrace();
-      this.disconnectClient(p, s);
-    }
-    LogManager.getInstance().log("ClientHandler", LogManager.Scope.INFO,
-        "Sent entLites to client. ");
-  }
-
+  /**
+   * Wait for the ready message from client
+   * 
+   * @param p The Player object of the client
+   * @param s The Ship object of the client
+   */
   private void waitForReadyMessage(Player p, Ship s) {
     // Add the player to the playerList when the player is ready
     try {
@@ -194,20 +220,17 @@ public class ClientHandler extends Thread {
       else
         this.disconnectClient(p, s);
     } catch (ClassNotFoundException cnfe) {
-      LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-          "Class of serialized object cannot be found." + cnfe.toString());
-      cnfe.printStackTrace();
       this.disconnectClient(p, s);
     } catch (IOException ioe) {
-      LogManager.getInstance().log("ClientHandler", LogManager.Scope.CRITICAL,
-          "Something is wrong when reading client's ready message" + ioe.toString());
-      ioe.printStackTrace();
       this.disconnectClient(p, s);
     }
   }
 
-  /*
-   * Use this only if things goes wrong before the client is added to the playerList
+  /**
+   * Disconnect the client if things goes wrong before the client is added to the playerList
+   * 
+   * @param p The Player object of the client
+   * @param s The Ship object of the client
    */
   private void disconnectClient(Player p, Ship s) {
     s.delete();
@@ -217,12 +240,22 @@ public class ClientHandler extends Thread {
     this.end();
   }
 
+  /**
+   * Get the client's IP address
+   * 
+   * @return The client's IP address
+   */
   public InetAddress getClientIP() {
     return this.clientIP;
   }
 
+  /**
+   * Get the client's UDP port number
+   * 
+   * @return The client's UDP port number
+   */
   public int getClientUdpPort() {
     return this.clientUdpPort;
   }
-  
+
 }

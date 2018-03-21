@@ -2,10 +2,10 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.items.Effect;
-import org.alien8.items.Mine;
-import org.alien8.items.Pickup;
-import org.alien8.items.Torpedo;
+import org.alien8.drops.Effect;
+import org.alien8.drops.Mine;
+import org.alien8.drops.Pickup;
+import org.alien8.drops.Torpedo;
 import org.alien8.score.ServerScoreBoard;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
@@ -125,8 +125,6 @@ public class Collision {
     // This allows us to ignore cases where a ship shoots itself
     if (bullet.getSource() == ship.getSerial())
       return;
-    if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
-      return;
 
     System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
     // Bullet damages ship
@@ -242,8 +240,6 @@ public class Collision {
   private void resolveShipMineCollision(Ship ship, Mine mine) {
     if (ship.getSerial() == mine.getSource())
       return;
-    if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
-      return;
 
     // Mine damages ship
     ship.damage(Parameters.MINE_DAMAGE);
@@ -275,8 +271,6 @@ public class Collision {
    */
   private void resolveShipTorpedoCollision(Ship ship, Torpedo torpedo) {
     if (ship.getSerial() == torpedo.getSource())
-      return;
-    if (ship.underEffect() && ship.getEffectType() == Effect.INVULNERABLE)
       return;
 
     // Mine damages ship

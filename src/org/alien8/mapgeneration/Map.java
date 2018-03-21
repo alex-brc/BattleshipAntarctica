@@ -36,7 +36,6 @@ public class Map {
     iceGrid = new boolean[l][w];
     makeMap(); // Actually generates the Map using the PerlinNoise class
     makeMinimap();
-    // makeRoughAABBs(Parameters.MAP_BOX_SIZE); //Gives the ice hitboxes
   }
 
   /**

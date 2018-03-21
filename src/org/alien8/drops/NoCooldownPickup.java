@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.physics.Position;
 
@@ -14,7 +14,7 @@ public class NoCooldownPickup extends Pickup {
    * @param position the Position of the Pickup
    */
   public NoCooldownPickup(Position position) {
-    super(position, new NoCooldownItem(), Pickup.NO_COOLDOWN_PICKUP);
+    super(position, new NoCooldownItem(), Pickup.NO_COOLDOWN);
   }
 
 }

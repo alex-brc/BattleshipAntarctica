@@ -7,10 +7,10 @@ x = not done
 
 x ai:
 	x AIController	
-x audio:
-	x AudioEvent
-	x AudioManager
-	x SoundEffects
+/ audio:
+	/ AudioEvent
+	/ AudioManager
+	/ SoundEffects
 x client:
 	x Client
 	x ClientInputSample
@@ -27,28 +27,28 @@ x core:
 	x ServerMessage
 	x ServerModelManager
 x items:
-	x Effect
-	x HealthItem
+	/ Effect
+	/ HealthItem
 	x HealthPickup
-	x InvulnerableItem
+	/ InvulnerableItem
 	x InvulnerablePickup
-	x Item
+	/ Item
 	x Mine
-	x MineItem
+	/ MineItem
 	x MinePickup
 	x NoCooldownItem
 	x NoCooldownPickup
 	x Pickup
 	x PlaneDropper
-	x SpeedItem
+	/ SpeedItem
 	x SpeedPickup
 	x Torpedo
-	x TorpedoItem
+	/ TorpedoItem
 	x TorpedoPickup
-x mapgeneration:
-	x Map
-	x MapVector
-	x PerlinNoise
+/ mapgeneration:
+	/ Map
+	/ MapVector
+	/ PerlinNoise
 x physics:
 	/ AABB
 	x AxisVector

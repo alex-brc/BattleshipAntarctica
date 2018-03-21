@@ -55,7 +55,6 @@ public class PerlinNoise {
    * @return the faded value
    */
   public static double fade(double n) {
-    // The standard perlin fade function to give smoother noise: 6n^5 - 15n^4 + 10n^3
     return n * n * n * (n * (n * 6 - 15) + 10);
   }
 
@@ -68,7 +67,6 @@ public class PerlinNoise {
    * @return the interpolated value
    */
   public static double linInterpolate(double a, double b, double w) {
-    // Linear Interpolation function
     return a + w * (b - a);
   }
 
@@ -81,17 +79,15 @@ public class PerlinNoise {
    * @return the Perlin value of the XY coordinate
    */
   public static double perlin(double x, double y, MapVector[][] gradients) {
-    // Calculates the perlin value of a given xy coordinate
     /*
-     * Connotation - The numbers after variables generally refer to the corners on the unit square:
-     * x0y1 -------- x1y1 | | | | | | x0y0 -------- x1y0 E.g. grad00 refers to the gradient vector
-     * on the bottom left corner of the square
+     * Notation - The numbers after variables generally refer to the corners on the unit square:
+     * E.g. grad00 refers to the gradient vector on the bottom left corner of the square
      */
     double x0 = FastMath.floor(x);
     double y0 = FastMath.floor(y);
     double x1 = FastMath.ceil(x);
     double y1 = FastMath.ceil(y);
-    // These are the points coordinates as if it were in the unit square (important for calcation of
+    // These are the points coordinates as if it were in the unit square (important for calculation of
     // the distance vector)
     double unitX = x - x0;
     double unitY = y - y0;
@@ -165,25 +161,4 @@ public class PerlinNoise {
     }
     return noiseGrid;
   }
-
-  // Just using this to test stuff
-  /*
-   * public static void main(String[] args){ int pxlSize = 512; int gridSize = 4;
-   * 
-   * double[][] testNoise = generateNoiseGrid(pxlSize, pxlSize, gridSize, gridSize);
-   * 
-   * BufferedImage image = new BufferedImage(pxlSize,pxlSize, BufferedImage.TYPE_INT_RGB); int colV
-   * = 0; Color c = new Color(0,0,0);
-   * 
-   * for (int y = 0; y < pxlSize; y++){ for (int x = 0; x < pxlSize; x++){ //colV =
-   * (int)FastMath.floor(testNoise[x][y]*255d); if (testNoise[x][y] > 0.4){ if (testNoise[x][y] <=
-   * 0.7){ c = new Color(0,64,128); }else if (testNoise[x][y] <= 0.9){ c = new Color(0,51,102);
-   * }else{ c = new Color(0,38,77); } } else{ if (testNoise[x][y] >= 0.2){ c = new
-   * Color(179,255,255); }else if (testNoise[x][y] >= 0.1){ c = new Color(204,255,255); }else { c =
-   * new Color(230,255,255); } } image.setRGB(x, y, c.getRGB()); } }
-   * 
-   * JFrame frame = new JFrame(); frame.getContentPane().setLayout(new FlowLayout());
-   * frame.getContentPane().add(new JLabel(new ImageIcon(image))); frame.pack();
-   * frame.setVisible(true); frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); }
-   */
 }

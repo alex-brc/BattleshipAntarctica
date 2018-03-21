@@ -12,16 +12,15 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.core.ServerModelManager;
-import org.alien8.items.Mine;
-import org.alien8.items.Pickup;
-import org.alien8.items.PlaneDropper;
-import org.alien8.items.Torpedo;
+import org.alien8.drops.Mine;
+import org.alien8.drops.Pickup;
+import org.alien8.drops.PlaneDropper;
+import org.alien8.drops.Torpedo;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
@@ -37,8 +36,17 @@ public class ServerGameHandler extends Thread {
   private byte[] receivedByte;
   private byte[] sendingByte;
   private volatile boolean gameRunning = true;
-  private int seconds;
+  private int currentMatchTime;
 
+  /**
+   * Constructor
+   * 
+   * @param ds Server's UDP socket
+   * @param ip Server's IP address
+   * @param entities List of entity
+   * @param latestCIS Table of the latest client input sample
+   * @param playerList List of player
+   */
   public ServerGameHandler(DatagramSocket ds, InetAddress ip,
       ConcurrentLinkedQueue<Entity> entities,
       ConcurrentHashMap<Player, ClientInputSample> latestCIS, ArrayList<Player> playerList) {
@@ -49,17 +57,24 @@ public class ServerGameHandler extends Thread {
     this.playerList = playerList;
   }
 
+  /**
+   * Main loop of the game
+   */
   @Override
   public void run() {
+    // Setup up variables for calculating time elapsed and ticks
     long lastTime = getNanoTime();
     long timer = getNanoTime();
-    seconds = Parameters.MATCH_LENGTH;
+    currentMatchTime = Parameters.MATCH_LENGTH;
     long currentTime = 0;
     double tick = 0;
 
     while (gameRunning) {
+      // Get current time
       currentTime = getNanoTime();
+
       tick += (currentTime - lastTime) / (Parameters.N_SECOND / Parameters.TICKS_PER_SECOND);
+
       while (tick >= 1) {
         this.readInputSample();
         this.updateGameStateByCIS();
@@ -71,18 +86,18 @@ public class ServerGameHandler extends Thread {
 
       if (getNanoTime() - timer > Parameters.N_SECOND) {
         timer += Parameters.N_SECOND;
-        seconds--;
-        if (seconds % 10 == 0)
+        currentMatchTime--;
+        if (currentMatchTime % 10 == 0)
           ServerModelManager.getInstance().addEntity(new PlaneDropper());
-        if(ServerModelManager.getInstance().countShips() == 1)
+        if (ServerModelManager.getInstance().countShips() == 1)
           gameRunning = false;
         updateServerTimer();
       }
 
-      if (seconds <= 0 ) {
+      if (currentMatchTime <= 0) {
         gameRunning = false;
       }
-      
+
     }
 
     // Notice all clients game has ended
@@ -107,8 +122,7 @@ public class ServerGameHandler extends Thread {
     // Notice all clients that server has been shut down
     for (ClientHandler ch : Server.getInstance().getCHList()) {
       ch.sendServerStoppedMessage();
-      ch.end(); // Will not immediately stop the client handler, it stops when server's TCP socket
-                // is closed (which throw exception for ch)
+      ch.end();
     }
 
     // Stop the server
@@ -116,31 +130,10 @@ public class ServerGameHandler extends Thread {
     System.out.println("Server game handler stopped");
   }
 
-  public int getSeconds() {
-    return seconds;
-  }
-  
-  public void updateServerTimer() {
-    Server.getInstance().addEvent(new TimerEvent(seconds));
-  }
-
   /**
-   * Gets current time in nanoseconds from the JVM
-   * 
-   * @return current time in nanoseconds
+   * Read input sample from client, number of input sample read for each call depends on the number
+   * of player
    */
-  private long getNanoTime() {
-    return System.nanoTime();
-  }
-
-  public boolean isGameRunning() {
-    return gameRunning;
-  }
-
-  public void end() {
-    gameRunning = false;
-  }
-
   private void readInputSample() {
     try {
       for (int i = 0; i < playerList.size(); i++) {
@@ -160,7 +153,7 @@ public class ServerGameHandler extends Thread {
         // Identify which Player the CIS belongs to
         Player p = Server.getInstance().getPlayerByIpAndPort(clientIP, clientPort);
 
-        // Put the received input sample in the CIS hash map
+        // Put the received input sample in the CIS table
         if (p != null && cis != null)
           if (latestCIS.containsKey(p))
             latestCIS.replace(p, cis);
@@ -170,22 +163,25 @@ public class ServerGameHandler extends Thread {
     } catch (SocketTimeoutException ste) {
       // Do nothing, just proceed
     } catch (IOException ioe) {
-      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL,
+      LogManager.getInstance().log("ServerGameHandler", LogManager.Scope.CRITICAL,
           "Something wrong when deserializing input sample byte");
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
-      LogManager.getInstance().log("ServerMulticastSender", LogManager.Scope.CRITICAL,
-          "Cannot find the class of the received serialized object");
+      LogManager.getInstance().log("ServerGameHandler", LogManager.Scope.CRITICAL,
+          "Cannot find the class ClientInputSample");
       cnfe.printStackTrace();
     }
   }
 
-  public void updateGameStateByCIS() {
+  /**
+   * Update the game state by Client's input sample
+   */
+  private void updateGameStateByCIS() {
     ServerModelManager.getInstance().updateServer(latestCIS);
   }
 
   /*
-   * Create a compressed set of entities (game state) from the original set of entities
+   * Create a compressed set of entities (ArrayList of EntityLite) from the original set of entities
    */
   private static ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
     ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
@@ -228,7 +224,10 @@ public class ServerGameHandler extends Thread {
     return EntitiesLite;
   }
 
-  public void sendGameState() {
+  /**
+   * Send a full snapshot of game state to players
+   */
+  private void sendGameState() {
     try {
       ArrayList<EntityLite> entsLite = calculateEntitiesLite(entities);
 
@@ -261,6 +260,22 @@ public class ServerGameHandler extends Thread {
           "Packet error: " + ioe.toString());
       ioe.printStackTrace();
     }
+  }
+
+  /**
+   * Update the server timer
+   */
+  private void updateServerTimer() {
+    Server.getInstance().addEvent(new TimerEvent(currentMatchTime));
+  }
+
+  /**
+   * Gets current time in nanoseconds from the JVM
+   * 
+   * @return current time in nanoseconds
+   */
+  private long getNanoTime() {
+    return System.nanoTime();
   }
 
 }

@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Sprite;
@@ -12,7 +12,7 @@ public class SpeedItem extends Item {
    */
   public SpeedItem() {
     // Doesn't have a ship at this point
-    super(Sprite.item_speed, Pickup.SPEED_PICKUP);
+    super(Sprite.item_speed, Pickup.SPEED);
   }
 
   /**

@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.core.ServerModelManager;
 import org.alien8.rendering.Sprite;
@@ -8,7 +8,7 @@ import org.alien8.rendering.Sprite;
  */
 public class TorpedoItem extends Item {
   public TorpedoItem() {
-    super(Sprite.item_torpedo, Pickup.TORPEDO_PICKUP);
+    super(Sprite.item_torpedo, Pickup.TORPEDO);
   }
 
   /**
