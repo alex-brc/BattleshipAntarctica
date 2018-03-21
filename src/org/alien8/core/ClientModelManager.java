@@ -8,23 +8,23 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
-import org.alien8.items.Effect;
-import org.alien8.items.HealthItem;
-import org.alien8.items.HealthPickup;
-import org.alien8.items.InvulnerableItem;
-import org.alien8.items.InvulnerablePickup;
-import org.alien8.items.Mine;
-import org.alien8.items.MineItem;
-import org.alien8.items.MinePickup;
-import org.alien8.items.NoCooldownItem;
-import org.alien8.items.NoCooldownPickup;
-import org.alien8.items.Pickup;
-import org.alien8.items.PlaneDropper;
-import org.alien8.items.SpeedItem;
-import org.alien8.items.SpeedPickup;
-import org.alien8.items.Torpedo;
-import org.alien8.items.TorpedoItem;
-import org.alien8.items.TorpedoPickup;
+import org.alien8.drops.Effect;
+import org.alien8.drops.HealthItem;
+import org.alien8.drops.HealthPickup;
+import org.alien8.drops.InvulnerableItem;
+import org.alien8.drops.InvulnerablePickup;
+import org.alien8.drops.Mine;
+import org.alien8.drops.MineItem;
+import org.alien8.drops.MinePickup;
+import org.alien8.drops.NoCooldownItem;
+import org.alien8.drops.NoCooldownPickup;
+import org.alien8.drops.Pickup;
+import org.alien8.drops.PlaneDropper;
+import org.alien8.drops.SpeedItem;
+import org.alien8.drops.SpeedPickup;
+import org.alien8.drops.Torpedo;
+import org.alien8.drops.TorpedoItem;
+import org.alien8.drops.TorpedoPickup;
 import org.alien8.mapgeneration.Map;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
@@ -96,22 +96,22 @@ public class ClientModelManager {
         
         // Give item
         switch(el.itemType) {
-        case Pickup.HEALTH_PICKUP: 
+        case Pickup.HEALTH: 
             s.giveItem(new HealthItem());
             break;
-        case Pickup.MINE_PICKUP: 
+        case Pickup.MINE: 
             s.giveItem(new MineItem());
             break;
-        case Pickup.INVULNERABLE_PICKUP: 
+        case Pickup.INVULNERABLE: 
             s.giveItem(new InvulnerableItem());
             break;
-        case Pickup.SPEED_PICKUP: 
+        case Pickup.SPEED: 
             s.giveItem(new SpeedItem());
             break;
-        case Pickup.NO_COOLDOWN_PICKUP: 
+        case Pickup.NO_COOLDOWN: 
             s.giveItem(new NoCooldownItem());
             break;
-        case Pickup.TORPEDO_PICKUP: 
+        case Pickup.TORPEDO: 
             s.giveItem(new TorpedoItem());
             break;
         default:
@@ -121,13 +121,13 @@ public class ClientModelManager {
         
         // Apply effect
         switch(el.effectType+1) {
-        case Pickup.INVULNERABLE_PICKUP: 
+        case Pickup.INVULNERABLE: 
             s.applyEffect(new Effect(999999999, Effect.INVULNERABLE));
             break;
-        case Pickup.SPEED_PICKUP:  
+        case Pickup.SPEED:  
             s.applyEffect(new Effect(999999999, Effect.SPEED));
             break;
-        case Pickup.NO_COOLDOWN_PICKUP:  
+        case Pickup.NO_COOLDOWN:  
             s.applyEffect(new Effect(999999999, Effect.NO_COOLDOWN));
             break;
         default:
@@ -154,13 +154,13 @@ public class ClientModelManager {
      
         // Apply effect
         switch(el.effectType+1) {
-        case Pickup.INVULNERABLE_PICKUP: 
+        case Pickup.INVULNERABLE: 
             s.applyEffect(new Effect(999999999, Effect.INVULNERABLE));
             break;
-        case Pickup.SPEED_PICKUP:  
+        case Pickup.SPEED:  
             s.applyEffect(new Effect(999999999, Effect.SPEED));
             break;
-        case Pickup.NO_COOLDOWN_PICKUP:  
+        case Pickup.NO_COOLDOWN:  
             s.applyEffect(new Effect(999999999, Effect.NO_COOLDOWN));
             break;
         default:
@@ -186,22 +186,22 @@ public class ClientModelManager {
       } else if (el.entityType == 3) { // Pickup
         Pickup p = null;
         switch (el.pickupType) {
-          case Pickup.HEALTH_PICKUP:
+          case Pickup.HEALTH:
             p = new HealthPickup(el.position);
             break;
-          case Pickup.MINE_PICKUP:
+          case Pickup.MINE:
             p = new MinePickup(el.position);
             break;
-          case Pickup.INVULNERABLE_PICKUP:
+          case Pickup.INVULNERABLE:
             p = new InvulnerablePickup(el.position);
             break;
-          case Pickup.SPEED_PICKUP:
+          case Pickup.SPEED:
             p = new SpeedPickup(el.position);
             break;
-          case Pickup.NO_COOLDOWN_PICKUP:
+          case Pickup.NO_COOLDOWN:
             p = new NoCooldownPickup(el.position);
             break;
-          case Pickup.TORPEDO_PICKUP:
+          case Pickup.TORPEDO:
             p = new TorpedoPickup(el.position);
             break;
         }

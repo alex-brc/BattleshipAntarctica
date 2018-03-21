@@ -15,8 +15,8 @@ import org.alien8.core.ClientModelManager;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.core.ServerModelManager;
-import org.alien8.items.Pickup;
-import org.alien8.items.PlaneDropper;
+import org.alien8.drops.Pickup;
+import org.alien8.drops.PlaneDropper;
 import org.alien8.physics.Position;
 import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
@@ -180,15 +180,17 @@ public class Renderer extends Canvas {
     drawText("P", 704, 56, true, FontColor.WHITE);
     drawMinimap(720, 16, true);
 
+    // Render scoreboard
     if (InputManager.getInstance().shiftPressed() || Client.getInstance().isWaitingToExit())
       ClientScoreBoard.getInstance().render();
 
+    // Render the time before exiting the match
     if (Client.getInstance().isWaitingToExit()) {
-      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 550, true,
+      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 565, true,
           FontColor.BLACK);
-      drawText("seconds", 230, 550, true, FontColor.BLACK);
-      drawText("before", 360, 550, true, FontColor.BLACK);
-      drawText("exiting", 480, 550, true, FontColor.BLACK);
+      drawText("seconds", 230, 565, true, FontColor.BLACK);
+      drawText("before", 360, 565, true, FontColor.BLACK);
+      drawText("exiting", 480, 565, true, FontColor.BLACK);
     }
 
     // Display player death message

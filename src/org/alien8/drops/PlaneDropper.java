@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import java.util.Random;
 import org.alien8.core.Entity;
@@ -83,22 +83,22 @@ public class PlaneDropper extends Entity {
     Pickup pickup = null;
     Random rand = new Random();
     switch (rand.nextInt(Pickup.NUMBER_OF_PICKUPS)) {
-      case Pickup.HEALTH_PICKUP:
+      case Pickup.HEALTH:
         pickup = new HealthPickup(packetPosition);
         break;
-      case Pickup.MINE_PICKUP:
+      case Pickup.MINE:
         pickup = new MinePickup(packetPosition);
         break;
-      case Pickup.INVULNERABLE_PICKUP:
+      case Pickup.INVULNERABLE:
         pickup = new InvulnerablePickup(packetPosition);
         break;
-      case Pickup.SPEED_PICKUP:
+      case Pickup.SPEED:
         pickup = new SpeedPickup(packetPosition);
         break;
-      case Pickup.NO_COOLDOWN_PICKUP:
+      case Pickup.NO_COOLDOWN:
         pickup = new NoCooldownPickup(packetPosition);
         break;
-      case Pickup.TORPEDO_PICKUP:
+      case Pickup.TORPEDO:
         pickup = new TorpedoPickup(packetPosition);
         break;
     }

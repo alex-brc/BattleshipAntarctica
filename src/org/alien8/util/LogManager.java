@@ -27,14 +27,14 @@ public class LogManager {
     INFO, DEBUG, WARNING, ERROR, CRITICAL
   }
 
-  public static String filePath = "logs/";
+  private static String filePath = "logs/";
 
   private static LogManager instance = null;
 
   private LogManager() {
 
     // Retrieve file names
-    File folder = new File("logs");
+    File folder = new File(filePath.replace("/", ""));
 
     folder.mkdir();
 
@@ -207,5 +207,12 @@ public class LogManager {
     } catch (IOException e) {
       System.out.println("ERROR: Logging the message failed. Exception: " + e.toString());
     }
+  }
+  
+  /** 
+   * @return the filepath of the current log file as <code> String </code>
+   */
+  public static String getFilePath() {
+	  return filePath;
   }
 }

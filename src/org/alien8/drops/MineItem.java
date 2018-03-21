@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.core.ServerModelManager;
 import org.alien8.rendering.Sprite;
@@ -12,7 +12,7 @@ public class MineItem extends Item {
    */
   public MineItem() {
     // Doesn't have a ship at this point
-    super(Sprite.item_mine, Pickup.MINE_PICKUP);
+    super(Sprite.item_mine, Pickup.MINE);
   }
 
   /**

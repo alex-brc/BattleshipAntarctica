@@ -29,6 +29,8 @@ public class Parameters {
   public static final int TIME_BEFORE_SERVER_END = 10;
   /** Determines if AI ships spawn on the map in a game. */
   public static final boolean AI_ON = true;
+  /** Number of AI in a match. */
+  public static final int NUMBER_OF_AI = 7;
   /** Toggles certain features, such as visible bounding boxes. */
   public static final boolean DEBUG_MODE = false;
 
@@ -44,10 +46,11 @@ public class Parameters {
   public static final int SERVER_PORT = 4446;
   /** Port for multicasting. */
   public static final int MULTI_CAST_PORT = 4445;
+  /** How long the server UDP socket blocks for waiting client's input sample. */
   public static final int SERVER_SOCKET_BLOCK_TIME = 100;
-  public static final int LIST_LENGTH_PER_PACKET = 5000;
-  public static final int FPS_FREQ = 1;
+  /** How much nanosecond in 1 second. */
   public static final int N_SECOND = 1000000000;
+  /** How much millisecond in 1 second. */
   public static final int M_SECOND = 1000;
   //////////////////////////////////////////////////////////
 
@@ -160,7 +163,7 @@ public class Parameters {
 
   /// AUDIO PARAMETERS
   /** Maximum number of "shoot" audio clips running at the same time. */
-  public static final int SFX_POOL_SIZE = 5;
+  public static final int SFX_POOL_SIZE = 3;
   /** Initial volume of sound effects. */
   public static final float INITIAL_VOLUME_SFX = 0.8f;
   /** Initial volume of ambient sound. */
@@ -176,7 +179,7 @@ public class Parameters {
   public static final float KILL_STREAK_MULTIPLIER = 0.1f;
   public static final float DISTANCE_MULTIPLIER = 0.1f;
   /** Height of scoreboard in pixels. */
-  public static final int SCOREBOARD_HEIGHT = 450;
+  public static final int SCOREBOARD_HEIGHT = 440;
   /** Width of scoreboard in pixels. */
   public static final int SCOREBOARD_WIDTH = 550;
   //////////////////////////////////////////////////////////

@@ -2,10 +2,10 @@ package test.org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.items.Effect;
-import org.alien8.items.HealthPickup;
-import org.alien8.items.Mine;
-import org.alien8.items.Torpedo;
+import org.alien8.drops.Effect;
+import org.alien8.drops.HealthPickup;
+import org.alien8.drops.Mine;
+import org.alien8.drops.Torpedo;
 import org.alien8.physics.AxisVector;
 import org.alien8.physics.Collision;
 import org.alien8.physics.MTV;
@@ -15,6 +15,7 @@ import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import net.jafama.FastMath;
 
 public class CollisionTest {
@@ -24,7 +25,7 @@ public class CollisionTest {
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-
+	  
   }
 
   @Test

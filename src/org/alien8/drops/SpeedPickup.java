@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.physics.Position;
 
@@ -14,7 +14,7 @@ public class SpeedPickup extends Pickup {
    * @param position the Position of the Pickup
    */
   public SpeedPickup(Position position) {
-    super(position, new SpeedItem(), Pickup.SPEED_PICKUP);
+    super(position, new SpeedItem(), Pickup.SPEED);
   }
 
 }

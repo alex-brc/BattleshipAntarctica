@@ -4,6 +4,7 @@ import java.io.Serializable;
 import org.alien8.physics.Position;
 
 public class ClientInputSample implements Serializable {
+
   private static final long serialVersionUID = 8460850087080341787L;
 
   public Position mousePosition = null;
@@ -16,7 +17,9 @@ public class ClientInputSample implements Serializable {
   public boolean spacePressed = false;
   public boolean escPressed = false;
 
-
+  /**
+   * Constructor
+   */
   public ClientInputSample() {
     mousePosition = InputManager.getInstance().mousePosition();
     lmbPressed = InputManager.getInstance().lmbPressed();
@@ -29,15 +32,12 @@ public class ClientInputSample implements Serializable {
     escPressed = InputManager.getInstance().escPressed();
   }
 
-  public boolean equals(ClientInputSample cis) {
-    return mousePosition.equals(cis.mousePosition) && lmbPressed == cis.lmbPressed
-        && rmbPressed == cis.rmbPressed && wPressed == cis.wPressed && aPressed == cis.aPressed
-        && sPressed == cis.sPressed && dPressed == cis.dPressed && spacePressed == cis.spacePressed
-        && escPressed == cis.escPressed;
-  }
-
+  /**
+   * String representation of the client input sample
+   */
   public String toString() {
     return mousePosition.getX() + "," + mousePosition.getY() + "," + lmbPressed + "," + rmbPressed
         + "," + wPressed + "," + aPressed + "," + sPressed + "," + dPressed + "," + spacePressed;
   }
+
 }

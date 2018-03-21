@@ -11,6 +11,9 @@ import org.alien8.util.LogManager;
  */
 public class ClientWindowListener implements WindowListener {
 
+  /**
+   * Perform a clean exit when the client closes the game window
+   */
   @Override
   public void windowClosed(WindowEvent e) {
 	  // Disconnect client
@@ -23,41 +26,53 @@ public class ClientWindowListener implements WindowListener {
 			  "Performed all tasks successfully. Cleanly exit.");
 	  System.exit(0);
   }
-
-  @Override
-  public void windowOpened(WindowEvent e) {
-    // TODO Auto-generated method stub
-
-  }
-
+  
+  /**
+   * Do ClientShutdownHook
+   */
   @Override
   public void windowClosing(WindowEvent e) {
-	// Do ClientShutdownHook
-	System.exit(0);
+    System.exit(0);
 
   }
 
+  /**
+   * Not used
+   */
+  @Override
+  public void windowOpened(WindowEvent e) {
+
+  }
+
+  /**
+   * Not used
+   */
   @Override
   public void windowIconified(WindowEvent e) {
-    // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Not used
+   */
   @Override
   public void windowDeiconified(WindowEvent e) {
-    // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Not used
+   */
   @Override
   public void windowActivated(WindowEvent e) {
-    // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Not used
+   */
   @Override
   public void windowDeactivated(WindowEvent e) {
-    // TODO Auto-generated method stub
 
   }
 

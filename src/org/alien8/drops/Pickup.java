@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
@@ -16,12 +16,12 @@ import net.jafama.FastMath;
  */
 public abstract class Pickup extends Entity {
   private static final long serialVersionUID = 2171627902685805520L;
-  public static final int HEALTH_PICKUP = 0;
-  public static final int SPEED_PICKUP = 1;
-  public static final int NO_COOLDOWN_PICKUP = 2;
-  public static final int INVULNERABLE_PICKUP = 3;
-  public static final int MINE_PICKUP = 4;
-  public static final int TORPEDO_PICKUP = 5;
+  public static final int HEALTH = 0;
+  public static final int SPEED = 1;
+  public static final int NO_COOLDOWN = 2;
+  public static final int INVULNERABLE = 3;
+  public static final int MINE = 4;
+  public static final int TORPEDO = 5;
   public static final int NUMBER_OF_PICKUPS = 6;
 
   protected Item item;
