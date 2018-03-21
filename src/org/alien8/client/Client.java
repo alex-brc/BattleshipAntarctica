@@ -427,14 +427,6 @@ public class Client implements Runnable {
     return seed;
   }
 
-  public void setTimeBeforeExiting(int t) {
-    this.timeBeforeExiting = t;
-  }
-
-  public int getTimeBeforeExiting() {
-    return this.timeBeforeExiting;
-  }
-
   /**
    * Disconnect the client, reset game state / network related fields
    */
@@ -500,6 +492,22 @@ public class Client implements Runnable {
    */
   public boolean isWaitingToExit() {
     return waitingToExit;
+  }
+  
+  /**
+   * Set the time remaining before exiting the match
+   * @param t The time remaining before exiting the match
+   */
+  public void setTimeBeforeExiting(int t) {
+    this.timeBeforeExiting = t;
+  }
+
+  /**
+   * Get the time remaining before exiting the match
+   * @param t The time remaining before exiting the match
+   */
+  public int getTimeBeforeExiting() {
+    return this.timeBeforeExiting;
   }
 
   /**
