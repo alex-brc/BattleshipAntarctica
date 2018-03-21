@@ -466,7 +466,6 @@ public class Client implements Runnable {
       timer = null;
       timeBeforeExiting = 10;
       FPS = 0;
-      opponents = new ArrayList<String>();
       clientIP = null;
       serverIP = null;
       multiCastIP = null;
