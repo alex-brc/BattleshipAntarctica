@@ -45,10 +45,10 @@ x core:
 	/ Torpedo
 	/ TorpedoItem
 	/ TorpedoPickup
-x mapgeneration:
-	x Map
-	x MapVector
-	x PerlinNoise
+/ mapgeneration:
+	/ Map
+	/ MapVector
+	/ PerlinNoise
 x physics:
 	/ AABB
 	x AxisVector
@@ -79,7 +79,7 @@ x server:
 	x Timer
 	x TimerEvent
 x ship:
-	x Bullet
+	/ Bullet
 	x Ship
 	x Turret
 x ui:

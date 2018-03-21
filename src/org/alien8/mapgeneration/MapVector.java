@@ -5,13 +5,13 @@ package org.alien8.mapgeneration;
  *
  */
 public class MapVector {
-  // Needed a very simple implementaion of a vector for the purpose vectors in the Perlin Noise
+  // Needed a very simple implementation of a vector for the purpose vectors in the Perlin Noise
   // algorithm
   protected double xValue;
   protected double yValue;
 
   /**
-   * Defualt constructor. Assigns zero values to x and y.
+   * Default constructor. Assigns zero values to x and y.
    */
   public MapVector() {
     xValue = 0d;
