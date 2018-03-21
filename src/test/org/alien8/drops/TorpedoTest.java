@@ -1,39 +1,27 @@
 package test.org.alien8.drops;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
+import org.alien8.drops.Torpedo;
+import org.alien8.physics.Position;
 import org.junit.Test;
 
 public class TorpedoTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
 	@Test
-	public void testRender() {
-		fail("Not yet implemented"); // TODO
+	public void test() {
+		// Make two torpedos
+		Torpedo torpedo = new Torpedo(new Position(-1,-1), 1, 0);
+		Torpedo torpedo2 = new Torpedo(new Position(1,1), 1, 0);
+		// Check it
+		assert(torpedo.getSource() == 1);
+		assert(torpedo.getDirection() == 0);
+		// Test render
+		torpedo.render();
+		// Test out of bounds
+		torpedo.dealWithOutOfBounds();
+		torpedo2.dealWithOutOfBounds();
+		// Check their states
+		assert(torpedo.isToBeDeleted());
+		assert(!torpedo2.isToBeDeleted());
+		// Call this empty method
+		torpedo.dealWithInIce(null);
 	}
-
-	@Test
-	public void testDealWithOutOfBounds() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testDealWithInIce() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testTorpedo() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testGetSource() {
-		fail("Not yet implemented"); // TODO
-	}
-
 }

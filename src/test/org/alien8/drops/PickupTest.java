@@ -1,44 +1,25 @@
 package test.org.alien8.drops;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
+import org.alien8.drops.MinePickup;
+import org.alien8.drops.Pickup;
+import org.alien8.physics.Position;
+import org.alien8.ship.Ship;
 import org.junit.Test;
 
 public class PickupTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
 	@Test
-	public void testRender() {
-		fail("Not yet implemented"); // TODO
+	public void test() {
+		// Test using any pickup that extends it.
+		Pickup pickup = new MinePickup(new Position(0,0));
+		// Check it
+		assert(pickup.getPickupType() == Pickup.MINE);
+		// Give it to a ship
+		Ship ship = new Ship(new Position(0,0),0,0);
+		pickup.onPickup(ship);
+		// Test the rendering
+		pickup.render();
+		// Call these empty methods
+		pickup.dealWithInIce(null);
+		pickup.dealWithOutOfBounds();
 	}
-
-	@Test
-	public void testDealWithOutOfBounds() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testDealWithInIce() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testPickup() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testGetPickupType() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testOnPickup() {
-		fail("Not yet implemented"); // TODO
-	}
-
 }

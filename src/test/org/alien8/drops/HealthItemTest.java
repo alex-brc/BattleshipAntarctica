@@ -13,6 +13,7 @@ public class HealthItemTest {
 		// Make 2 items
 		HealthItem healthItem1 = new HealthItem();
 		HealthItem healthItem2 = new HealthItem();
+		
 		// Check the healthItem
 		assert(healthItem1.getSprite() == Sprite.item_health);
 		assert(healthItem1.getItemType() == Pickup.HEALTH);

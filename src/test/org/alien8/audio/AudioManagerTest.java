@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientModelManager;
+import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.ship.Ship;
 import org.junit.AfterClass;
@@ -93,6 +94,12 @@ public class AudioManagerTest {
 		am.sfxMuteToggle();
 		// Play one more sound
 		am.addEvent(ae);
+		// Make a sound out of hearing range
+		AudioEvent ae2 = new AudioEvent(AudioEvent.Type.SHOOT, 
+				new Position(Parameters.MAX_HEARING_DISTANCE, 
+						Parameters.MAX_HEARING_DISTANCE));
+		// Play it
+		am.addEvent(ae2);
 		am.sfxMuteToggle();
 		
 		// Wait for all sounds to finish playing

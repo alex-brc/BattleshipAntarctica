@@ -13,7 +13,7 @@ import org.junit.Test;
 public class MineItemTest {
 	@Test
 	public void testUse() {
-		// Make 2 items
+		// Make an item
 		MineItem item = new MineItem();
 		// Check the item
 		assert(item.getSprite() == Sprite.item_mine);

@@ -26,25 +26,25 @@ x core:
 	x Parameters
 	x ServerMessage
 	x ServerModelManager
-x items:
+/ drops:
 	/ Effect
 	/ HealthItem
-	x HealthPickup
+	/ HealthPickup
 	/ InvulnerableItem
-	x InvulnerablePickup
+	/ InvulnerablePickup
 	/ Item
-	x Mine
+	/ Mine
 	/ MineItem
-	x MinePickup
-	x NoCooldownItem
-	x NoCooldownPickup
-	x Pickup
-	x PlaneDropper
+	/ MinePickup
+	/ NoCooldownItem
+	/ NoCooldownPickup
+	/ Pickup
+	/ PlaneDropper
 	/ SpeedItem
-	x SpeedPickup
-	x Torpedo
+	/ SpeedPickup
+	/ Torpedo
 	/ TorpedoItem
-	x TorpedoPickup
+	/ TorpedoPickup
 x mapgeneration:
 	x Map
 	x MapVector
