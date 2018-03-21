@@ -2,7 +2,6 @@ package org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.drops.Effect;
 import org.alien8.drops.Mine;
 import org.alien8.drops.Pickup;
 import org.alien8.drops.Torpedo;
@@ -290,7 +289,7 @@ public class Collision {
       if (deployer != null)
         ServerScoreBoard.getInstance().giveKill(deployer);
     }
-    // Destroy mine
+    // Destroy torpedo
     torpedo.delete();
   }
 }

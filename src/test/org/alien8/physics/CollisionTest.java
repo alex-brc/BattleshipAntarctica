@@ -2,7 +2,6 @@ package test.org.alien8.physics;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.drops.Effect;
 import org.alien8.drops.HealthPickup;
 import org.alien8.drops.Mine;
 import org.alien8.drops.Torpedo;
@@ -15,7 +14,6 @@ import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import net.jafama.FastMath;
 
 public class CollisionTest {
@@ -25,7 +23,7 @@ public class CollisionTest {
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-	  
+
   }
 
   @Test
@@ -146,24 +144,6 @@ public class CollisionTest {
   }
 
   @Test
-  public void testInvulnerableShipEnemyBulletCollision() {
-    // Test Collision between an invulnerable Ship and an enemy Bullet
-    Entity s = new Ship(new Position(0, 0), 0, 0);
-    s.setSerial(1);
-    double initialHealth = s.getHealth();
-    ((Ship) s).applyEffect(new Effect(
-        System.currentTimeMillis()
-            + Parameters.ITEM_INVULNERABLE_ITEM_DURATION * Parameters.M_SECOND,
-        Effect.INVULNERABLE));
-    Entity b = new Bullet(new Position(0, 0), 0, 0, 2);
-
-    Collision c = new Collision(s, b);
-    c.resolveCollision();
-    assert (s.getHealth() == initialHealth);
-    assert (b.isToBeDeleted() == false);
-  }
-
-  @Test
   public void testShipPickupCollision() {
     // Test Collision between a Ship and a Pickup
     Entity s = new Ship(new Position(0, 0), 0, 0);
@@ -203,24 +183,6 @@ public class CollisionTest {
   }
 
   @Test
-  public void testInvulnerableShipEnemyMineCollision() {
-    // Test Collision between an invulnerable Ship and an enemy Mine
-    Entity s = new Ship(new Position(0, 0), 0, 0);
-    s.setSerial(1);
-    double initialHealth = s.getHealth();
-    ((Ship) s).applyEffect(new Effect(
-        System.currentTimeMillis()
-            + Parameters.ITEM_INVULNERABLE_ITEM_DURATION * Parameters.M_SECOND,
-        Effect.INVULNERABLE));
-    Entity m = new Mine(new Position(0, 0), 2);
-
-    Collision c = new Collision(s, m);
-    c.resolveCollision();
-    assert (s.getHealth() == initialHealth);
-    assert (m.isToBeDeleted() == false);
-  }
-
-  @Test
   public void testShipOwnTorpedoCollision() {
     // Test Collision between a Ship its own Torpedo
     Entity s = new Ship(new Position(0, 0), 0, 0);
@@ -245,24 +207,6 @@ public class CollisionTest {
     c.resolveCollision();
     assert (s.getHealth() == initialHealth - damage);
     assert (m.isToBeDeleted() == true);
-  }
-
-  @Test
-  public void testInvulnerableShipEnemyTorpedoCollision() {
-    // Test Collision between an invulnerable Ship and an enemy Torpedo
-    Entity s = new Ship(new Position(0, 0), 0, 0);
-    s.setSerial(1);
-    double initialHealth = s.getHealth();
-    ((Ship) s).applyEffect(new Effect(
-        System.currentTimeMillis()
-            + Parameters.ITEM_INVULNERABLE_ITEM_DURATION * Parameters.M_SECOND,
-        Effect.INVULNERABLE));
-    Entity r = new Torpedo(new Position(0, 0), 2, 0);
-
-    Collision c = new Collision(s, r);
-    c.resolveCollision();
-    assert (s.getHealth() == initialHealth);
-    assert (r.isToBeDeleted() == false);
   }
 
 }
