@@ -45,10 +45,10 @@ x items:
 	x Torpedo
 	x TorpedoItem
 	x TorpedoPickup
-x mapgeneration:
-	x Map
-	x MapVector
-	x PerlinNoise
+/ mapgeneration:
+	/ Map
+	/ MapVector
+	/ PerlinNoise
 x physics:
 	/ AABB
 	x AxisVector
