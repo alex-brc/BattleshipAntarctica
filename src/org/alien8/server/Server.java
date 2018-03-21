@@ -28,9 +28,6 @@ import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
-/*
- * A singleton game server, call Server.getInstance().start() every time a client starts a server
- */
 public class Server implements Runnable {
 
   private static Server instance;
@@ -54,36 +51,64 @@ public class Server implements Runnable {
   private Integer maxPlayer;
   private volatile LinkedList<Bullet> bullets = new LinkedList<Bullet>();
 
+  /**
+   * Private constructor to prevent global instantiation
+   */
   private Server() {
-    // Prevent instantiation
+
   }
 
+  /**
+   * Create and return a server instance the first time being called, only return the instance
+   * afterwards
+   * 
+   * @return A Server instance
+   */
   public static Server getInstance() {
     if (instance == null)
       instance = new Server();
     return instance;
   }
 
+  /**
+   * Start the server thread
+   */
   public void start() {
+    // Reset all game state / network related fields before starting
     this.reset();
     thread = new Thread(this, "Battleship Antarctica Server");
     thread.start();
   }
 
+  /**
+   * Stop the server thread
+   */
   public void stop() {
     udpSocket.close();
     try {
-      tcpSocket.close(); // Would make tcpSocket.accept() to throw SocketException + all
-                         // ClientHandlers would throw IOException
+      /**
+       * Would make tcpSocket.accept() to throw SocketException + all ClientHandlers would throw
+       * IOException
+       */
+      tcpSocket.close();
+
     } catch (IOException ioe) {
-      System.out.println("Can't close TCP socket!?");
+      System.out.println("Can't close TCP socket");
     }
   }
 
+  /**
+   * Set the maximum number of players for the game server
+   * 
+   * @param max Maximum number of players
+   */
   public void setMaxPlayer(int max) {
     this.maxPlayer = max;
   }
 
+  /**
+   * Reset all game state / network related fields
+   */
   public void reset() {
     model.reset();
     thread = null;
@@ -104,9 +129,11 @@ public class Server implements Runnable {
     bullets = new LinkedList<Bullet>();
   }
 
+  /**
+   * The server main loop for accepting connection request
+   */
   @Override
   public void run() {
-    model.makeMap(seed);
     this.initializeGameState();
     this.setHostIP();
     try {
@@ -143,13 +170,16 @@ public class Server implements Runnable {
       ioe.printStackTrace();
     } catch (ClassNotFoundException cnfe) {
       LogManager.getInstance().log("Server", LogManager.Scope.CRITICAL,
-          "Cannot find the class of the received serialized object");
+          "Cannot find the class ClientMessage");
       cnfe.printStackTrace();
     }
 
     System.out.println("Server no longer accept client connection");
   }
 
+  /**
+   * Set the game server IP and the multi cast IP
+   */
   private void setHostIP() {
     try {
       hostIP = Inet4Address.getLocalHost();
@@ -160,11 +190,14 @@ public class Server implements Runnable {
     }
   }
 
-  /*
-   * Only initialize the game state, will not start the server game loop
+  /**
+   * Initialize the game state, would not start the game loop
    */
   public void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
+
+    // Make the map
+    model.makeMap(seed);
 
     // Populate bullet pools
     for (int i = 0; i < Parameters.BULLET_POOL_SIZE; i++)
@@ -174,21 +207,18 @@ public class Server implements Runnable {
     if (Parameters.AI_ON)
       initializeAIs();
 
+    // Add a plane dropper
     model.addEntity(new PlaneDropper());
 
     LogManager.getInstance().log("Server", LogManager.Scope.INFO,
         "Game set up. Waiting for players.");
   }
 
+  /**
+   * Initialize the AIs
+   */
   private void initializeAIs() {
-    /*
-     * Ai controllers should be put in the ConcurrentHashMap<Ship, AIController> aiMap so the loop
-     * has constant time access to the AI controller given the ship also, remember to give them
-     * colours
-     */
-
-    // test ai
-    for (int i = 1; i <= 7; i++) {
+    for (int i = 1; i <= Parameters.NUMBER_OF_AI; i++) {
       int randColour = (new Random()).nextInt(0xFFFFFF);
       Ship sh = new Ship(getRandomPosition(), 0, randColour);
       AIController ai = new AIController(sh);
@@ -196,7 +226,57 @@ public class Server implements Runnable {
       aiMap.put(sh, ai);
     }
   }
+  
+  /**
+   * Get a position on the map randomly that doesn't have ice for ship spawning
+   * 
+   * @return A position on the map
+   */
+  public Position getRandomPosition() {
+    boolean[][] iceGrid = model.getMap().getIceGrid();
+    Random r = new Random();
+    int randomX = 0;
+    int randomY = 0;
+    boolean appropriatePosition = false;
 
+    while (!appropriatePosition) {
+      boolean collideWithIce = false;
+      int minX = (int) Parameters.SHIP_LENGTH;
+      int minY = (int) Parameters.SHIP_WIDTH;
+      int maxX = Parameters.MAP_WIDTH - (int) Parameters.SHIP_LENGTH;
+      int maxY = Parameters.MAP_HEIGHT - (int) Parameters.SHIP_WIDTH;
+      randomX = r.nextInt((maxX - minX) + 1) + minX;
+      randomY = r.nextInt((maxY - minY) + 1) + minY;
+      int xPosStart = randomX - (int) Parameters.SHIP_LENGTH;
+      int xPosEnd = randomX + (int) Parameters.SHIP_LENGTH;
+      int yPosStart = randomY - (int) Parameters.SHIP_WIDTH;
+      int yPosEnd = randomY + (int) Parameters.SHIP_WIDTH;
+
+      outerloop: for (int x = xPosStart; x < xPosEnd; x++) {
+        for (int y = yPosStart; y < yPosEnd; y++) {
+          if (iceGrid[x][y]) {
+            collideWithIce = true;
+            break outerloop;
+          }
+        }
+      }
+
+      if (!collideWithIce) {
+        appropriatePosition = true;
+      }
+    }
+
+    return new Position(randomX, randomY);
+  }
+
+  /**
+   * Process client's message
+   * 
+   * @param clientIP Client's IP address
+   * @param cr Message from client
+   * @param toClient Output stream to write data to client
+   * @param fromClient Input stream to read data from client
+   */
   private void processClientMessage(InetAddress clientIP, ClientMessage cr,
       ObjectOutputStream toClient, ObjectInputStream fromClient) {
     if (cr.getType() == 0) { // Connect request
@@ -207,16 +287,24 @@ public class Server implements Runnable {
     }
 
   }
-
-  private boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
-    for (Player p : playerList) {
-      if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
-        return true;
-      }
+  
+  /**
+   * Start the game state handler
+   */
+  public void startSGH() {
+    sgh = new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
+    for (ClientHandler ch : chList) {
+      ch.sendStartGame();
     }
-    return false;
+    sgh.start();
   }
 
+  /**
+   * Disconnect the player from the server
+   * 
+   * @param clientIP Client's IP address
+   * @param clientPort Client's UDP port number
+   */
   public void disconnectPlayer(InetAddress clientIP, int clientPort) {
     if (isPlayerConnected(clientIP, clientPort)) {
       Player pToBeRemoved = this.getPlayerByIpAndPort(clientIP, clientPort);
@@ -234,6 +322,22 @@ public class Server implements Runnable {
   }
 
   /**
+   * Check if the player is connected
+   * 
+   * @param clientIP Client's IP address
+   * @param clientPort Client's UDP port number
+   * @return
+   */
+  private boolean isPlayerConnected(InetAddress clientIP, int clientPort) {
+    for (Player p : playerList) {
+      if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Gets player by bullet. Used in awarding score.
    * 
    * @param l the bullet belonging to the player
@@ -246,24 +350,33 @@ public class Server implements Runnable {
     return null;
   }
 
+  /**
+   * Add a game event
+   * 
+   * @param event The GameEvent object
+   */
   public void addEvent(GameEvent event) {
     events.add(event);
   }
 
+  /**
+   * Get the next game event
+   * 
+   * @return The GameEvent object
+   */
   public GameEvent getNextEvent() {
     if (events.size() == 0)
       return null;
     return events.removeFirst();
   }
 
-  public void startSGH() {
-    sgh = new ServerGameHandler(udpSocket, multiCastIP, entities, latestCIS, playerList);
-    for(ClientHandler ch : chList) {
-    	ch.sendStartGame();
-    }
-    sgh.start();
-  }
-
+  /**
+   * Get the corresponding player object using client's IP address and UDP port number
+   * 
+   * @param clientIP Client's IP address
+   * @param clientPort Client's UDP port number
+   * @return The player object
+   */
   public Player getPlayerByIpAndPort(InetAddress clientIP, int clientPort) {
     for (Player p : playerList) {
       if (p.getIP().equals(clientIP) && p.getPort() == clientPort) {
@@ -273,18 +386,42 @@ public class Server implements Runnable {
     return null;
   }
 
+  /**
+   * Get the AI controller for a ship
+   * 
+   * @param ship The ship object
+   * @return The AI controller
+   */
   public AIController getAIByShip(Ship ship) {
     return aiMap.get(ship);
   }
 
+  /**
+   * Get the corresponding player object using its ship
+   * 
+   * @param ship The ship object
+   * @return The player object
+   */
   public Player getPlayerByShip(Ship ship) {
     return playerMap.get(ship);
   }
 
+  /**
+   * Get the list of ClientHandler
+   * 
+   * @return A list of ClientHandler
+   */
   public ArrayList<ClientHandler> getCHList() {
     return chList;
   }
 
+  /**
+   * Get the corresponding ClientHandler using client's IP address and UDP port number
+   * 
+   * @param clientIP Client's IP address
+   * @param clientPort Client's UDP port number
+   * @return A ClientHandler object
+   */
   public ClientHandler getClientHandlerByIpAndPort(InetAddress clientIP, int clientUdpPort) {
     for (ClientHandler ch : chList) {
       if (ch.getClientIP().equals(clientIP) && ch.getClientUdpPort() == clientUdpPort) {
@@ -294,42 +431,14 @@ public class Server implements Runnable {
     return null;
   }
 
-  public Position getRandomPosition() {
-    boolean[][] iceGrid = model.getMap().getIceGrid();
-    Random r = new Random();
-    int randomX = 0;
-    int randomY = 0;
-    boolean appropriatePosition = false;
-
-    // Choose a random position without ice for ship spawning
-    while (!appropriatePosition) {
-      boolean collideWithIce = false;
-      int minX = (int) Parameters.SHIP_LENGTH;
-      int minY = (int) Parameters.SHIP_WIDTH;
-      int maxX = Parameters.MAP_WIDTH - (int) Parameters.SHIP_LENGTH;
-      int maxY = Parameters.MAP_HEIGHT - (int) Parameters.SHIP_WIDTH;
-      randomX = r.nextInt((maxX - minX) + 1) + minX;
-      randomY = r.nextInt((maxY - minY) + 1) + minY;
-
-      outerloop: for (int x = randomX - (int) Parameters.SHIP_LENGTH; x < randomX
-          + (int) Parameters.SHIP_LENGTH; x++) {
-        for (int y = randomY - (int) Parameters.SHIP_WIDTH; y < randomY
-            + (int) Parameters.SHIP_WIDTH; y++) {
-          if (iceGrid[x][y]) {
-            collideWithIce = true;
-            break outerloop;
-          }
-        }
-      }
-
-      if (!collideWithIce) {
-        appropriatePosition = true;
-      }
-    }
-
-    return new Position(randomX, randomY);
-  }
-
+  /**
+   * Get a bullet from the pool
+   * @param position Position of the bullet
+   * @param direction Direction of the bullet
+   * @param distance Distance that will travel for the bullet
+   * @param serial Serial number of the bullet
+   * @return A bullet
+   */
   public Bullet getBullet(Position position, double direction, double distance, long serial) {
 
     // Take one from the top

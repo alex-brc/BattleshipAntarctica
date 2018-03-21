@@ -5,8 +5,8 @@ import java.net.InetAddress;
 import org.alien8.physics.Position;
 
 /**
- * This class represent the compressed version of an entity, used when sending change in game state
- * across the network.
+ * This class represent the compressed version of an entity, used when sending game state across the
+ * network.
  */
 public class EntityLite implements Serializable {
 
@@ -45,7 +45,25 @@ public class EntityLite implements Serializable {
   // For pickups
   public int pickupType;
 
-  // For Player Ship
+  /**
+   * Constructor for Player Ship
+   * @param serial Serial of the ship
+   * @param entityType Entity type number for ship
+   * @param position Position of the ship
+   * @param toBeDeleted Whether the ship is to be deleted
+   * @param direction Direction of the ship
+   * @param speed Speed of the ship
+   * @param health Health of the ship
+   * @param frontTurretDirection Front turret direction of the ship
+   * @param rearTurretDirection Rear turret direction of the ship
+   * @param frontTurretCharge Front turret charge of the ship
+   * @param rearTurretCharge Rear turret charge of the ship
+   * @param colour Colour of the ship
+   * @param itemType Item type of the ship
+   * @param effectType Effect type of the ship
+   * @param clientIP Client's IP address of the player that control the ship
+   * @param clientUdpPort Client's UDP port number of the player that control the ship
+   */
   public EntityLite(long serial, int entityType, Position position, boolean toBeDeleted,
       double direction, double speed, double health, double frontTurretDirection,
       double rearTurretDirection, double frontTurretCharge, double rearTurretCharge, int colour,
@@ -68,7 +86,20 @@ public class EntityLite implements Serializable {
     this.clientUdpPort = clientUdpPort;
   }
 
-  // For AI Ship
+  /**
+   * Constructor for AI ship
+   * @param serial Serial number of the ship
+   * @param entityType Entity type number for ship
+   * @param position Position of the ship
+   * @param toBeDeleted Whether the ship is to be deleted
+   * @param direction Direction of the ship
+   * @param speed Speed of the ship
+   * @param health Health of the ship
+   * @param frontTurretDirection Front turret direction of the ship
+   * @param rearTurretDirection Rear turret direction of the ship
+   * @param effectType Effect type of the ship
+   * @param colour Colour of the ship
+   */
   public EntityLite(long serial, int entityType, Position position, boolean toBeDeleted,
       double direction, double speed, double health, double frontTurretDirection,
       double rearTurretDirection, int effectType, int colour) {
@@ -85,7 +116,18 @@ public class EntityLite implements Serializable {
     this.effectType = effectType;
   }
 
-  // For Bullet
+  /**
+   * Constructor for Bullet
+   * @param serial Serial number of the bullet
+   * @param entityType Entity type number for bullet
+   * @param position Position of the bullet
+   * @param toBeDeleted Whether the bullet is to be deleted
+   * @param direction Direction of the bullet
+   * @param speed Speed of the bullet
+   * @param distance Distance that will be traveled by the bullet
+   * @param travelled Distance travreled by the bullet
+   * @param source Source of the bullet
+   */
   public EntityLite(long serial, int entityType, Position position, boolean toBeDeleted,
       double direction, double speed, double distance, double travelled, long source) {
     this.serial = serial;
@@ -99,7 +141,13 @@ public class EntityLite implements Serializable {
     this.source = source;
   }
 
-  // For pickup
+  /**
+   * Constuctor for pickup
+   * @param entityType Entity type number for pickup
+   * @param position Position of the pickup
+   * @param pickupType Type of the pickup
+   * @param toBeDeleted Whether the pickup is to be deleted
+   */
   public EntityLite(int entityType, Position position, int pickupType, boolean toBeDeleted) {
     this.entityType = entityType;
     this.position = position;
@@ -107,7 +155,13 @@ public class EntityLite implements Serializable {
     this.toBeDeleted = toBeDeleted;
   }
 
-  // For PlaneDropper
+  /**
+   * Constructor for plane drooper
+   * @param entityType Entity type number for plane dropper
+   * @param position Position of the plane dropper
+   * @param toBeDeleted Whether the plane dropper is to be deleted
+   * @param direction Direction of the plane dropper
+   */
   public EntityLite(int entityType, Position position, boolean toBeDeleted, double direction) {
     this.entityType = entityType;
     this.position = position;
@@ -115,6 +169,9 @@ public class EntityLite implements Serializable {
     this.direction = direction;
   }
 
+  /**
+   * String representation of this EntityLite
+   */
   public String toString() {
     return "Serial: " + serial + ", " + "EntityType: " + entityType;
   }
