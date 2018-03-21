@@ -79,7 +79,7 @@ x server:
 	x Timer
 	x TimerEvent
 x ship:
-	x Bullet
+	/ Bullet
 	x Ship
 	x Turret
 x ui:
