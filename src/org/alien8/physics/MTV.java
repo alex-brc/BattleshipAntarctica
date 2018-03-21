@@ -3,9 +3,7 @@ package org.alien8.physics;
 /**
  * This class represents the Minimum Translation Vector (MTV) between two objects. If they overlap,
  * it can be used to identify the minimum distance the object's would have to be moved so that they
- * were no longer overlapping. This idae is useful in collision detection.
- * 
- * @author curly
+ * were no longer overlapping. This idea is useful in collision detection.
  *
  */
 public class MTV {

@@ -33,7 +33,8 @@ public class AudioManager implements Runnable {
   private static AudioManager instance = null;
   private volatile boolean running;
   private Random rand;
-  private Clip ambient;
+  private Clip ambientMenu;
+  private Clip ambientInGame;
   private ConcurrentLinkedQueue<AudioEvent> audioEvents;
 
   private double ambientVolumeValue;
@@ -66,7 +67,8 @@ public class AudioManager implements Runnable {
       sfxVolumeValue = Parameters.INITIAL_VOLUME_SFX;
 
       // Loads ambient sound
-      ambient = SoundEffects.makeClip(SoundEffects.AMBIENT);
+      ambientMenu = SoundEffects.makeClip(SoundEffects.MENU_MUSIC);
+      ambientInGame = SoundEffects.makeClip(SoundEffects.INGAME_MUSIC);
       ambientVolumeValue = Parameters.INITIAL_VOLUME_AMBIENT;
 
       // Initialise event queue
@@ -121,18 +123,41 @@ public class AudioManager implements Runnable {
   /**
    * Starts the ambient sound.
    */
-  public void startAmbient() {
-    setVolume(ambient, ambientVolumeValue);
-    ambient.loop(Clip.LOOP_CONTINUOUSLY);
+  public void startAmbient(int type) {
+    switch (type) {
+      case 0:
+        setVolume(ambientMenu, ambientVolumeValue);
+        ambientMenu.loop(Clip.LOOP_CONTINUOUSLY);
+        break;
+      case 1:
+        setVolume(ambientInGame, ambientVolumeValue);
+        ambientInGame.loop(Clip.LOOP_CONTINUOUSLY);
+        break;
+      default:
+        break;
+    }
+
   }
 
   /**
    * Stops the ambient sound.
    */
-  public void stopAmbient() {
-    ambient.stop();
-    ambient.flush();
-    ambient.setFramePosition(0);
+  public void stopAmbient(int type) {
+    switch (type) {
+      case 0:
+        ambientMenu.stop();
+        ambientMenu.flush();
+        ambientMenu.setFramePosition(0);
+        break;
+      case 1:
+        ambientInGame.stop();
+        ambientInGame.flush();
+        ambientInGame.setFramePosition(0);
+        break;
+      default:
+        break;
+    }
+
   }
 
   /**
@@ -143,12 +168,14 @@ public class AudioManager implements Runnable {
    */
   public boolean ambientMuteToggle() {
     if (!ambientIsMuted) {
-      setVolume(ambient, 0.0f);
+      setVolume(ambientMenu, 0.0f);
+      setVolume(ambientInGame, 0.0f);
       ambientIsMuted = true;
       return true;
     }
 
-    setVolume(ambient, ambientVolumeValue);
+    setVolume(ambientMenu, ambientVolumeValue);
+    setVolume(ambientInGame, ambientVolumeValue);
     ambientIsMuted = false;
     return false;
   }
@@ -160,7 +187,8 @@ public class AudioManager implements Runnable {
     ambientVolumeValue += 0.1f;
     if (ambientVolumeValue > 1)
       ambientVolumeValue = 1f;
-    setVolume(ambient, ambientVolumeValue);
+    setVolume(ambientMenu, ambientVolumeValue);
+    setVolume(ambientInGame, ambientVolumeValue);
   }
 
   /**
@@ -170,7 +198,8 @@ public class AudioManager implements Runnable {
     ambientVolumeValue -= 0.1f;
     if (ambientVolumeValue < 0)
       ambientVolumeValue = 0f;
-    setVolume(ambient, ambientVolumeValue);
+    setVolume(ambientMenu, ambientVolumeValue);
+    setVolume(ambientInGame, ambientVolumeValue);
   }
 
   /**
@@ -263,7 +292,8 @@ public class AudioManager implements Runnable {
         clip.close();
       }
       // Stop and close ambient clips
-      ambient.close();
+      ambientMenu.close();
+      ambientInGame.close();
     } catch (Exception e) {
       LogManager.getInstance().log("Audio", LogManager.Scope.ERROR,
           "Audio clips could not be closed: " + e.getMessage());

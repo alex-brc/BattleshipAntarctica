@@ -208,8 +208,8 @@ public abstract class Entity implements Serializable, Cloneable {
     double centerY = position.getY();
     // First, calculate box as if it is facing north
     // Corners are labelled:
-    // 0 1
     // 3 2
+    // 0 1
     obb[0] = new Position(centerX - this.getLength() / 2, centerY + this.getWidth() / 2);
     obb[1] = new Position(centerX + this.getLength() / 2, centerY + this.getWidth() / 2);
     obb[2] = new Position(centerX + this.getLength() / 2, centerY - this.getWidth() / 2);

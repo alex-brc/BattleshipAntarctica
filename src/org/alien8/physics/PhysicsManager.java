@@ -45,7 +45,7 @@ public class PhysicsManager {
   public static void applyFriction(Entity e) {
     e.setSpeed(e.getSpeed() * Parameters.FRICTION);
     // Makes friction less CPU-intensive sometimes
-    if (e.getSpeed() < 0.001d) {
+    if (e.getSpeed() <= 0.001d) {
       e.setSpeed(0);
     }
   }

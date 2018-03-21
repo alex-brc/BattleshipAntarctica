@@ -66,6 +66,21 @@ public class Collision {
   }
 
   /**
+   * Checks for equality between this Collision and another.
+   * 
+   * @param c the other Collision
+   * @return {@code true} if the Collisions are equal, {@code false} if not
+   */
+  public boolean equals(Collision c) {
+    if ((entity1.equals(c.getEntity1()) && entity2.equals(c.getEntity2()))
+        || (entity1.equals(c.getEntity2()) && entity2.equals(c.getEntity1()))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * Method to resolve a Collision. Calculates things like damage, velocity and direction
    * post-collision.
    */

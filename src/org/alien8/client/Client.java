@@ -142,6 +142,8 @@ public class Client implements Runnable {
           Renderer.getInstance().render(nameScreen);
           break;
         case MAIN_MENU:
+          AudioManager.getInstance().startAmbient(0);
+          AudioManager.getInstance().stopAmbient(1);
           Renderer.getInstance().render(menu);
           break;
         case SETTINGS_MENU:
@@ -151,8 +153,9 @@ public class Client implements Runnable {
           Renderer.getInstance().render(lobby);
           break;
         case IN_GAME:
+          AudioManager.getInstance().stopAmbient(0);
           // Play the ambient music
-          AudioManager.getInstance().startAmbient();
+          AudioManager.getInstance().startAmbient(1);
 
           long lastTime = getTime();
           long currentTime = 0;
@@ -200,8 +203,9 @@ public class Client implements Runnable {
                 Renderer.getInstance().render(model);
               }
             }
-            AudioManager.getInstance().stopAmbient();
-            
+            AudioManager.getInstance().stopAmbient(0);
+            AudioManager.getInstance().stopAmbient(1);
+
           } catch (IOException ioe) {
             // Do nothing just proceed and end the game loop
           }
