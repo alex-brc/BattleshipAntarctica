@@ -14,8 +14,8 @@ public class CollisionTest {
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-    Entity e1 = new Ship();
-    col = new Collision();
+    // Entity e1 = new Ship();
+    // col = new Collision();
   }
 
   @Test

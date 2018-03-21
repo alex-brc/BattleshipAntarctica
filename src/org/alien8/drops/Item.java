@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.rendering.Sprite;
 import org.alien8.ship.Ship;

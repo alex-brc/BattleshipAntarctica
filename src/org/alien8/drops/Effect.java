@@ -1,6 +1,4 @@
-package org.alien8.items;
-
-import org.alien8.rendering.Renderer;
+package org.alien8.drops;
 
 /**
  * This class represents a status effect that an Entity is currently under (e.g. speed boost,

@@ -21,11 +21,7 @@ public class AudioManager implements Runnable {
   public static final int SFX = -99;
   public static final int AMBIENT = -98;
 
-  public static final int AIRPLANE_PASS = 0;
   public static final int SFX_SHIP_SHOOT = 1;
-  public static final int SFX_ICE_CRASH = 2;
-  public static final int SFX_SHIP_CRASH = 3;
-  public static final int SFX_PLANE_PASS = 4;
   public double RANGE;
   public double RANGE_MIN;
   public double RANGE_MAX;
@@ -45,7 +41,7 @@ public class AudioManager implements Runnable {
   private LinkedList<Clip> shoot3Pool;
 
   /**
-   * Constructor. Private to prevent global instantiation.
+   * Constructor. Private to prevent instantiation.
    */
   private AudioManager() {
     LogManager.getInstance().log("Audio", LogManager.Scope.INFO, "Loading sound files...");
@@ -59,14 +55,14 @@ public class AudioManager implements Runnable {
 
       // Pool shoot sound effects
       for (int i = 0; i < Parameters.SFX_POOL_SIZE; i++) {
-        shoot1Pool.add(SoundEffects.makeClip(SoundEffects.SHIP_SHOOT_1));
-        shoot2Pool.add(SoundEffects.makeClip(SoundEffects.SHIP_SHOOT_2));
-        shoot3Pool.add(SoundEffects.makeClip(SoundEffects.SHIP_SHOOT_3));
+        shoot1Pool.add(SoundEffects.SHIP_SHOOT_1.makeClip());
+        shoot2Pool.add(SoundEffects.SHIP_SHOOT_2.makeClip());
+        shoot3Pool.add(SoundEffects.SHIP_SHOOT_3.makeClip());
       }
       sfxVolumeValue = Parameters.INITIAL_VOLUME_SFX;
 
       // Loads ambient sound
-      ambient = SoundEffects.makeClip(SoundEffects.AMBIENT);
+      ambient = SoundEffects.AMBIENT.makeClip();
       ambientVolumeValue = Parameters.INITIAL_VOLUME_AMBIENT;
 
       // Initialise event queue
@@ -122,6 +118,9 @@ public class AudioManager implements Runnable {
    * Starts the ambient sound.
    */
   public void startAmbient() {
+	if(ambientIsMuted)
+		return;
+	
     setVolume(ambient, ambientVolumeValue);
     ambient.loop(Clip.LOOP_CONTINUOUSLY);
   }
@@ -221,12 +220,8 @@ public class AudioManager implements Runnable {
    * @param volume the new volume for the clip (0 to 1)
    */
   private void setVolume(Clip clip, double volume) {
-    if (volume < 0.0f || volume > 1.0f)
-      return;
-
     float gain = (float) (RANGE * volume + RANGE_MIN);
     ((FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(gain);
-
   }
 
   /**
@@ -251,24 +246,18 @@ public class AudioManager implements Runnable {
     // Stop run()
     this.running = false;
     // Kill daemons
-    try {
-      // Close SFX clips
-      for (Clip clip : shoot1Pool) {
-        clip.close();
-      }
-      for (Clip clip : shoot2Pool) {
-        clip.close();
-      }
-      for (Clip clip : shoot3Pool) {
-        clip.close();
-      }
-      // Stop and close ambient clips
-      ambient.close();
-    } catch (Exception e) {
-      LogManager.getInstance().log("Audio", LogManager.Scope.ERROR,
-          "Audio clips could not be closed: " + e.getMessage());
-      return false;
+    for (Clip clip : shoot1Pool) {
+    	clip.close();
     }
+    for (Clip clip : shoot2Pool) {
+    	clip.close();
+    }
+    for (Clip clip : shoot3Pool) {
+    	clip.close();
+    }
+    // Stop and close ambient clips
+    ambient.close();
+
     LogManager.getInstance().log("Audio", LogManager.Scope.INFO, "Audio manager closed cleanly.");
     return true;
   }
@@ -279,7 +268,7 @@ public class AudioManager implements Runnable {
    * @param type the type of sounds to play, i.e. AudioManager.SFX_SHIP_SHOOT will shoot one of 3
    *        shooting sounds at random
    */
-  public void playSound(int type, Position position) {
+  private void playSound(int type, Position position) {
     double dist = ClientModelManager.getInstance().getPlayer().getPosition().distanceTo(position);
 
     // Only play it if it's in hearing range
@@ -289,8 +278,8 @@ public class AudioManager implements Runnable {
     double modifier = distanceVolumeFunction(dist);
 
     if (type == SFX_SHIP_SHOOT) {
-      int k = rand.nextInt(3);
-      switch (k) {
+      int k = rand.nextInt(1000);
+      switch (k%3) {
         case 0:
           playSFX(shoot1Pool, modifier);
           return;
@@ -317,11 +306,7 @@ public class AudioManager implements Runnable {
       setVolume(clip, sfxVolumeValue * modifier);
     else
       setVolume(clip, 0.0f);
-
-    if (clip.isRunning()) {
-      clip.stop();
-      clip.flush();
-    }
+    
     clip.setFramePosition(0);
     clip.start();
 
@@ -346,10 +331,6 @@ public class AudioManager implements Runnable {
   private void handleEvent(AudioEvent event) {
     if (event.getType() == AudioEvent.Type.SHOOT)
       playSound(SFX_SHIP_SHOOT, event.getPosition());
-    else if (event.getType() == AudioEvent.Type.SHIP_CRASH)
-      playSound(SFX_SHIP_CRASH, event.getPosition());
-    else if (event.getType() == AudioEvent.Type.ICE_CRASH)
-      playSound(SFX_ICE_CRASH, event.getPosition());
   }
 
 }

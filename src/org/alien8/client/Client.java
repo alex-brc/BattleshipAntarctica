@@ -275,6 +275,7 @@ public class Client implements Runnable {
       try {
         clientIP = InetAddress.getLocalHost();
         serverIP = InetAddress.getByName(serverIPStr);
+        
         tcpSocket = new Socket(serverIP, Parameters.SERVER_PORT);
         tcpSocket.setSoTimeout(2000);
         udpSocket = new DatagramSocket();
@@ -290,7 +291,7 @@ public class Client implements Runnable {
         Long seed = this.getMapSeed(fromServer);
         model.makeMap(seed);
 
-        // Receive the initial game state from server
+        // Receive the initial game state from server\
         ArrayList<EntityLite> entsLite = this.receiveGameStateTCP(fromServer);
         model.sync(entsLite, clientIP, clientUdpPort);
 
