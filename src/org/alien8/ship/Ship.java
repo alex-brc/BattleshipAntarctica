@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
-import org.alien8.items.Effect;
-import org.alien8.items.Item;
+import org.alien8.drops.Effect;
+import org.alien8.drops.Item;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
@@ -81,6 +81,16 @@ public class Ship extends Entity implements Serializable {
       super.setSpeed(speed);
   }
 
+  /**
+   * @param damage the amount of damage to inflict on the ship
+   */
+  public void damage(double damage) {
+	  if(this.underEffect() && this.getEffectType() == Effect.INVULNERABLE)
+		  return;
+	  
+	  this.setHealth(this.getHealth() - damage);
+  }
+  
   /**
    * @return the front Turret of this Ship
    */

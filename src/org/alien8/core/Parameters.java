@@ -163,7 +163,7 @@ public class Parameters {
 
   /// AUDIO PARAMETERS
   /** Maximum number of "shoot" audio clips running at the same time. */
-  public static final int SFX_POOL_SIZE = 5;
+  public static final int SFX_POOL_SIZE = 3;
   /** Initial volume of sound effects. */
   public static final float INITIAL_VOLUME_SFX = 0.8f;
   /** Initial volume of ambient sound. */

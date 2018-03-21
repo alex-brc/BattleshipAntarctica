@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.physics.Position;
 
@@ -14,7 +14,7 @@ public class InvulnerablePickup extends Pickup {
    * @param position the Position of the Pickup
    */
   public InvulnerablePickup(Position position) {
-    super(position, new InvulnerableItem(), Pickup.INVULNERABLE_PICKUP);
+    super(position, new InvulnerableItem(), Pickup.INVULNERABLE);
   }
 
 }

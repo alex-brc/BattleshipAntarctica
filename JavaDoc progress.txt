@@ -102,5 +102,5 @@ x server:
 	/ StartButton
 	/ TextBox
 	/ VolumeButton
-x util:
-	x LogManager
+/ util:
+	/ LogManager

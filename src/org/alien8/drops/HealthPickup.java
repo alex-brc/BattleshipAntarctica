@@ -1,4 +1,4 @@
-package org.alien8.items;
+package org.alien8.drops;
 
 import org.alien8.physics.Position;
 
@@ -14,6 +14,6 @@ public class HealthPickup extends Pickup {
    * @param position the Position of the Pickup
    */
   public HealthPickup(Position position) {
-    super(position, new HealthItem(), Pickup.HEALTH_PICKUP);
+    super(position, new HealthItem(), Pickup.HEALTH);
   }
 }
