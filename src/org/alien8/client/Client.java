@@ -16,6 +16,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
@@ -27,6 +28,7 @@ import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreEvent;
 import org.alien8.server.GameEvent;
+import org.alien8.server.KillEvent;
 import org.alien8.server.Server;
 import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
@@ -267,6 +269,8 @@ public class Client implements Runnable {
         ClientScoreBoard.getInstance().update((new Score((ScoreEvent) event)));
       } else if (event instanceof TimerEvent) {
         timer = new Timer((TimerEvent) event);
+      } else if (event instanceof KillEvent) {
+    	Renderer.getInstance().addWreck((KillEvent) event);
       }
     }
   }

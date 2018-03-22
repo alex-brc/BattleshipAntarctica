@@ -137,7 +137,7 @@ public class Collision {
     if (new Double(ship.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
       ServerScoreBoard.getInstance().kill(ship);
-      ship.delete();
+      ship.kill();
       // Award score to the killer
       // If it's AI, no points
       if (shooter != null)
@@ -208,12 +208,12 @@ public class Collision {
     if (new Double(entity1.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
       ServerScoreBoard.getInstance().kill(ship1);
-      entity1.delete();
+      ship1.kill();
     }
     if (new Double(entity2.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
       ServerScoreBoard.getInstance().kill(ship2);
-      entity2.delete();
+      ship2.kill();
     }
   }
 
@@ -251,7 +251,7 @@ public class Collision {
     if (new Double(ship.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
       ServerScoreBoard.getInstance().kill(ship);
-      ship.delete();
+      ship.kill();
       // Award score to the killer
       // If it's AI, no points
       if (deployer != null)
@@ -283,7 +283,7 @@ public class Collision {
     if (new Double(ship.getHealth()).intValue() <= 0) {
       System.out.println("A ship died!");
       ServerScoreBoard.getInstance().kill(ship);
-      ship.delete();
+      ship.kill();
       // Award score to the killer
       // If it's AI, no points
       if (deployer != null)

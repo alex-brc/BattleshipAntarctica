@@ -24,6 +24,7 @@ public class Sprite implements Serializable {
   public static Sprite ship_purple = new Sprite("/org/alien8/assets/ship_purple.png");
   public static Sprite ship_red = new Sprite("/org/alien8/assets/ship_red.png");
   public static Sprite ship_turquoise = new Sprite("/org/alien8/assets/ship_turquoise.png");
+  public static Sprite ship_wreckage = new Sprite("/org/alien8/assets/ship_wreckage.png");
   public static Sprite turret = new Sprite("/org/alien8/assets/turret.png");
   public static Sprite turret_bar = new Sprite("/org/alien8/assets/turret_bar.png");
   public static Sprite health_bar = new Sprite("/org/alien8/assets/health_bar.png");
@@ -44,6 +45,10 @@ public class Sprite implements Serializable {
   public static Sprite effect_invulnerable = new Sprite("/org/alien8/assets/effect_invulnerable.png");
   public static Sprite crosshair = new Sprite("/org/alien8/assets/crosshair.png");
   public static Sprite torpedo = new Sprite("/org/alien8/assets/torpedo.png");
+  public static Sprite fire1 = new Sprite("/org/alien8/assets/fire1.png");
+  public static Sprite fire2 = new Sprite("/org/alien8/assets/fire2.png");
+  public static Sprite fire3 = new Sprite("/org/alien8/assets/fire3.png");
+  
   /**
    * Constructor.
    * 
@@ -303,5 +308,29 @@ public class Sprite implements Serializable {
     	}
     }
     return newSprite;
+  }
+
+  /**
+   * Combines the two sprites to make a new one.
+   * The first sprite is on the bottom, the second one on top.
+   * The two sprites must be the same size.
+   * 
+   * @param sprite1 the original sprite
+   * @param sprite2 the sprite to paste on top of
+   * @return the new sprite if the sizes match, null otherwise
+   */
+  public static Sprite pasteSprites(Sprite sprite1, Sprite sprite2) {
+	if(sprite1.getWidth() != sprite2.getWidth() || sprite2.getHeight() != sprite2.getHeight())
+		return null;
+	
+	Sprite newSprite = new Sprite(sprite1.getWidth(), sprite1.getHeight());
+	newSprite.pixels = sprite1.pixels;
+	
+	for(int i = 0; i < newSprite.pixels.length; i++)
+		if(sprite2.pixels[i] != 0xffff00ff)
+			newSprite.pixels[i] = sprite2.pixels[i];
+			
+	return newSprite;
+	
   }
 }

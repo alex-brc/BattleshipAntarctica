@@ -3,6 +3,7 @@ package org.alien8.ship;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.drops.Effect;
@@ -12,6 +13,9 @@ import org.alien8.physics.Position;
 import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
+import org.alien8.server.KillEvent;
+import org.alien8.server.Server;
+
 import net.jafama.FastMath;
 
 /**
@@ -477,6 +481,16 @@ public class Ship extends Entity implements Serializable {
 	  else 
 		  return 0x00C000;
   }
+  
+  /**
+   * Kills this ship. 
+   * First will show it being destroyed then
+   * it will call delete() on itself.
+   */
+  public void kill() {
+	Server.getInstance().addEvent(new KillEvent(this));
+	this.delete();
+  }
 
   /**
    * Prevents this Ship from moving outside of the bounds of the map. The Ship will go as far as the
@@ -623,5 +637,6 @@ public class Ship extends Entity implements Serializable {
     // Return the difference anyway
     return diff;
   }
+
 }
 

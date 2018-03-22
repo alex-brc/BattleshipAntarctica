@@ -167,9 +167,9 @@ public class Parameters {
   /** Maximum number of "shoot" audio clips running at the same time. */
   public static final int SFX_POOL_SIZE = 3;
   /** Initial volume of sound effects. */
-  public static final float INITIAL_VOLUME_SFX = 0.8f;
+  public static final float INITIAL_VOLUME_SFX = 0.7f;
   /** Initial volume of ambient sound. */
-  public static final float INITIAL_VOLUME_AMBIENT = 0.8f;
+  public static final float INITIAL_VOLUME_AMBIENT = 0.7f;
   /** Maximum distance sound can be heard from. */
   public static final int MAX_HEARING_DISTANCE = 1500;
   //////////////////////////////////////////////////////////

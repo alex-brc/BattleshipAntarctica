@@ -6,7 +6,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.LinkedList;
+
 import javax.swing.JFrame;
+
 import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
@@ -20,9 +23,11 @@ import org.alien8.drops.PlaneDropper;
 import org.alien8.physics.Position;
 import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
+import org.alien8.server.KillEvent;
 import org.alien8.server.Timer;
 import org.alien8.ship.Ship;
 import org.alien8.ui.Page;
+
 import net.jafama.FastMath;
 
 /**
@@ -33,6 +38,7 @@ public class Renderer extends Canvas {
 
   private static final long serialVersionUID = 1L;
   public static Renderer instance;
+  public LinkedList<Wreck> wrecks;
   private int width;
   private int height;
   private int xScroll;
@@ -53,6 +59,7 @@ public class Renderer extends Canvas {
 
     image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+    wrecks = new LinkedList<Wreck>();
 
     frame = new JFrame();
 
@@ -84,6 +91,14 @@ public class Renderer extends Canvas {
     if (instance == null)
       instance = new Renderer();
     return instance;
+  }
+  
+  /**
+   * Add a ship wreckage to the map
+   * @param killEvent the killEvent caused by the ship dying
+   */
+  public void addWreck(KillEvent killEvent) {
+	  this.wrecks.add(new Wreck(killEvent));
   }
 
   /**
@@ -131,6 +146,14 @@ public class Renderer extends Canvas {
     // Render white border round the map
     drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFFFFFF, false);
 
+    // Render wreckages
+    for(Wreck wreck : wrecks) {
+    	// Draw wreck sprite
+        drawSprite((int) wreck.getPosition().getX() - wreck.getSprite().getWidth() / 2,
+            (int) wreck.getPosition().getY() - wreck.getSprite().getHeight() / 2, wreck.getSprite(), false);
+        
+    }
+    
     // Render Entities
     for (Entity e : model.getEntities()) {
       e.render();
