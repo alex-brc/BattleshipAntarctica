@@ -29,6 +29,7 @@ public class Ship extends Entity implements Serializable {
   private static final long serialVersionUID = -432334137390727161L;
   private Turret frontTurret;
   private Turret rearTurret;
+  private double[] flameSpots;
   private Item item;
   private Effect effect;
   private int colour;
@@ -50,6 +51,12 @@ public class Ship extends Entity implements Serializable {
     frontTurret = new Turret(position, this.getSerial());
     rearTurret = new Turret(position, this.getSerial());
 
+    // Chosen to look relatively good
+    flameSpots = new double[]{
+    		0.1,
+    		-0.2,
+    		0.17};
+    
     setTurretsPosition();
     setTurretsDirection(new Position(0, 0));
   }
@@ -183,6 +190,7 @@ public class Ship extends Entity implements Serializable {
     rearTurret.setPosition(this.getPosition()
         .addPosition(new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())),
             FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
+    
   }
 
   /**
@@ -444,8 +452,27 @@ public class Ship extends Entity implements Serializable {
     		(int) (position.getY() + Parameters.SHIP_WIDTH/2 + 5) + 1, 
     		(int) ((Parameters.HEALTH_BAR_WIDTH - 1) * this.getHealth() / Parameters.SHIP_HEALTH), 
     		Parameters.HEALTH_BAR_HEIGHT - 1,
-    		getColor(this.getHealth()), 
+    		getHealthColor(this.getHealth()), 
     		false);
+    
+    // Draw damage level
+    int damageLevel = this.getDamageLevel(this.getHealth());
+    double p = 0;
+    Position pos = new Position(0,0);
+    for(int i = 0; i < damageLevel; i++) {
+      p = 2 * Parameters.SHIP_LENGTH * flameSpots[i];
+      pos = this.getPosition()
+              .addPosition(new Position(FastMath.floor(p * FastMath.cos(this.getDirection())),
+                      FastMath.floor(p * FastMath.sin(this.getDirection()))));
+  	  Renderer.getInstance().drawSprite(
+  			  (int) pos.getX() - Sprite.fires[i].getWidth() + 3,
+  			  (int) pos.getY() - Sprite.fires[i].getHeight() + 3,
+  			  Sprite.fires[i], false);
+    }
+    
+    /* frontTurret.setPosition(this.getPosition()
+            .addPosition(new Position(FastMath.floor(r * FastMath.cos(this.getDirection())),
+                FastMath.floor(r * FastMath.sin(this.getDirection()))))); */
     
     // Draw effects
     if (effect != null) {
@@ -470,10 +497,29 @@ public class Ship extends Entity implements Serializable {
   }
   
   /**
+   * Determines how many flame sprites to draw on the ship
+   * 
+   * @param health the health of the ship
+   * @return the number of flame sprites to draw on the ship
+   */
+  private int getDamageLevel(double health) {
+	  if(health <= 20)
+		  return 3;
+	  else if(health <= 60)
+		  return 2;
+	  else if(health <= 80)
+		  return 1;
+	  else 
+		  return 0;
+  }
+  
+  /**
+   * Determines the colour of the health bar
+   * 
    * @param health the current health of the ship
    * @return a hex color value for the ship health bar
    */
-  private int getColor(double health) {
+  private int getHealthColor(double health) {
 	  if(health <= 20)
 		  return 0xFF0000;
 	  else if(health <= 60)

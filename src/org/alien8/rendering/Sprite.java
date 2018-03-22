@@ -48,6 +48,7 @@ public class Sprite implements Serializable {
   public static Sprite fire1 = new Sprite("/org/alien8/assets/fire1.png");
   public static Sprite fire2 = new Sprite("/org/alien8/assets/fire2.png");
   public static Sprite fire3 = new Sprite("/org/alien8/assets/fire3.png");
+  public static Sprite[] fires = new Sprite[] {fire1, fire2, fire3};
   
   /**
    * Constructor.
