@@ -22,15 +22,13 @@ public class Parameters {
   /** Determines if ice can be collided with or not. */
   public static final boolean ICE_IS_SOLID = true;
   /** The maximum number of players allowed in a match. */
-  public static final int MAX_PLAYERS = 16;
+  public static final int MAX_PLAYERS = 8;
   /** The length of a match in seconds. */
   public static final int MATCH_LENGTH = 300;
   /** The length of time in seconds before a server ends once a game has finished. */
   public static final int TIME_BEFORE_SERVER_END = 10;
   /** Determines if AI ships spawn on the map in a game. */
   public static final boolean AI_ON = true;
-  /** Number of AI in a match. */
-  public static final int NUMBER_OF_AI = 7;
   /** Toggles certain features, such as visible bounding boxes. */
   public static final boolean DEBUG_MODE = false;
 
@@ -70,6 +68,10 @@ public class Parameters {
   public static final int GAME_PARALLAX_WEIGHT = 15;
   /** Affects how much the game logo moves in menus when the mouse is aimed around the screen. */
   public static final int MENU_PARALLAX_WEIGHT = 100;
+  /** Width of the health bar displayed for each player. */
+  public static final int HEALTH_BAR_WIDTH = 50;
+  /** Height of the health bar displayed for each player. */
+  public static final int HEALTH_BAR_HEIGHT = 12;
   //////////////////////////////////////////////////////////
 
 

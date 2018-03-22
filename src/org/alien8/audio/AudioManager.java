@@ -124,11 +124,11 @@ public class AudioManager implements Runnable {
   public void startAmbient(int type) {
     switch (type) {
       case 0:
-        setVolume(ambientMenu, ambientVolumeValue);
+        setVolume(ambientMenu, (ambientIsMuted ? 0.0 : ambientVolumeValue));
         ambientMenu.loop(Clip.LOOP_CONTINUOUSLY);
         break;
       case 1:
-        setVolume(ambientInGame, ambientVolumeValue);
+        setVolume(ambientInGame, (ambientIsMuted ? 0.0 : ambientVolumeValue));
         ambientInGame.loop(Clip.LOOP_CONTINUOUSLY);
         break;
       default:

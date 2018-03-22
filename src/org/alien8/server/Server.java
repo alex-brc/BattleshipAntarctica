@@ -218,7 +218,7 @@ public class Server implements Runnable {
    * Initialize the AIs
    */
   private void initializeAIs() {
-    for (int i = 1; i <= Parameters.NUMBER_OF_AI; i++) {
+    for (int i = 1; i <= Parameters.MAX_PLAYERS - this.playerList.size(); i++) {
       int randColour = (new Random()).nextInt(0xFFFFFF);
       Ship sh = new Ship(getRandomPosition(), 0, randColour);
       AIController ai = new AIController(sh);

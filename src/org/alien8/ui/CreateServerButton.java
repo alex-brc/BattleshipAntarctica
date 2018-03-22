@@ -4,6 +4,7 @@ import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import org.alien8.client.Client;
 import org.alien8.client.Client.State;
+import org.alien8.core.Parameters;
 
 /**
  * This class represents a Button used to create a game server.
@@ -27,7 +28,7 @@ public class CreateServerButton extends Button {
    * Attempts to create a game server.
    */
   public void executeAction() {
-    Client.getInstance().createServer(8);
+    Client.getInstance().createServer(Parameters.MAX_PLAYERS);
     Client.getInstance().getLobby().setHost();
     Client.getInstance().setState(State.IN_LOBBY);
     String localServerIPStr = null;
