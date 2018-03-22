@@ -67,7 +67,7 @@ public class Parameters {
   /** Height of the minimap on the HUD. */
   public static final int MINIMAP_HEIGHT = 64;
   /** Affects how the game view moves when the mouse is aimed around the screen. */
-  public static final int GAME_PARALLAX_WEIGHT = 20;
+  public static final int GAME_PARALLAX_WEIGHT = 15;
   /** Affects how much the game logo moves in menus when the mouse is aimed around the screen. */
   public static final int MENU_PARALLAX_WEIGHT = 100;
   //////////////////////////////////////////////////////////

@@ -122,9 +122,9 @@ public class Renderer extends Canvas {
     Position mousePos = InputManager.getInstance().mousePosition();
 
     xScroll = (int) (player.getPosition().getX() - width / 2
-        + (mousePos.getX() - width / 2) / Parameters.GAME_PARALLAX_WEIGHT);
+        + (mousePos.getX() - width) / Parameters.GAME_PARALLAX_WEIGHT);
     yScroll = (int) (player.getPosition().getY() - height / 2
-        + (mousePos.getY() - height / 2) / Parameters.GAME_PARALLAX_WEIGHT);
+        + (mousePos.getY() - height) / Parameters.GAME_PARALLAX_WEIGHT);
 
     // Render terrain
     model.getMap().render(this);
