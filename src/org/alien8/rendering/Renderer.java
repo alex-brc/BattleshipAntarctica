@@ -67,7 +67,14 @@ public class Renderer extends Canvas {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.addWindowListener(new ClientWindowListener());
     frame.setLocationRelativeTo(null);
-    frame.setVisible(true);
+    frame.setVisible(false);
+  }
+  
+  /**
+   * Call to set the frame as visible.
+   */
+  public void show() {
+	  frame.setVisible(true);
   }
 
   /**

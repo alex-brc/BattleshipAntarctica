@@ -1,19 +1,15 @@
 package test.org.alien8.drops;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
+import org.alien8.drops.SpeedPickup;
+import org.alien8.physics.Position;
 import org.junit.Test;
 
 public class SpeedPickupTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
 	@Test
-	public void testSpeedPickup() {
-		fail("Not yet implemented"); // TODO
+	public void test() {
+		// Make a pickup
+		SpeedPickup pickup = new SpeedPickup(new Position(0,0));
+		// Check it
+		assert(pickup.getPosition().getX() == 0 && pickup.getPosition().getY() == 0);
 	}
-
 }

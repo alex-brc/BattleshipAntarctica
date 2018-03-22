@@ -1,19 +1,15 @@
 package test.org.alien8.drops;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
+import org.alien8.drops.HealthPickup;
+import org.alien8.physics.Position;
 import org.junit.Test;
 
 public class HealthPickupTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
 	@Test
-	public void testHealthPickup() {
-		fail("Not yet implemented"); // TODO
+	public void test() {
+		// Make a pickup
+		HealthPickup pickup = new HealthPickup(new Position(0,0));
+		// Check it
+		assert(pickup.getPosition().getX() == 0 && pickup.getPosition().getY() == 0);
 	}
-
 }

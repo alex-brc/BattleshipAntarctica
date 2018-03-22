@@ -1,6 +1,7 @@
 package test.org.alien8.core;
 
 import static org.junit.Assert.fail;
+import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.ship.Ship;
@@ -69,7 +70,13 @@ public class EntityTest {
 
   @Test
   public void testDelete() {
-    fail("Not yet implemented");
+    // Test initial state
+    Entity e = new Ship(new Position(0, 0), 0, 0xFF00FF);
+    assert (!e.isToBeDeleted());
+
+    // Test deletion
+    e.delete();
+    assert (e.isToBeDeleted());
   }
 
   @Test

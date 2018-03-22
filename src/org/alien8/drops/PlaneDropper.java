@@ -75,7 +75,14 @@ public class PlaneDropper extends Entity {
   public void dealWithInIce(boolean[][] iceGrid) {
     // Nothing, it's flying
   }
-
+  
+  /**
+   * @return the position where the packet will be dropped
+   */
+  public Position getPacketPosition() {
+	  return this.packetPosition;
+  }
+  
   /**
    * Drops a random Pickup.
    */

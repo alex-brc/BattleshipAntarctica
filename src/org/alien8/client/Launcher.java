@@ -1,6 +1,7 @@
 package org.alien8.client;
 
 import org.alien8.audio.AudioManager;
+import org.alien8.rendering.Renderer;
 import org.alien8.score.ServerScoreBoard;
 import org.alien8.util.LogManager;
 
@@ -28,10 +29,12 @@ public class Launcher {
    */
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
-
+    Launcher.instance = launcher;
+    
     // Loading client window
     launcher.game = Client.getInstance();
-    Launcher.instance = launcher;
+    Renderer.getInstance().show();
+    
     // Load log manager
     launcher.loadStatus = "Preparing logger...";
     System.out.println(launcher.loadStatus);

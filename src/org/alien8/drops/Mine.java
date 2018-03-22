@@ -41,11 +41,18 @@ public class Mine extends Entity {
         (int) position.getY() - sprite.getHeight() / 2, sprite, false);
   }
 
+  /**
+   * This object would never be out of bounds, as it is
+   * created at some player's position
+   */
   @Override
   public void dealWithOutOfBounds() {
     // Will never be
   }
-
+  /**
+   * This object would never be in ice, as it is
+   * created at some player's position
+   */
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
     // Will never be
