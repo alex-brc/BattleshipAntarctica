@@ -230,8 +230,7 @@ public class Ship extends Entity implements Serializable {
     double ra = 0;
 
     // Front
-    double angle = Renderer.getInstance().getScreenPositionAI(frontTurret.getPosition())
-        .getAngleTo(targetPosition);
+    double angle = frontTurret.getPosition().getAngleTo(targetPosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
@@ -240,8 +239,7 @@ public class Ship extends Entity implements Serializable {
       frontTurret.setDirection(angle);
 
     // Rear
-    angle = Renderer.getInstance().getScreenPositionAI(rearTurret.getPosition())
-        .getAngleTo(targetPosition);
+    angle = rearTurret.getPosition().getAngleTo(targetPosition);
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);

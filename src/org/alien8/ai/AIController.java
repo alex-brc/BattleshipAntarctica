@@ -83,6 +83,7 @@ public class AIController {
    * map.
    */
   public void update() {
+	model = ServerModelManager.getInstance();
     target = findClosestTarget();
     if (target != null) {
       myShip.setTurretsDirectionAI(target.getPosition());
@@ -94,6 +95,10 @@ public class AIController {
       myShip.useItem();
     }
     changeDefaultTurn++;
+    /*To add a bit more variety to the AI every 1200 ticks it changes the default way it turns
+     * if it doesn't matter which way to turn. This also makes sure that they don't get stuck doing
+     * circles.
+     */
     if (changeDefaultTurn > 1200) {
       rightTurnDefault = !rightTurnDefault;
       changeDefaultTurn = 0;
