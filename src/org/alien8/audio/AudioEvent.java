@@ -17,7 +17,7 @@ public class AudioEvent extends GameEvent {
    *
    */
   public enum Type {
-    SHOOT, ICE_CRASH, SHIP_CRASH;
+    SHOOT, HIT, PICKUP, MINE_EXPLODE;
   }
 
   private Type type;

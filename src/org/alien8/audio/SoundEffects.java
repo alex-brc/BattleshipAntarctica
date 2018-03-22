@@ -12,13 +12,17 @@ import javax.sound.sampled.Clip;
  */
 public enum SoundEffects {
 
-  AMBIENT("/org/alien8/assets/ambient_waves.wav"), WIND("/org/alien8/assets/wind.wav"), MENU_MUSIC(
-      "/org/alien8/assets/12 Shingle Tingle.wav"), INGAME_MUSIC(
-          "/org/alien8/assets/04 Shell Shock Shake.wav"), AIRPLANE_PASS(
-              "/org/alien8/assets/airplane_pass.wav"), SHIP_SHOOT_1(
-                  "/org/alien8/assets/cannon1.wav"), SHIP_SHOOT_2(
-                      "/org/alien8/assets/cannon2.wav"), SHIP_SHOOT_3(
-                          "/org/alien8/assets/cannon3.wav");
+	AMBIENT("/org/alien8/assets/ambient_waves.wav"), 
+	WIND("/org/alien8/assets/wind.wav"),
+	MENU_MUSIC("/org/alien8/assets/12 Shingle Tingle.wav"), 
+	INGAME_MUSIC("/org/alien8/assets/04 Shell Shock Shake.wav"), 
+	AIRPLANE_PASS("/org/alien8/assets/airplane_pass.wav"), 
+	SHIP_SHOOT_1("/org/alien8/assets/cannon1.wav"), 
+	SHIP_SHOOT_2("/org/alien8/assets/cannon2.wav"), 
+	SHIP_SHOOT_3("/org/alien8/assets/cannon3.wav"),
+	SHIP_PICKUP("/org/alien8/assets/pickup.wav"),
+	SHIP_HIT("/org/alien8/assets/hit.wav"),
+	MINE_EXPLODE("/org/alien8/assets/mine_explosion.wav");
 
   private String fileName;
 

@@ -1,5 +1,6 @@
 package org.alien8.audio;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -23,7 +24,10 @@ public class AudioManager implements Runnable {
   public static final int SFX = -99;
   public static final int AMBIENT = -98;
 
-  public static final int SFX_SHIP_SHOOT = 1;
+  public static final int SHIP_SHOOT = 1;
+  public static final int SHIP_HIT = 2;
+  public static final int SHIP_PICKUP = 3;
+  
   public double RANGE;
   public double RANGE_MIN;
   public double RANGE_MAX;
@@ -39,9 +43,10 @@ public class AudioManager implements Runnable {
   private double sfxVolumeValue;
   private boolean ambientIsMuted = false;
   private boolean sfxIsMuted = false;
-  private LinkedList<Clip> shoot1Pool;
-  private LinkedList<Clip> shoot2Pool;
-  private LinkedList<Clip> shoot3Pool;
+  private ArrayList<LinkedList<Clip>> shootPools;
+  private LinkedList<Clip> hitPool;
+  private LinkedList<Clip> pickupPool;
+  private LinkedList<Clip> minePool;
 
   /**
    * Constructor. Private to prevent instantiation.
@@ -52,16 +57,39 @@ public class AudioManager implements Runnable {
       rand = new Random();
       // Pre-load sound files into pools
       SoundEffects.init();
-      shoot1Pool = new LinkedList<Clip>();
-      shoot2Pool = new LinkedList<Clip>();
-      shoot3Pool = new LinkedList<Clip>();
-
+      
+      LinkedList<Clip> shoot1Pool = new LinkedList<Clip>();
+      LinkedList<Clip> shoot2Pool = new LinkedList<Clip>();
+      LinkedList<Clip> shoot3Pool = new LinkedList<Clip>();
       // Pool shoot sound effects
       for (int i = 0; i < Parameters.SFX_POOL_SIZE; i++) {
         shoot1Pool.add(SoundEffects.SHIP_SHOOT_1.makeClip());
         shoot2Pool.add(SoundEffects.SHIP_SHOOT_2.makeClip());
         shoot3Pool.add(SoundEffects.SHIP_SHOOT_3.makeClip());
       }
+      
+      shootPools = new ArrayList<LinkedList<Clip>>();
+      shootPools.add(shoot1Pool);
+      shootPools.add(shoot2Pool);
+      shootPools.add(shoot3Pool);
+      
+      pickupPool = new LinkedList<Clip>();
+      // Pool pickup sound effect
+      for (int i = 0; i < 1; i++) {
+          pickupPool.add(SoundEffects.SHIP_PICKUP.makeClip());
+        }
+      
+      hitPool = new LinkedList<Clip>();
+      // Pool hit sound effects
+      for (int i = 0; i < Parameters.SFX_POOL_SIZE; i++) {
+          hitPool.add(SoundEffects.SHIP_HIT.makeClip());
+        }
+
+      minePool = new LinkedList<Clip>();
+      // Pool mine explosion sound effect
+      for (int i = 0; i < 1; i++) {
+          minePool.add(SoundEffects.MINE_EXPLODE.makeClip());
+        }
       sfxVolumeValue = Parameters.INITIAL_VOLUME_SFX;
 
       // Loads ambient sound
@@ -273,15 +301,10 @@ public class AudioManager implements Runnable {
     // Stop run()
     this.running = false;
     // Kill daemons
-    for (Clip clip : shoot1Pool) {
-    	clip.close();
-    }
-    for (Clip clip : shoot2Pool) {
-    	clip.close();
-    }
-    for (Clip clip : shoot3Pool) {
-    	clip.close();
-    }
+    for(int i = 0; i < 3; i++)
+    	for (Clip clip : shootPools.get(i)) {
+    		clip.close();
+    	}
     // Stop and close ambient clips
     ambientMenu.close();
     ambientInGame.close();
@@ -296,7 +319,7 @@ public class AudioManager implements Runnable {
    * @param type the type of sounds to play, i.e. AudioManager.SFX_SHIP_SHOOT will shoot one of 3
    *        shooting sounds at random
    */
-  private void playSound(int type, Position position) {
+  private void playSound(AudioEvent.Type type, Position position) {
     double dist = ClientModelManager.getInstance().getPlayer().getPosition().distanceTo(position);
 
     // Only play it if it's in hearing range
@@ -305,19 +328,21 @@ public class AudioManager implements Runnable {
 
     double modifier = distanceVolumeFunction(dist);
 
-    if (type == SFX_SHIP_SHOOT) {
-      int k = rand.nextInt(1000);
-      switch (k%3) {
-        case 0:
-          playSFX(shoot1Pool, modifier);
-          return;
-        case 1:
-          playSFX(shoot2Pool, modifier);
-          return;
-        case 2:
-          playSFX(shoot3Pool, modifier);
-          return;
-      }
+    switch(type) {
+    case SHOOT:
+      int k = rand.nextInt(3);
+      playSFX(shootPools.get(k), modifier);
+      break;
+    case HIT:
+      playSFX(hitPool, modifier);
+      break;
+    case PICKUP:
+      playSFX(pickupPool, modifier);
+      break;
+    case MINE_EXPLODE:
+      playSFX(minePool, modifier);
+    default:
+      break;
     }
   }
 
@@ -357,8 +382,7 @@ public class AudioManager implements Runnable {
    * @param event the AudioEvent to handle
    */
   private void handleEvent(AudioEvent event) {
-    if (event.getType() == AudioEvent.Type.SHOOT)
-      playSound(SFX_SHIP_SHOOT, event.getPosition());
+    playSound(event.getType(), event.getPosition());
   }
 
 }

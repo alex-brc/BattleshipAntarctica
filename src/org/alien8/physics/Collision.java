@@ -1,5 +1,6 @@
 package org.alien8.physics;
 
+import org.alien8.audio.AudioEvent;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.drops.Mine;
@@ -124,7 +125,10 @@ public class Collision {
     // This allows us to ignore cases where a ship shoots itself
     if (bullet.getSource() == ship.getSerial())
       return;
-
+    
+    // Send audio event for bullet hit
+    Server.getInstance().addEvent(new AudioEvent(AudioEvent.Type.HIT, ship.getPosition()));
+    
     System.out.println("B: " + bullet.getSource() + ", S: " + ship.getSerial());
     // Bullet damages ship
     ship.damage(bullet.getDamage());
@@ -224,9 +228,13 @@ public class Collision {
    * @param pickup the Pickup involved in the Collision
    */
   private void resolveShipPickupCollision(Ship ship, Pickup pickup) {
-    if (!ship.hasItem()) {
+	// Give item if it doesn't have one already 
+	if (!ship.hasItem()) {
       pickup.onPickup(ship);
     }
+	
+	// Send pickup audio event
+    Server.getInstance().addEvent(new AudioEvent(AudioEvent.Type.PICKUP, ship.getPosition()));
     pickup.delete();
   }
 
@@ -240,6 +248,9 @@ public class Collision {
     if (ship.getSerial() == mine.getSource())
       return;
 
+    // Send audio event for mine explosion
+    Server.getInstance().addEvent(new AudioEvent(AudioEvent.Type.MINE_EXPLODE, ship.getPosition()));
+    
     // Mine damages ship
     ship.damage(Parameters.MINE_DAMAGE);
     // Award score to the mine owner
@@ -271,8 +282,11 @@ public class Collision {
   private void resolveShipTorpedoCollision(Ship ship, Torpedo torpedo) {
     if (ship.getSerial() == torpedo.getSource())
       return;
-
-    // Mine damages ship
+    
+    // Send audio event for torpedo hit
+    Server.getInstance().addEvent(new AudioEvent(AudioEvent.Type.HIT, ship.getPosition()));
+    
+    // Torpedo damages ship
     ship.damage(Parameters.TORPEDO_DAMAGE);
     // Award score to the mine owner
     Player deployer = Server.getInstance().getPlayer(torpedo.getSource());
