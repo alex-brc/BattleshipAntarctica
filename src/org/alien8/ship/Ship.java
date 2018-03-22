@@ -428,14 +428,24 @@ public class Ship extends Entity implements Serializable {
     Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
         (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
-    // Display health
-    r.drawText(new Integer(new Double(getHealth()).intValue()).toString(),
-        new Double(getPosition().getX()).intValue() + 20,
-        new Double(getPosition().getY()).intValue(), false, FontColor.BLACK);
+    
     // Render turrets
     frontTurret.render();
     rearTurret.render();
 
+    // Display health
+    r.drawRect((int) (position.getX() - Parameters.HEALTH_BAR_WIDTH/2), 
+    		(int) (position.getY() + Parameters.SHIP_WIDTH/2 + 5), 
+    		Parameters.HEALTH_BAR_WIDTH, Parameters.HEALTH_BAR_HEIGHT,
+    		0x000000, false);
+    r.drawFilledRect((int) position.getX() - Parameters.HEALTH_BAR_WIDTH/2 + 1, 
+    		(int) (position.getY() + Parameters.SHIP_WIDTH/2 + 5) + 1, 
+    		(int) ((Parameters.HEALTH_BAR_WIDTH - 1) * this.getHealth() / Parameters.SHIP_HEALTH), 
+    		Parameters.HEALTH_BAR_HEIGHT - 1,
+    		getColor(this.getHealth()), 
+    		false);
+    
+    // Draw effects
     if (effect != null) {
       Sprite sp = null;
       switch (effect.getEffectType()) {
@@ -455,6 +465,19 @@ public class Ship extends Entity implements Serializable {
       Renderer.getInstance().drawSprite((int) this.getPosition().getX() - sp.getWidth() / 2,
           (int) this.getPosition().getY() - sp.getHeight() / 2, sp, false);
     }
+  }
+  
+  /**
+   * @param health the current health of the ship
+   * @return a hex color value for the ship health bar
+   */
+  private int getColor(double health) {
+	  if(health <= 20)
+		  return 0xFF0000;
+	  else if(health <= 60)
+		  return 0xFFA500;
+	  else 
+		  return 0x00C000;
   }
 
   /**

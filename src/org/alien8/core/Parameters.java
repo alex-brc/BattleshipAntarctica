@@ -68,6 +68,10 @@ public class Parameters {
   public static final int GAME_PARALLAX_WEIGHT = 20;
   /** Affects how much the game logo moves in menus when the mouse is aimed around the screen. */
   public static final int MENU_PARALLAX_WEIGHT = 100;
+  /** Width of the health bar displayed for each player. */
+  public static final int HEALTH_BAR_WIDTH = 50;
+  /** Height of the health bar displayed for each player. */
+  public static final int HEALTH_BAR_HEIGHT = 12;
   //////////////////////////////////////////////////////////
 
 
