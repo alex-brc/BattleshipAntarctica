@@ -24,7 +24,7 @@ public class Parameters {
   /** The maximum number of players allowed in a match. */
   public static final int MAX_PLAYERS = 8;
   /** The length of a match in seconds. */
-  public static final int MATCH_LENGTH = 300;
+  public static final int MATCH_LENGTH = 10;
   /** The length of time in seconds before a server ends once a game has finished. */
   public static final int TIME_BEFORE_SERVER_END = 10;
   /** Determines if AI ships spawn on the map in a game. */
