@@ -121,10 +121,15 @@ public class Renderer extends Canvas {
     Ship player = model.getPlayer();
     Position mousePos = InputManager.getInstance().mousePosition();
 
-    xScroll = (int) (player.getPosition().getX() - width / 2
-        + (mousePos.getX() - width) / Parameters.GAME_PARALLAX_WEIGHT);
-    yScroll = (int) (player.getPosition().getY() - height / 2
-        + (mousePos.getY() - height) / Parameters.GAME_PARALLAX_WEIGHT);
+    if (ClientScoreBoard.getInstance().getScore(player.getSerial()).getAlive()) { // Camera fixed on player's ship
+      xScroll = (int) (player.getPosition().getX() - width / 2
+          + (mousePos.getX() - width) / Parameters.GAME_PARALLAX_WEIGHT);
+      yScroll = (int) (player.getPosition().getY() - height / 2
+          + (mousePos.getY() - height) / Parameters.GAME_PARALLAX_WEIGHT);
+    } else { // Camera traverse the whole map according to mouse position
+      xScroll = (int) (mousePos.getX() * 1.6);
+      yScroll = (int) (mousePos.getY() * 2.6);
+    }
 
     // Render terrain
     model.getMap().render(this);

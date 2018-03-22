@@ -47,6 +47,7 @@ public class EntityLite implements Serializable {
 
   /**
    * Constructor for Player Ship
+   * 
    * @param serial Serial of the ship
    * @param entityType Entity type number for ship
    * @param position Position of the ship
@@ -88,6 +89,7 @@ public class EntityLite implements Serializable {
 
   /**
    * Constructor for AI ship
+   * 
    * @param serial Serial number of the ship
    * @param entityType Entity type number for ship
    * @param position Position of the ship
@@ -118,6 +120,7 @@ public class EntityLite implements Serializable {
 
   /**
    * Constructor for Bullet
+   * 
    * @param serial Serial number of the bullet
    * @param entityType Entity type number for bullet
    * @param position Position of the bullet
@@ -143,6 +146,7 @@ public class EntityLite implements Serializable {
 
   /**
    * Constuctor for pickup
+   * 
    * @param entityType Entity type number for pickup
    * @param position Position of the pickup
    * @param pickupType Type of the pickup
@@ -157,6 +161,7 @@ public class EntityLite implements Serializable {
 
   /**
    * Constructor for plane drooper
+   * 
    * @param entityType Entity type number for plane dropper
    * @param position Position of the plane dropper
    * @param toBeDeleted Whether the plane dropper is to be deleted
