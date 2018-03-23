@@ -18,13 +18,16 @@ import org.alien8.core.ClientModelManager;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.core.ServerModelManager;
+import org.alien8.drops.Mine;
 import org.alien8.drops.Pickup;
 import org.alien8.drops.PlaneDropper;
+import org.alien8.drops.Torpedo;
 import org.alien8.physics.Position;
 import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
 import org.alien8.server.KillEvent;
 import org.alien8.server.Timer;
+import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.ui.Page;
 
@@ -160,10 +163,25 @@ public class Renderer extends Canvas {
         
     }
     
-    // Render Entities
-    for (Entity e : model.getEntities()) {
-      e.render();
-    }
+    // Render Entities in order
+    for (Entity e : model.getEntities())
+    	if(e instanceof Pickup)
+    		e.render();
+    for (Entity e : model.getEntities())
+    	if(e instanceof Mine)
+    		e.render();
+    for (Entity e : model.getEntities())
+    	if(e instanceof Ship)
+    		e.render();
+    for (Entity e : model.getEntities())
+    	if(e instanceof Bullet)
+    		e.render();
+    for (Entity e : model.getEntities())
+    	if(e instanceof Torpedo)
+    		e.render();
+    for (Entity e : model.getEntities())
+    	if(e instanceof PlaneDropper)
+    		e.render();
 
     /// HUD components
     // Render black frame round the edge of the screen
