@@ -43,7 +43,7 @@ public class Parameters {
   /** Port for multicasting. */
   public static final int MULTI_CAST_PORT = 4445;
   /** How long the server UDP socket blocks for waiting client's input sample. */
-  public static final int SERVER_SOCKET_BLOCK_TIME = 100;
+  public static final int SERVER_SOCKET_BLOCK_TIME = 200;
   /** How much nanosecond in 1 second. */
   public static final int N_SECOND = 1000000000;
   /** How much millisecond in 1 second. */

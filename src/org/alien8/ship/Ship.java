@@ -440,9 +440,15 @@ public class Ship extends Entity implements Serializable {
 
 
     // Render ship sprite
-    Sprite currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    Sprite currentSprite = null;
+    if(!Renderer.getInstance().easterEgg) {
+    	currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    }
+    else {
+    	currentSprite = Sprite.ship_green.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    }
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
-        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+			(int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
     
     // Render turrets
     frontTurret.render();

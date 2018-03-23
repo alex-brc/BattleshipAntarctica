@@ -22,6 +22,7 @@ public class Sprite implements Serializable {
   public static Sprite ship_green = new Sprite("/org/alien8/assets/ship_green.png");
   public static Sprite ship_orange = new Sprite("/org/alien8/assets/ship_orange.png");
   public static Sprite ship_purple = new Sprite("/org/alien8/assets/ship_purple.png");
+  public static Sprite saucer = new Sprite("/org/alien8/assets/saucer.png");
   public static Sprite ship_red = new Sprite("/org/alien8/assets/ship_red.png");
   public static Sprite ship_turquoise = new Sprite("/org/alien8/assets/ship_turquoise.png");
   public static Sprite ship_wreckage = new Sprite("/org/alien8/assets/ship_wreckage.png");

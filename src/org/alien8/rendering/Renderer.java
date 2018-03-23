@@ -638,4 +638,7 @@ public class Renderer extends Canvas {
       }
     }
   }
+  
+  /** SECRETZ */
+  public boolean easterEgg = false;
 }

@@ -59,9 +59,16 @@ public class PlaneDropper extends Entity {
 
   @Override
   public void render() {
-    Renderer.getInstance().drawSprite((int) this.getPosition().getX(),
-        (int) this.getPosition().getY(),
-        Sprite.plane.rotateSprite(-(this.getDirection() - FastMath.PI / 2)), false);
+	Sprite currentSprite = null;
+    if(!Renderer.getInstance().easterEgg) {
+    	currentSprite = Sprite.plane.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    }
+    else {
+    	currentSprite = Sprite.saucer;
+    }
+    Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
+			(int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+    
   }
 
   @Override

@@ -10,6 +10,7 @@ public class CreditsPage implements Page {
 	private InfoBox sfxCredits3;
 	private InfoBox sfxCredits4;
 	private InfoBox sfxCredits5;
+	private InfoBox sfxCredits6;
 	private InfoBox musicCredits;
 	private ReturnToMainButton returnBtn;
 	
@@ -39,7 +40,10 @@ public class CreditsPage implements Page {
 		text = "and every member of Alien8";
 		sfxCredits5 = new InfoBox(r.getWidth()/2 - text.length()*8, r.getHeight() / 9 * 6 - 8, text.length() * 16, 16);
 		sfxCredits5.updateText(text);
-		
+		text = "- the code is alien8 -";
+		sfxCredits6 = new InfoBox(r.getWidth()/2 - text.length()*8, r.getHeight() / 9 * 7 - 8, text.length() * 16, 16);
+		sfxCredits6.updateText(text);
+
 		returnBtn = new ReturnToMainButton(r.getWidth()/2 - btnWidth, r.getHeight() / 9 * 8 - 10, 2 * btnWidth, 40);
 	}
 	
@@ -51,6 +55,7 @@ public class CreditsPage implements Page {
 		sfxCredits3.render(r);
 		sfxCredits4.render(r);
 		sfxCredits5.render(r);
+		sfxCredits6.render(r);
 		musicCredits.render(r);
 		returnBtn.render(r);
 	}
