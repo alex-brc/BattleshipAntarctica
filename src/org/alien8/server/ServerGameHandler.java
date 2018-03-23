@@ -129,6 +129,13 @@ public class ServerGameHandler extends Thread {
     Server.getInstance().stop();
     System.out.println("Server game handler stopped");
   }
+  
+  /**
+   * @return true if the game is running, false otherwise
+   */
+  public boolean running() {
+	  return gameRunning;
+  }
 
   /**
    * Read input sample from client, number of input sample read for each call depends on the number

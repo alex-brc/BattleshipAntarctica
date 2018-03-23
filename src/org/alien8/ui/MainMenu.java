@@ -17,6 +17,7 @@ public class MainMenu implements Page {
   private SettingButton setBtn;
   private ExitButton exBtn;
   private InteractiveLogo logo;
+  private CreditsButton credsBtn;
 
   /**
    * Constructor.
@@ -27,7 +28,7 @@ public class MainMenu implements Page {
     int fieldWidth = (18 * 16) + 4; // IP length * font size + padding
     int btnWidth = (18 * 16) + 4; // Max button text length * font size + padding
     int height = 40; // Font size + padding;
-    int vPad = 8; // Spacing between buttons = r.getWidth() / vPad
+    int vPad = 9; // Spacing between buttons = r.getWidth() / vPad
     int vOffset = 140; // Pixels to offset from the top of the window
 
     Renderer r = Renderer.getInstance();
@@ -42,10 +43,13 @@ public class MainMenu implements Page {
         vOffset + (r.getHeight() / vPad) * 3 + height + 4, infoWidth, height);
     conBtn = new ConnectButton(r.getWidth() / 2 - btnWidth / 2,
         vOffset + (r.getHeight() / vPad) * 3, btnWidth, height);
-    exBtn = new ExitButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 5,
-        btnWidth, height);
     setBtn = new SettingButton(r.getWidth() / 2 - btnWidth / 2,
-        vOffset + (r.getHeight() / vPad) * 4, btnWidth, height);
+            vOffset + (r.getHeight() / vPad) * 4, btnWidth, height);
+    credsBtn = new CreditsButton(r.getWidth() / 2 - btnWidth / 2,
+            vOffset + (r.getHeight() / vPad) * 5, btnWidth, height);
+    exBtn = new ExitButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 6,
+        btnWidth, height);
+    
 
     // Make the logo
     logo = new InteractiveLogo(r.getWidth() / 2, 100);
@@ -59,6 +63,7 @@ public class MainMenu implements Page {
     conBtn.render(r);
     conInfo.render(r);
     setBtn.render(r);
+    credsBtn.render(r);
     exBtn.render(r);
 
     logo.render();

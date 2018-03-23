@@ -2,6 +2,7 @@ package org.alien8.ui;
 
 import org.alien8.client.Client;
 import org.alien8.client.Client.State;
+import org.alien8.server.Server;
 
 /**
  * This class represents a Button used to return to the main menu.
@@ -26,6 +27,12 @@ public class ReturnToMainButton extends Button {
    */
   public void executeAction() {
     Client.getInstance().setState(State.MAIN_MENU);
+    try {
+    if(Server.getInstance().gameRunning())
+    	Server.getInstance().stop();
+    } catch(NullPointerException e) {
+    	// There is no server, that's fine
+    }
   }
 
 }

@@ -16,7 +16,7 @@ public class AudioEventTest {
 		assert(ae.getPosition().getX() == 0);
 		assert(ae.getPosition().getY() == 0);
 		
-		assert(ae.getType() == AudioEvent.Type.SHIP_CRASH);
+		assert(ae.getType() == AudioEvent.Type.MINE_EXPLODE);
 		System.out.println(ae.toString());
 		assert(ae.toString().equals("SHIP_CRASH X: 0.0 Y: 0.0"));
 	}

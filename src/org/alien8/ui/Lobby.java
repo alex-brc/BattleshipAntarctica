@@ -14,6 +14,7 @@ import org.alien8.rendering.Sprite;
 public class Lobby implements Page {
   private boolean isHost = false;
   private StartButton startBtn;
+  private ReturnToMainButton returnBtn;
   private InteractiveLogo logo;
   private String ip;
 
@@ -22,7 +23,8 @@ public class Lobby implements Page {
    */
   public Lobby() {
     logo = new InteractiveLogo(Renderer.getInstance().getWidth() / 2, 100);
-    startBtn = new StartButton(360, 530, 80, 30);
+    startBtn = new StartButton(280, 530, 110, 30);
+    returnBtn = new ReturnToMainButton(400, 530, 110, 30);
     try {
       ip = "server ip: " + InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
@@ -58,6 +60,7 @@ public class Lobby implements Page {
           renderer.getWidth() / 2 - "waiting for players".length() * 8, 180, true, FontColor.WHITE);
     }
     logo.render();
+    returnBtn.render(renderer);
     renderer.drawSprite(renderer.getWidth() / 2 - Sprite.controls.getWidth() / 2,
         renderer.getHeight() / 2 - Sprite.controls.getHeight() / 2 + 60, Sprite.controls, true);
 

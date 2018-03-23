@@ -176,7 +176,14 @@ public class Server implements Runnable {
 
     System.out.println("Server no longer accept client connection");
   }
-
+  
+  /**
+   * @return true if the game is running, false otherwise
+   */
+  public boolean gameRunning() {
+	  return sgh.running();
+  }
+  
   /**
    * Set the game server IP and the multi cast IP
    */
@@ -193,7 +200,7 @@ public class Server implements Runnable {
   /**
    * Initialize the game state, would not start the game loop
    */
-  public void initializeGameState() {
+  private void initializeGameState() {
     LogManager.getInstance().log("Server", LogManager.Scope.INFO, "Initialising game state...");
 
     // Make the map
@@ -218,7 +225,7 @@ public class Server implements Runnable {
    * Initialize the AIs
    */
   private void initializeAIs() {
-    for (int i = 1; i <= Parameters.MAX_PLAYERS - this.playerList.size(); i++) {
+    for (int i = 1; i <= Parameters.MAX_PLAYERS; i++) {
       int randColour = (new Random()).nextInt(0xFFFFFF);
       Ship sh = new Ship(getRandomPosition(), 0, randColour);
       AIController ai = new AIController(sh);

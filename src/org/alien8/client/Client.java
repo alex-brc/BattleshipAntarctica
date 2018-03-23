@@ -32,6 +32,7 @@ import org.alien8.server.KillEvent;
 import org.alien8.server.Server;
 import org.alien8.server.Timer;
 import org.alien8.server.TimerEvent;
+import org.alien8.ui.CreditsPage;
 import org.alien8.ui.Lobby;
 import org.alien8.ui.MainMenu;
 import org.alien8.ui.NameScreen;
@@ -43,7 +44,7 @@ public class Client implements Runnable {
 
   // All possible client UI states
   public enum State {
-    NAME_SCREEN, MAIN_MENU, SPLASH_SCREEN, IN_GAME, SETTINGS_MENU, IN_LOBBY
+    NAME_SCREEN, MAIN_MENU, SPLASH_SCREEN, IN_GAME, SETTINGS_MENU, IN_LOBBY, CREDITS_SCREEN
   }
 
   private State state = State.SPLASH_SCREEN;
@@ -70,6 +71,7 @@ public class Client implements Runnable {
   private SettingsMenu settings = null;
   private NameScreen nameScreen = null;
   private Lobby lobby = null;
+  private CreditsPage credits = null;
   private ClientTCP clientTCP;
   private byte[] buf = new byte[65536];
   private byte[] receivedByte;
@@ -85,6 +87,7 @@ public class Client implements Runnable {
     menu = new MainMenu();
     settings = new SettingsMenu();
     lobby = new Lobby();
+    credits = new CreditsPage();
   }
 
   /**
@@ -140,6 +143,9 @@ public class Client implements Runnable {
           break;
         case IN_LOBBY:
           Renderer.getInstance().render(lobby);
+          break;
+        case CREDITS_SCREEN:
+          Renderer.getInstance().render(credits);
           break;
         /**
          * The main loop of the game. A common way to implement it. This implementation basically
