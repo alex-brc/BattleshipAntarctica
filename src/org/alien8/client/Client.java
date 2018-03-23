@@ -24,6 +24,7 @@ import org.alien8.core.ClientModelManager;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.rendering.Renderer;
+import org.alien8.rendering.Wreck;
 import org.alien8.score.ClientScoreBoard;
 import org.alien8.score.Score;
 import org.alien8.score.ScoreEvent;
@@ -466,6 +467,7 @@ public class Client implements Runnable {
       // Reset relevant field
       model.reset();
       ClientScoreBoard.getInstance().reset();
+      Renderer.getInstance().wrecks = new LinkedList<Wreck>();
       timer = null;
       timeBeforeExiting = 10;
       FPS = 0;

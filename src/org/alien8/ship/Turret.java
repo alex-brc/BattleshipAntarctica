@@ -176,7 +176,7 @@ public class Turret implements Serializable {
   public void shoot() {
     if (distance == this.minDistance || this.isOnCooldown())
       return;
-
+    
     ServerModelManager.getInstance().addEntity(Server.getInstance().getBullet(this.getPosition(),
         this.getDirection(), distance, this.getShipSerial()));
 
