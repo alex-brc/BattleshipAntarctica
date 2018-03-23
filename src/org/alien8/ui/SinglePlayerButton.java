@@ -37,7 +37,7 @@ public class SinglePlayerButton extends Button {
     if (localServerIPStr != null)
       Client.getInstance().connect(localServerIPStr);
 
-    // Game start
-    Server.getInstance().startSGH();
+    Client.getInstance().getLobby().setHost();
+    Client.getInstance().setState(Client.State.IN_LOBBY);
   }
 }
