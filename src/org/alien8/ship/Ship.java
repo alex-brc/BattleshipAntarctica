@@ -256,6 +256,7 @@ public class Ship extends Entity implements Serializable {
 
     // Rear
     angle = rearTurret.getPosition().getAngleTo(targetPosition);
+    angle += rand.nextDouble() * Parameters.AI_PRECISION - Parameters.AI_PRECISION / 2;
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);
