@@ -26,13 +26,8 @@ public class ReturnToMainButton extends Button {
    * Returns to the main menu.
    */
   public void executeAction() {
+    Server.getInstance().stop();
     Client.getInstance().setState(State.MAIN_MENU);
-    try {
-    if(Server.getInstance().gameRunning())
-    	Server.getInstance().stop();
-    } catch(NullPointerException e) {
-    	// There is no server, that's fine
-    }
   }
 
 }

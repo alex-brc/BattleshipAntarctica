@@ -91,7 +91,7 @@ public class Server implements Runnable {
        * IOException
        */
       tcpSocket.close();
-
+      System.out.println("All server socket closed");
     } catch (IOException ioe) {
       System.out.println("Can't close TCP socket");
     }
@@ -175,6 +175,11 @@ public class Server implements Runnable {
     }
 
     System.out.println("Server no longer accept client connection");
+    
+    // Notice all clients that server have stopped
+    for (ClientHandler ch : chList) {
+      ch.sendServerStoppedMessage();
+    }
   }
   
   /**
@@ -324,7 +329,6 @@ public class Server implements Runnable {
       ServerScoreBoard.getInstance().remove(pToBeRemoved);
       chList.remove(ch);
       ch.end();
-      System.out.println("Client disconnected");
     }
   }
 
