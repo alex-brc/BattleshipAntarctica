@@ -137,6 +137,7 @@ public class Renderer extends Canvas {
     Position mousePos = InputManager.getInstance().mousePosition();
 
     if (ClientScoreBoard.getInstance().getScore(player.getSerial()).getAlive()) { // Camera fixed on player's ship
+      drawText("SPECTATOR-VIEW", width - "SPECTATOR-VIEW".length()*16, 600, true, FontColor.BLACK);
       xScroll = (int) (player.getPosition().getX() - width / 2
           + (mousePos.getX() - width) / Parameters.GAME_PARALLAX_WEIGHT);
       yScroll = (int) (player.getPosition().getY() - height / 2
@@ -216,11 +217,11 @@ public class Renderer extends Canvas {
 
     // Render the time before exiting the match
     if (Client.getInstance().isWaitingToExit()) {
-      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 565, true,
-          FontColor.BLACK);
-      drawText("seconds", 230, 565, true, FontColor.BLACK);
-      drawText("before", 360, 565, true, FontColor.BLACK);
-      drawText("exiting", 480, 565, true, FontColor.BLACK);
+      drawText(Integer.toString(Client.getInstance().getTimeBeforeExiting()), 190, 520, true,
+          FontColor.WHITE);
+      drawText("seconds", 230, 520, true, FontColor.WHITE);
+      drawText("before", 360, 520, true, FontColor.WHITE);
+      drawText("exiting", 480, 520, true, FontColor.WHITE);
     }
 
     // Display player death message

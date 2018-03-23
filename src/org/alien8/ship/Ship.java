@@ -3,6 +3,7 @@ package org.alien8.ship;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Random;
 
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
@@ -240,9 +241,12 @@ public class Ship extends Entity implements Serializable {
   public void setTurretsDirectionAI(Position targetPosition) {
     // Had to make this to allow the AI ships to aim at positions
     double ra = 0;
-
+    
+    Random rand = new Random();
+    
     // Front
     double angle = frontTurret.getPosition().getAngleTo(targetPosition);
+    angle += rand.nextDouble() * Parameters.AI_PRECISION - Parameters.AI_PRECISION / 2;
     angle = (-1) * angle + FastMath.PI / 2;
     ra = angle + (FastMath.PI - this.getDirection());
     ra = PhysicsManager.shiftAngle(ra);

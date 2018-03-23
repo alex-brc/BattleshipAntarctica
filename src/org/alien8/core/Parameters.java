@@ -24,11 +24,9 @@ public class Parameters {
   /** The maximum number of players allowed in a match. */
   public static final int MAX_PLAYERS = 8;
   /** The length of a match in seconds. */
-  public static final int MATCH_LENGTH = 200;
+  public static final int MATCH_LENGTH = 60 * 3;
   /** The length of time in seconds before a server ends once a game has finished. */
   public static final int TIME_BEFORE_SERVER_END = 10;
-  /** Determines if AI ships spawn on the map in a game. */
-  public static final boolean AI_ON = true;
   /** Toggles certain features, such as visible bounding boxes. */
   public static final boolean DEBUG_MODE = false;
 
@@ -122,6 +120,12 @@ public class Parameters {
   public static final double SHIP_ROTATION_PER_SEC = FastMath.PI / 3;
   //////////////////////////////////////////////////////////
 
+  /// AI PARAMETERS
+  /** Determines if AI ships spawn on the map in a game. */
+  public static final boolean AI_ON = true;
+  /** The evenly distributed error for AI aiming in radians */
+  public static final double AI_PRECISION = 0.5;
+  //////////////////////////////////////////////////////////
 
   /// BULLET PARAMETERS
   // Bullet parameters. Cooldowns in milliseconds.
