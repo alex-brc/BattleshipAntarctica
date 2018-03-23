@@ -14,8 +14,7 @@ import org.alien8.rendering.Sprite;
 public class Lobby implements Page {
   private boolean isHost = false;
   private StartButton startBtn;
-  private ReturnToMainButton hostReturnBtn;
-  private ReturnToMainButton clientReturnBtn;
+  private ReturnToMainButton returnBtn;
   private InteractiveLogo logo;
   private String ip;
 
@@ -25,8 +24,7 @@ public class Lobby implements Page {
   public Lobby() {
     logo = new InteractiveLogo(Renderer.getInstance().getWidth() / 2, 100);
     startBtn = new StartButton(280, 530, 110, 30);
-    hostReturnBtn = new ReturnToMainButton(400, 530, 110, 30);
-    clientReturnBtn = new ReturnToMainButton(Renderer.getInstance().getWidth() / 2 - 55, 540, 110, 30);
+    returnBtn = new ReturnToMainButton(400, 530, 110, 30);
     try {
       ip = "server ip: " + InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
@@ -53,17 +51,16 @@ public class Lobby implements Page {
   public void render(Renderer renderer) {
     if (isHost) {
       startBtn.render(renderer);
-      hostReturnBtn.render(renderer);
       renderer.drawText(ip, renderer.getWidth() / 2 - ip.length() * 8, 180, true, FontColor.WHITE);
     } else {
       renderer.drawText("the host can start the game",
-          renderer.getWidth() / 2 - "the host can start the game".length() * 8, 515, true,
+          renderer.getWidth() / 2 - "the host can start the game".length() * 8, 530, true,
           FontColor.WHITE);
       renderer.drawText("waiting for players",
           renderer.getWidth() / 2 - "waiting for players".length() * 8, 180, true, FontColor.WHITE);
-      clientReturnBtn.render(renderer);
     }
     logo.render();
+    returnBtn.render(renderer);
     renderer.drawSprite(renderer.getWidth() / 2 - Sprite.controls.getWidth() / 2,
         renderer.getHeight() / 2 - Sprite.controls.getHeight() / 2 + 60, Sprite.controls, true);
 
