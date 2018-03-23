@@ -330,7 +330,7 @@ public class Client implements Runnable {
         Long seed = this.getMapSeed(fromServer);
         model.makeMap(seed);
 
-        // Receive the initial game state from server\
+        // Receive the initial game state from server
         ArrayList<EntityLite> entsLite = this.receiveGameStateTCP(fromServer);
         model.sync(entsLite, clientIP, clientUdpPort);
 
@@ -348,7 +348,6 @@ public class Client implements Runnable {
         clientTCP.start();
         gameRunning = true;
         playersCompeting = true;
-        System.out.println("ok");
 
       } catch (SocketTimeoutException e) {
         this.disconnect();
