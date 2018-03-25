@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 import org.alien8.core.Entity;
+import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.drops.Effect;
 import org.alien8.drops.Item;
@@ -15,6 +16,7 @@ import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import org.alien8.server.KillEvent;
+import org.alien8.server.Player;
 import org.alien8.server.Server;
 
 import net.jafama.FastMath;
@@ -665,6 +667,45 @@ public class Ship extends Entity implements Serializable {
         }
       }
     }
+  }
+  
+  @Override
+  public EntityLite pack() {
+	  EntityLite el = new EntityLite();
+	  Player p = Server.getInstance().getPlayerByShip(this);
+	  if(p != null) {
+		  el.setSerial(this.serial);
+		  el.setEntityType(0);
+		  el.setPosition(this.getPosition());
+		  el.setToBeDeleted(this.toBeDeleted);
+		  el.setDirection(this.getDirection());
+		  el.setSpeed(this.getSpeed());
+		  el.setHealth(this.getHealth());
+		  el.setFrontTurretDirection(this.getFrontTurretDirection());
+		  el.setRearTurretDirection(this.getRearTurretDirection());
+		  el.setFrontTurretCharge(this.getFrontTurretCharge());
+		  el.setRearTurretCharge(this.getRearTurretCharge());
+		  el.setColour(this.getColour());
+		  el.setItemType(this.getItemType());
+		  el.setEffectType(this.getEffectType());
+		  el.setClientIP(p.getIP());
+		  el.setClientUdpPort(p.getPort());
+	  }
+	  else {
+		  el.setSerial(this.serial);
+		  el.setEntityType(1);
+		  el.setPosition(this.getPosition());
+		  el.setToBeDeleted(this.toBeDeleted);
+		  el.setDirection(this.getDirection());
+		  el.setSpeed(this.getSpeed());
+		  el.setHealth(this.getHealth());
+		  el.setFrontTurretDirection(this.getFrontTurretDirection());
+		  el.setRearTurretDirection(this.getRearTurretDirection());
+		  el.setColour(this.getColour());
+		  el.setEffectType(this.getEffectType());
+	  }
+	  
+	  return el;
   }
 
   /**

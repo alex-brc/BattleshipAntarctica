@@ -1,6 +1,8 @@
 package org.alien8.ai;
 
 import java.util.Iterator;
+
+import org.alien8.core.Controller;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
 import org.alien8.core.ServerModelManager;
@@ -13,14 +15,14 @@ import org.alien8.ship.Ship;
  * other Ships.
  *
  */
-public class AIController {
+public class AIController implements Controller {
 
-  protected ServerModelManager model;
-  protected Ship myShip;
-  protected Entity target;
-  protected boolean[][] iceGrid;
-  protected boolean rightTurnDefault = true;
-  protected int changeDefaultTurn = 0;
+  private ServerModelManager model;
+  private Ship myShip;
+  private Entity target;
+  private boolean[][] iceGrid;
+  private boolean rightTurnDefault = true;
+  private int changeDefaultTurn = 0;
 
   /**
    * Constructor.
@@ -31,51 +33,6 @@ public class AIController {
     model = ServerModelManager.getInstance();
     iceGrid = model.getMap().getIceGrid();
     myShip = ship;
-  }
-
-  /**
-   * @return the Ship controlled by this AI
-   */
-  public Ship getShip() {
-    return myShip;
-  }
-
-  /**
-   * @return the current target Entity of this Ship
-   */
-  public Entity getTarget() {
-    return target;
-  }
-
-  /**
-   * @param target the target Entity to set
-   */
-  public void setTarget(Ship target) {
-    this.target = target;
-  }
-
-  /**
-   * @return the closest enemy Ship to this AI
-   */
-  public Entity findClosestTarget() {
-    Entity closestTarget = null;
-    Position currentPos = myShip.getPosition();
-    Iterator<Entity> entities = model.getEntities().iterator();
-    double shortestDistance = 10000;
-    // Iterates over all the entities finding the closest entity that is also a ship (and not
-    // itself)
-    while (entities.hasNext()) {
-      Entity currentEntity = entities.next();
-      if (currentEntity instanceof org.alien8.ship.Ship) {
-        double currentDistance = currentPos.distanceTo(currentEntity.getPosition());
-        if ((currentDistance < shortestDistance)
-            && (myShip.getSerial() != currentEntity.getSerial())) {
-          closestTarget = currentEntity;
-          shortestDistance = currentDistance;
-        }
-      }
-    }
-    return closestTarget;
   }
 
   /**
@@ -108,13 +65,37 @@ public class AIController {
   }
 
   /**
+   * @return the closest enemy Ship to this AI
+   */
+  private Entity findClosestTarget() {
+    Entity closestTarget = null;
+    Position currentPos = myShip.getPosition();
+    Iterator<Entity> entities = model.getEntities().iterator();
+    double shortestDistance = 10000;
+    // Iterates over all the entities finding the closest entity that is also a ship (and not
+    // itself)
+    while (entities.hasNext()) {
+      Entity currentEntity = entities.next();
+      if (currentEntity instanceof org.alien8.ship.Ship) {
+        double currentDistance = currentPos.distanceTo(currentEntity.getPosition());
+        if ((currentDistance < shortestDistance)
+            && (myShip.getSerial() != currentEntity.getSerial())) {
+          closestTarget = currentEntity;
+          shortestDistance = currentDistance;
+        }
+      }
+    }
+    return closestTarget;
+  }
+
+  /**
    * Draws 3 rays out from the front of the ship in order to detect ice in front of it, returning
    * {@code true} if ice is detected.
    * 
    * @param rayLength the length of the rays to draw
    * @return {@code true} if ice is detected, {@code false} if not
    */
-  public boolean rayDetect(int rayLength) {
+  private boolean rayDetect(int rayLength) {
     Position[] corners = myShip.getObb();
     double direction = myShip.getDirection();
     double xNose = (corners[0].getX() + corners[1].getX()) / 2.0;
@@ -133,7 +114,7 @@ public class AIController {
    * @param maxR the maximum range of the line
    * @return {@code true} if the line hits ice, {@code false} if not
    */
-  public boolean drawRay(Position start, double dir, int maxR) {
+  private boolean drawRay(Position start, double dir, int maxR) {
     double x0 = start.getX();
     double y0 = start.getY();
     for (int r = 1; r <= maxR; r++) {
@@ -150,7 +131,7 @@ public class AIController {
   /**
    * Wanders around the map, avoiding ice and walls.
    */
-  public void wander() {
+  private void wander() {
     if (rayDetect((int) Parameters.SHIP_LENGTH)) {
       PhysicsManager.applyForce(myShip, Parameters.SHIP_BACKWARD_FORCE,
           PhysicsManager.shiftAngle(myShip.getDirection() + Math.PI));

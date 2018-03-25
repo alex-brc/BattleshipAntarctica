@@ -3,9 +3,9 @@ package org.alien8.core;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
-import org.alien8.client.InputManager;
 import org.alien8.mapgeneration.Map;
 import org.alien8.physics.Collision;
 import org.alien8.physics.CollisionDetector;
@@ -74,15 +74,13 @@ public class ServerModelManager {
         // Handle player stuff
         Ship ship = (Ship) ent;
         ai = Server.getInstance().getAIByShip(ship);
-        if (ai != null) {
+        if (ai != null) { // It's an AIController
           ai.update();
-        } else
+        } else // It's a Player
           for (Player p : latestCIS.keySet()) {
             if (ent == p.getShip()) {
-              Ship s = (Ship) ent;
-              s.updateEffect();
-              ClientInputSample cis = latestCIS.get(p);
-              InputManager.processInputs(s, cis);
+              p.setClientInputSample(latestCIS.get(p));
+              p.update();
               break;
             }
           }

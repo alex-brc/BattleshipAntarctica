@@ -7,5 +7,6 @@ import java.io.Serializable;
  *
  */
 public abstract class GameEvent implements Serializable {
-  // Empty, just a referencer
+	private static final long serialVersionUID = 1L;
+    // Empty, just a referencer
 }
