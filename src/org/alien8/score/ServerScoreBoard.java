@@ -92,20 +92,13 @@ public class ServerScoreBoard {
    * @param score the amount of points to award
    */
   public void giveScore(Player player, int score) {
-    try {
-      for (Score sc : scores)
-        if (player.getShip().getSerial() == sc.getShipSerial()) {
-          sc.giveScore(Parameters.TORPEDO_SCORE);
-          Server.getInstance().addEvent(sc.exportToEvent());
-          order();
-          return;
-        }
-    } catch (NullPointerException e) {
-      LogManager.getInstance().log("ScoreBoard", LogManager.Scope.CRITICAL,
-          "In giveHit(): the bullet or player given was null. Exiting...");
-      e.printStackTrace();
-      System.exit(-1);
-    }
+	  for (Score sc : scores)
+		  if (player.getShip().getSerial() == sc.getShipSerial()) {
+			  sc.giveScore(score);
+			  Server.getInstance().addEvent(sc.exportToEvent());
+			  order();
+			  return;
+		  }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
         "In giveHit(): given player not found on the scoreboard.");
   }
@@ -134,7 +127,6 @@ public class ServerScoreBoard {
    * @param bullet the Bullet which hit another Ship
    */
   public void giveHit(Player player, Bullet bullet) {
-    try {
       for (Score score : scores)
         if (player.getShip().getSerial() == score.getShipSerial()) {
           score.giveHit(bullet);
@@ -142,12 +134,7 @@ public class ServerScoreBoard {
           order();
           return;
         }
-    } catch (NullPointerException e) {
-      LogManager.getInstance().log("ScoreBoard", LogManager.Scope.CRITICAL,
-          "In giveHit(): the bullet or player given was null. Exiting...");
-      e.printStackTrace();
-      System.exit(-1);
-    }
+    
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
         "In giveHit(): given player not found on the scoreboard.");
   }

@@ -65,11 +65,11 @@ x rendering:
 	x FontColor
 	x Renderer
 	x Sprite
-x score:
-	x ClientScoreBoard
-	x Score
-	x ScoreEvent
-	x ServerScoreBoard
+/ score:
+	/ ClientScoreBoard
+	/ Score
+	/ ScoreEvent
+	/ ServerScoreBoard
 x server:
 	x ClientHandler
 	x GameEvent
@@ -92,5 +92,5 @@ x ui:
 	x MainMenu
 	x SinglePlayerButton
 	x SplashScreen
-x util:
-	x LogManager
+/ util:
+	/ LogManager
