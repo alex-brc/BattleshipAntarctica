@@ -35,6 +35,7 @@ public class ClientInputSample implements Serializable {
   /**
    * String representation of the client input sample
    */
+  @Override
   public String toString() {
     return mousePosition.getX() + "," + mousePosition.getY() + "," + lmbPressed + "," + rmbPressed
         + "," + wPressed + "," + aPressed + "," + sPressed + "," + dPressed + "," + spacePressed;

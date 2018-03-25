@@ -16,12 +16,8 @@ import org.alien8.ship.Ship;
 
 
 /**
- * This class implements the model at the core of the game itself. It is responsible for the main
- * loop that updates the game state 60 times a second. It also keeps the record of game entities in
- * a LinkedList<Entity>.
- * <p>
- * 
- * @version 1.0
+ * This class implements the model at the core of the game itself. It keeps the record of game
+ * entities in a ConcurrentLinkedQueue<Entity>.
  */
 public class ServerModelManager {
 
@@ -31,14 +27,19 @@ public class ServerModelManager {
   private CollisionDetector collisionDetector = new CollisionDetector();
   private Map map;
 
+  /**
+   * Private constructor to prevent global instantiation
+   */
   private ServerModelManager() {
-    // Prevent global instantiation
+    
   }
 
   /**
-   * A standard getInstance() in accordance with the singleton pattern
+   * A standard getInstance() in accordance with the singleton pattern.
+   * Create and return a ServerModelManager instance the first time being called,
+   * only return the instance afterwards
    * 
-   * @return an instance of the active ModelManager
+   * @return A ServerModelManager instance
    */
   public static ServerModelManager getInstance() {
     if (instance == null)
@@ -46,6 +47,9 @@ public class ServerModelManager {
     return instance;
   }
 
+  /**
+   * Reset game state related fields
+   */
   public void reset() {
     lastSerial = 0;
     entities = new ConcurrentLinkedQueue<Entity>();
@@ -53,10 +57,18 @@ public class ServerModelManager {
     map = null;
   }
 
+  /**
+   * Make a map from a random seed
+   * @param seed A random long
+   */
   public void makeMap(long seed) {
     map = new Map(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH, 8, 8, seed);
   }
 
+  /**
+   * Update the server game state using the latest client input sample table
+   * @param latestCIS An hashmap storing the latest client input sample
+   */
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
     // Loop through all the entities
     // System.out.println(entities.size());
@@ -98,9 +110,9 @@ public class ServerModelManager {
   }
 
   /**
-   * Creates a serial number for it then adds the Entity to the entity list
+   * Creates a serial number for it then adds the Entity to the entity queue
    * 
-   * @param entity the Entity to add to the list
+   * @param entity the Entity to add to the queue
    * @return true if the Entity was added successfully, false otherwise
    */
   public boolean addEntity(Entity entity) {
@@ -112,20 +124,25 @@ public class ServerModelManager {
   }
 
   /**
-   * @return the entity list as a LinkedList<Entity>
+   * Get the current Entity queue
+   * @return An Entity queue
    */
   public ConcurrentLinkedQueue<Entity> getEntities() {
     return entities;
   }
 
+  /**
+   * Get the map
+   * @return The map
+   */
   public Map getMap() {
     return this.map;
   }
 
-  public void setMap(Map m) {
-    map = m;
-  }
-
+  /**
+   * Count the number of ships in the entity queue
+   * @return The number of ships in the entity queue
+   */
   public int countShips() {
     int counter = 0;
     for (Entity ent : entities)

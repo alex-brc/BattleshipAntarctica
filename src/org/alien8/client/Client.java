@@ -92,8 +92,9 @@ public class Client implements Runnable {
   }
 
   /**
-   * Create and return a Client instance the first time being called, only return the instance
-   * afterwards
+   * A standard getInstance() in accordance with the singleton pattern.
+   * Create and return a Client instance the first time being called,
+   * only return the instance afterwards
    * 
    * @return A Client instance
    */

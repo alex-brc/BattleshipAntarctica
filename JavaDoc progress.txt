@@ -17,14 +17,14 @@ x = not done
 	/ ClientWindowListener
 	/ InputManager
 	/ Launcher
-x core:
+/ core:
 	/ ClientMessage
-	x ClientModelManager
+	/ ClientModelManager
 	/ Entity
 	/ EntityLite
-	x Parameters
+	/ Parameters
 	/ ServerMessage
-	x ServerModelManager
+	/ ServerModelManager
 / items:
 	/ Effect
 	/ HealthItem
@@ -69,14 +69,14 @@ x core:
 	/ Score
 	/ ScoreEvent
 	/ ServerScoreBoard
-x server:
+/ server:
 	/ ClientHandler
 	/ GameEvent
 	/ Player
 	/ Server
 	/ ServerGameHandler
-	x Timer
-	x TimerEvent
+	/ Timer
+	/ TimerEvent
 / ship:
 	/ Bullet
 	/ Ship
