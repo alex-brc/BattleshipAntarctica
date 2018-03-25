@@ -9,18 +9,17 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
-import org.alien8.core.ServerModelManager;
 import org.alien8.core.ServerMessage;
+import org.alien8.core.ServerModelManager;
 import org.alien8.physics.Position;
 import org.alien8.score.Score;
-import org.alien8.score.ServerScoreBoard;
 import org.alien8.score.ScoreEvent;
-import org.alien8.ship.Bullet;
+import org.alien8.score.ServerScoreBoard;
 import org.alien8.ship.Ship;
-import org.alien8.util.LogManager;
 
 public class ClientHandler extends Thread {
 
@@ -180,28 +179,10 @@ public class ClientHandler extends Thread {
   private ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
     ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
 
-    for (Entity e : ents) {
-      if (e instanceof Ship) {
-        Ship s = (Ship) e;
-        Player p = Server.getInstance().getPlayerByShip(s);
-        if (p != null) { // Player ship
-          EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
-              s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getRearTurretDirection(), s.getFrontTurretCharge(), s.getRearTurretCharge(),
-              s.getColour(), s.getItemType(), s.getEffectType(), p.getIP(), p.getPort()));
-        } else { // AI ship
-          EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
-              s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getRearTurretDirection(), s.getEffectType(), s.getColour()));
-        }
-
-      } else if (e instanceof Bullet) {
-        Bullet b = (Bullet) e;
-        EntitiesLite.add(new EntityLite(b.getSerial(), 2, b.getPosition(), b.isToBeDeleted(),
-            b.getDirection(), b.getSpeed(), b.getDistance(), b.getTravelled(), b.getSource()));
-      }
+    for(Entity e : ents){
+    	EntitiesLite.add(e.pack());
     }
-
+    
     return EntitiesLite;
   }
 

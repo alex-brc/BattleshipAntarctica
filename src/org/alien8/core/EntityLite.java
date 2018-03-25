@@ -44,78 +44,9 @@ public class EntityLite implements Serializable {
 
   // For pickups
   public int pickupType;
-
-  /**
-   * Constructor for Player Ship
-   * 
-   * @param serial Serial of the ship
-   * @param entityType Entity type number for ship
-   * @param position Position of the ship
-   * @param toBeDeleted Whether the ship is to be deleted
-   * @param direction Direction of the ship
-   * @param speed Speed of the ship
-   * @param health Health of the ship
-   * @param frontTurretDirection Front turret direction of the ship
-   * @param rearTurretDirection Rear turret direction of the ship
-   * @param frontTurretCharge Front turret charge of the ship
-   * @param rearTurretCharge Rear turret charge of the ship
-   * @param colour Colour of the ship
-   * @param itemType Item type of the ship
-   * @param effectType Effect type of the ship
-   * @param clientIP Client's IP address of the player that control the ship
-   * @param clientUdpPort Client's UDP port number of the player that control the ship
-   */
-  public EntityLite(long serial, int entityType, Position position, boolean toBeDeleted,
-      double direction, double speed, double health, double frontTurretDirection,
-      double rearTurretDirection, double frontTurretCharge, double rearTurretCharge, int colour,
-      int itemType, int effectType, InetAddress clientIP, int clientUdpPort) {
-    this.serial = serial;
-    this.entityType = entityType;
-    this.position = position;
-    this.toBeDeleted = toBeDeleted;
-    this.direction = direction;
-    this.speed = speed;
-    this.health = health;
-    this.frontTurretDirection = frontTurretDirection;
-    this.rearTurretDirection = rearTurretDirection;
-    this.frontTurretCharge = frontTurretCharge;
-    this.rearTurretCharge = rearTurretCharge;
-    this.colour = colour;
-    this.itemType = itemType;
-    this.effectType = effectType;
-    this.clientIP = clientIP;
-    this.clientUdpPort = clientUdpPort;
-  }
-
-  /**
-   * Constructor for AI ship
-   * 
-   * @param serial Serial number of the ship
-   * @param entityType Entity type number for ship
-   * @param position Position of the ship
-   * @param toBeDeleted Whether the ship is to be deleted
-   * @param direction Direction of the ship
-   * @param speed Speed of the ship
-   * @param health Health of the ship
-   * @param frontTurretDirection Front turret direction of the ship
-   * @param rearTurretDirection Rear turret direction of the ship
-   * @param effectType Effect type of the ship
-   * @param colour Colour of the ship
-   */
-  public EntityLite(long serial, int entityType, Position position, boolean toBeDeleted,
-      double direction, double speed, double health, double frontTurretDirection,
-      double rearTurretDirection, int effectType, int colour) {
-    this.serial = serial;
-    this.entityType = entityType;
-    this.position = position;
-    this.toBeDeleted = toBeDeleted;
-    this.direction = direction;
-    this.speed = speed;
-    this.health = health;
-    this.frontTurretDirection = frontTurretDirection;
-    this.rearTurretDirection = rearTurretDirection;
-    this.colour = colour;
-    this.effectType = effectType;
+  
+  public EntityLite() {
+	  
   }
 
   /**
@@ -145,21 +76,6 @@ public class EntityLite implements Serializable {
   }
 
   /**
-   * Constuctor for pickup
-   * 
-   * @param entityType Entity type number for pickup
-   * @param position Position of the pickup
-   * @param pickupType Type of the pickup
-   * @param toBeDeleted Whether the pickup is to be deleted
-   */
-  public EntityLite(int entityType, Position position, int pickupType, boolean toBeDeleted) {
-    this.entityType = entityType;
-    this.position = position;
-    this.pickupType = pickupType;
-    this.toBeDeleted = toBeDeleted;
-  }
-
-  /**
    * Constructor for plane drooper
    * 
    * @param entityType Entity type number for plane dropper
@@ -173,8 +89,170 @@ public class EntityLite implements Serializable {
     this.toBeDeleted = toBeDeleted;
     this.direction = direction;
   }
+  
+  
 
-  /**
+  public long getSerial() {
+	return serial;
+}
+
+public void setSerial(long serial) {
+	this.serial = serial;
+}
+
+public int getEntityType() {
+	return entityType;
+}
+
+public void setEntityType(int entityType) {
+	this.entityType = entityType;
+}
+
+public Position getPosition() {
+	return position;
+}
+
+public void setPosition(Position position) {
+	this.position = position;
+}
+
+public boolean isToBeDeleted() {
+	return toBeDeleted;
+}
+
+public void setToBeDeleted(boolean toBeDeleted) {
+	this.toBeDeleted = toBeDeleted;
+}
+
+public double getDirection() {
+	return direction;
+}
+
+public void setDirection(double direction) {
+	this.direction = direction;
+}
+
+public double getSpeed() {
+	return speed;
+}
+
+public void setSpeed(double speed) {
+	this.speed = speed;
+}
+
+public double getHealth() {
+	return health;
+}
+
+public void setHealth(double health) {
+	this.health = health;
+}
+
+public double getFrontTurretDirection() {
+	return frontTurretDirection;
+}
+
+public void setFrontTurretDirection(double frontTurretDirection) {
+	this.frontTurretDirection = frontTurretDirection;
+}
+
+public double getRearTurretDirection() {
+	return rearTurretDirection;
+}
+
+public void setRearTurretDirection(double rearTurretDirection) {
+	this.rearTurretDirection = rearTurretDirection;
+}
+
+public int getColour() {
+	return colour;
+}
+
+public void setColour(int colour) {
+	this.colour = colour;
+}
+
+public InetAddress getClientIP() {
+	return clientIP;
+}
+
+public void setClientIP(InetAddress clientIP) {
+	this.clientIP = clientIP;
+}
+
+public int getClientUdpPort() {
+	return clientUdpPort;
+}
+
+public void setClientUdpPort(int clientUdpPort) {
+	this.clientUdpPort = clientUdpPort;
+}
+
+public double getFrontTurretCharge() {
+	return frontTurretCharge;
+}
+
+public void setFrontTurretCharge(double frontTurretCharge) {
+	this.frontTurretCharge = frontTurretCharge;
+}
+
+public double getRearTurretCharge() {
+	return rearTurretCharge;
+}
+
+public void setRearTurretCharge(double rearTurretCharge) {
+	this.rearTurretCharge = rearTurretCharge;
+}
+
+public int getItemType() {
+	return itemType;
+}
+
+public void setItemType(int itemType) {
+	this.itemType = itemType;
+}
+
+public int getEffectType() {
+	return effectType;
+}
+
+public void setEffectType(int effectType) {
+	this.effectType = effectType;
+}
+
+public double getDistance() {
+	return distance;
+}
+
+public void setDistance(double distance) {
+	this.distance = distance;
+}
+
+public double getTravelled() {
+	return travelled;
+}
+
+public void setTravelled(double travelled) {
+	this.travelled = travelled;
+}
+
+public long getSource() {
+	return source;
+}
+
+public void setSource(long source) {
+	this.source = source;
+}
+
+public int getPickupType() {
+	return pickupType;
+}
+
+public void setPickupType(int pickupType) {
+	this.pickupType = pickupType;
+}
+
+/**
    * String representation of this EntityLite
    */
   public String toString() {

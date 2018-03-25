@@ -6,12 +6,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
 import org.alien8.audio.AudioManager;
-import org.alien8.core.Parameters;
-import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
-import org.alien8.ship.Ship;
-import net.jafama.FastMath;
 
 /**
  * This singleton class is a listener to be added to the main window. It adds all relevant input
@@ -35,7 +32,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   // Not synced - local controls
   private boolean escPressed = false; // Pull up menu
   private boolean shiftPressed = false; // Show scoreboard
-  private boolean mPressed = false; // Mute sounds
   private boolean anyPressed = false; // Any key
 
   private char typed = 0; // most recently typed key
@@ -55,51 +51,6 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
   public static InputManager getInstance() {
     return instance;
   }
-
-  /**
-   * Processes any inputs.
-   * 
-   * @param player the Player to process inputs for
-   * @param cis a ClientInputSample containing inputs
-   */
-  public static void processInputs(Ship player, ClientInputSample cis) {
-    // Apply forward OR backward force
-    if (cis.wPressed)
-      PhysicsManager.applyForce(player, Parameters.SHIP_FORWARD_FORCE, player.getDirection());
-    else if (cis.sPressed)
-      PhysicsManager.applyForce(player, Parameters.SHIP_BACKWARD_FORCE,
-          PhysicsManager.shiftAngle(player.getDirection() + FastMath.PI));
-
-    // Apply rotation
-    if (cis.aPressed)
-      PhysicsManager.rotateEntity(player,
-          (-1) * Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-    if (cis.dPressed)
-      PhysicsManager.rotateEntity(player,
-          Parameters.SHIP_ROTATION_PER_SEC / Parameters.TICKS_PER_SECOND);
-
-    // Apply "friction"
-    PhysicsManager.applyFriction(player);
-
-    // Use item
-    if (cis.spacePressed)
-      player.useItem();
-
-    // Prepare for shooting
-    // Orientation
-    player.setTurretsDirection(cis.mousePosition);
-
-    if (cis.lmbPressed)
-      player.frontTurretCharge();
-    else
-      player.frontTurretShoot();
-
-    if (cis.rmbPressed)
-      player.rearTurretCharge();
-    else
-      player.rearTurretShoot();
-  }
-
 
   /**
    * @return true if left mouse button is pressed, false otherwise

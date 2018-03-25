@@ -1,6 +1,7 @@
 package org.alien8.drops;
 
 import org.alien8.core.Entity;
+import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
@@ -8,6 +9,7 @@ import org.alien8.rendering.FontColor;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import org.alien8.ship.Ship;
+
 import net.jafama.FastMath;
 
 /**
@@ -133,5 +135,17 @@ public abstract class Pickup extends Entity {
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
     // Will never be in ice
+  }
+  
+  @Override
+  public EntityLite pack() {
+	  
+	  EntityLite el = new EntityLite();
+	  el.setEntityType(3);
+	  el.setPosition(this.position);
+	  el.setPickupType(this.pickupType);
+	  el.setToBeDeleted(this.toBeDeleted);
+	  
+	  return el;
   }
 }

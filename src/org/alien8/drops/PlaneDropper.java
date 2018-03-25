@@ -1,13 +1,16 @@
 package org.alien8.drops;
 
 import java.util.Random;
+
 import org.alien8.core.Entity;
+import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.core.ServerModelManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import org.alien8.server.Server;
+
 import net.jafama.FastMath;
 
 /**
@@ -117,5 +120,15 @@ public class PlaneDropper extends Entity {
    */
   private Position getMiddleOfMap() {
     return new Position(Parameters.MAP_WIDTH / 2, Parameters.MAP_HEIGHT / 2);
+  }
+  
+  @Override
+  public EntityLite pack() {
+	  EntityLite el = new EntityLite();
+	  el.setPosition(this.getPosition());
+	  el.setEntityType(4);
+	  el.setDirection(this.getDirection());
+	  
+	  return el;
   }
 }

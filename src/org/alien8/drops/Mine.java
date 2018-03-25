@@ -1,6 +1,7 @@
 package org.alien8.drops;
 
 import org.alien8.core.Entity;
+import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
@@ -56,6 +57,17 @@ public class Mine extends Entity {
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
     // Will never be
+  }
+  
+  @Override
+  public EntityLite pack() {
+	  EntityLite el = new EntityLite();
+	  el.setEntityType(5);
+	  el.setPosition(this.getPosition());
+	  el.setToBeDeleted(this.isToBeDeleted());
+	  el.setDirection(this.getDirection());
+	  
+	  return el;
   }
 
 }

@@ -12,17 +12,13 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.core.ServerModelManager;
-import org.alien8.drops.Mine;
-import org.alien8.drops.Pickup;
 import org.alien8.drops.PlaneDropper;
-import org.alien8.drops.Torpedo;
-import org.alien8.ship.Bullet;
-import org.alien8.ship.Ship;
 import org.alien8.util.LogManager;
 
 public class ServerGameHandler extends Thread {
@@ -192,40 +188,9 @@ public class ServerGameHandler extends Thread {
    */
   private static ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
     ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
-
-    for (Entity e : ents) {
-      if (e instanceof Ship) {
-        Ship s = (Ship) e;
-        Player p = Server.getInstance().getPlayerByShip(s);
-        if (p != null) { // Player ship
-          EntitiesLite.add(new EntityLite(s.getSerial(), 0, s.getPosition(), s.isToBeDeleted(),
-              s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getRearTurretDirection(), s.getFrontTurretCharge(), s.getRearTurretCharge(),
-              s.getColour(), s.getItemType(), s.getEffectType(), p.getIP(), p.getPort()));
-        } else { // AI ship
-          EntitiesLite.add(new EntityLite(s.getSerial(), 1, s.getPosition(), s.isToBeDeleted(),
-              s.getDirection(), s.getSpeed(), s.getHealth(), s.getFrontTurretDirection(),
-              s.getRearTurretDirection(), s.getEffectType(), s.getColour()));
-        }
-
-      } else if (e instanceof Bullet) {
-        Bullet b = (Bullet) e;
-        EntitiesLite.add(new EntityLite(b.getSerial(), 2, b.getPosition(), b.isToBeDeleted(),
-            b.getDirection(), b.getSpeed(), b.getDistance(), b.getTravelled(), b.getSource()));
-      } else if (e instanceof Pickup) {
-        Pickup p = (Pickup) e;
-        EntitiesLite.add(new EntityLite(3, p.getPosition(), p.getPickupType(), p.isToBeDeleted()));
-      } else if (e instanceof PlaneDropper) {
-        PlaneDropper pd = (PlaneDropper) e;
-        EntitiesLite
-            .add(new EntityLite(4, pd.getPosition(), pd.isToBeDeleted(), pd.getDirection()));
-      } else if (e instanceof Mine) {
-        Mine m = (Mine) e;
-        EntitiesLite.add(new EntityLite(5, m.getPosition(), m.isToBeDeleted(), m.getDirection()));
-      } else if (e instanceof Torpedo) {
-        Torpedo t = (Torpedo) e;
-        EntitiesLite.add(new EntityLite(6, t.getPosition(), t.isToBeDeleted(), t.getDirection()));
-      }
+    
+    for(Entity e : ents) {
+    	EntitiesLite.add(e.pack());
     }
 
     return EntitiesLite;
