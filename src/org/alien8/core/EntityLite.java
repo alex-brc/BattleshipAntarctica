@@ -10,253 +10,206 @@ import org.alien8.physics.Position;
  */
 public class EntityLite implements Serializable {
 
-  private static final long serialVersionUID = -7757472834374226318L;
+	private static final long serialVersionUID = -7757472834374226318L;
 
-  // For Ship and bullet
-  public long serial;
-  /*
-   * 0 - Player Ship 1 - AI Ship 2 - Bullet
-   */
-  public int entityType;
-  public Position position;
-  public boolean toBeDeleted = false;
-  public double direction;
-  public double speed;
+	// For Ship and bullet
+	public long serial;
+	/*
+	 * 0 - Player Ship 1 - AI Ship 2 - Bullet
+	 */
+	public int entityType;
+	public Position position;
+	public boolean toBeDeleted = false;
+	public double direction;
+	public double speed;
 
-  // For Ship
-  public double health;
-  public double frontTurretDirection;
-  public double rearTurretDirection;
-  public int colour;
+	// For Ship
+	public double health;
+	public double frontTurretDirection;
+	public double rearTurretDirection;
+	public int colour;
 
-  // For player's Ship
-  public InetAddress clientIP;
-  public int clientUdpPort;
-  public double frontTurretCharge;
-  public double rearTurretCharge;
-  public int itemType;
-  public int effectType;
+	// For player's Ship
+	public InetAddress clientIP;
+	public int clientUdpPort;
+	public double frontTurretCharge;
+	public double rearTurretCharge;
+	public int itemType;
+	public int effectType;
 
-  // For bullet
-  public double distance;
-  public double travelled;
-  public long source;
+	// For bullet
+	public double distance;
+	public double travelled;
+	public long source;
 
-  // For pickups
-  public int pickupType;
-  
-  public EntityLite() {
-	  
-  }
+	// For pickups
+	public int pickupType;
 
-  /**
-   * Constructor for Bullet
-   * 
-   * @param serial Serial number of the bullet
-   * @param entityType Entity type number for bullet
-   * @param position Position of the bullet
-   * @param toBeDeleted Whether the bullet is to be deleted
-   * @param direction Direction of the bullet
-   * @param speed Speed of the bullet
-   * @param distance Distance that will be traveled by the bullet
-   * @param travelled Distance travreled by the bullet
-   * @param source Source of the bullet
-   */
-  public EntityLite(long serial, int entityType, Position position, boolean toBeDeleted,
-      double direction, double speed, double distance, double travelled, long source) {
-    this.serial = serial;
-    this.entityType = entityType;
-    this.position = position;
-    this.toBeDeleted = toBeDeleted;
-    this.direction = direction;
-    this.speed = speed;
-    this.distance = distance;
-    this.travelled = travelled;
-    this.source = source;
-  }
+	public long getSerial() {
+		return serial;
+	}
 
-  /**
-   * Constructor for plane drooper
-   * 
-   * @param entityType Entity type number for plane dropper
-   * @param position Position of the plane dropper
-   * @param toBeDeleted Whether the plane dropper is to be deleted
-   * @param direction Direction of the plane dropper
-   */
-  public EntityLite(int entityType, Position position, boolean toBeDeleted, double direction) {
-    this.entityType = entityType;
-    this.position = position;
-    this.toBeDeleted = toBeDeleted;
-    this.direction = direction;
-  }
-  
-  
+	public void setSerial(long serial) {
+		this.serial = serial;
+	}
 
-  public long getSerial() {
-	return serial;
-}
+	public int getEntityType() {
+		return entityType;
+	}
 
-public void setSerial(long serial) {
-	this.serial = serial;
-}
+	public void setEntityType(int entityType) {
+		this.entityType = entityType;
+	}
 
-public int getEntityType() {
-	return entityType;
-}
+	public Position getPosition() {
+		return position;
+	}
 
-public void setEntityType(int entityType) {
-	this.entityType = entityType;
-}
+	public void setPosition(Position position) {
+		this.position = position;
+	}
 
-public Position getPosition() {
-	return position;
-}
+	public boolean isToBeDeleted() {
+		return toBeDeleted;
+	}
 
-public void setPosition(Position position) {
-	this.position = position;
-}
+	public void setToBeDeleted(boolean toBeDeleted) {
+		this.toBeDeleted = toBeDeleted;
+	}
 
-public boolean isToBeDeleted() {
-	return toBeDeleted;
-}
+	public double getDirection() {
+		return direction;
+	}
 
-public void setToBeDeleted(boolean toBeDeleted) {
-	this.toBeDeleted = toBeDeleted;
-}
+	public void setDirection(double direction) {
+		this.direction = direction;
+	}
 
-public double getDirection() {
-	return direction;
-}
+	public double getSpeed() {
+		return speed;
+	}
 
-public void setDirection(double direction) {
-	this.direction = direction;
-}
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
 
-public double getSpeed() {
-	return speed;
-}
+	public double getHealth() {
+		return health;
+	}
 
-public void setSpeed(double speed) {
-	this.speed = speed;
-}
+	public void setHealth(double health) {
+		this.health = health;
+	}
 
-public double getHealth() {
-	return health;
-}
+	public double getFrontTurretDirection() {
+		return frontTurretDirection;
+	}
 
-public void setHealth(double health) {
-	this.health = health;
-}
+	public void setFrontTurretDirection(double frontTurretDirection) {
+		this.frontTurretDirection = frontTurretDirection;
+	}
 
-public double getFrontTurretDirection() {
-	return frontTurretDirection;
-}
+	public double getRearTurretDirection() {
+		return rearTurretDirection;
+	}
 
-public void setFrontTurretDirection(double frontTurretDirection) {
-	this.frontTurretDirection = frontTurretDirection;
-}
+	public void setRearTurretDirection(double rearTurretDirection) {
+		this.rearTurretDirection = rearTurretDirection;
+	}
 
-public double getRearTurretDirection() {
-	return rearTurretDirection;
-}
+	public int getColour() {
+		return colour;
+	}
 
-public void setRearTurretDirection(double rearTurretDirection) {
-	this.rearTurretDirection = rearTurretDirection;
-}
+	public void setColour(int colour) {
+		this.colour = colour;
+	}
 
-public int getColour() {
-	return colour;
-}
+	public InetAddress getClientIP() {
+		return clientIP;
+	}
 
-public void setColour(int colour) {
-	this.colour = colour;
-}
+	public void setClientIP(InetAddress clientIP) {
+		this.clientIP = clientIP;
+	}
 
-public InetAddress getClientIP() {
-	return clientIP;
-}
+	public int getClientUdpPort() {
+		return clientUdpPort;
+	}
 
-public void setClientIP(InetAddress clientIP) {
-	this.clientIP = clientIP;
-}
+	public void setClientUdpPort(int clientUdpPort) {
+		this.clientUdpPort = clientUdpPort;
+	}
 
-public int getClientUdpPort() {
-	return clientUdpPort;
-}
+	public double getFrontTurretCharge() {
+		return frontTurretCharge;
+	}
 
-public void setClientUdpPort(int clientUdpPort) {
-	this.clientUdpPort = clientUdpPort;
-}
+	public void setFrontTurretCharge(double frontTurretCharge) {
+		this.frontTurretCharge = frontTurretCharge;
+	}
 
-public double getFrontTurretCharge() {
-	return frontTurretCharge;
-}
+	public double getRearTurretCharge() {
+		return rearTurretCharge;
+	}
 
-public void setFrontTurretCharge(double frontTurretCharge) {
-	this.frontTurretCharge = frontTurretCharge;
-}
+	public void setRearTurretCharge(double rearTurretCharge) {
+		this.rearTurretCharge = rearTurretCharge;
+	}
 
-public double getRearTurretCharge() {
-	return rearTurretCharge;
-}
+	public int getItemType() {
+		return itemType;
+	}
 
-public void setRearTurretCharge(double rearTurretCharge) {
-	this.rearTurretCharge = rearTurretCharge;
-}
+	public void setItemType(int itemType) {
+		this.itemType = itemType;
+	}
 
-public int getItemType() {
-	return itemType;
-}
+	public int getEffectType() {
+		return effectType;
+	}
 
-public void setItemType(int itemType) {
-	this.itemType = itemType;
-}
+	public void setEffectType(int effectType) {
+		this.effectType = effectType;
+	}
 
-public int getEffectType() {
-	return effectType;
-}
+	public double getDistance() {
+		return distance;
+	}
 
-public void setEffectType(int effectType) {
-	this.effectType = effectType;
-}
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
 
-public double getDistance() {
-	return distance;
-}
+	public double getTravelled() {
+		return travelled;
+	}
 
-public void setDistance(double distance) {
-	this.distance = distance;
-}
+	public void setTravelled(double travelled) {
+		this.travelled = travelled;
+	}
 
-public double getTravelled() {
-	return travelled;
-}
+	public long getSource() {
+		return source;
+	}
 
-public void setTravelled(double travelled) {
-	this.travelled = travelled;
-}
+	public void setSource(long source) {
+		this.source = source;
+	}
 
-public long getSource() {
-	return source;
-}
+	public int getPickupType() {
+		return pickupType;
+	}
 
-public void setSource(long source) {
-	this.source = source;
-}
+	public void setPickupType(int pickupType) {
+		this.pickupType = pickupType;
+	}
 
-public int getPickupType() {
-	return pickupType;
-}
-
-public void setPickupType(int pickupType) {
-	this.pickupType = pickupType;
-}
-
-/**
-   * String representation of this EntityLite
-   */
-  public String toString() {
-    return "Serial: " + serial + ", " + "EntityType: " + entityType;
-  }
+	/**
+	 * String representation of this EntityLite
+	 */
+	public String toString() {
+		return "Serial: " + serial + ", " + "EntityType: " + entityType;
+	}
 
 }
