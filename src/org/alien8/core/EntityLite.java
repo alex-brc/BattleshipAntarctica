@@ -208,6 +208,7 @@ public class EntityLite implements Serializable {
 	/**
 	 * String representation of this EntityLite
 	 */
+	@Override
 	public String toString() {
 		return "Serial: " + serial + ", " + "EntityType: " + entityType;
 	}

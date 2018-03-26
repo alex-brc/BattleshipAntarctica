@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.client.InputManager;
@@ -31,12 +30,8 @@ import org.alien8.ship.Ship;
 
 
 /**
- * This class implements the model at the core of the game itself. It is responsible for the main
- * loop that updates the game state 60 times a second. It also keeps the record of game entities in
- * a LinkedList<Entity>.
- * <p>
- * 
- * @version 1.0
+ * This class implements the model at the core of the game itself. It keeps the record of game
+ * entities in a ConcurrentLinkedQueue<Entity>.
  */
 public class ClientModelManager {
 
@@ -46,21 +41,29 @@ public class ClientModelManager {
   private Map map;
   private Ship player;
 
+  /**
+   * Private constructor to prevent global instantiation
+   */
   private ClientModelManager() {
-    // Prevent global instantiation
+
   }
 
   /**
-   * A standard getInstance() in accordance with the singleton pattern
+   * A standard getInstance() in accordance with the singleton pattern.
+   * Create and return a ClientModelManager instance the first time being called,
+   * only return the instance afterwards
    * 
-   * @return an instance of the active ModelManager
+   * @return a ClientModelManager instance
    */
   public static ClientModelManager getInstance() {
     if (instance == null)
       instance = new ClientModelManager();
     return instance;
   }
-  
+
+  /**
+   * Reset game state related fields
+   */
   public void reset() {
     lastSerial = 0;
     entities = new ConcurrentLinkedQueue<Entity>();
@@ -68,12 +71,19 @@ public class ClientModelManager {
     player = null;
   }
 
+  /**
+   * Make a map from a random seed
+   * @param seed A random long
+   */
   public void makeMap(long seed) {
     map = new Map(Parameters.MAP_HEIGHT, Parameters.MAP_WIDTH, 8, 8, seed);
   }
 
   /**
    * Sync the client with the server
+   * @param entitiesLite An array-list of EntityLite
+   * @param clientIP This client's IP address
+   * @param clientUdpPort This client's UDP port number
    */
   public void sync(ArrayList<EntityLite> entitiesLite, InetAddress clientIP,
       Integer clientUdpPort) {
@@ -93,45 +103,45 @@ public class ClientModelManager {
         s.getRearTurret().setDirection(el.rearTurretDirection);
         s.getFrontTurret().setDistance(el.frontTurretCharge);
         s.getRearTurret().setDistance(el.rearTurretCharge);
-        
+
         // Give item
-        switch(el.itemType) {
-        case Pickup.HEALTH: 
+        switch (el.itemType) {
+          case Pickup.HEALTH:
             s.giveItem(new HealthItem());
             break;
-        case Pickup.MINE: 
+          case Pickup.MINE:
             s.giveItem(new MineItem());
             break;
-        case Pickup.INVULNERABLE: 
+          case Pickup.INVULNERABLE:
             s.giveItem(new InvulnerableItem());
             break;
-        case Pickup.SPEED: 
+          case Pickup.SPEED:
             s.giveItem(new SpeedItem());
             break;
-        case Pickup.NO_COOLDOWN: 
+          case Pickup.NO_COOLDOWN:
             s.giveItem(new NoCooldownItem());
             break;
-        case Pickup.TORPEDO: 
+          case Pickup.TORPEDO:
             s.giveItem(new TorpedoItem());
             break;
-        default:
+          default:
             // Don't give an item
             break;
         }
-        
+
         // Apply effect
-        switch(el.effectType+1) {
-        case Pickup.INVULNERABLE: 
+        switch (el.effectType + 1) {
+          case Pickup.INVULNERABLE:
             s.applyEffect(new Effect(999999999, Effect.INVULNERABLE));
             break;
-        case Pickup.SPEED:  
+          case Pickup.SPEED:
             s.applyEffect(new Effect(999999999, Effect.SPEED));
             break;
-        case Pickup.NO_COOLDOWN:  
+          case Pickup.NO_COOLDOWN:
             s.applyEffect(new Effect(999999999, Effect.NO_COOLDOWN));
             break;
-        default:
-        	// Don't apply effect
+          default:
+            // Don't apply effect
             break;
         }
 
@@ -151,23 +161,23 @@ public class ClientModelManager {
         s.setHealth(el.health);
         s.getFrontTurret().setDirection(el.frontTurretDirection);
         s.getRearTurret().setDirection(el.rearTurretDirection);
-     
+
         // Apply effect
-        switch(el.effectType+1) {
-        case Pickup.INVULNERABLE: 
+        switch (el.effectType + 1) {
+          case Pickup.INVULNERABLE:
             s.applyEffect(new Effect(999999999, Effect.INVULNERABLE));
             break;
-        case Pickup.SPEED:  
+          case Pickup.SPEED:
             s.applyEffect(new Effect(999999999, Effect.SPEED));
             break;
-        case Pickup.NO_COOLDOWN:  
+          case Pickup.NO_COOLDOWN:
             s.applyEffect(new Effect(999999999, Effect.NO_COOLDOWN));
             break;
-        default:
-        	// Don't apply effect
+          default:
+            // Don't apply effect
             break;
         }
-        
+
         if (el.toBeDeleted) {
           s.delete();
         }
@@ -237,9 +247,9 @@ public class ClientModelManager {
   }
 
   /**
-   * Creates a serial number for it then adds the Entity to the entity list
+   * Creates a serial number for it then adds the Entity to the entity queue
    * 
-   * @param entity the Entity to add to the list
+   * @param entity the Entity to add to the queue
    * @return true if the Entity was added successfully, false otherwise
    */
   public boolean addEntity(Entity entity) {
@@ -251,7 +261,8 @@ public class ClientModelManager {
   }
 
   /**
-   * @return the entity list as a LinkedList<Entity>
+   * Get the current Entity queue
+   * @return An Entity queue
    */
   public ConcurrentLinkedQueue<Entity> getEntities() {
     return entities;
@@ -266,15 +277,20 @@ public class ClientModelManager {
     this.player = player;
   }
 
+  /**
+   * Get this player's designated ship
+   * @return
+   */
   public Ship getPlayer() {
     return player;
   }
 
+  /**
+   * Get the map
+   * @return The map
+   */
   public Map getMap() {
     return this.map;
   }
 
-  public void setMap(Map m) {
-    map = m;
-  }
 }
