@@ -1,15 +1,20 @@
 package test.org.alien8.ship;
 
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.drops.Effect;
 import org.alien8.drops.HealthItem;
 import org.alien8.drops.InvulnerableItem;
 import org.alien8.drops.Item;
 import org.alien8.physics.Position;
+import org.alien8.server.Server;
 import org.alien8.ship.Ship;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import net.jafama.FastMath;
 
 public class ShipTest {
@@ -232,6 +237,26 @@ public class ShipTest {
     s.setSerial(20);
     String value = "Ship 20,X: 100.0 Y: 100.0";
     assert (s.toString().equals(value));
+  }
+  
+  @Test
+  public void testPack() {
+	Ship s = new Ship(new Position(100, 100), 0, 0xFF00FF);
+	EntityLite el = s.pack();
+	
+	// Will not find a player, so test for "ai ship pack"
+	assert(el.getSerial() == s.getSerial());
+	assert(el.getEntityType() == 2);
+	assert(el.getPosition() == s.getPosition());
+	assert(el.isToBeDeleted() == s.isToBeDeleted());
+	assert(el.getDirection() == s.getDirection());
+	assert(el.getSpeed() == s.getSpeed());
+	assert(el.getHealth() == s.getHealth());
+	assert(el.getFrontTurretDirection() == s.getFrontTurretDirection());
+	assert(el.getRearTurretDirection() == s.getRearTurretDirection());
+	assert(el.getColour() == s.getColour());
+	assert(el.getEffectType() == s.getEffectType());
+	
   }
 
 }

@@ -23,5 +23,7 @@ public class TorpedoTest {
 		assert(!torpedo2.isToBeDeleted());
 		// Call this empty method
 		torpedo.dealWithInIce(null);
+		// Test pack
+		torpedo.pack();
 	}
 }

@@ -1,5 +1,6 @@
 package test.org.alien8.ship;
 
+import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.ship.Bullet;
@@ -84,5 +85,21 @@ public class BulletTest {
     Bullet b = new Bullet(new Position(100, 100), 0, 50, 1);
     String value = "Bullet: 0.0/50.0, -1, X: 100.0 Y: 100.0";
     assert (b.toString().equals(value));
+  }
+  
+  @Test
+  public void testPack() {
+	Bullet b = new Bullet(new Position(100, 100), 0, 50, 1);
+	EntityLite el = b.pack();
+	
+	assert(el.getSerial() == b.getSerial());
+	assert(el.getEntityType() == 2);
+	assert(el.getPosition() == b.getPosition());
+	assert(el.isToBeDeleted() == b.isToBeDeleted());
+	assert(el.getDirection() == b.getDirection());
+	assert(el.getSpeed() == b.getSpeed());
+	assert(el.getDistance() == b.getDistance());
+	assert(el.getTravelled() == b.getTravelled());
+	assert(el.getSource() == b.getSource());
   }
 }

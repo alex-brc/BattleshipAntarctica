@@ -5,8 +5,8 @@ click 'New' then 'JUnit Test Case'.
 x = not done
 / = done
 
-x ai:
-	x AIController	
+/ ai:
+	/ AIController	
 / audio:
 	/ AudioEvent
 	/ AudioManager

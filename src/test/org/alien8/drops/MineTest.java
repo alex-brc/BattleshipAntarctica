@@ -16,5 +16,7 @@ public class MineTest extends Object {
 		// Call these empty methods
 		mine.dealWithInIce(null);
 		mine.dealWithOutOfBounds();
+		// Test pack
+		mine.pack();
 	}
 }
