@@ -24,14 +24,16 @@ public class ClientMessage implements Serializable {
 
   /**
    * Get the message type
+   * 
    * @return
    */
   public int getType() {
     return this.type;
   }
-  
+
   /**
    * Get client's in-game name
+   * 
    * @return
    */
   public String getPlayerName() {
@@ -40,6 +42,7 @@ public class ClientMessage implements Serializable {
 
   /**
    * Get client's UDP port number
+   * 
    * @return
    */
   public int getUdpPort() {

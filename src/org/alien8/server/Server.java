@@ -176,14 +176,14 @@ public class Server implements Runnable {
 
     System.out.println("Server no longer accept client connection");
   }
-  
+
   /**
    * @return true if the game is running, false otherwise
    */
   public boolean gameRunning() {
-	  return sgh.running();
+    return sgh.running();
   }
-  
+
   /**
    * Set the game server IP and the multi cast IP
    */
@@ -233,7 +233,7 @@ public class Server implements Runnable {
       aiMap.put(sh, ai);
     }
   }
-  
+
   /**
    * Get a position on the map randomly that doesn't have ice for ship spawning
    * 
@@ -294,7 +294,7 @@ public class Server implements Runnable {
     }
 
   }
-  
+
   /**
    * Start the game state handler
    */
@@ -440,6 +440,7 @@ public class Server implements Runnable {
 
   /**
    * Get a bullet from the pool
+   * 
    * @param position Position of the bullet
    * @param direction Direction of the bullet
    * @param distance Distance that will travel for the bullet

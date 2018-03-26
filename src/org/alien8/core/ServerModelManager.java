@@ -3,7 +3,6 @@ package org.alien8.core;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.ai.AIController;
 import org.alien8.client.ClientInputSample;
 import org.alien8.mapgeneration.Map;
@@ -31,13 +30,12 @@ public class ServerModelManager {
    * Private constructor to prevent global instantiation
    */
   private ServerModelManager() {
-    
+
   }
 
   /**
-   * A standard getInstance() in accordance with the singleton pattern.
-   * Create and return a ServerModelManager instance the first time being called,
-   * only return the instance afterwards
+   * A standard getInstance() in accordance with the singleton pattern. Create and return a
+   * ServerModelManager instance the first time being called, only return the instance afterwards
    * 
    * @return A ServerModelManager instance
    */
@@ -59,6 +57,7 @@ public class ServerModelManager {
 
   /**
    * Make a map from a random seed
+   * 
    * @param seed A random long
    */
   public void makeMap(long seed) {
@@ -67,6 +66,7 @@ public class ServerModelManager {
 
   /**
    * Update the server game state using the latest client input sample table
+   * 
    * @param latestCIS An hashmap storing the latest client input sample
    */
   public void updateServer(ConcurrentHashMap<Player, ClientInputSample> latestCIS) {
@@ -125,6 +125,7 @@ public class ServerModelManager {
 
   /**
    * Get the current Entity queue
+   * 
    * @return An Entity queue
    */
   public ConcurrentLinkedQueue<Entity> getEntities() {
@@ -133,6 +134,7 @@ public class ServerModelManager {
 
   /**
    * Get the map
+   * 
    * @return The map
    */
   public Map getMap() {
@@ -141,6 +143,7 @@ public class ServerModelManager {
 
   /**
    * Count the number of ships in the entity queue
+   * 
    * @return The number of ships in the entity queue
    */
   public int countShips() {

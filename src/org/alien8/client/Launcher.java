@@ -30,11 +30,11 @@ public class Launcher {
   public static void main(String[] args) {
     Launcher launcher = new Launcher();
     Launcher.instance = launcher;
-    
+
     // Loading client window
     launcher.game = Client.getInstance();
     Renderer.getInstance().show();
-    
+
     // Load log manager
     launcher.loadStatus = "Preparing logger...";
     System.out.println(launcher.loadStatus);

@@ -6,6 +6,7 @@ public class TimerEvent extends GameEvent {
 
   /**
    * Constructor
+   * 
    * @param seconds Current time in seconds
    */
   public TimerEvent(int seconds) {

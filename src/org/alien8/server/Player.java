@@ -1,13 +1,11 @@
 package org.alien8.server;
 
 import java.net.InetAddress;
-
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Controller;
 import org.alien8.core.Parameters;
 import org.alien8.physics.PhysicsManager;
 import org.alien8.ship.Ship;
-
 import net.jafama.FastMath;
 
 public class Player implements Controller {
@@ -20,6 +18,7 @@ public class Player implements Controller {
 
   /**
    * Constructor
+   * 
    * @param name Name the player
    * @param ip IP address of the player
    * @param port UDP port number of the player
@@ -34,9 +33,9 @@ public class Player implements Controller {
 
   @Override
   public void update() {
-	ship.updateEffect();
-	
-	// Apply forward OR backward force
+    ship.updateEffect();
+
+    // Apply forward OR backward force
     if (cis.wPressed)
       PhysicsManager.applyForce(ship, Parameters.SHIP_FORWARD_FORCE, ship.getDirection());
     else if (cis.sPressed)
@@ -73,18 +72,19 @@ public class Player implements Controller {
       ship.rearTurretShoot();
 
   }
-  
+
   /**
    * Sets the client input sample for an update().
    * 
    * @param cis the client input sample
    */
   public void setClientInputSample(ClientInputSample cis) {
-	  this.cis = cis;
+    this.cis = cis;
   }
 
   /**
    * Get the player's name
+   * 
    * @return The player's name
    */
   public String getName() {
@@ -93,6 +93,7 @@ public class Player implements Controller {
 
   /**
    * Get the player's IP address
+   * 
    * @return The player's IP address
    */
   public InetAddress getIP() {
@@ -101,6 +102,7 @@ public class Player implements Controller {
 
   /**
    * Get the player's UDP port number
+   * 
    * @return The player's UDP port number
    */
   public int getPort() {
@@ -109,6 +111,7 @@ public class Player implements Controller {
 
   /**
    * Get the player's ship
+   * 
    * @return The player's ship
    */
   public Ship getShip() {

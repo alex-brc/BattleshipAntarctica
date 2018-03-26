@@ -1,7 +1,6 @@
 package org.alien8.ai;
 
 import java.util.Iterator;
-
 import org.alien8.core.Controller;
 import org.alien8.core.Entity;
 import org.alien8.core.Parameters;
@@ -40,7 +39,7 @@ public class AIController implements Controller {
    * map.
    */
   public void update() {
-	model = ServerModelManager.getInstance();
+    model = ServerModelManager.getInstance();
     target = findClosestTarget();
     if (target != null) {
       myShip.setTurretsDirectionAI(target.getPosition());
@@ -52,8 +51,9 @@ public class AIController implements Controller {
       myShip.useItem();
     }
     changeDefaultTurn++;
-    /*To add a bit more variety to the AI every 1200 ticks it changes the default way it turns
-     * if it doesn't matter which way to turn. This also makes sure that they don't get stuck doing
+    /*
+     * To add a bit more variety to the AI every 1200 ticks it changes the default way it turns if
+     * it doesn't matter which way to turn. This also makes sure that they don't get stuck doing
      * circles.
      */
     if (changeDefaultTurn > 1200) {

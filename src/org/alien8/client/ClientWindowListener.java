@@ -16,17 +16,17 @@ public class ClientWindowListener implements WindowListener {
    */
   @Override
   public void windowClosed(WindowEvent e) {
-	  // Disconnect client
-	  Launcher.getInstance().getRunningClient().disconnect();
-	  // Shutdown audio clips
-	  AudioManager.getInstance().shutDown();
-	  // Log status
-	  System.out.println("System exitted cleanly. Check log for crash information");
-	  LogManager.getInstance().log("Shutdown", LogManager.Scope.INFO,
-			  "Performed all tasks successfully. Cleanly exit.");
-	  System.exit(0);
+    // Disconnect client
+    Launcher.getInstance().getRunningClient().disconnect();
+    // Shutdown audio clips
+    AudioManager.getInstance().shutDown();
+    // Log status
+    System.out.println("System exitted cleanly. Check log for crash information");
+    LogManager.getInstance().log("Shutdown", LogManager.Scope.INFO,
+        "Performed all tasks successfully. Cleanly exit.");
+    System.exit(0);
   }
-  
+
   /**
    * Do ClientShutdownHook
    */

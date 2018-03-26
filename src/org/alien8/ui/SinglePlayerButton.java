@@ -28,9 +28,9 @@ public class SinglePlayerButton extends Button {
    * Starts a single player game.
    */
   public void executeAction() {
-	if(Client.getInstance().getMenu().getIP().equals("alien8"))
-		Renderer.getInstance().easterEgg = true;
-	  
+    if (Client.getInstance().getMenu().getIP().equals("alien8"))
+      Renderer.getInstance().easterEgg = true;
+
     Client.getInstance().createServer(1);
     String localServerIPStr = null;
     try {

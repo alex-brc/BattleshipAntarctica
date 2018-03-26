@@ -12,7 +12,6 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.client.ClientInputSample;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -125,12 +124,12 @@ public class ServerGameHandler extends Thread {
     Server.getInstance().stop();
     System.out.println("Server game handler stopped");
   }
-  
+
   /**
    * @return true if the game is running, false otherwise
    */
   public boolean running() {
-	  return gameRunning;
+    return gameRunning;
   }
 
   /**
@@ -188,9 +187,9 @@ public class ServerGameHandler extends Thread {
    */
   private static ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
     ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
-    
-    for(Entity e : ents) {
-    	EntitiesLite.add(e.pack());
+
+    for (Entity e : ents) {
+      EntitiesLite.add(e.pack());
     }
 
     return EntitiesLite;

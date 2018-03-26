@@ -44,8 +44,7 @@ public class Map {
   protected void makeMap() {
     double waterLevel = Parameters.THIN_ICE_LEVEL; // Defines the cut-off point for water or ice
     // Gets a noise grid from the PerlinNoise class
-    noiseGrid =
-        PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity, seed);
+    noiseGrid = PerlinNoise.generateNoiseGrid(length, width, lengthDensity, widthDensity, seed);
     // Loops over all the pixels setting them to either ice (True) or water (False) based on the
     // water level
     for (int y = 0; y < width; y++) {
@@ -100,9 +99,9 @@ public class Map {
   public boolean[][] getIceGrid() {
     return iceGrid;
   }
-  
+
   public double[][] getNoiseGrid() {
-	  return noiseGrid;
+    return noiseGrid;
   }
 
   /**

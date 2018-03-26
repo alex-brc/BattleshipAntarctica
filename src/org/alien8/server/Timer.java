@@ -9,6 +9,7 @@ public class Timer {
 
   /**
    * Constructor
+   * 
    * @param event The TimeEvent object
    */
   public Timer(TimerEvent event) {
@@ -18,6 +19,7 @@ public class Timer {
 
   /**
    * Constructor
+   * 
    * @param seconds Current time in seconds
    */
   public Timer(int seconds) {
@@ -27,6 +29,7 @@ public class Timer {
 
   /**
    * Get current time (minute part)
+   * 
    * @return Current time (minute part)
    */
   public int getMinutes() {
@@ -35,6 +38,7 @@ public class Timer {
 
   /**
    * Get current time (seconds part)
+   * 
    * @return Current time (seconds part)
    */
   public int getSeconds() {

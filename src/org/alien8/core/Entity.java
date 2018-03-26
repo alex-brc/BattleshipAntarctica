@@ -373,7 +373,7 @@ public abstract class Entity implements Serializable, Cloneable {
    *        represents water
    */
   public abstract void dealWithInIce(boolean[][] iceGrid);
-  
-  
+
+
   public abstract EntityLite pack();
 }

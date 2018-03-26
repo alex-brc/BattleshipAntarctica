@@ -6,7 +6,6 @@ import org.alien8.core.Parameters;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-
 import net.jafama.FastMath;
 
 /**
@@ -56,14 +55,14 @@ public class Torpedo extends Entity {
   public void dealWithInIce(boolean[][] iceGrid) {
     // Should pass through ice
   }
-  
+
   @Override
   public EntityLite pack() {
-	  EntityLite el = new EntityLite();
-	  el.setPosition(this.getPosition());
-	  el.setEntityType(6);
-	  el.setDirection(this.getDirection());
-	  
-	  return el;
+    EntityLite el = new EntityLite();
+    el.setPosition(this.getPosition());
+    el.setEntityType(6);
+    el.setDirection(this.getDirection());
+
+    return el;
   }
 }

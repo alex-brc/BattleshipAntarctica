@@ -44,12 +44,12 @@ public class MainMenu implements Page {
     conBtn = new ConnectButton(r.getWidth() / 2 - btnWidth / 2,
         vOffset + (r.getHeight() / vPad) * 3, btnWidth, height);
     setBtn = new SettingButton(r.getWidth() / 2 - btnWidth / 2,
-            vOffset + (r.getHeight() / vPad) * 4, btnWidth, height);
+        vOffset + (r.getHeight() / vPad) * 4, btnWidth, height);
     credsBtn = new CreditsButton(r.getWidth() / 2 - btnWidth / 2,
-            vOffset + (r.getHeight() / vPad) * 5, btnWidth, height);
+        vOffset + (r.getHeight() / vPad) * 5, btnWidth, height);
     exBtn = new ExitButton(r.getWidth() / 2 - btnWidth / 2, vOffset + (r.getHeight() / vPad) * 6,
         btnWidth, height);
-    
+
 
     // Make the logo
     logo = new InteractiveLogo(r.getWidth() / 2, 100);

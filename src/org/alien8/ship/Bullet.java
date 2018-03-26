@@ -1,7 +1,6 @@
 package org.alien8.ship;
 
 import java.io.Serializable;
-
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
@@ -9,7 +8,6 @@ import org.alien8.physics.PhysicsManager;
 import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
-
 import net.jafama.FastMath;
 
 /**
@@ -210,20 +208,20 @@ public class Bullet extends Entity implements Serializable {
       }
     }
   }
-  
+
   @Override
   public EntityLite pack() {
-	  EntityLite el = new EntityLite();
-	  el.setSerial(this.getSerial());
-	  el.setEntityType(2);
-	  el.setPosition(this.getPosition());
-	  el.setToBeDeleted(this.toBeDeleted);
-	  el.setDirection(this.getDirection());
-	  el.setSpeed(this.getSpeed());
-	  el.setDistance(this.getDistance());
-	  el.setTravelled(this.getTravelled());
-	  el.setSource(this.getSource());
+    EntityLite el = new EntityLite();
+    el.setSerial(this.getSerial());
+    el.setEntityType(2);
+    el.setPosition(this.getPosition());
+    el.setToBeDeleted(this.toBeDeleted);
+    el.setDirection(this.getDirection());
+    el.setSpeed(this.getSpeed());
+    el.setDistance(this.getDistance());
+    el.setTravelled(this.getTravelled());
+    el.setSource(this.getSource());
 
-	  return el;
+    return el;
   }
 }

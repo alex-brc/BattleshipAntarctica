@@ -87,7 +87,8 @@ public class PerlinNoise {
     double y0 = FastMath.floor(y);
     double x1 = FastMath.ceil(x);
     double y1 = FastMath.ceil(y);
-    // These are the points coordinates as if it were in the unit square (important for calculation of
+    // These are the points coordinates as if it were in the unit square (important for calculation
+    // of
     // the distance vector)
     double unitX = x - x0;
     double unitY = y - y0;

@@ -4,27 +4,27 @@ import org.alien8.physics.Position;
 import org.alien8.ship.Ship;
 
 public class KillEvent extends GameEvent {
-	private static final long serialVersionUID = 1L;
-	
-	private Position position;
-	private int colour;
-	private double direction;
-	
-	public KillEvent(Ship ship) {
-		this.position = ship.getPosition();
-		this.colour = ship.getColour();
-		this.direction = ship.getDirection();
-	}
+  private static final long serialVersionUID = 1L;
 
-	public Position getPosition() {
-		return position;
-	}
+  private Position position;
+  private int colour;
+  private double direction;
 
-	public int getColour() {
-		return colour;
-	}
+  public KillEvent(Ship ship) {
+    this.position = ship.getPosition();
+    this.colour = ship.getColour();
+    this.direction = ship.getDirection();
+  }
 
-	public double getDirection() {
-		return direction;
-	}
+  public Position getPosition() {
+    return position;
+  }
+
+  public int getColour() {
+    return colour;
+  }
+
+  public double getDirection() {
+    return direction;
+  }
 }

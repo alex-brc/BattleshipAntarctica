@@ -49,9 +49,8 @@ public class ClientModelManager {
   }
 
   /**
-   * A standard getInstance() in accordance with the singleton pattern.
-   * Create and return a ClientModelManager instance the first time being called,
-   * only return the instance afterwards
+   * A standard getInstance() in accordance with the singleton pattern. Create and return a
+   * ClientModelManager instance the first time being called, only return the instance afterwards
    * 
    * @return a ClientModelManager instance
    */
@@ -73,6 +72,7 @@ public class ClientModelManager {
 
   /**
    * Make a map from a random seed
+   * 
    * @param seed A random long
    */
   public void makeMap(long seed) {
@@ -81,6 +81,7 @@ public class ClientModelManager {
 
   /**
    * Sync the client with the server
+   * 
    * @param entitiesLite An array-list of EntityLite
    * @param clientIP This client's IP address
    * @param clientUdpPort This client's UDP port number
@@ -262,6 +263,7 @@ public class ClientModelManager {
 
   /**
    * Get the current Entity queue
+   * 
    * @return An Entity queue
    */
   public ConcurrentLinkedQueue<Entity> getEntities() {
@@ -279,6 +281,7 @@ public class ClientModelManager {
 
   /**
    * Get this player's designated ship
+   * 
    * @return
    */
   public Ship getPlayer() {
@@ -287,6 +290,7 @@ public class ClientModelManager {
 
   /**
    * Get the map
+   * 
    * @return The map
    */
   public Map getMap() {

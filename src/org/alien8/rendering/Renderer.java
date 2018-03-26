@@ -7,9 +7,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.LinkedList;
-
 import javax.swing.JFrame;
-
 import org.alien8.client.Client;
 import org.alien8.client.ClientWindowListener;
 import org.alien8.client.InputManager;
@@ -30,7 +28,6 @@ import org.alien8.server.Timer;
 import org.alien8.ship.Bullet;
 import org.alien8.ship.Ship;
 import org.alien8.ui.Page;
-
 import net.jafama.FastMath;
 
 /**
@@ -79,12 +76,12 @@ public class Renderer extends Canvas {
     frame.setLocationRelativeTo(null);
     frame.setVisible(false);
   }
-  
+
   /**
    * Call to set the frame as visible.
    */
   public void show() {
-	  frame.setVisible(true);
+    frame.setVisible(true);
   }
 
   /**
@@ -95,13 +92,14 @@ public class Renderer extends Canvas {
       instance = new Renderer();
     return instance;
   }
-  
+
   /**
    * Add a ship wreckage to the map
+   * 
    * @param killEvent the killEvent caused by the ship dying
    */
   public void addWreck(KillEvent killEvent) {
-	  this.wrecks.add(new Wreck(killEvent));
+    this.wrecks.add(new Wreck(killEvent));
   }
 
   /**
@@ -139,8 +137,10 @@ public class Renderer extends Canvas {
     Ship player = model.getPlayer();
     Position mousePos = InputManager.getInstance().mousePosition();
 
-    if (ClientScoreBoard.getInstance().getScore(player.getSerial()).getAlive()) { // Camera fixed on player's ship
-      drawText("SPECTATOR-VIEW", width - "SPECTATOR-VIEW".length()*16, 600, true, FontColor.BLACK);
+    if (ClientScoreBoard.getInstance().getScore(player.getSerial()).getAlive()) { // Camera fixed on
+                                                                                  // player's ship
+      drawText("SPECTATOR-VIEW", width - "SPECTATOR-VIEW".length() * 16, 600, true,
+          FontColor.BLACK);
       xScroll = (int) (player.getPosition().getX() - width / 2
           + (mousePos.getX() - width) / Parameters.GAME_PARALLAX_WEIGHT);
       yScroll = (int) (player.getPosition().getY() - height / 2
@@ -156,32 +156,33 @@ public class Renderer extends Canvas {
     drawRect(0, 0, Parameters.MAP_WIDTH, Parameters.MAP_HEIGHT, 0xFFFFFF, false);
 
     // Render wreckages
-    for(Wreck wreck : wrecks) {
-    	// Draw wreck sprite
-        drawSprite((int) wreck.getPosition().getX() - wreck.getSprite().getWidth() / 2,
-            (int) wreck.getPosition().getY() - wreck.getSprite().getHeight() / 2, wreck.getSprite(), false);
-        
+    for (Wreck wreck : wrecks) {
+      // Draw wreck sprite
+      drawSprite((int) wreck.getPosition().getX() - wreck.getSprite().getWidth() / 2,
+          (int) wreck.getPosition().getY() - wreck.getSprite().getHeight() / 2, wreck.getSprite(),
+          false);
+
     }
-    
+
     // Render Entities in order
     for (Entity e : model.getEntities())
-    	if(e instanceof Pickup)
-    		e.render();
+      if (e instanceof Pickup)
+        e.render();
     for (Entity e : model.getEntities())
-    	if(e instanceof Mine)
-    		e.render();
+      if (e instanceof Mine)
+        e.render();
     for (Entity e : model.getEntities())
-    	if(e instanceof Ship)
-    		e.render();
+      if (e instanceof Ship)
+        e.render();
     for (Entity e : model.getEntities())
-    	if(e instanceof Bullet)
-    		e.render();
+      if (e instanceof Bullet)
+        e.render();
     for (Entity e : model.getEntities())
-    	if(e instanceof Torpedo)
-    		e.render();
+      if (e instanceof Torpedo)
+        e.render();
     for (Entity e : model.getEntities())
-    	if(e instanceof PlaneDropper)
-    		e.render();
+      if (e instanceof PlaneDropper)
+        e.render();
 
     /// HUD components
     // Render black frame round the edge of the screen
@@ -516,14 +517,16 @@ public class Renderer extends Canvas {
     for (int y = y0; y < y1; y++) {
       for (int x = x0; x < x1; x++) {
         if (x >= 0 && y >= 0 && x < Parameters.MAP_WIDTH && y < Parameters.MAP_HEIGHT) {
-        	if(grid[x][y] < Parameters.DEEP_WATER_LEVEL)
-          	  drawPixel(x,y,Parameters.DEEP_WATER_COLOR,false);
-            else if(Parameters.DEEP_WATER_LEVEL <= grid[x][y] && grid[x][y] < Parameters.SHALLOW_WATER_LEVEL)
-          	  drawPixel(x,y,Parameters.SHALLOW_WATER_COLOR,false);
-            else if(Parameters.SHALLOW_WATER_LEVEL <= grid[x][y] && grid[x][y] < Parameters.THIN_ICE_LEVEL)
-          	  drawPixel(x,y,Parameters.THIN_ICE_COLOR,false);
-            else if(Parameters.THIN_ICE_LEVEL <= grid[x][y])
-          	  drawPixel(x,y,Parameters.THICK_ICE_COLOR,false);
+          if (grid[x][y] < Parameters.DEEP_WATER_LEVEL)
+            drawPixel(x, y, Parameters.DEEP_WATER_COLOR, false);
+          else if (Parameters.DEEP_WATER_LEVEL <= grid[x][y]
+              && grid[x][y] < Parameters.SHALLOW_WATER_LEVEL)
+            drawPixel(x, y, Parameters.SHALLOW_WATER_COLOR, false);
+          else if (Parameters.SHALLOW_WATER_LEVEL <= grid[x][y]
+              && grid[x][y] < Parameters.THIN_ICE_LEVEL)
+            drawPixel(x, y, Parameters.THIN_ICE_COLOR, false);
+          else if (Parameters.THIN_ICE_LEVEL <= grid[x][y])
+            drawPixel(x, y, Parameters.THICK_ICE_COLOR, false);
         }
       }
     }
@@ -638,7 +641,7 @@ public class Renderer extends Canvas {
       }
     }
   }
-  
+
   /** SECRETZ */
   public boolean easterEgg = false;
 }

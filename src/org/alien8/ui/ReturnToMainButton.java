@@ -28,10 +28,10 @@ public class ReturnToMainButton extends Button {
   public void executeAction() {
     Client.getInstance().setState(State.MAIN_MENU);
     try {
-    if(Server.getInstance().gameRunning())
-    	Server.getInstance().stop();
-    } catch(NullPointerException e) {
-    	// There is no server, that's fine
+      if (Server.getInstance().gameRunning())
+        Server.getInstance().stop();
+    } catch (NullPointerException e) {
+      // There is no server, that's fine
     }
   }
 

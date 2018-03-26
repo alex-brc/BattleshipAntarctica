@@ -21,10 +21,10 @@ public class HealthItem extends Item {
   @Override
   public void use() {
     if (ship != null) {
-    	if (ship.getHealth() > Parameters.SHIP_HEALTH - Parameters.ITEM_HEALTH_ITEM_VALUE)
-    		ship.setHealth(Parameters.SHIP_HEALTH);
-    	else
-    		ship.setHealth(ship.getHealth() + Parameters.ITEM_HEALTH_ITEM_VALUE);
-    	}
+      if (ship.getHealth() > Parameters.SHIP_HEALTH - Parameters.ITEM_HEALTH_ITEM_VALUE)
+        ship.setHealth(Parameters.SHIP_HEALTH);
+      else
+        ship.setHealth(ship.getHealth() + Parameters.ITEM_HEALTH_ITEM_VALUE);
     }
+  }
 }

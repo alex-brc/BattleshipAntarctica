@@ -44,8 +44,8 @@ public class Font {
     for (int i = 0; i < text.length(); i++) {
       char currentChar = text.charAt(i);
       int index = charIndex.indexOf(currentChar);
-      if(index == -1)
-    	  return;
+      if (index == -1)
+        return;
       switch (color) {
         case BLACK:
           r.drawSprite(x + i * 16, y, charactersBlack[index], fixed);

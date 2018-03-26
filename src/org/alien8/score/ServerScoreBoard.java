@@ -92,13 +92,13 @@ public class ServerScoreBoard {
    * @param score the amount of points to award
    */
   public void giveScore(Player player, int score) {
-	  for (Score sc : scores)
-		  if (player.getShip().getSerial() == sc.getShipSerial()) {
-			  sc.giveScore(score);
-			  Server.getInstance().addEvent(sc.exportToEvent());
-			  order();
-			  return;
-		  }
+    for (Score sc : scores)
+      if (player.getShip().getSerial() == sc.getShipSerial()) {
+        sc.giveScore(score);
+        Server.getInstance().addEvent(sc.exportToEvent());
+        order();
+        return;
+      }
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
         "In giveHit(): given player not found on the scoreboard.");
   }
@@ -127,14 +127,14 @@ public class ServerScoreBoard {
    * @param bullet the Bullet which hit another Ship
    */
   public void giveHit(Player player, Bullet bullet) {
-      for (Score score : scores)
-        if (player.getShip().getSerial() == score.getShipSerial()) {
-          score.giveHit(bullet);
-          Server.getInstance().addEvent(score.exportToEvent());
-          order();
-          return;
-        }
-    
+    for (Score score : scores)
+      if (player.getShip().getSerial() == score.getShipSerial()) {
+        score.giveHit(bullet);
+        Server.getInstance().addEvent(score.exportToEvent());
+        order();
+        return;
+      }
+
     LogManager.getInstance().log("ScoreBoard", LogManager.Scope.ERROR,
         "In giveHit(): given player not found on the scoreboard.");
   }

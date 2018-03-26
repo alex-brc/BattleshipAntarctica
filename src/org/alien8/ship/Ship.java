@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
-
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
@@ -18,7 +17,6 @@ import org.alien8.rendering.Sprite;
 import org.alien8.server.KillEvent;
 import org.alien8.server.Player;
 import org.alien8.server.Server;
-
 import net.jafama.FastMath;
 
 /**
@@ -55,11 +53,8 @@ public class Ship extends Entity implements Serializable {
     rearTurret = new Turret(position, this.getSerial());
 
     // Chosen to look relatively good
-    flameSpots = new double[]{
-    		0.1,
-    		-0.2,
-    		0.17};
-    
+    flameSpots = new double[] {0.1, -0.2, 0.17};
+
     setTurretsPosition();
     setTurretsDirection(new Position(0, 0));
   }
@@ -99,12 +94,12 @@ public class Ship extends Entity implements Serializable {
    * @param damage the amount of damage to inflict on the ship
    */
   public void damage(double damage) {
-	  if(this.underEffect() && this.getEffectType() == Effect.INVULNERABLE)
-		  return;
-	  
-	  this.setHealth(this.getHealth() - damage);
+    if (this.underEffect() && this.getEffectType() == Effect.INVULNERABLE)
+      return;
+
+    this.setHealth(this.getHealth() - damage);
   }
-  
+
   /**
    * @return the front Turret of this Ship
    */
@@ -193,7 +188,7 @@ public class Ship extends Entity implements Serializable {
     rearTurret.setPosition(this.getPosition()
         .addPosition(new Position(FastMath.floor((-r) * FastMath.cos(this.getDirection())),
             FastMath.floor((-r) * FastMath.sin(this.getDirection())))));
-    
+
   }
 
   /**
@@ -243,9 +238,9 @@ public class Ship extends Entity implements Serializable {
   public void setTurretsDirectionAI(Position targetPosition) {
     // Had to make this to allow the AI ships to aim at positions
     double ra = 0;
-    
+
     Random rand = new Random();
-    
+
     // Front
     double angle = frontTurret.getPosition().getAngleTo(targetPosition);
     angle += rand.nextDouble() * Parameters.AI_PRECISION - Parameters.AI_PRECISION / 2;
@@ -443,50 +438,45 @@ public class Ship extends Entity implements Serializable {
 
     // Render ship sprite
     Sprite currentSprite = null;
-    if(!Renderer.getInstance().easterEgg) {
-    	currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
-    }
-    else {
-    	currentSprite = Sprite.ship_green.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    if (!Renderer.getInstance().easterEgg) {
+      currentSprite = sprite.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    } else {
+      currentSprite = Sprite.ship_green.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
     }
     r.drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
-			(int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
-    
+        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+
     // Render turrets
     frontTurret.render();
     rearTurret.render();
 
     // Display health
-    r.drawRect((int) (position.getX() - Parameters.HEALTH_BAR_WIDTH/2), 
-    		(int) (position.getY() + Parameters.SHIP_WIDTH/2 + 5), 
-    		Parameters.HEALTH_BAR_WIDTH, Parameters.HEALTH_BAR_HEIGHT,
-    		0x000000, false);
-    r.drawFilledRect((int) position.getX() - Parameters.HEALTH_BAR_WIDTH/2 + 1, 
-    		(int) (position.getY() + Parameters.SHIP_WIDTH/2 + 5) + 1, 
-    		(int) ((Parameters.HEALTH_BAR_WIDTH - 1) * this.getHealth() / Parameters.SHIP_HEALTH), 
-    		Parameters.HEALTH_BAR_HEIGHT - 1,
-    		getHealthColor(this.getHealth()), 
-    		false);
-    
+    r.drawRect((int) (position.getX() - Parameters.HEALTH_BAR_WIDTH / 2),
+        (int) (position.getY() + Parameters.SHIP_WIDTH / 2 + 5), Parameters.HEALTH_BAR_WIDTH,
+        Parameters.HEALTH_BAR_HEIGHT, 0x000000, false);
+    r.drawFilledRect((int) position.getX() - Parameters.HEALTH_BAR_WIDTH / 2 + 1,
+        (int) (position.getY() + Parameters.SHIP_WIDTH / 2 + 5) + 1,
+        (int) ((Parameters.HEALTH_BAR_WIDTH - 1) * this.getHealth() / Parameters.SHIP_HEALTH),
+        Parameters.HEALTH_BAR_HEIGHT - 1, getHealthColor(this.getHealth()), false);
+
     // Draw damage level
     int damageLevel = this.getDamageLevel(this.getHealth());
     double p = 0;
-    Position pos = new Position(0,0);
-    for(int i = 0; i < damageLevel; i++) {
+    Position pos = new Position(0, 0);
+    for (int i = 0; i < damageLevel; i++) {
       p = 2 * Parameters.SHIP_LENGTH * flameSpots[i];
       pos = this.getPosition()
-              .addPosition(new Position(FastMath.floor(p * FastMath.cos(this.getDirection())),
-                      FastMath.floor(p * FastMath.sin(this.getDirection()))));
-  	  Renderer.getInstance().drawSprite(
-  			  (int) pos.getX() - Sprite.fires[i].getWidth() + 3,
-  			  (int) pos.getY() - Sprite.fires[i].getHeight() + 3,
-  			  Sprite.fires[i], false);
+          .addPosition(new Position(FastMath.floor(p * FastMath.cos(this.getDirection())),
+              FastMath.floor(p * FastMath.sin(this.getDirection()))));
+      Renderer.getInstance().drawSprite((int) pos.getX() - Sprite.fires[i].getWidth() + 3,
+          (int) pos.getY() - Sprite.fires[i].getHeight() + 3, Sprite.fires[i], false);
     }
-    
-    /* frontTurret.setPosition(this.getPosition()
-            .addPosition(new Position(FastMath.floor(r * FastMath.cos(this.getDirection())),
-                FastMath.floor(r * FastMath.sin(this.getDirection()))))); */
-    
+
+    /*
+     * frontTurret.setPosition(this.getPosition() .addPosition(new Position(FastMath.floor(r *
+     * FastMath.cos(this.getDirection())), FastMath.floor(r * FastMath.sin(this.getDirection())))));
+     */
+
     // Draw effects
     if (effect != null) {
       Sprite sp = null;
@@ -508,7 +498,7 @@ public class Ship extends Entity implements Serializable {
           (int) this.getPosition().getY() - sp.getHeight() / 2, sp, false);
     }
   }
-  
+
   /**
    * Determines how many flame sprites to draw on the ship
    * 
@@ -516,16 +506,16 @@ public class Ship extends Entity implements Serializable {
    * @return the number of flame sprites to draw on the ship
    */
   private int getDamageLevel(double health) {
-	  if(health <= 20)
-		  return 3;
-	  else if(health <= 60)
-		  return 2;
-	  else if(health <= 80)
-		  return 1;
-	  else 
-		  return 0;
+    if (health <= 20)
+      return 3;
+    else if (health <= 60)
+      return 2;
+    else if (health <= 80)
+      return 1;
+    else
+      return 0;
   }
-  
+
   /**
    * Determines the colour of the health bar
    * 
@@ -533,22 +523,20 @@ public class Ship extends Entity implements Serializable {
    * @return a hex color value for the ship health bar
    */
   private int getHealthColor(double health) {
-	  if(health <= 20)
-		  return 0xFF0000;
-	  else if(health <= 60)
-		  return 0xFFA500;
-	  else 
-		  return 0x00C000;
+    if (health <= 20)
+      return 0xFF0000;
+    else if (health <= 60)
+      return 0xFFA500;
+    else
+      return 0x00C000;
   }
-  
+
   /**
-   * Kills this ship. 
-   * First will show it being destroyed then
-   * it will call delete() on itself.
+   * Kills this ship. First will show it being destroyed then it will call delete() on itself.
    */
   public void kill() {
-	Server.getInstance().addEvent(new KillEvent(this));
-	this.delete();
+    Server.getInstance().addEvent(new KillEvent(this));
+    this.delete();
   }
 
   /**
@@ -668,44 +656,43 @@ public class Ship extends Entity implements Serializable {
       }
     }
   }
-  
+
   @Override
   public EntityLite pack() {
-	  EntityLite el = new EntityLite();
-	  Player p = Server.getInstance().getPlayerByShip(this);
-	  if(p != null) {
-		  el.setSerial(this.serial);
-		  el.setEntityType(0);
-		  el.setPosition(this.getPosition());
-		  el.setToBeDeleted(this.toBeDeleted);
-		  el.setDirection(this.getDirection());
-		  el.setSpeed(this.getSpeed());
-		  el.setHealth(this.getHealth());
-		  el.setFrontTurretDirection(this.getFrontTurretDirection());
-		  el.setRearTurretDirection(this.getRearTurretDirection());
-		  el.setFrontTurretCharge(this.getFrontTurretCharge());
-		  el.setRearTurretCharge(this.getRearTurretCharge());
-		  el.setColour(this.getColour());
-		  el.setItemType(this.getItemType());
-		  el.setEffectType(this.getEffectType());
-		  el.setClientIP(p.getIP());
-		  el.setClientUdpPort(p.getPort());
-	  }
-	  else {
-		  el.setSerial(this.serial);
-		  el.setEntityType(1);
-		  el.setPosition(this.getPosition());
-		  el.setToBeDeleted(this.toBeDeleted);
-		  el.setDirection(this.getDirection());
-		  el.setSpeed(this.getSpeed());
-		  el.setHealth(this.getHealth());
-		  el.setFrontTurretDirection(this.getFrontTurretDirection());
-		  el.setRearTurretDirection(this.getRearTurretDirection());
-		  el.setColour(this.getColour());
-		  el.setEffectType(this.getEffectType());
-	  }
-	  
-	  return el;
+    EntityLite el = new EntityLite();
+    Player p = Server.getInstance().getPlayerByShip(this);
+    if (p != null) {
+      el.setSerial(this.serial);
+      el.setEntityType(0);
+      el.setPosition(this.getPosition());
+      el.setToBeDeleted(this.toBeDeleted);
+      el.setDirection(this.getDirection());
+      el.setSpeed(this.getSpeed());
+      el.setHealth(this.getHealth());
+      el.setFrontTurretDirection(this.getFrontTurretDirection());
+      el.setRearTurretDirection(this.getRearTurretDirection());
+      el.setFrontTurretCharge(this.getFrontTurretCharge());
+      el.setRearTurretCharge(this.getRearTurretCharge());
+      el.setColour(this.getColour());
+      el.setItemType(this.getItemType());
+      el.setEffectType(this.getEffectType());
+      el.setClientIP(p.getIP());
+      el.setClientUdpPort(p.getPort());
+    } else {
+      el.setSerial(this.serial);
+      el.setEntityType(1);
+      el.setPosition(this.getPosition());
+      el.setToBeDeleted(this.toBeDeleted);
+      el.setDirection(this.getDirection());
+      el.setSpeed(this.getSpeed());
+      el.setHealth(this.getHealth());
+      el.setFrontTurretDirection(this.getFrontTurretDirection());
+      el.setRearTurretDirection(this.getRearTurretDirection());
+      el.setColour(this.getColour());
+      el.setEffectType(this.getEffectType());
+    }
+
+    return el;
   }
 
   /**

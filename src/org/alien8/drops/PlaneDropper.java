@@ -1,7 +1,6 @@
 package org.alien8.drops;
 
 import java.util.Random;
-
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
 import org.alien8.core.Parameters;
@@ -10,7 +9,6 @@ import org.alien8.physics.Position;
 import org.alien8.rendering.Renderer;
 import org.alien8.rendering.Sprite;
 import org.alien8.server.Server;
-
 import net.jafama.FastMath;
 
 /**
@@ -62,16 +60,15 @@ public class PlaneDropper extends Entity {
 
   @Override
   public void render() {
-	Sprite currentSprite = null;
-    if(!Renderer.getInstance().easterEgg) {
-    	currentSprite = Sprite.plane.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
-    }
-    else {
-    	currentSprite = Sprite.saucer;
+    Sprite currentSprite = null;
+    if (!Renderer.getInstance().easterEgg) {
+      currentSprite = Sprite.plane.rotateSprite(-(this.getDirection() - FastMath.PI / 2));
+    } else {
+      currentSprite = Sprite.saucer;
     }
     Renderer.getInstance().drawSprite((int) position.getX() - currentSprite.getWidth() / 2,
-			(int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
-    
+        (int) position.getY() - currentSprite.getHeight() / 2, currentSprite, false);
+
   }
 
   @Override
@@ -85,14 +82,14 @@ public class PlaneDropper extends Entity {
   public void dealWithInIce(boolean[][] iceGrid) {
     // Nothing, it's flying
   }
-  
+
   /**
    * @return the position where the packet will be dropped
    */
   public Position getPacketPosition() {
-	  return this.packetPosition;
+    return this.packetPosition;
   }
-  
+
   /**
    * Drops a random Pickup.
    */
@@ -128,14 +125,14 @@ public class PlaneDropper extends Entity {
   private Position getMiddleOfMap() {
     return new Position(Parameters.MAP_WIDTH / 2, Parameters.MAP_HEIGHT / 2);
   }
-  
+
   @Override
   public EntityLite pack() {
-	  EntityLite el = new EntityLite();
-	  el.setPosition(this.getPosition());
-	  el.setEntityType(4);
-	  el.setDirection(this.getDirection());
-	  
-	  return el;
+    EntityLite el = new EntityLite();
+    el.setPosition(this.getPosition());
+    el.setEntityType(4);
+    el.setDirection(this.getDirection());
+
+    return el;
   }
 }

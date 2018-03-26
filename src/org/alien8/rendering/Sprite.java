@@ -43,14 +43,15 @@ public class Sprite implements Serializable {
   public static Sprite logo = new Sprite("/org/alien8/assets/logo.png");
   public static Sprite controls = new Sprite("/org/alien8/assets/controls.png");
   public static Sprite effect_speed = new Sprite("/org/alien8/assets/effect_speed.png");
-  public static Sprite effect_invulnerable = new Sprite("/org/alien8/assets/effect_invulnerable.png");
+  public static Sprite effect_invulnerable =
+      new Sprite("/org/alien8/assets/effect_invulnerable.png");
   public static Sprite crosshair = new Sprite("/org/alien8/assets/crosshair.png");
   public static Sprite torpedo = new Sprite("/org/alien8/assets/torpedo.png");
   public static Sprite fire1 = new Sprite("/org/alien8/assets/fire1.png");
   public static Sprite fire2 = new Sprite("/org/alien8/assets/fire2.png");
   public static Sprite fire3 = new Sprite("/org/alien8/assets/fire3.png");
   public static Sprite[] fires = new Sprite[] {fire1, fire2, fire3};
-  
+
   /**
    * Constructor.
    * 
@@ -81,7 +82,7 @@ public class Sprite implements Serializable {
   public Sprite(Sprite s) {
     width = s.getWidth();
     height = s.getHeight();
-    pixels = new int[width*height];
+    pixels = new int[width * height];
     System.arraycopy(s.getPixels(), 0, pixels, 0, s.getPixels().length);
   }
 
@@ -169,99 +170,97 @@ public class Sprite implements Serializable {
           s.getPixels()[(int) nx + (int) ny * s.getWidth()] = pixels[x + y * width];
       }
     }
-    for (int y = 0; y < s.getHeight(); y++){
-    	for (int x = 0; x < s.getWidth(); x++){
-    		if (s.getPixels()[x + y * s.getWidth()] == 0xffff00ff){
-    			/*
-    			 * 1 4 6
-    			 * 2 x 7
-    			 * 3 5 8
-    			 */
-    			int count = 0;
-    			int totalR = 0;
-    			int totalG = 0;
-    			int totalB = 0;
-        		if (x > 0){
-        			if (y > 0){
-        				int hex1 = s.getPixels()[(x-1) + (y-1) * s.getWidth()] % 0xff000000;
-        				if (hex1 != 0xff00ff){
-        					count++;
-        					totalR += (hex1 & 0xff0000) >> 16;
-        					totalG += (hex1 & 0xff00) >> 8;
-    						totalB += (hex1 & 0xff);
-        				}
-        			}
-        			int hex2 = s.getPixels()[(x-1) + y * s.getWidth()] % 0xff000000;
-        			if (hex2 != 0xffff00ff){
-        				count++;
-        				totalR += (hex2 & 0xff0000) >> 16;
-    					totalG += (hex2 & 0xff00) >> 8;
-						totalB += (hex2 & 0xff);
-        			}
-        			if (y < s.getHeight() -1){
-        				int hex3 = s.getPixels()[(x-1) + (y+1) * s.getWidth()] % 0xff000000;
-        				if (hex3 != 0xffff00ff){
-        					count++;
-        					totalR += (hex3 & 0xff0000) >> 16;
-        					totalG += (hex3 & 0xff00) >> 8;
-    						totalB += (hex3 & 0xff);
-        				}
-        			}
-        		}
-        		if (y > 0){
-        			int hex4 = s.getPixels()[x + (y-1) * s.getWidth()] % 0xff000000;
-        			if (hex4 != 0xffff00ff){
-    					count++;
-    					totalR += (hex4 & 0xff0000) >> 16;
-    					totalG += (hex4 & 0xff00) >> 8;
-						totalB += (hex4 & 0xff);
-    				}
-        		}
-        		if (y < s.getHeight() -1){
-        			int hex5 = s.getPixels()[x + (y+1) * s.getWidth()] % 0xff000000;
-        			if (hex5 != 0xffff00ff){
-    					count++;
-    					totalR += (hex5 & 0xff0000) >> 16;
-    					totalG += (hex5 & 0xff00) >> 8;
-						totalB += (hex5 & 0xff);
-    				}
-        		}
-        		if (x < s.getWidth() -1){
-        			if (y > 0){
-        				int hex6 = s.getPixels()[(x+1) + (y-1) * s.getWidth()] % 0xff000000;
-        				if (hex6 != 0xff00ff){
-        					count++;
-        					totalR += (hex6 & 0xff0000) >> 16;
-        					totalG += (hex6 & 0xff00) >> 8;
-    						totalB += (hex6 & 0xff);
-        				}
-        			}
-        			int hex7 = s.getPixels()[(x+1) + y * s.getWidth()] % 0xff000000;
-    				if (hex7 != 0xff00ff){
-    					count++;
-    					totalR += (hex7 & 0xff0000) >> 16;
-    					totalG += (hex7 & 0xff00) >> 8;
-						totalB += (hex7 & 0xff);
-    				}
-    				if (y < s.getHeight() -1){
-        				int hex8 = s.getPixels()[(x+1) + (y+1) * s.getWidth()] % 0xff000000;
-        				if (hex8 != 0xff00ff){
-        					count++;
-        					totalR += (hex8 & 0xff0000) >> 16;
-        					totalG += (hex8 & 0xff00) >> 8;
-    						totalB += (hex8 & 0xff);
-        				}
-        			}
-        		}
-        		if (count > 6){
-        			int r = totalR / count;
-        			int g = totalG / count;
-        			int b = totalB / count;
-        			int hex = 0xff000000 + (r * 0x10000) + (g * 0x100) + b;
-        			s.getPixels()[x + y * s.getWidth()] = hex;
-        		}
-    		}
-    	}
+    for (int y = 0; y < s.getHeight(); y++) {
+      for (int x = 0; x < s.getWidth(); x++) {
+        if (s.getPixels()[x + y * s.getWidth()] == 0xffff00ff) {
+          /*
+           * 1 4 6 2 x 7 3 5 8
+           */
+          int count = 0;
+          int totalR = 0;
+          int totalG = 0;
+          int totalB = 0;
+          if (x > 0) {
+            if (y > 0) {
+              int hex1 = s.getPixels()[(x - 1) + (y - 1) * s.getWidth()] % 0xff000000;
+              if (hex1 != 0xff00ff) {
+                count++;
+                totalR += (hex1 & 0xff0000) >> 16;
+                totalG += (hex1 & 0xff00) >> 8;
+                totalB += (hex1 & 0xff);
+              }
+            }
+            int hex2 = s.getPixels()[(x - 1) + y * s.getWidth()] % 0xff000000;
+            if (hex2 != 0xffff00ff) {
+              count++;
+              totalR += (hex2 & 0xff0000) >> 16;
+              totalG += (hex2 & 0xff00) >> 8;
+              totalB += (hex2 & 0xff);
+            }
+            if (y < s.getHeight() - 1) {
+              int hex3 = s.getPixels()[(x - 1) + (y + 1) * s.getWidth()] % 0xff000000;
+              if (hex3 != 0xffff00ff) {
+                count++;
+                totalR += (hex3 & 0xff0000) >> 16;
+                totalG += (hex3 & 0xff00) >> 8;
+                totalB += (hex3 & 0xff);
+              }
+            }
+          }
+          if (y > 0) {
+            int hex4 = s.getPixels()[x + (y - 1) * s.getWidth()] % 0xff000000;
+            if (hex4 != 0xffff00ff) {
+              count++;
+              totalR += (hex4 & 0xff0000) >> 16;
+              totalG += (hex4 & 0xff00) >> 8;
+              totalB += (hex4 & 0xff);
+            }
+          }
+          if (y < s.getHeight() - 1) {
+            int hex5 = s.getPixels()[x + (y + 1) * s.getWidth()] % 0xff000000;
+            if (hex5 != 0xffff00ff) {
+              count++;
+              totalR += (hex5 & 0xff0000) >> 16;
+              totalG += (hex5 & 0xff00) >> 8;
+              totalB += (hex5 & 0xff);
+            }
+          }
+          if (x < s.getWidth() - 1) {
+            if (y > 0) {
+              int hex6 = s.getPixels()[(x + 1) + (y - 1) * s.getWidth()] % 0xff000000;
+              if (hex6 != 0xff00ff) {
+                count++;
+                totalR += (hex6 & 0xff0000) >> 16;
+                totalG += (hex6 & 0xff00) >> 8;
+                totalB += (hex6 & 0xff);
+              }
+            }
+            int hex7 = s.getPixels()[(x + 1) + y * s.getWidth()] % 0xff000000;
+            if (hex7 != 0xff00ff) {
+              count++;
+              totalR += (hex7 & 0xff0000) >> 16;
+              totalG += (hex7 & 0xff00) >> 8;
+              totalB += (hex7 & 0xff);
+            }
+            if (y < s.getHeight() - 1) {
+              int hex8 = s.getPixels()[(x + 1) + (y + 1) * s.getWidth()] % 0xff000000;
+              if (hex8 != 0xff00ff) {
+                count++;
+                totalR += (hex8 & 0xff0000) >> 16;
+                totalG += (hex8 & 0xff00) >> 8;
+                totalB += (hex8 & 0xff);
+              }
+            }
+          }
+          if (count > 6) {
+            int r = totalR / count;
+            int g = totalG / count;
+            int b = totalB / count;
+            int hex = 0xff000000 + (r * 0x10000) + (g * 0x100) + b;
+            s.getPixels()[x + y * s.getWidth()] = hex;
+          }
+        }
+      }
     }
 
     return s;
@@ -304,35 +303,34 @@ public class Sprite implements Serializable {
    */
   public static Sprite makeShipSprite(int colour) {
     Sprite newSprite = new Sprite(Sprite.ship_green);
-    for (int i = 0; i < newSprite.getPixels().length; i++){
-    	if (newSprite.getPixels()[i] == 0xff00b800){
-    		newSprite.getPixels()[i] = colour;
-    	}
+    for (int i = 0; i < newSprite.getPixels().length; i++) {
+      if (newSprite.getPixels()[i] == 0xff00b800) {
+        newSprite.getPixels()[i] = colour;
+      }
     }
     return newSprite;
   }
 
   /**
-   * Combines the two sprites to make a new one.
-   * The first sprite is on the bottom, the second one on top.
-   * The two sprites must be the same size.
+   * Combines the two sprites to make a new one. The first sprite is on the bottom, the second one
+   * on top. The two sprites must be the same size.
    * 
    * @param sprite1 the original sprite
    * @param sprite2 the sprite to paste on top of
    * @return the new sprite if the sizes match, null otherwise
    */
   public static Sprite pasteSprites(Sprite sprite1, Sprite sprite2) {
-	if(sprite1.getWidth() != sprite2.getWidth() || sprite2.getHeight() != sprite2.getHeight())
-		return null;
-	
-	Sprite newSprite = new Sprite(sprite1.getWidth(), sprite1.getHeight());
-	newSprite.pixels = sprite1.pixels;
-	
-	for(int i = 0; i < newSprite.pixels.length; i++)
-		if(sprite2.pixels[i] != 0xffff00ff)
-			newSprite.pixels[i] = sprite2.pixels[i];
-			
-	return newSprite;
-	
+    if (sprite1.getWidth() != sprite2.getWidth() || sprite2.getHeight() != sprite2.getHeight())
+      return null;
+
+    Sprite newSprite = new Sprite(sprite1.getWidth(), sprite1.getHeight());
+    newSprite.pixels = sprite1.pixels;
+
+    for (int i = 0; i < newSprite.pixels.length; i++)
+      if (sprite2.pixels[i] != 0xffff00ff)
+        newSprite.pixels[i] = sprite2.pixels[i];
+
+    return newSprite;
+
   }
 }

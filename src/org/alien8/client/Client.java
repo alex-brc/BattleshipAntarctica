@@ -16,7 +16,6 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import org.alien8.audio.AudioEvent;
 import org.alien8.audio.AudioManager;
 import org.alien8.core.ClientMessage;
@@ -92,9 +91,8 @@ public class Client implements Runnable {
   }
 
   /**
-   * A standard getInstance() in accordance with the singleton pattern.
-   * Create and return a Client instance the first time being called,
-   * only return the instance afterwards
+   * A standard getInstance() in accordance with the singleton pattern. Create and return a Client
+   * instance the first time being called, only return the instance afterwards
    * 
    * @return A Client instance
    */
@@ -278,7 +276,7 @@ public class Client implements Runnable {
       } else if (event instanceof TimerEvent) {
         timer = new Timer((TimerEvent) event);
       } else if (event instanceof KillEvent) {
-    	Renderer.getInstance().addWreck((KillEvent) event);
+        Renderer.getInstance().addWreck((KillEvent) event);
       }
     }
   }
@@ -316,7 +314,7 @@ public class Client implements Runnable {
       try {
         clientIP = InetAddress.getLocalHost();
         serverIP = InetAddress.getByName(serverIPStr);
-        
+
         tcpSocket = new Socket(serverIP, Parameters.SERVER_PORT);
         tcpSocket.setSoTimeout(2000);
         udpSocket = new DatagramSocket();
@@ -507,9 +505,10 @@ public class Client implements Runnable {
   public boolean isWaitingToExit() {
     return waitingToExit;
   }
-  
+
   /**
    * Set the time remaining before exiting the match
+   * 
    * @param t The time remaining before exiting the match
    */
   public void setTimeBeforeExiting(int t) {
@@ -518,6 +517,7 @@ public class Client implements Runnable {
 
   /**
    * Get the time remaining before exiting the match
+   * 
    * @param t The time remaining before exiting the match
    */
   public int getTimeBeforeExiting() {

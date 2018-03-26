@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.alien8.core.ClientMessage;
 import org.alien8.core.Entity;
 import org.alien8.core.EntityLite;
@@ -179,10 +178,10 @@ public class ClientHandler extends Thread {
   private ArrayList<EntityLite> calculateEntitiesLite(ConcurrentLinkedQueue<Entity> ents) {
     ArrayList<EntityLite> EntitiesLite = new ArrayList<EntityLite>();
 
-    for(Entity e : ents){
-    	EntitiesLite.add(e.pack());
+    for (Entity e : ents) {
+      EntitiesLite.add(e.pack());
     }
-    
+
     return EntitiesLite;
   }
 

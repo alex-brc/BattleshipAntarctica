@@ -43,31 +43,30 @@ public class Mine extends Entity {
   }
 
   /**
-   * This object would never be out of bounds, as it is
-   * created at some player's position
+   * This object would never be out of bounds, as it is created at some player's position
    */
   @Override
   public void dealWithOutOfBounds() {
     // Will never be
   }
+
   /**
-   * This object would never be in ice, as it is
-   * created at some player's position
+   * This object would never be in ice, as it is created at some player's position
    */
   @Override
   public void dealWithInIce(boolean[][] iceGrid) {
     // Will never be
   }
-  
+
   @Override
   public EntityLite pack() {
-	  EntityLite el = new EntityLite();
-	  el.setEntityType(5);
-	  el.setPosition(this.getPosition());
-	  el.setToBeDeleted(this.isToBeDeleted());
-	  el.setDirection(this.getDirection());
-	  
-	  return el;
+    EntityLite el = new EntityLite();
+    el.setEntityType(5);
+    el.setPosition(this.getPosition());
+    el.setToBeDeleted(this.isToBeDeleted());
+    el.setDirection(this.getDirection());
+
+    return el;
   }
 
 }

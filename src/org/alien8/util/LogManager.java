@@ -208,11 +208,11 @@ public class LogManager {
       System.out.println("ERROR: Logging the message failed. Exception: " + e.toString());
     }
   }
-  
-  /** 
+
+  /**
    * @return the filepath of the current log file as <code> String </code>
    */
   public static String getFilePath() {
-	  return filePath;
+    return filePath;
   }
 }
